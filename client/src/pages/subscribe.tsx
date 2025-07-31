@@ -103,7 +103,7 @@ const PlanSelection = ({ onSelectPlan }: { onSelectPlan: (plan: string) => void 
     {
       id: 'parent-premium',
       name: 'Parent Premium',
-      price: 39,
+      price: 49,
       description: 'Enhanced support for complex cases',
       popular: true,
       features: [
@@ -118,7 +118,7 @@ const PlanSelection = ({ onSelectPlan }: { onSelectPlan: (plan: string) => void 
     {
       id: 'parent-pro',
       name: 'Parent Pro',
-      price: 59,
+      price: 29,
       description: 'Comprehensive parent advocacy package',
       popular: false,
       features: [
@@ -136,7 +136,7 @@ const PlanSelection = ({ onSelectPlan }: { onSelectPlan: (plan: string) => void 
     {
       id: 'advocate-standard',
       name: 'Advocate Standard',
-      price: 75,
+      price: 49,
       description: 'Professional advocacy services',
       popular: false,
       features: [
@@ -151,7 +151,7 @@ const PlanSelection = ({ onSelectPlan }: { onSelectPlan: (plan: string) => void 
     {
       id: 'advocate-premium',
       name: 'Advocate Premium',
-      price: 125,
+      price: 75,
       description: 'Full-service advocacy practice support',
       popular: true,
       features: [
@@ -166,7 +166,7 @@ const PlanSelection = ({ onSelectPlan }: { onSelectPlan: (plan: string) => void 
     {
       id: 'advocate-enterprise',
       name: 'Advocate Enterprise',
-      price: 199,
+      price: 99,
       description: 'Enterprise-level advocacy solutions',
       popular: false,
       features: [

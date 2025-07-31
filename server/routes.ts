@@ -126,14 +126,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         customerId = customer.id;
       }
 
-      // Set price based on plan
+      // Set price based on plan - using actual price IDs from your CSV
       const priceMapping = {
-        'parent-basic': process.env.STRIPE_PARENT_BASIC_PRICE_ID || 'price_parent_basic',
-        'parent-premium': process.env.STRIPE_PARENT_PREMIUM_PRICE_ID || 'price_parent_premium',
-        'parent-pro': process.env.STRIPE_PARENT_PRO_PRICE_ID || 'price_parent_pro',
-        'advocate-standard': process.env.STRIPE_ADVOCATE_STANDARD_PRICE_ID || 'price_advocate_standard',
-        'advocate-premium': process.env.STRIPE_ADVOCATE_PREMIUM_PRICE_ID || 'price_advocate_premium',
-        'advocate-enterprise': process.env.STRIPE_ADVOCATE_ENTERPRISE_PRICE_ID || 'price_advocate_enterprise',
+        'parent-basic': 'price_1Rr3bk8iKZXV0srZ0URHZo4O',      // Parent Basic $19/month
+        'parent-premium': 'price_1Rr3e68iKZXV0srZnPPK5J3R',    // Parent Premium $49/month
+        'parent-pro': 'price_1Rr3co8iKZXV0srZA1kEdBW1',        // Parent Plus $29/month (mapped to pro)
+        'advocate-standard': 'price_1Rr3gL8iKZXV0srZmfuD32yv',  // Advocate Starter $49/month
+        'advocate-premium': 'price_1Rr3hR8iKZXV0srZ5lPscs0p',   // Advocate Pro $75/month  
+        'advocate-enterprise': 'price_1Rr3ik8iKZXV0srZPRPByMQx', // Advocate Agency $99/month
       };
       const priceId = priceMapping[plan as keyof typeof priceMapping];
 
