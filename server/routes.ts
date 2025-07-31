@@ -1,5 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import path from "path";
 import Stripe from "stripe";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
@@ -18,6 +19,48 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
   await setupAuth(app);
+
+  // Serve subscribe.html
+  app.get('/subscribe.html', (req, res) => {
+    res.sendFile(path.join(__dirname, '../subscribe.html'));
+  });
+
+  // Create Stripe checkout session for subscribe.html
+  app.post('/create-checkout-session', async (req, res) => {
+    try {
+      const { userId, plan } = req.body;
+      
+      // Map plan names to price IDs
+      const priceMapping: { [key: string]: string } = {
+        'parent_basic': process.env.STRIPE_PARENT_BASIC_PRICE_ID || 'price_parent_basic',
+        'advocate_pro': process.env.STRIPE_ADVOCATE_PRO_PRICE_ID || 'price_advocate_pro'
+      };
+
+      const priceId = priceMapping[plan];
+      if (!priceId) {
+        return res.status(400).json({ error: 'Invalid plan selected' });
+      }
+
+      const session = await stripe.checkout.sessions.create({
+        mode: 'subscription',
+        payment_method_types: ['card'],
+        line_items: [
+          {
+            price: priceId,
+            quantity: 1,
+          },
+        ],
+        success_url: `${req.protocol}://${req.get('host')}/success.html`,
+        cancel_url: `${req.protocol}://${req.get('host')}/subscribe.html`,
+        client_reference_id: userId,
+      });
+
+      res.json({ sessionId: session.id });
+    } catch (error: any) {
+      console.error('Checkout session error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
 
   // Auth routes
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My IEP Hero – Subscribe</title>
+  <script src="https://js.stripe.com/v3/"></script>
+</head>
+<body>
+  <h1>Subscribe to a Plan</h1>
+
+  <button onclick="subscribe('parent_basic')">Parent Basic – $19/mo</button>
+  <button onclick="subscribe('advocate_pro')">Advocate Pro – $75/mo</button>
+
+  <script>
+    // ✅ Your real Stripe publishable key
+    const stripe = Stripe("pk_test_51Rr3Ot8iKZXV0srZoLgITuaO6CwtlWVW4PVYgYVa3sfdcFbOy1t6OipSEXr9cYCFPrtOfL0kP8z8UTdvD0pa91tx00wNX0ZmGX");
+
+    async function subscribe(plan) {
+      const userId = "test-user"; // we will replace this with real auth later
+
+      const response = await fetch("https://fee5faf2-f364-490e-b85d-8d0d4d221b0d-00-27o17n8aze2a6.janeway.replit.dev/create-checkout-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, plan })
+      });
+
+      const data = await response.json();
+      stripe.redirectToCheckout({ sessionId: data.sessionId });
+    }
+  </script>
+</body>
+</html>
