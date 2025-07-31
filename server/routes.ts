@@ -32,11 +32,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Map plan names to price IDs
       const priceMapping: { [key: string]: string } = {
-        'parent_basic': process.env.STRIPE_PARENT_BASIC_PRICE_ID || 'price_parent_basic',
-        'advocate_pro': process.env.STRIPE_ADVOCATE_PRO_PRICE_ID || 'price_advocate_pro'
+        'parent_basic': process.env.STRIPE_PARENT_BASIC_PRICE_ID!,
+        'advocate_pro': process.env.STRIPE_ADVOCATE_PRO_PRICE_ID!
       };
 
       const priceId = priceMapping[plan];
+      console.log(`Plan: ${plan}, Price ID: ${priceId}`);
+      
       if (!priceId) {
         return res.status(400).json({ error: 'Invalid plan selected' });
       }
