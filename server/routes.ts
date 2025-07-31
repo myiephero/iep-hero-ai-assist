@@ -30,10 +30,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { userId, plan } = req.body;
       
-      // Map plan names to price IDs
+      // Map plan names to price IDs from your CSV data
       const priceMapping: { [key: string]: string } = {
-        'parent_basic': process.env.STRIPE_PARENT_BASIC_PRICE_ID!,
-        'advocate_pro': process.env.STRIPE_ADVOCATE_PRO_PRICE_ID!
+        'parent_basic': 'price_1Rr3bk8iKZXV0srZ0URHZo4O',    // Parent Basic $19/month
+        'advocate_pro': 'price_1Rr3hR8iKZXV0srZ5lPscs0p'     // Advocate Pro $75/month
       };
 
       const priceId = priceMapping[plan];
