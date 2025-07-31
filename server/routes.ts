@@ -30,17 +30,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { userId, plan } = req.body;
       
-      // Map plan names to price IDs from your CSV data
+      // Map plan names to price IDs from your CSV data - support both naming conventions
       const priceMapping: { [key: string]: string } = {
-        'parent_basic': 'price_1Rr3bk8iKZXV0srZ0URHZo4O',    // Parent Basic $19/month
-        'advocate_pro': 'price_1Rr3hR8iKZXV0srZ5lPscs0p'     // Advocate Pro $75/month
+        // Underscore naming (for standalone subscribe.html)
+        'parent_basic': 'price_1Rr3bk8iKZXV0srZ0URHZo4O',      // Parent Basic $19/month
+        'parent_premium': 'price_1Rr3e68iKZXV0srZnPPK5J3R',    // Parent Premium $49/month
+        'parent_pro': 'price_1Rr3co8iKZXV0srZA1kEdBW1',        // Parent Plus $29/month
+        'advocate_pro': 'price_1Rr3hR8iKZXV0srZ5lPscs0p',       // Advocate Pro $75/month
+        // Hyphen naming (for main web app)
+        'parent-basic': 'price_1Rr3bk8iKZXV0srZ0URHZo4O',      // Parent Basic $19/month
+        'parent-premium': 'price_1Rr3e68iKZXV0srZnPPK5J3R',    // Parent Premium $49/month
+        'parent-pro': 'price_1Rr3co8iKZXV0srZA1kEdBW1',        // Parent Plus $29/month
+        'advocate-standard': 'price_1Rr3gL8iKZXV0srZmfuD32yv',  // Advocate Starter $49/month
+        'advocate-premium': 'price_1Rr3hR8iKZXV0srZ5lPscs0p',   // Advocate Pro $75/month
+        'advocate-enterprise': 'price_1Rr3ik8iKZXV0srZPRPByMQx'  // Advocate Agency $99/month
       };
 
       const priceId = priceMapping[plan];
-      console.log(`Plan: ${plan}, Price ID: ${priceId}`);
+      console.log(`Plan received: "${plan}", Price ID: ${priceId}`);
+      console.log('Available plans:', Object.keys(priceMapping));
       
       if (!priceId) {
-        return res.status(400).json({ error: 'Invalid plan selected' });
+        return res.status(400).json({ error: `Invalid plan selected: ${plan}. Available plans: ${Object.keys(priceMapping).join(', ')}` });
       }
 
       const session = await stripe.checkout.sessions.create({
@@ -136,6 +147,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         'advocate-enterprise': 'price_1Rr3ik8iKZXV0srZPRPByMQx', // Advocate Agency $99/month
       };
       const priceId = priceMapping[plan as keyof typeof priceMapping];
+      console.log(`Plan: ${plan}, Price ID: ${priceId}`);
+      
+      if (!priceId) {
+        return res.status(400).json({ message: `Invalid plan selected: ${plan}` });
+      }
 
       // Create subscription
       const subscription = await stripe.subscriptions.create({
