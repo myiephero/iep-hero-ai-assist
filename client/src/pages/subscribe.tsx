@@ -275,21 +275,35 @@ export default function Subscribe() {
     setIsLoading(true);
 
     try {
-      const response = await apiRequest("POST", "/api/create-subscription", { plan });
-      const data = await response.json();
-      setClientSecret(data.clientSecret);
-    } catch (error: any) {
-      if (isUnauthorizedError(error)) {
-        toast({
-          title: "Unauthorized",
-          description: "You are logged out. Logging in again...",
-          variant: "destructive",
-        });
-        setTimeout(() => {
-          window.location.href = "/api/login";
-        }, 500);
-        return;
+      // Use the public checkout session endpoint that doesn't require auth
+      const response = await fetch('/create-checkout-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          userId: 'guest-user', 
+          plan 
+        }),
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to create checkout session');
       }
+      
+      const data = await response.json();
+      
+      // Redirect to Stripe Checkout
+      const stripe = (window as any).Stripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+      const { error } = await stripe.redirectToCheckout({
+        sessionId: data.sessionId
+      });
+      
+      if (error) {
+        throw new Error(error.message);
+      }
+    } catch (error: any) {
       toast({
         title: "Error",
         description: error.message || "Failed to create subscription",
