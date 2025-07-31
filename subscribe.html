@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My IEP Hero – Subscribe</title>
+  <script src="https://js.stripe.com/v3/"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f9fafb;
+    }
+    .container {
+      background: white;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      text-align: center;
+      color: #1f2937;
+      margin-bottom: 40px;
+    }
+    .plans {
+      display: flex;
+      gap: 30px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .plan {
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 30px;
+      min-width: 300px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+    .plan:hover {
+      border-color: #3b82f6;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+    .plan.popular {
+      border-color: #3b82f6;
+      position: relative;
+    }
+    .plan.popular::before {
+      content: "Most Popular";
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #3b82f6;
+      color: white;
+      padding: 6px 20px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .plan h3 {
+      color: #1f2937;
+      margin-bottom: 10px;
+      font-size: 24px;
+    }
+    .plan .price {
+      font-size: 48px;
+      font-weight: bold;
+      color: #1f2937;
+      margin: 20px 0;
+    }
+    .plan .price span {
+      font-size: 18px;
+      color: #6b7280;
+    }
+    .plan ul {
+      list-style: none;
+      padding: 0;
+      margin: 30px 0;
+      text-align: left;
+    }
+    .plan li {
+      padding: 8px 0;
+      color: #4b5563;
+      position: relative;
+      padding-left: 25px;
+    }
+    .plan li::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: #10b981;
+      font-weight: bold;
+    }
+    button {
+      background: #3b82f6;
+      color: white;
+      border: none;
+      padding: 15px 40px;
+      border-radius: 8px;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: #2563eb;
+    }
+    button:disabled {
+      background: #9ca3af;
+      cursor: not-allowed;
+    }
+    .loading {
+      display: none;
+      text-align: center;
+      margin-top: 20px;
+      color: #6b7280;
+    }
+    .error {
+      color: #dc2626;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 20px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Subscribe to a Plan</h1>
+    
+    <div class="plans">
+      <div class="plan">
+        <h3>Parent Basic</h3>
+        <div class="price">$19<span>/mo</span></div>
+        <p>Essential support for involved parents</p>
+        <ul>
+          <li>Monthly 1-hour consultation call</li>
+          <li>Email support within 48 hours</li>
+          <li>Access to resource library</li>
+          <li>IEP template and checklist tools</li>
+          <li>Basic rights and law guidance</li>
+        </ul>
+        <button onclick="subscribe('parent-basic')">Select Parent Basic</button>
+      </div>
+
+      <div class="plan popular">
+        <h3>Advocate Pro</h3>
+        <div class="price">$75<span>/mo</span></div>
+        <p>Comprehensive advocacy services</p>
+        <ul>
+          <li>Everything in Parent Basic, plus:</li>
+          <li>Weekly 1-hour consultation calls</li>
+          <li>Priority email support (24-hour)</li>
+          <li>IEP meeting preparation & attendance</li>
+          <li>Document review and drafting</li>
+          <li>Emergency consultation hotline</li>
+          <li>Legal referral network access</li>
+        </ul>
+        <button onclick="subscribe('advocate-pro')">Select Advocate Pro</button>
+      </div>
+    </div>
+
+    <div class="loading" id="loading">
+      <p>Setting up your subscription...</p>
+    </div>
+
+    <div class="error" id="error"></div>
+  </div>
+
+  <script>
+    // Get Stripe public key from environment or use test key
+    const STRIPE_PUBLIC_KEY = window.VITE_STRIPE_PUBLIC_KEY || "pk_test_51234567890abcdef"; // Replace with your actual public key
+    const stripe = Stripe(STRIPE_PUBLIC_KEY);
+
+    async function subscribe(plan) {
+      const buttons = document.querySelectorAll('button');
+      const loading = document.getElementById('loading');
+      const errorDiv = document.getElementById('error');
+      
+      // Disable buttons and show loading
+      buttons.forEach(btn => btn.disabled = true);
+      loading.style.display = 'block';
+      errorDiv.style.display = 'none';
+
+      try {
+        // Get the current domain for the API call
+        const apiUrl = `${window.location.origin}/api/create-subscription`;
+        
+        const response = await fetch(apiUrl, {
+          method: "POST",
+          headers: { 
+            "Content-Type": "application/json",
+            "credentials": "include" // Include cookies for authentication
+          },
+          body: JSON.stringify({ plan })
+        });
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            // User not authenticated, redirect to login
+            window.location.href = '/api/login';
+            return;
+          }
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        
+        if (data.clientSecret) {
+          // Redirect to Stripe Checkout or use Elements
+          const { error } = await stripe.confirmPayment({
+            clientSecret: data.clientSecret,
+            confirmParams: {
+              return_url: `${window.location.origin}/success`,
+            },
+          });
+
+          if (error) {
+            throw new Error(error.message);
+          }
+        } else {
+          throw new Error('No client secret received from server');
+        }
+      } catch (error) {
+        console.error('Subscription error:', error);
+        errorDiv.textContent = error.message || 'An error occurred while setting up your subscription. Please try again.';
+        errorDiv.style.display = 'block';
+        
+        // Re-enable buttons
+        buttons.forEach(btn => btn.disabled = false);
+      } finally {
+        loading.style.display = 'none';
+      }
+    }
+
+    // Check if user is logged in on page load
+    window.addEventListener('load', async () => {
+      try {
+        const response = await fetch('/api/auth/user', {
+          credentials: 'include'
+        });
+        
+        if (!response.ok) {
+          // User not authenticated, show login message
+          const errorDiv = document.getElementById('error');
+          errorDiv.innerHTML = 'Please <a href="/api/login" style="color: #3b82f6; text-decoration: underline;">log in</a> to subscribe to a plan.';
+          errorDiv.style.display = 'block';
+          
+          // Disable subscription buttons
+          document.querySelectorAll('button').forEach(btn => btn.disabled = true);
+        }
+      } catch (error) {
+        console.error('Auth check failed:', error);
+      }
+    });
+  </script>
+</body>
+</html>
