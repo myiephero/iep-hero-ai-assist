@@ -83,117 +83,181 @@ const SubscribeForm = ({ selectedPlan }: { selectedPlan: string }) => {
 };
 
 const PlanSelection = ({ onSelectPlan }: { onSelectPlan: (plan: string) => void }) => {
+  const [activeTab, setActiveTab] = useState<'parent' | 'advocate'>('parent');
+
+  const parentPlans = [
+    {
+      id: 'parent-basic',
+      name: 'Parent Basic',
+      price: 19,
+      description: 'Essential support for involved parents',
+      popular: false,
+      features: [
+        'Monthly 1-hour consultation call',
+        'Email support within 48 hours',
+        'Access to resource library',
+        'IEP template and checklist tools',
+        'Basic rights and law guidance'
+      ]
+    },
+    {
+      id: 'parent-premium',
+      name: 'Parent Premium',
+      price: 39,
+      description: 'Enhanced support for complex cases',
+      popular: true,
+      features: [
+        'Everything in Parent Basic, plus:',
+        'Bi-weekly 1-hour consultation calls',
+        'Priority email support (24-hour)',
+        'IEP meeting preparation guidance',
+        'Document review assistance',
+        'Access to advocacy templates'
+      ]
+    },
+    {
+      id: 'parent-pro',
+      name: 'Parent Pro',
+      price: 59,
+      description: 'Comprehensive parent advocacy package',
+      popular: false,
+      features: [
+        'Everything in Parent Premium, plus:',
+        'Weekly 1-hour consultation calls',
+        'Emergency consultation hotline',
+        'IEP meeting attendance (virtual)',
+        'Legal referral network access',
+        'Crisis intervention support'
+      ]
+    }
+  ];
+
+  const advocatePlans = [
+    {
+      id: 'advocate-standard',
+      name: 'Advocate Standard',
+      price: 75,
+      description: 'Professional advocacy services',
+      popular: false,
+      features: [
+        'Unlimited consultation calls',
+        'Priority email support (4-hour)',
+        'IEP meeting attendance',
+        'Document drafting and review',
+        'Legal research assistance',
+        'Professional development resources'
+      ]
+    },
+    {
+      id: 'advocate-premium',
+      name: 'Advocate Premium',
+      price: 125,
+      description: 'Full-service advocacy practice support',
+      popular: true,
+      features: [
+        'Everything in Advocate Standard, plus:',
+        '24/7 emergency consultation line',
+        'Legal expert network access',
+        'Advanced case management tools',
+        'Continuing education credits',
+        'Peer consultation network'
+      ]
+    },
+    {
+      id: 'advocate-enterprise',
+      name: 'Advocate Enterprise',
+      price: 199,
+      description: 'Enterprise-level advocacy solutions',
+      popular: false,
+      features: [
+        'Everything in Advocate Premium, plus:',
+        'Multi-case management dashboard',
+        'White-label client portal',
+        'Custom training programs',
+        'Dedicated account manager',
+        'Advanced analytics and reporting'
+      ]
+    }
+  ];
+
+  const currentPlans = activeTab === 'parent' ? parentPlans : advocatePlans;
+
   return (
-    <div className="max-w-5xl mx-auto">
+    <div className="max-w-7xl mx-auto">
       <div className="text-center mb-12">
         <h1 className="text-3xl font-bold text-gray-900 mb-4">Choose Your Plan</h1>
         <p className="text-lg text-gray-600">Select the advocacy plan that best fits your needs.</p>
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-8">
-        {/* Parent Basic Plan */}
-        <Card className="shadow-lg border border-gray-200 relative">
-          <CardContent className="p-8">
-            <div className="text-center mb-8">
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">Parent Basic</h3>
-              <p className="text-gray-600 mb-4">Essential support for involved parents</p>
-              <div className="flex items-baseline justify-center">
-                <span className="text-5xl font-bold text-gray-900">$19</span>
-                <span className="text-xl text-gray-600 ml-1">/month</span>
+      {/* Tab Toggle */}
+      <div className="flex justify-center mb-12">
+        <div className="bg-gray-100 p-1 rounded-lg">
+          <button
+            className={`px-6 py-3 rounded-md font-medium transition-colors ${
+              activeTab === 'parent'
+                ? 'bg-white text-primary shadow-sm'
+                : 'text-gray-600 hover:text-gray-900'
+            }`}
+            onClick={() => setActiveTab('parent')}
+          >
+            For Parents
+          </button>
+          <button
+            className={`px-6 py-3 rounded-md font-medium transition-colors ${
+              activeTab === 'advocate'
+                ? 'bg-white text-primary shadow-sm'
+                : 'text-gray-600 hover:text-gray-900'
+            }`}
+            onClick={() => setActiveTab('advocate')}
+          >
+            For Advocates
+          </button>
+        </div>
+      </div>
+
+      {/* Plans Grid */}
+      <div className="grid lg:grid-cols-3 gap-8">
+        {currentPlans.map((plan) => (
+          <Card key={plan.id} className={`shadow-lg border relative ${plan.popular ? 'border-2 border-primary' : 'border-gray-200'}`}>
+            {plan.popular && (
+              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                <span className="bg-primary text-white px-6 py-2 rounded-full text-sm font-semibold">
+                  Most Popular
+                </span>
               </div>
-              <p className="text-sm text-gray-600 mt-2">Billed monthly • Cancel anytime</p>
-            </div>
+            )}
 
-            <ul className="space-y-4 mb-8">
-              <li className="flex items-start">
-                <CheckCircle className="text-green-600 mt-1 mr-3 h-5 w-5" />
-                <span className="text-gray-700">Monthly 1-hour consultation call</span>
-              </li>
-              <li className="flex items-start">
-                <CheckCircle className="text-green-600 mt-1 mr-3 h-5 w-5" />
-                <span className="text-gray-700">Email support within 48 hours</span>
-              </li>
-              <li className="flex items-start">
-                <CheckCircle className="text-green-600 mt-1 mr-3 h-5 w-5" />
-                <span className="text-gray-700">Access to resource library</span>
-              </li>
-              <li className="flex items-start">
-                <CheckCircle className="text-green-600 mt-1 mr-3 h-5 w-5" />
-                <span className="text-gray-700">IEP template and checklist tools</span>
-              </li>
-              <li className="flex items-start">
-                <CheckCircle className="text-green-600 mt-1 mr-3 h-5 w-5" />
-                <span className="text-gray-700">Basic rights and law guidance</span>
-              </li>
-            </ul>
-
-            <Button 
-              className="w-full py-4 text-lg"
-              onClick={() => onSelectPlan('parent-basic')}
-            >
-              Select Parent Basic
-            </Button>
-          </CardContent>
-        </Card>
-
-        {/* Advocate Pro Plan */}
-        <Card className="shadow-xl border-2 border-primary relative">
-          <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-            <span className="bg-primary text-white px-6 py-2 rounded-full text-sm font-semibold">
-              Most Popular
-            </span>
-          </div>
-
-          <CardContent className="p-8">
-            <div className="text-center mb-8">
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">Advocate Pro</h3>
-              <p className="text-gray-600 mb-4">Comprehensive advocacy services</p>
-              <div className="flex items-baseline justify-center">
-                <span className="text-5xl font-bold text-gray-900">$75</span>
-                <span className="text-xl text-gray-600 ml-1">/month</span>
+            <CardContent className="p-8">
+              <div className="text-center mb-8">
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">{plan.name}</h3>
+                <p className="text-gray-600 mb-4">{plan.description}</p>
+                <div className="flex items-baseline justify-center">
+                  <span className="text-5xl font-bold text-gray-900">${plan.price}</span>
+                  <span className="text-xl text-gray-600 ml-1">/month</span>
+                </div>
+                <p className="text-sm text-gray-600 mt-2">Billed monthly • Cancel anytime</p>
               </div>
-              <p className="text-sm text-gray-600 mt-2">Billed monthly • Cancel anytime</p>
-            </div>
 
-            <ul className="space-y-4 mb-8">
-              <li className="flex items-start">
-                <CheckCircle className="text-green-600 mt-1 mr-3 h-5 w-5" />
-                <span className="text-gray-700"><strong>Everything in Parent Basic, plus:</strong></span>
-              </li>
-              <li className="flex items-start">
-                <CheckCircle className="text-green-600 mt-1 mr-3 h-5 w-5" />
-                <span className="text-gray-700">Weekly 1-hour consultation calls</span>
-              </li>
-              <li className="flex items-start">
-                <CheckCircle className="text-green-600 mt-1 mr-3 h-5 w-5" />
-                <span className="text-gray-700">Priority email support (24-hour response)</span>
-              </li>
-              <li className="flex items-start">
-                <CheckCircle className="text-green-600 mt-1 mr-3 h-5 w-5" />
-                <span className="text-gray-700">IEP meeting preparation and attendance</span>
-              </li>
-              <li className="flex items-start">
-                <CheckCircle className="text-green-600 mt-1 mr-3 h-5 w-5" />
-                <span className="text-gray-700">Document review and drafting support</span>
-              </li>
-              <li className="flex items-start">
-                <CheckCircle className="text-green-600 mt-1 mr-3 h-5 w-5" />
-                <span className="text-gray-700">Emergency consultation hotline</span>
-              </li>
-              <li className="flex items-start">
-                <CheckCircle className="text-green-600 mt-1 mr-3 h-5 w-5" />
-                <span className="text-gray-700">Legal referral network access</span>
-              </li>
-            </ul>
+              <ul className="space-y-4 mb-8 min-h-[240px]">
+                {plan.features.map((feature, index) => (
+                  <li key={index} className="flex items-start">
+                    <CheckCircle className="text-green-600 mt-1 mr-3 h-5 w-5 flex-shrink-0" />
+                    <span className={`text-gray-700 ${feature.includes('Everything in') ? 'font-semibold' : ''}`}>
+                      {feature}
+                    </span>
+                  </li>
+                ))}
+              </ul>
 
-            <Button 
-              className="w-full py-4 text-lg"
-              onClick={() => onSelectPlan('advocate-pro')}
-            >
-              Select Advocate Pro
-            </Button>
-          </CardContent>
-        </Card>
+              <Button 
+                className="w-full py-4 text-lg"
+                onClick={() => onSelectPlan(plan.id)}
+              >
+                Select {plan.name}
+              </Button>
+            </CardContent>
+          </Card>
+        ))}
       </div>
     </div>
   );

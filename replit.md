@@ -2,7 +2,19 @@
 
 ## Overview
 
-This is a full-stack web application for IEP (Individualized Education Program) advocacy services. The platform provides subscription-based access to educational advocacy resources, consultation services, and support for families navigating the special education process. It features two subscription tiers (Parent Basic and Advocate Pro) with Stripe payment integration and comprehensive user authentication through Replit Auth.
+This is a full-stack web application for IEP (Individualized Education Program) advocacy services. The platform provides subscription-based access to educational advocacy resources, consultation services, and support for families navigating the special education process. It features multiple subscription tiers across two user categories:
+
+**Parent Plans** ($19-$59/month):
+- Parent Basic ($19): Monthly consultations, email support, resource library
+- Parent Premium ($39): Bi-weekly consultations, priority support, meeting prep
+- Parent Pro ($59): Weekly consultations, emergency hotline, virtual meeting attendance
+
+**Professional Advocate Plans** ($75-$199/month):
+- Advocate Standard ($75): Unlimited consultations, meeting attendance, professional resources
+- Advocate Premium ($125): 24/7 support, expert network, case management tools
+- Advocate Enterprise ($199): Multi-case dashboard, white-label portal, custom training
+
+The platform includes Stripe payment integration and comprehensive user authentication through Replit Auth.
 
 ## User Preferences
 

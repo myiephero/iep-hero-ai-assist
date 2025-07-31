@@ -142,44 +142,46 @@ export default function Landing() {
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Professional IEP advocacy services tailored to your needs. 
-              Cancel anytime with no long-term commitments.
+              Multiple tiers available for both parents and professional advocates.
             </p>
           </div>
 
           <div className="grid lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
-            {/* Parent Basic Plan */}
+            {/* Parent Plans Preview */}
             <Card className="shadow-lg border border-gray-200 relative">
               <CardContent className="p-8">
                 <div className="text-center mb-8">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">Parent Basic</h3>
-                  <p className="text-gray-600 mb-4">Essential support for involved parents</p>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">For Parents</h3>
+                  <p className="text-gray-600 mb-4">Essential to comprehensive support</p>
                   <div className="flex items-baseline justify-center">
-                    <span className="text-5xl font-bold text-gray-900">$19</span>
+                    <span className="text-3xl font-bold text-gray-900">$19</span>
+                    <span className="text-lg text-gray-600 mx-2">-</span>
+                    <span className="text-3xl font-bold text-gray-900">$59</span>
                     <span className="text-xl text-gray-600 ml-1">/month</span>
                   </div>
-                  <p className="text-sm text-gray-600 mt-2">Billed monthly • Cancel anytime</p>
+                  <p className="text-sm text-gray-600 mt-2">3 tiers available • Billed monthly</p>
                 </div>
 
                 <ul className="space-y-4 mb-8">
                   <li className="flex items-start">
                     <CheckCircle className="text-green-600 mt-1 mr-3 h-5 w-5" />
-                    <span className="text-gray-700">Monthly 1-hour consultation call</span>
+                    <span className="text-gray-700">Monthly to weekly consultation calls</span>
                   </li>
                   <li className="flex items-start">
                     <CheckCircle className="text-green-600 mt-1 mr-3 h-5 w-5" />
-                    <span className="text-gray-700">Email support within 48 hours</span>
+                    <span className="text-gray-700">Email support (24-48 hour response)</span>
                   </li>
                   <li className="flex items-start">
                     <CheckCircle className="text-green-600 mt-1 mr-3 h-5 w-5" />
-                    <span className="text-gray-700">Access to resource library</span>
+                    <span className="text-gray-700">IEP templates and advocacy tools</span>
                   </li>
                   <li className="flex items-start">
                     <CheckCircle className="text-green-600 mt-1 mr-3 h-5 w-5" />
-                    <span className="text-gray-700">IEP template and checklist tools</span>
+                    <span className="text-gray-700">Meeting preparation & attendance</span>
                   </li>
                   <li className="flex items-start">
                     <CheckCircle className="text-green-600 mt-1 mr-3 h-5 w-5" />
-                    <span className="text-gray-700">Basic rights and law guidance</span>
+                    <span className="text-gray-700">Emergency consultation hotline</span>
                   </li>
                 </ul>
 
@@ -187,16 +189,16 @@ export default function Landing() {
                   className="w-full py-4 text-lg"
                   onClick={() => window.location.href = "/api/login"}
                 >
-                  Start Parent Basic
+                  View Parent Plans
                 </Button>
 
                 <p className="text-xs text-gray-600 text-center mt-4">
-                  Perfect for parents who want expert guidance and support
+                  Perfect for parents seeking expert guidance and support
                 </p>
               </CardContent>
             </Card>
 
-            {/* Advocate Pro Plan */}
+            {/* Professional Advocate Plans Preview */}
             <Card className="shadow-xl border-2 border-primary relative">
               <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
                 <span className="bg-primary text-white px-6 py-2 rounded-full text-sm font-semibold">
@@ -206,43 +208,37 @@ export default function Landing() {
 
               <CardContent className="p-8">
                 <div className="text-center mb-8">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">Advocate Pro</h3>
-                  <p className="text-gray-600 mb-4">Comprehensive advocacy services</p>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">For Professional Advocates</h3>
+                  <p className="text-gray-600 mb-4">Standard to enterprise-level solutions</p>
                   <div className="flex items-baseline justify-center">
-                    <span className="text-5xl font-bold text-gray-900">$75</span>
+                    <span className="text-3xl font-bold text-gray-900">$75</span>
+                    <span className="text-lg text-gray-600 mx-2">-</span>
+                    <span className="text-3xl font-bold text-gray-900">$199</span>
                     <span className="text-xl text-gray-600 ml-1">/month</span>
                   </div>
-                  <p className="text-sm text-gray-600 mt-2">Billed monthly • Cancel anytime</p>
+                  <p className="text-sm text-gray-600 mt-2">3 tiers available • Billed monthly</p>
                 </div>
 
                 <ul className="space-y-4 mb-8">
                   <li className="flex items-start">
                     <CheckCircle className="text-green-600 mt-1 mr-3 h-5 w-5" />
-                    <span className="text-gray-700"><strong>Everything in Parent Basic, plus:</strong></span>
+                    <span className="text-gray-700">Unlimited consultation calls</span>
                   </li>
                   <li className="flex items-start">
                     <CheckCircle className="text-green-600 mt-1 mr-3 h-5 w-5" />
-                    <span className="text-gray-700">Weekly 1-hour consultation calls</span>
+                    <span className="text-gray-700">Priority email support (4-24 hour)</span>
                   </li>
                   <li className="flex items-start">
                     <CheckCircle className="text-green-600 mt-1 mr-3 h-5 w-5" />
-                    <span className="text-gray-700">Priority email support (24-hour response)</span>
+                    <span className="text-gray-700">Advanced case management tools</span>
                   </li>
                   <li className="flex items-start">
                     <CheckCircle className="text-green-600 mt-1 mr-3 h-5 w-5" />
-                    <span className="text-gray-700">IEP meeting preparation and attendance</span>
+                    <span className="text-gray-700">Legal expert network access</span>
                   </li>
                   <li className="flex items-start">
                     <CheckCircle className="text-green-600 mt-1 mr-3 h-5 w-5" />
-                    <span className="text-gray-700">Document review and drafting support</span>
-                  </li>
-                  <li className="flex items-start">
-                    <CheckCircle className="text-green-600 mt-1 mr-3 h-5 w-5" />
-                    <span className="text-gray-700">Emergency consultation hotline</span>
-                  </li>
-                  <li className="flex items-start">
-                    <CheckCircle className="text-green-600 mt-1 mr-3 h-5 w-5" />
-                    <span className="text-gray-700">Legal referral network access</span>
+                    <span className="text-gray-700">White-label client portal & training</span>
                   </li>
                 </ul>
 
@@ -250,11 +246,11 @@ export default function Landing() {
                   className="w-full py-4 text-lg"
                   onClick={() => window.location.href = "/api/login"}
                 >
-                  Start Advocate Pro
+                  View Advocate Plans
                 </Button>
 
                 <p className="text-xs text-gray-600 text-center mt-4">
-                  Ideal for complex cases requiring intensive advocacy
+                  Professional tools for advocacy practice growth
                 </p>
               </CardContent>
             </Card>

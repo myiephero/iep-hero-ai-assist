@@ -126,41 +126,161 @@
       margin-top: 20px;
       display: none;
     }
+    .user-toggle {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 40px;
+      border-radius: 12px;
+      background: #f3f4f6;
+      padding: 6px;
+      width: fit-content;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .toggle-btn {
+      background: transparent;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      color: #6b7280;
+    }
+    .toggle-btn.active {
+      background: #3b82f6;
+      color: white;
+    }
+    .toggle-btn:hover:not(.active) {
+      background: #e5e7eb;
+      color: #374151;
+    }
+    .plans-section {
+      margin-bottom: 40px;
+    }
+    .plans-section h2 {
+      text-align: center;
+      color: #1f2937;
+      margin-bottom: 30px;
+      font-size: 28px;
+    }
+    .plans {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      justify-content: center;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Subscribe to a Plan</h1>
     
-    <div class="plans">
-      <div class="plan">
-        <h3>Parent Basic</h3>
-        <div class="price">$19<span>/mo</span></div>
-        <p>Essential support for involved parents</p>
-        <ul>
-          <li>Monthly 1-hour consultation call</li>
-          <li>Email support within 48 hours</li>
-          <li>Access to resource library</li>
-          <li>IEP template and checklist tools</li>
-          <li>Basic rights and law guidance</li>
-        </ul>
-        <button onclick="subscribe('parent-basic')">Select Parent Basic</button>
-      </div>
+    <!-- User Type Toggle -->
+    <div class="user-toggle">
+      <button class="toggle-btn active" onclick="showPlans('parent')">For Parents</button>
+      <button class="toggle-btn" onclick="showPlans('advocate')">For Advocates</button>
+    </div>
+    
+    <!-- Parent Plans -->
+    <div id="parent-plans" class="plans-section">
+      <h2>Parent Plans</h2>
+      <div class="plans">
+        <div class="plan">
+          <h3>Parent Basic</h3>
+          <div class="price">$19<span>/mo</span></div>
+          <p>Essential support for involved parents</p>
+          <ul>
+            <li>Monthly 1-hour consultation call</li>
+            <li>Email support within 48 hours</li>
+            <li>Access to resource library</li>
+            <li>IEP template and checklist tools</li>
+            <li>Basic rights and law guidance</li>
+          </ul>
+          <button onclick="subscribe('parent-basic')">Select Parent Basic</button>
+        </div>
 
-      <div class="plan popular">
-        <h3>Advocate Pro</h3>
-        <div class="price">$75<span>/mo</span></div>
-        <p>Comprehensive advocacy services</p>
-        <ul>
-          <li>Everything in Parent Basic, plus:</li>
-          <li>Weekly 1-hour consultation calls</li>
-          <li>Priority email support (24-hour)</li>
-          <li>IEP meeting preparation & attendance</li>
-          <li>Document review and drafting</li>
-          <li>Emergency consultation hotline</li>
-          <li>Legal referral network access</li>
-        </ul>
-        <button onclick="subscribe('advocate-pro')">Select Advocate Pro</button>
+        <div class="plan popular">
+          <h3>Parent Premium</h3>
+          <div class="price">$39<span>/mo</span></div>
+          <p>Enhanced support for complex cases</p>
+          <ul>
+            <li>Everything in Parent Basic, plus:</li>
+            <li>Bi-weekly 1-hour consultation calls</li>
+            <li>Priority email support (24-hour)</li>
+            <li>IEP meeting preparation guidance</li>
+            <li>Document review assistance</li>
+            <li>Access to advocacy templates</li>
+          </ul>
+          <button onclick="subscribe('parent-premium')">Select Parent Premium</button>
+        </div>
+
+        <div class="plan">
+          <h3>Parent Pro</h3>
+          <div class="price">$59<span>/mo</span></div>
+          <p>Comprehensive parent advocacy package</p>
+          <ul>
+            <li>Everything in Parent Premium, plus:</li>
+            <li>Weekly 1-hour consultation calls</li>
+            <li>Emergency consultation hotline</li>
+            <li>IEP meeting attendance (virtual)</li>
+            <li>Legal referral network access</li>
+            <li>Crisis intervention support</li>
+          </ul>
+          <button onclick="subscribe('parent-pro')">Select Parent Pro</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Advocate Plans -->
+    <div id="advocate-plans" class="plans-section" style="display: none;">
+      <h2>Professional Advocate Plans</h2>
+      <div class="plans">
+        <div class="plan">
+          <h3>Advocate Standard</h3>
+          <div class="price">$75<span>/mo</span></div>
+          <p>Professional advocacy services</p>
+          <ul>
+            <li>Unlimited consultation calls</li>
+            <li>Priority email support (4-hour)</li>
+            <li>IEP meeting attendance</li>
+            <li>Document drafting and review</li>
+            <li>Legal research assistance</li>
+            <li>Professional development resources</li>
+          </ul>
+          <button onclick="subscribe('advocate-standard')">Select Advocate Standard</button>
+        </div>
+
+        <div class="plan popular">
+          <h3>Advocate Premium</h3>
+          <div class="price">$125<span>/mo</span></div>
+          <p>Full-service advocacy practice support</p>
+          <ul>
+            <li>Everything in Advocate Standard, plus:</li>
+            <li>24/7 emergency consultation line</li>
+            <li>Legal expert network access</li>
+            <li>Advanced case management tools</li>
+            <li>Continuing education credits</li>
+            <li>Peer consultation network</li>
+          </ul>
+          <button onclick="subscribe('advocate-premium')">Select Advocate Premium</button>
+        </div>
+
+        <div class="plan">
+          <h3>Advocate Enterprise</h3>
+          <div class="price">$199<span>/mo</span></div>
+          <p>Enterprise-level advocacy solutions</p>
+          <ul>
+            <li>Everything in Advocate Premium, plus:</li>
+            <li>Multi-case management dashboard</li>
+            <li>White-label client portal</li>
+            <li>Custom training programs</li>
+            <li>Dedicated account manager</li>
+            <li>Advanced analytics and reporting</li>
+          </ul>
+          <button onclick="subscribe('advocate-enterprise')">Select Advocate Enterprise</button>
+        </div>
       </div>
     </div>
 
@@ -237,6 +357,26 @@
       }
     }
 
+    // Toggle between parent and advocate plans
+    function showPlans(userType) {
+      const parentPlans = document.getElementById('parent-plans');
+      const advocatePlans = document.getElementById('advocate-plans');
+      const toggleButtons = document.querySelectorAll('.toggle-btn');
+      
+      // Update button states
+      toggleButtons.forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+      
+      // Show/hide plan sections
+      if (userType === 'parent') {
+        parentPlans.style.display = 'block';
+        advocatePlans.style.display = 'none';
+      } else {
+        parentPlans.style.display = 'none';
+        advocatePlans.style.display = 'block';
+      }
+    }
+
     // Check if user is logged in on page load
     window.addEventListener('load', async () => {
       try {
@@ -251,7 +391,7 @@
           errorDiv.style.display = 'block';
           
           // Disable subscription buttons
-          document.querySelectorAll('button').forEach(btn => btn.disabled = true);
+          document.querySelectorAll('button:not(.toggle-btn)').forEach(btn => btn.disabled = true);
         }
       } catch (error) {
         console.error('Auth check failed:', error);

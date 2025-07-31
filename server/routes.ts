@@ -39,7 +39,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userEmail = req.user.claims.email;
       const userName = req.user.claims.first_name || req.user.claims.email;
 
-      if (!plan || !['parent-basic', 'advocate-pro'].includes(plan)) {
+      const validPlans = [
+        'parent-basic', 'parent-premium', 'parent-pro',
+        'advocate-standard', 'advocate-premium', 'advocate-enterprise'
+      ];
+      
+      if (!plan || !validPlans.includes(plan)) {
         return res.status(400).json({ message: 'Invalid plan selected' });
       }
 
@@ -77,9 +82,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Set price based on plan
-      const priceId = plan === 'parent-basic' 
-        ? (process.env.STRIPE_PARENT_BASIC_PRICE_ID || 'price_parent_basic')
-        : (process.env.STRIPE_ADVOCATE_PRO_PRICE_ID || 'price_advocate_pro');
+      const priceMapping = {
+        'parent-basic': process.env.STRIPE_PARENT_BASIC_PRICE_ID || 'price_parent_basic',
+        'parent-premium': process.env.STRIPE_PARENT_PREMIUM_PRICE_ID || 'price_parent_premium',
+        'parent-pro': process.env.STRIPE_PARENT_PRO_PRICE_ID || 'price_parent_pro',
+        'advocate-standard': process.env.STRIPE_ADVOCATE_STANDARD_PRICE_ID || 'price_advocate_standard',
+        'advocate-premium': process.env.STRIPE_ADVOCATE_PREMIUM_PRICE_ID || 'price_advocate_premium',
+        'advocate-enterprise': process.env.STRIPE_ADVOCATE_ENTERPRISE_PRICE_ID || 'price_advocate_enterprise',
+      };
+      const priceId = priceMapping[plan as keyof typeof priceMapping];
 
       // Create subscription
       const subscription = await stripe.subscriptions.create({
