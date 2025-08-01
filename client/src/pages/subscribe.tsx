@@ -3,7 +3,7 @@ import { loadStripe } from '@stripe/stripe-js';
 import { useEffect, useState } from 'react';
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/useAuth";
+
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -267,7 +267,7 @@ export default function Subscribe() {
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [clientSecret, setClientSecret] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { user, isAuthenticated } = useAuth();
+  // Subscribe page works independently of authentication
   const { toast } = useToast();
 
   const handlePlanSelection = async (plan: string) => {
@@ -315,13 +315,7 @@ export default function Subscribe() {
     }
   };
 
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full"></div>
-      </div>
-    );
-  }
+  // Subscription page is accessible without authentication
 
   return (
     <div className="min-h-screen bg-gray-50">

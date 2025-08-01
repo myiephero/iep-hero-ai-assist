@@ -17,21 +17,25 @@ function Router() {
 
   return (
     <Switch>
-      {isLoading || !isAuthenticated ? (
-        <>
-          <Route path="/" component={Landing} />
-          <Route path="/terms" component={Terms} />
-          <Route path="/privacy" component={Privacy} />
-        </>
+      {/* Public routes available to everyone */}
+      <Route path="/subscribe" component={Subscribe} />
+      <Route path="/success" component={Success} />
+      <Route path="/terms" component={Terms} />
+      <Route path="/privacy" component={Privacy} />
+      
+      {/* Conditional routes based on auth */}
+      {isLoading ? (
+        <Route path="/" component={() => (
+          <div className="min-h-screen flex items-center justify-center">
+            <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
+          </div>
+        )} />
+      ) : isAuthenticated ? (
+        <Route path="/" component={Home} />
       ) : (
-        <>
-          <Route path="/" component={Home} />
-          <Route path="/subscribe" component={Subscribe} />
-          <Route path="/success" component={Success} />
-          <Route path="/terms" component={Terms} />
-          <Route path="/privacy" component={Privacy} />
-        </>
+        <Route path="/" component={Landing} />
       )}
+      
       <Route component={NotFound} />
     </Switch>
   );
