@@ -1,6 +1,14 @@
 # Overview
 
-IEP Hero is a web application designed to support families, advocates, and professionals in managing Individualized Education Program (IEP) goals and documentation. The application provides tools for tracking student progress, managing IEP-related documents, scheduling events, and facilitating communication between stakeholders in the special education process.
+My IEP Hero is a comprehensive SaaS platform for Individualized Education Program (IEP) management, designed to empower parents and professionals with advanced collaboration tools and intuitive workflow management. The application provides complete IEP lifecycle management including goal tracking, document storage, progress monitoring, and subscription-based service plans.
+
+## Recent Changes (January 2025)
+- ✓ Full-stack application successfully migrated and integrated
+- ✓ Supabase authentication system implemented and working  
+- ✓ Dashboard with IEP goals, documents, and events tracking
+- ✓ Stripe payment integration for multiple subscription tiers
+- ✓ Build:dev script added for Lovable.dev compatibility
+- ✓ Application running successfully on port 5000
 
 # User Preferences
 
@@ -57,3 +65,4 @@ The application uses **PostgreSQL** as the primary database with **Drizzle ORM**
 **Date Handling**: date-fns library for consistent date formatting and manipulation across the application.
 
 **Form Management**: React Hook Form with Zod for form validation and hookform/resolvers for schema-based validation integration.
+ 
