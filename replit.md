@@ -57,3 +57,4 @@ The application uses **PostgreSQL** as the primary database with **Drizzle ORM**
 **Date Handling**: date-fns library for consistent date formatting and manipulation across the application.
 
 **Form Management**: React Hook Form with Zod for form validation and hookform/resolvers for schema-based validation integration.
+ 
