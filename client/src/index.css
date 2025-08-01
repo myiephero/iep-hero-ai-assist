@@ -15,8 +15,8 @@
   --border: hsl(213, 25%, 88%);
   --input: hsl(213, 25%, 88%);
   
-  /* My IEP Hero calming color palette - Updated Design System */
-  --primary: hsl(213, 94%, 68%); /* Professional Blue */
+  /* My IEP Hero calming color palette - Matching reference design */
+  --primary: hsl(200, 85%, 65%); /* Soft Professional Blue matching the reference */
   --primary-foreground: hsl(0, 0%, 100%);
   --secondary: hsl(142, 76%, 73%); /* Soft Sage Green */
   --secondary-foreground: hsl(213, 20%, 15%);

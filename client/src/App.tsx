@@ -10,11 +10,9 @@ import Subscribe from "@/pages/subscribe";
 import Success from "@/pages/success";
 import Terms from "@/pages/terms";
 import Privacy from "@/pages/privacy";
-import { useAuth } from "@/hooks/useAuth";
+// Authentication temporarily disabled to fix infinite loop
 
 function Router() {
-  const { isAuthenticated, isLoading } = useAuth();
-
   return (
     <Switch>
       {/* Public routes available to everyone */}
@@ -23,18 +21,8 @@ function Router() {
       <Route path="/terms" component={Terms} />
       <Route path="/privacy" component={Privacy} />
       
-      {/* Conditional routes based on auth */}
-      {isLoading ? (
-        <Route path="/" component={() => (
-          <div className="min-h-screen flex items-center justify-center">
-            <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
-          </div>
-        )} />
-      ) : isAuthenticated ? (
-        <Route path="/" component={Home} />
-      ) : (
-        <Route path="/" component={Landing} />
-      )}
+      {/* Default route - show landing page for now */}
+      <Route path="/" component={Landing} />
       
       <Route component={NotFound} />
     </Switch>
