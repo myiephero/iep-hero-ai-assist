@@ -9,71 +9,18 @@ import { users } from "@shared/schema";
 import { eq } from "drizzle-orm";
 
 if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY. Please get it from https://dashboard.stripe.com/apikeys');
+  console.warn('Missing required Stripe secret: STRIPE_SECRET_KEY. Stripe operations will be disabled.');
 }
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: "2025-07-30.basil",
-});
+}) : null;
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
   await setupAuth(app);
 
-  // Serve subscribe.html
-  app.get('/subscribe.html', (req, res) => {
-    res.sendFile(path.join(__dirname, '../subscribe.html'));
-  });
-
-  // Create Stripe checkout session for subscribe.html
-  app.post('/create-checkout-session', async (req, res) => {
-    try {
-      const { userId, plan } = req.body;
-      
-      // Map plan names to price IDs from your CSV data - support both naming conventions
-      const priceMapping: { [key: string]: string } = {
-        // Underscore naming (for standalone subscribe.html)
-        'parent_basic': 'price_1Rr3bk8iKZXV0srZ0URHZo4O',      // Parent Basic $19/month
-        'parent_premium': 'price_1Rr3e68iKZXV0srZnPPK5J3R',    // Parent Premium $49/month
-        'parent_pro': 'price_1Rr3co8iKZXV0srZA1kEdBW1',        // Parent Plus $29/month
-        'advocate_pro': 'price_1Rr3hR8iKZXV0srZ5lPscs0p',       // Advocate Pro $75/month
-        // Hyphen naming (for main web app)
-        'parent-basic': 'price_1Rr3bk8iKZXV0srZ0URHZo4O',      // Parent Basic $19/month
-        'parent-premium': 'price_1Rr3e68iKZXV0srZnPPK5J3R',    // Parent Premium $49/month
-        'parent-pro': 'price_1Rr3co8iKZXV0srZA1kEdBW1',        // Parent Plus $29/month
-        'advocate-standard': 'price_1Rr3gL8iKZXV0srZmfuD32yv',  // Advocate Starter $49/month
-        'advocate-premium': 'price_1Rr3hR8iKZXV0srZ5lPscs0p',   // Advocate Pro $75/month
-        'advocate-enterprise': 'price_1Rr3ik8iKZXV0srZPRPByMQx'  // Advocate Agency $99/month
-      };
-
-      const priceId = priceMapping[plan];
-      console.log(`Plan received: "${plan}", Price ID: ${priceId}`);
-      console.log('Available plans:', Object.keys(priceMapping));
-      
-      if (!priceId) {
-        return res.status(400).json({ error: `Invalid plan selected: ${plan}. Available plans: ${Object.keys(priceMapping).join(', ')}` });
-      }
-
-      const session = await stripe.checkout.sessions.create({
-        mode: 'subscription',
-        payment_method_types: ['card'],
-        line_items: [
-          {
-            price: priceId,
-            quantity: 1,
-          },
-        ],
-        success_url: `${req.protocol}://${req.get('host')}/success.html`,
-        cancel_url: `${req.protocol}://${req.get('host')}/subscribe.html`,
-        client_reference_id: userId,
-      });
-
-      res.json({ sessionId: session.id });
-    } catch (error: any) {
-      console.error('Checkout session error:', error);
-      res.status(500).json({ error: error.message });
-    }
-  });
+  // Note: Removed unsafe external subscribe.html and success.html routes for security
 
   // Auth routes
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
@@ -89,6 +36,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Create subscription for a specific plan
   app.post('/api/create-subscription', isAuthenticated, async (req: any, res) => {
+    if (!stripe) {
+      return res.status(500).json({ message: 'Payment processing not configured' });
+    }
+
     try {
       const { plan } = req.body;
       const userId = req.user.claims.sub;
