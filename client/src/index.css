@@ -1,0 +1,120 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(213, 19%, 13%);
+  --muted: hsl(210, 40%, 98%);
+  --muted-foreground: hsl(215, 16%, 47%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(213, 19%, 13%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(213, 19%, 13%);
+  --border: hsl(214, 32%, 91%);
+  --input: hsl(214, 32%, 91%);
+  --primary: hsl(207, 90%, 54%);
+  --primary-foreground: hsl(210, 40%, 98%);
+  --secondary: hsl(123, 38%, 57%);
+  --secondary-foreground: hsl(210, 40%, 2%);
+  --accent: hsl(36, 100%, 50%);
+  --accent-foreground: hsl(210, 40%, 2%);
+  --destructive: hsl(0, 84%, 60%);
+  --destructive-foreground: hsl(210, 40%, 98%);
+  --ring: hsl(213, 19%, 13%);
+  --radius: 0.5rem;
+  
+  /* Custom IEP Hero colors */
+  --iep-primary: hsl(207, 90%, 54%);
+  --iep-secondary: hsl(123, 38%, 57%);
+  --iep-accent: hsl(36, 100%, 50%);
+  --iep-surface: hsl(210, 17%, 98%);
+  --iep-text-primary: hsl(213, 19%, 13%);
+  --iep-text-secondary: hsl(215, 16%, 47%);
+}
+
+.dark {
+  --background: hsl(222, 84%, 5%);
+  --foreground: hsl(210, 40%, 98%);
+  --muted: hsl(217, 32%, 17%);
+  --muted-foreground: hsl(215, 20%, 65%);
+  --popover: hsl(222, 84%, 5%);
+  --popover-foreground: hsl(210, 40%, 98%);
+  --card: hsl(222, 84%, 5%);
+  --card-foreground: hsl(210, 40%, 98%);
+  --border: hsl(217, 32%, 17%);
+  --input: hsl(217, 32%, 17%);
+  --primary: hsl(207, 90%, 54%);
+  --primary-foreground: hsl(210, 40%, 98%);
+  --secondary: hsl(217, 32%, 17%);
+  --secondary-foreground: hsl(210, 40%, 98%);
+  --accent: hsl(217, 32%, 17%);
+  --accent-foreground: hsl(210, 40%, 98%);
+  --destructive: hsl(0, 63%, 31%);
+  --destructive-foreground: hsl(210, 40%, 98%);
+  --ring: hsl(212, 12%, 84%);
+  --radius: 0.5rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+}
+
+/* Custom component styles */
+.stats-card {
+  @apply bg-white shadow-sm rounded-lg border border-gray-200 hover:shadow-md transition-shadow;
+}
+
+.goal-card {
+  @apply border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow bg-white;
+}
+
+.progress-bar {
+  @apply w-full bg-gray-200 rounded-full h-2;
+}
+
+.progress-fill {
+  @apply h-2 rounded-full transition-all duration-300;
+}
+
+.nav-link {
+  @apply text-gray-600 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors;
+}
+
+.nav-link.active {
+  @apply text-primary bg-blue-50;
+}
+
+.btn-primary {
+  @apply bg-primary text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors;
+}
+
+.btn-secondary {
+  @apply bg-gray-100 text-gray-900 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-200 transition-colors;
+}
+
+.status-badge {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+}
+
+.status-on-track {
+  @apply bg-green-100 text-green-800;
+}
+
+.status-needs-focus {
+  @apply bg-yellow-100 text-yellow-800;
+}
+
+.status-exceeding {
+  @apply bg-green-100 text-green-800;
+}
+
+.file-upload-zone {
+  @apply border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-primary transition-colors cursor-pointer;
+}
