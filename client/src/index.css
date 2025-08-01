@@ -4,67 +4,69 @@
 
 :root {
   /* Light neutrals with subtle blue undertones for a calming feel */
-  --background: hsl(213, 30%, 98%);
-  --foreground: hsl(213, 20%, 15%);
-  --muted: hsl(213, 25%, 94%);
-  --muted-foreground: hsl(213, 15%, 55%);
-  --popover: hsl(213, 30%, 98%);
-  --popover-foreground: hsl(213, 20%, 15%);
-  --card: hsl(0, 0%, 100%);
-  --card-foreground: hsl(213, 20%, 15%);
-  --border: hsl(213, 25%, 88%);
-  --input: hsl(213, 25%, 88%);
+  --background: 213 30% 98%;
+  --foreground: 213 20% 15%;
+  --muted: 213 25% 94%;
+  --muted-foreground: 213 15% 55%;
+  --popover: 213 30% 98%;
+  --popover-foreground: 213 20% 15%;
+  --card: 0 0% 100%;
+  --card-foreground: 213 20% 15%;
+  --border: 213 25% 88%;
+  --input: 213 25% 88%;
   
-  /* My IEP Hero calming color palette - Direct color values */
-  --primary: 213 94% 68%; /* Professional Blue: #4F9AFF */
+  /* My IEP Hero calming color palette - Professional Blue #4F9AFF */
+  --primary: 213 94% 68%;
   --primary-foreground: 0 0% 100%;
-  --secondary: 142 76% 73%; /* Soft Sage Green: #7DD3AC */
+  /* Soft Sage Green #7DD3AC */
+  --secondary: 142 76% 73%;
   --secondary-foreground: 213 20% 15%;
-  --accent: 25 95% 53%; /* Warm Support Orange: #FF7A1A */
+  /* Warm Support Orange #FF7A1A */
+  --accent: 25 95% 53%;
   --accent-foreground: 0 0% 100%;
   
   /* Status colors for supportive, non-overwhelming UX */
-  --success: hsl(142, 76%, 36%); /* Gentle Green */
-  --success-foreground: hsl(0, 0%, 100%);
-  --warning: hsl(43, 96%, 56%); /* Soft Amber */
-  --warning-foreground: hsl(213, 20%, 15%);
-  --destructive: hsl(0, 84%, 60%); /* Gentle Red */
-  --destructive-foreground: hsl(0, 0%, 100%);
+  --success: 142 76% 36%;
+  --success-foreground: 0 0% 100%;
+  --warning: 43 96% 56%;
+  --warning-foreground: 213 20% 15%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
   
-  --ring: hsl(213, 94%, 68%);
+  --ring: 213 94% 68%;
   --radius: 0.5rem;
 }
 
 .dark {
   /* Dark mode with calming blue undertones */
-  --background: hsl(213, 50%, 8%);
-  --foreground: hsl(213, 30%, 92%);
-  --muted: hsl(213, 40%, 15%);
-  --muted-foreground: hsl(213, 20%, 65%);
-  --popover: hsl(213, 50%, 8%);
-  --popover-foreground: hsl(213, 30%, 92%);
-  --card: hsl(213, 45%, 12%);
-  --card-foreground: hsl(213, 30%, 92%);
-  --border: hsl(213, 40%, 18%);
-  --input: hsl(213, 40%, 18%);
+  --background: 213 50% 8%;
+  --foreground: 213 30% 92%;
+  --muted: 213 40% 15%;
+  --muted-foreground: 213 20% 65%;
+  --popover: 213 50% 8%;
+  --popover-foreground: 213 30% 92%;
+  --card: 213 45% 12%;
+  --card-foreground: 213 30% 92%;
+  --border: 213 40% 18%;
+  --input: 213 40% 18%;
   
   /* My IEP Hero colors adapted for dark mode */
-  --primary: hsl(213, 94%, 68%); /* Professional Blue - same as light */
-  --primary-foreground: hsl(0, 0%, 100%);
-  --secondary: hsl(142, 60%, 45%); /* Soft Sage Green - darker for readability */
-  --secondary-foreground: hsl(213, 30%, 92%);
-  --accent: hsl(25, 95%, 53%); /* Warm Support Orange - same as light */
-  --accent-foreground: hsl(0, 0%, 100%);
+  --primary: 213 94% 68%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 142 60% 45%;
+  --secondary-foreground: 213 30% 92%;
+  --accent: 25 95% 53%;
+  --accent-foreground: 0 0% 100%;
   
   /* Status colors for dark mode */
-  --success: hsl(142, 70%, 40%); /* Gentle Green - adjusted */
-  --success-foreground: hsl(0, 0%, 100%);
-  --warning: hsl(43, 90%, 60%); /* Soft Amber - adjusted */
-  --warning-foreground: hsl(213, 50%, 8%);
-  --destructive: hsl(0, 80%, 65%); /* Gentle Red - adjusted */
-  --destructive-foreground: hsl(0, 0%, 100%);
+  --success: 142 70% 40%;
+  --success-foreground: 0 0% 100%;
+  --warning: 43 90% 60%;
+  --warning-foreground: 213 50% 8%;
+  --destructive: 0 80% 65%;
+  --destructive-foreground: 0 0% 100%;
   
-  --ring: hsl(213, 94%, 68%);
+  --ring: 213 94% 68%;
 }
 
 @layer base {
