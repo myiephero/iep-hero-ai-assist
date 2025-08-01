@@ -15,13 +15,13 @@
   --border: hsl(213, 25%, 88%);
   --input: hsl(213, 25%, 88%);
   
-  /* My IEP Hero calming color palette - Exact match from reference */  
-  --primary: hsl(213, 94%, 68%); /* Professional Blue from your reference image */
-  --primary-foreground: hsl(0, 0%, 100%);
-  --secondary: hsl(142, 76%, 73%); /* Soft Sage Green */
-  --secondary-foreground: hsl(213, 20%, 15%);
-  --accent: hsl(25, 95%, 53%); /* Warm Support Orange */
-  --accent-foreground: hsl(0, 0%, 100%);
+  /* My IEP Hero calming color palette - Exact specified values */
+  --primary: 213 94% 68%; /* Professional Blue: #4F9AFF */
+  --primary-foreground: 0 0% 100%;
+  --secondary: 142 76% 73%; /* Soft Sage Green: #7DD3AC */
+  --secondary-foreground: 213 20% 15%;
+  --accent: 25 95% 53%; /* Warm Support Orange: #FF7A1A */
+  --accent-foreground: 0 0% 100%;
   
   /* Status colors for supportive, non-overwhelming UX */
   --success: hsl(142, 76%, 36%); /* Gentle Green */

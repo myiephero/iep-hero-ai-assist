@@ -20,6 +20,23 @@ The platform includes Stripe payment integration and comprehensive user authenti
 
 Preferred communication style: Simple, everyday language.
 
+### Design System Colors
+The "My IEP Hero" platform uses a specific calming color palette designed for parents navigating IEP challenges:
+
+**Primary (Professional Blue):**
+- HSL: `213 94% 68%` 
+- Hex: `#4F9AFF`
+
+**Secondary (Soft Sage Green):**
+- HSL: `142 76% 73%`
+- Hex: `#7DD3AC`
+
+**Accent (Warm Support Orange):**
+- HSL: `25 95% 53%`
+- Hex: `#FF7A1A`
+
+These colors are implemented as CSS custom properties in the design system and used throughout both the React application and standalone HTML pages.
+
 ## System Architecture
 
 ### Frontend Architecture
