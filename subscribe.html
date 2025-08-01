@@ -1,30 +1,479 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>My IEP Hero – Subscribe</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My IEP Hero – Subscribe to Expert Advocacy</title>
   <script src="https://js.stripe.com/v3/"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      /* My IEP Hero calming color palette */
+      --primary: hsl(200, 85%, 65%); /* Soft Professional Blue */
+      --secondary: hsl(142, 76%, 73%); /* Soft Sage Green */
+      --accent: hsl(25, 95%, 53%); /* Warm Support Orange */
+      --success: hsl(142, 76%, 36%); /* Gentle Green */
+      --warning: hsl(43, 96%, 56%); /* Soft Amber */
+      --destructive: hsl(0, 84%, 60%); /* Gentle Red */
+      --background: hsl(213, 30%, 98%);
+      --foreground: hsl(213, 20%, 15%);
+      --muted: hsl(213, 25%, 94%);
+      --border: hsl(213, 25%, 88%);
+    }
+    
+    .bg-primary { background-color: hsl(200, 85%, 65%); }
+    .bg-secondary { background-color: hsl(142, 76%, 73%); }
+    .bg-accent { background-color: hsl(25, 95%, 53%); }
+    .text-primary { color: hsl(200, 85%, 65%); }
+    .border-primary { border-color: hsl(200, 85%, 65%); }
+    .hover\:bg-primary:hover { background-color: hsl(200, 85%, 60%); }
+    
+    .gradient-bg {
+      background: linear-gradient(135deg, hsl(213, 30%, 98%) 0%, hsl(200, 85%, 95%) 100%);
+    }
+    
+    .plan-card {
+      transition: all 0.3s ease;
+      background: white;
+      border: 2px solid hsl(213, 25%, 88%);
+    }
+    
+    .plan-card:hover {
+      border-color: hsl(200, 85%, 65%);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+      transform: translateY(-2px);
+    }
+    
+    .popular-badge {
+      background: linear-gradient(135deg, hsl(25, 95%, 53%) 0%, hsl(43, 96%, 56%) 100%);
+    }
+  </style>
 </head>
-<body>
-  <h1>Subscribe to a Plan</h1>
+<body class="gradient-bg min-h-screen">
+  <!-- Header -->
+  <header class="bg-white shadow-sm border-b border-border">
+    <div class="max-w-6xl mx-auto px-4 py-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-2">
+          <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+            <span class="text-white font-bold text-sm">IEP</span>
+          </div>
+          <h1 class="text-xl font-bold text-primary">My IEP Hero</h1>
+        </div>
+        <p class="text-sm text-gray-600">Secure IEP advocacy and parent support platform</p>
+      </div>
+    </div>
+  </header>
 
-  <button onclick="subscribe('parent_basic')">Parent Basic – $19/mo</button>
-  <button onclick="subscribe('advocate_pro')">Advocate Pro – $75/mo</button>
+  <!-- Main Content -->
+  <main class="max-w-6xl mx-auto px-4 py-12">
+    <!-- Hero Section -->
+    <div class="text-center mb-12">
+      <h2 class="text-4xl font-bold text-foreground mb-4">Choose Your Advocacy Plan</h2>
+      <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+        Connect with expert advocates, get AI-powered IEP analysis, and ensure your child receives 
+        the educational support they deserve.
+      </p>
+    </div>
+
+    <!-- Plan Type Tabs -->
+    <div class="flex justify-center mb-8">
+      <div class="bg-white rounded-lg p-1 shadow-sm border border-border">
+        <button onclick="showPlans('parent')" id="parent-tab" class="px-6 py-2 rounded-md font-medium transition-all bg-primary text-white">
+          Parent Plans
+        </button>
+        <button onclick="showPlans('advocate')" id="advocate-tab" class="px-6 py-2 rounded-md font-medium transition-all text-gray-600 hover:text-primary">
+          Professional Advocates
+        </button>
+      </div>
+    </div>
+
+    <!-- Parent Plans -->
+    <div id="parent-plans" class="grid md:grid-cols-3 gap-6 mb-8">
+      <!-- Parent Basic -->
+      <div class="plan-card rounded-lg p-6 relative">
+        <div class="mb-4">
+          <h3 class="text-xl font-bold text-foreground">Parent Basic</h3>
+          <p class="text-gray-600 text-sm">Essential support for involved parents</p>
+        </div>
+        <div class="mb-6">
+          <span class="text-3xl font-bold text-primary">$19</span>
+          <span class="text-gray-600">/month</span>
+        </div>
+        <ul class="space-y-3 mb-6">
+          <li class="flex items-start space-x-2">
+            <svg class="w-5 h-5 text-success mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-sm">Monthly 1-hour consultation call</span>
+          </li>
+          <li class="flex items-start space-x-2">
+            <svg class="w-5 h-5 text-success mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-sm">Email support within 48 hours</span>
+          </li>
+          <li class="flex items-start space-x-2">
+            <svg class="w-5 h-5 text-success mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-sm">Access to resource library</span>
+          </li>
+          <li class="flex items-start space-x-2">
+            <svg class="w-5 h-5 text-success mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-sm">IEP template and checklist tools</span>
+          </li>
+          <li class="flex items-start space-x-2">
+            <svg class="w-5 h-5 text-success mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-sm">Basic rights and law guidance</span>
+          </li>
+        </ul>
+        <button onclick="subscribe('parent-basic')" class="w-full bg-primary hover:bg-primary text-white font-medium py-3 px-4 rounded-lg transition-colors">
+          Get Started
+        </button>
+      </div>
+
+      <!-- Parent Premium -->
+      <div class="plan-card rounded-lg p-6 relative">
+        <div class="popular-badge absolute -top-3 left-1/2 transform -translate-x-1/2 px-4 py-1 rounded-full text-white text-xs font-medium">
+          Most Popular
+        </div>
+        <div class="mb-4">
+          <h3 class="text-xl font-bold text-foreground">Parent Premium</h3>
+          <p class="text-gray-600 text-sm">Enhanced support for complex cases</p>
+        </div>
+        <div class="mb-6">
+          <span class="text-3xl font-bold text-primary">$49</span>
+          <span class="text-gray-600">/month</span>
+        </div>
+        <ul class="space-y-3 mb-6">
+          <li class="flex items-start space-x-2">
+            <svg class="w-5 h-5 text-success mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-sm">Everything in Parent Basic, plus:</span>
+          </li>
+          <li class="flex items-start space-x-2">
+            <svg class="w-5 h-5 text-success mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-sm">Bi-weekly 1-hour consultation calls</span>
+          </li>
+          <li class="flex items-start space-x-2">
+            <svg class="w-5 h-5 text-success mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-sm">Priority email support (24-hour)</span>
+          </li>
+          <li class="flex items-start space-x-2">
+            <svg class="w-5 h-5 text-success mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-sm">IEP meeting preparation guidance</span>
+          </li>
+          <li class="flex items-start space-x-2">
+            <svg class="w-5 h-5 text-success mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-sm">Document review assistance</span>
+          </li>
+        </ul>
+        <button onclick="subscribe('parent-premium')" class="w-full bg-primary hover:bg-primary text-white font-medium py-3 px-4 rounded-lg transition-colors">
+          Get Started
+        </button>
+      </div>
+
+      <!-- Parent Pro -->
+      <div class="plan-card rounded-lg p-6 relative">
+        <div class="mb-4">
+          <h3 class="text-xl font-bold text-foreground">Parent Pro</h3>
+          <p class="text-gray-600 text-sm">Comprehensive parent advocacy package</p>
+        </div>
+        <div class="mb-6">
+          <span class="text-3xl font-bold text-primary">$29</span>
+          <span class="text-gray-600">/month</span>
+        </div>
+        <ul class="space-y-3 mb-6">
+          <li class="flex items-start space-x-2">
+            <svg class="w-5 h-5 text-success mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-sm">Everything in Parent Premium, plus:</span>
+          </li>
+          <li class="flex items-start space-x-2">
+            <svg class="w-5 h-5 text-success mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-sm">Weekly 1-hour consultation calls</span>
+          </li>
+          <li class="flex items-start space-x-2">
+            <svg class="w-5 h-5 text-success mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-sm">Emergency hotline access</span>
+          </li>
+          <li class="flex items-start space-x-2">
+            <svg class="w-5 h-5 text-success mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-sm">Virtual IEP meeting attendance</span>
+          </li>
+          <li class="flex items-start space-x-2">
+            <svg class="w-5 h-5 text-success mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-sm">Advanced advocacy templates</span>
+          </li>
+        </ul>
+        <button onclick="subscribe('parent-pro')" class="w-full bg-primary hover:bg-primary text-white font-medium py-3 px-4 rounded-lg transition-colors">
+          Get Started
+        </button>
+      </div>
+    </div>
+
+    <!-- Advocate Plans -->
+    <div id="advocate-plans" class="grid md:grid-cols-3 gap-6 mb-8 hidden">
+      <!-- Advocate Standard -->
+      <div class="plan-card rounded-lg p-6 relative">
+        <div class="mb-4">
+          <h3 class="text-xl font-bold text-foreground">Advocate Standard</h3>
+          <p class="text-gray-600 text-sm">Professional tools for advocates</p>
+        </div>
+        <div class="mb-6">
+          <span class="text-3xl font-bold text-primary">$75</span>
+          <span class="text-gray-600">/month</span>
+        </div>
+        <ul class="space-y-3 mb-6">
+          <li class="flex items-start space-x-2">
+            <svg class="w-5 h-5 text-success mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-sm">Unlimited client consultations</span>
+          </li>
+          <li class="flex items-start space-x-2">
+            <svg class="w-5 h-5 text-success mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-sm">IEP meeting attendance</span>
+          </li>
+          <li class="flex items-start space-x-2">
+            <svg class="w-5 h-5 text-success mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-sm">Professional resource library</span>
+          </li>
+          <li class="flex items-start space-x-2">
+            <svg class="w-5 h-5 text-success mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-sm">Legal document templates</span>
+          </li>
+          <li class="flex items-start space-x-2">
+            <svg class="w-5 h-5 text-success mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-sm">Case management tools</span>
+          </li>
+        </ul>
+        <button onclick="subscribe('advocate-standard')" class="w-full bg-primary hover:bg-primary text-white font-medium py-3 px-4 rounded-lg transition-colors">
+          Get Started
+        </button>
+      </div>
+
+      <!-- Advocate Premium -->
+      <div class="plan-card rounded-lg p-6 relative">
+        <div class="popular-badge absolute -top-3 left-1/2 transform -translate-x-1/2 px-4 py-1 rounded-full text-white text-xs font-medium">
+          Most Popular
+        </div>
+        <div class="mb-4">
+          <h3 class="text-xl font-bold text-foreground">Advocate Premium</h3>
+          <p class="text-gray-600 text-sm">Enhanced professional support</p>
+        </div>
+        <div class="mb-6">
+          <span class="text-3xl font-bold text-primary">$125</span>
+          <span class="text-gray-600">/month</span>
+        </div>
+        <ul class="space-y-3 mb-6">
+          <li class="flex items-start space-x-2">
+            <svg class="w-5 h-5 text-success mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-sm">Everything in Standard, plus:</span>
+          </li>
+          <li class="flex items-start space-x-2">
+            <svg class="w-5 h-5 text-success mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-sm">24/7 emergency support</span>
+          </li>
+          <li class="flex items-start space-x-2">
+            <svg class="w-5 h-5 text-success mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-sm">Expert network access</span>
+          </li>
+          <li class="flex items-start space-x-2">
+            <svg class="w-5 h-5 text-success mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-sm">Advanced case management tools</span>
+          </li>
+          <li class="flex items-start space-x-2">
+            <svg class="w-5 h-5 text-success mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-sm">Priority training access</span>
+          </li>
+        </ul>
+        <button onclick="subscribe('advocate-premium')" class="w-full bg-primary hover:bg-primary text-white font-medium py-3 px-4 rounded-lg transition-colors">
+          Get Started
+        </button>
+      </div>
+
+      <!-- Advocate Enterprise -->
+      <div class="plan-card rounded-lg p-6 relative">
+        <div class="mb-4">
+          <h3 class="text-xl font-bold text-foreground">Advocate Enterprise</h3>
+          <p class="text-gray-600 text-sm">Complete professional solution</p>
+        </div>
+        <div class="mb-6">
+          <span class="text-3xl font-bold text-primary">$199</span>
+          <span class="text-gray-600">/month</span>
+        </div>
+        <ul class="space-y-3 mb-6">
+          <li class="flex items-start space-x-2">
+            <svg class="w-5 h-5 text-success mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-sm">Everything in Premium, plus:</span>
+          </li>
+          <li class="flex items-start space-x-2">
+            <svg class="w-5 h-5 text-success mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-sm">Multi-case dashboard</span>
+          </li>
+          <li class="flex items-start space-x-2">
+            <svg class="w-5 h-5 text-success mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-sm">White-label client portal</span>
+          </li>
+          <li class="flex items-start space-x-2">
+            <svg class="w-5 h-5 text-success mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-sm">Custom training programs</span>
+          </li>
+          <li class="flex items-start space-x-2">
+            <svg class="w-5 h-5 text-success mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-sm">Dedicated account manager</span>
+          </li>
+        </ul>
+        <button onclick="subscribe('advocate-enterprise')" class="w-full bg-primary hover:bg-primary text-white font-medium py-3 px-4 rounded-lg transition-colors">
+          Get Started
+        </button>
+      </div>
+    </div>
+
+    <!-- Trust Indicators -->
+    <div class="bg-white rounded-lg p-8 shadow-sm border border-border">
+      <div class="grid md:grid-cols-3 gap-6 text-center">
+        <div class="flex items-center justify-center space-x-2">
+          <svg class="w-6 h-6 text-success" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-7-4z" clip-rule="evenodd"></path>
+          </svg>
+          <span class="font-medium text-gray-700">FERPA Compliant</span>
+        </div>
+        <div class="flex items-center justify-center space-x-2">
+          <svg class="w-6 h-6 text-success" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2z" clip-rule="evenodd"></path>
+          </svg>
+          <span class="font-medium text-gray-700">Secure & Encrypted</span>
+        </div>
+        <div class="flex items-center justify-center space-x-2">
+          <svg class="w-6 h-6 text-success" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+          </svg>
+          <span class="font-medium text-gray-700">Expert Support</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-border mt-16">
+    <div class="max-w-6xl mx-auto px-4 py-8">
+      <div class="text-center text-gray-600">
+        <p>&copy; 2025 My IEP Hero. Empowering families through expert IEP advocacy.</p>
+      </div>
+    </div>
+  </footer>
 
   <script>
-    // ✅ Your real Stripe publishable key
+    // Your real Stripe publishable key
     const stripe = Stripe("pk_test_51Rr3Ot8iKZXV0srZoLgITuaO6CwtlWVW4PVYgYVa3sfdcFbOy1t6OipSEXr9cYCFPrtOfL0kP8z8UTdvD0pa91tx00wNX0ZmGX");
 
+    function showPlans(type) {
+      const parentPlans = document.getElementById('parent-plans');
+      const advocatePlans = document.getElementById('advocate-plans');
+      const parentTab = document.getElementById('parent-tab');
+      const advocateTab = document.getElementById('advocate-tab');
+
+      if (type === 'parent') {
+        parentPlans.classList.remove('hidden');
+        advocatePlans.classList.add('hidden');
+        parentTab.classList.add('bg-primary', 'text-white');
+        parentTab.classList.remove('text-gray-600', 'hover:text-primary');
+        advocateTab.classList.remove('bg-primary', 'text-white');
+        advocateTab.classList.add('text-gray-600', 'hover:text-primary');
+      } else {
+        parentPlans.classList.add('hidden');
+        advocatePlans.classList.remove('hidden');
+        advocateTab.classList.add('bg-primary', 'text-white');
+        advocateTab.classList.remove('text-gray-600', 'hover:text-primary');
+        parentTab.classList.remove('bg-primary', 'text-white');
+        parentTab.classList.add('text-gray-600', 'hover:text-primary');
+      }
+    }
+
     async function subscribe(plan) {
-      const userId = "test-user"; // we will replace this with real auth later
+      try {
+        const userId = "test-user-" + Date.now(); // Temporary user ID
+        
+        const response = await fetch("/api/create-subscription", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userId, plan })
+        });
 
-      const response = await fetch("https://fee5faf2-f364-490e-b85d-8d0d4d221b0d-00-27o17n8aze2a6.janeway.replit.dev/create-checkout-session", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId, plan })
-      });
+        if (!response.ok) {
+          throw new Error('Failed to create subscription');
+        }
 
-      const data = await response.json();
-      stripe.redirectToCheckout({ sessionId: data.sessionId });
+        const data = await response.json();
+        
+        if (data.sessionId) {
+          // Redirect to Stripe Checkout
+          const result = await stripe.redirectToCheckout({ sessionId: data.sessionId });
+          if (result.error) {
+            console.error('Stripe error:', result.error);
+            alert('Payment error: ' + result.error.message);
+          }
+        } else {
+          console.error('No session ID received');
+          alert('Failed to start checkout process');
+        }
+      } catch (error) {
+        console.error('Subscription error:', error);
+        alert('Failed to start subscription process: ' + error.message);
+      }
     }
   </script>
 </body>
