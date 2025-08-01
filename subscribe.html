@@ -8,44 +8,44 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     :root {
-      /* My IEP Hero calming color palette - Exact specified values */
-      --primary: 213 94% 68%; /* Professional Blue: #4F9AFF */
-      --secondary: 142 76% 73%; /* Soft Sage Green: #7DD3AC */
-      --accent: 25 95% 53%; /* Warm Support Orange: #FF7A1A */
-      --success: hsl(142, 76%, 36%); /* Gentle Green */
-      --warning: hsl(43, 96%, 56%); /* Soft Amber */
-      --destructive: hsl(0, 84%, 60%); /* Gentle Red */
-      --background: hsl(213, 30%, 98%);
-      --foreground: hsl(213, 20%, 15%);
-      --muted: hsl(213, 25%, 94%);
-      --border: hsl(213, 25%, 88%);
+      /* My IEP Hero calming color palette - Direct hex values */
+      --primary: #4F9AFF; /* Professional Blue */
+      --secondary: #7DD3AC; /* Soft Sage Green */
+      --accent: #FF7A1A; /* Warm Support Orange */
+      --success: #4ade80; /* Gentle Green */
+      --warning: #fbbf24; /* Soft Amber */
+      --destructive: #ef4444; /* Gentle Red */
+      --background: #fafbfe;
+      --foreground: #1e293b;
+      --muted: #f1f5f9;
+      --border: #e2e8f0;
     }
     
-    .bg-primary { background-color: hsl(var(--primary)); }
-    .bg-secondary { background-color: hsl(var(--secondary)); }
-    .bg-accent { background-color: hsl(var(--accent)); }
-    .text-primary { color: hsl(var(--primary)); }
-    .border-primary { border-color: hsl(var(--primary)); }
-    .hover\:bg-primary:hover { background-color: hsl(213 94% 63%); }
+    .bg-primary { background-color: var(--primary); }
+    .bg-secondary { background-color: var(--secondary); }
+    .bg-accent { background-color: var(--accent); }
+    .text-primary { color: var(--primary); }
+    .border-primary { border-color: var(--primary); }
+    .hover\:bg-primary:hover { background-color: #3B82F6; }
     
     .gradient-bg {
-      background: linear-gradient(135deg, hsl(213, 30%, 98%) 0%, hsl(213 94% 95%) 100%);
+      background: linear-gradient(135deg, #fafbfe 0%, #e0f2fe 100%);
     }
     
     .plan-card {
       transition: all 0.3s ease;
       background: white;
-      border: 2px solid hsl(213, 25%, 88%);
+      border: 2px solid var(--border);
     }
     
     .plan-card:hover {
-      border-color: hsl(var(--primary));
+      border-color: var(--primary);
       box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
       transform: translateY(-2px);
     }
     
     .popular-badge {
-      background: linear-gradient(135deg, hsl(25, 95%, 53%) 0%, hsl(43, 96%, 56%) 100%);
+      background: linear-gradient(135deg, var(--accent) 0%, var(--warning) 100%);
     }
   </style>
 </head>
