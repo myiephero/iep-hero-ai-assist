@@ -15,7 +15,7 @@
   --border: hsl(213, 25%, 88%);
   --input: hsl(213, 25%, 88%);
   
-  /* My IEP Hero calming color palette */
+  /* My IEP Hero calming color palette - Updated Design System */
   --primary: hsl(213, 94%, 68%); /* Professional Blue */
   --primary-foreground: hsl(0, 0%, 100%);
   --secondary: hsl(142, 76%, 73%); /* Soft Sage Green */
@@ -23,7 +23,7 @@
   --accent: hsl(25, 95%, 53%); /* Warm Support Orange */
   --accent-foreground: hsl(0, 0%, 100%);
   
-  /* Status colors for supportive UX */
+  /* Status colors for supportive, non-overwhelming UX */
   --success: hsl(142, 76%, 36%); /* Gentle Green */
   --success-foreground: hsl(0, 0%, 100%);
   --warning: hsl(43, 96%, 56%); /* Soft Amber */
