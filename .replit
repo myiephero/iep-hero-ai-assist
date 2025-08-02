@@ -1,5 +1,5 @@
 [run]
-command = "npm run dev"
+command = "node server-js.js"
 
 [nix]
 channel = "stable"

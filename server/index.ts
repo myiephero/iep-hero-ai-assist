@@ -1,3 +1,3 @@
-// Redirect to minimal server to bypass complex dependencies
-console.log("🔄 Redirecting to minimal server...");
-import('./minimal.js');
+// tsx is broken - redirect to pure JS server
+console.log("🔄 tsx failing, trying pure JS...");
+import('../server-js.js');
