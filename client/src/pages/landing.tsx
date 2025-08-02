@@ -47,8 +47,8 @@ export default function Landing() {
       {/* Main Content */}
       <div className="flex flex-col lg:flex-row min-h-[calc(100vh-4rem)]">
         {/* Left side - Hero content */}
-        <div className="flex-1 flex flex-col justify-center px-4 sm:px-6 lg:px-8 py-12 bg-background">
-        <div className="max-w-lg mx-auto lg:mx-0">
+        <div className="w-full lg:w-1/2 flex flex-col justify-center px-4 sm:px-6 lg:px-8 py-12 bg-background">
+          <div className="max-w-lg mx-auto lg:mx-0">
             <h1 className="text-4xl lg:text-6xl font-bold mb-6">
               <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                 My IEP Hero
@@ -61,7 +61,6 @@ export default function Landing() {
               Connect with expert advocates, get AI-powered IEP analysis, and ensure your child receives the educational support they deserve.
             </p>
             
-            
             <div className="flex flex-col sm:flex-row gap-4 mb-12">
               <Button size="lg" className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 text-primary-foreground px-8" onClick={handleSignUp}>
                 Get Started Today
@@ -70,6 +69,7 @@ export default function Landing() {
                 Learn More
               </Button>
             </div>
+            
             {/* Trust Indicators */}
             <div className="flex flex-wrap gap-6 text-sm text-muted-foreground">
               <div className="flex items-center">
@@ -89,7 +89,7 @@ export default function Landing() {
         </div>
 
         {/* Right side - Sign in form */}
-        <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 bg-muted/30">
+        <div className="w-full lg:w-1/2 flex items-center justify-center px-4 sm:px-6 lg:px-8 bg-muted/30">
           <Card className="w-full max-w-md" id="signin-form">
             <CardHeader className="space-y-1">
               <CardTitle className="text-2xl font-bold">Welcome Back</CardTitle>
