@@ -91,7 +91,7 @@ export default function Landing() {
                   <Button
                     variant="default"
                     size="sm"
-                    className="flex-1 text-sm"
+                    className="flex-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 active:scale-95 transition-all duration-100"
                     onClick={() => setAuthMode("signin")}
                   >
                     Sign In
@@ -99,7 +99,7 @@ export default function Landing() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="flex-1 text-sm"
+                    className="flex-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 active:scale-95 transition-all duration-100"
                     onClick={() => setAuthMode("signup")}
                   >
                     Sign Up
@@ -116,7 +116,7 @@ export default function Landing() {
                       id="email"
                       type="email"
                       placeholder="Enter your email"
-                      className="w-full"
+                      className="w-full focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
@@ -128,45 +128,44 @@ export default function Landing() {
                       id="password"
                       type="password"
                       placeholder="Enter your password"
-                      className="w-full"
+                      className="w-full focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
                     />
                   </div>
-                  <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
+                  <Button 
+                    type="submit" 
+                    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 active:scale-95 transition-all duration-100"
+                  >
                     Sign In
                   </Button>
                 </form>
               </CardContent>
             </Card>
           ) : (
-            <Card className="w-full max-w-md">
-              <CardHeader className="space-y-1">
-                {/* Auth Mode Tabs */}
-                <div className="flex space-x-1 bg-muted p-1 rounded-lg mb-4">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="flex-1 text-sm"
-                    onClick={() => setAuthMode("signin")}
-                  >
-                    Sign In
-                  </Button>
-                  <Button
-                    variant="default"
-                    size="sm"
-                    className="flex-1 text-sm"
-                    onClick={() => setAuthMode("signup")}
-                  >
-                    Sign Up
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <SignUp onBackToSignIn={() => setAuthMode("signin")} />
-              </CardContent>
-            </Card>
+            <div className="w-full max-w-md">
+              {/* Auth Mode Tabs for Sign Up */}
+              <div className="flex space-x-1 bg-muted p-1 rounded-lg mb-4">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="flex-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 active:scale-95 transition-all duration-100"
+                  onClick={() => setAuthMode("signin")}
+                >
+                  Sign In
+                </Button>
+                <Button
+                  variant="default"
+                  size="sm"
+                  className="flex-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 active:scale-95 transition-all duration-100"
+                  onClick={() => setAuthMode("signup")}
+                >
+                  Sign Up
+                </Button>
+              </div>
+              <SignUp onBackToSignIn={() => setAuthMode("signin")} />
+            </div>
           )}
         </div>
       </div>

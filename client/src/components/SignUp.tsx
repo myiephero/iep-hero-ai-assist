@@ -49,102 +49,96 @@ export function SignUp({ onBackToSignIn }: SignUpProps) {
 
   if (step === 'role') {
     return (
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="w-fit -ml-2 mb-2"
-            onClick={onBackToSignIn}
-          >
-            <ArrowLeft className="h-4 w-4 mr-1" />
-            Back to Sign In
-          </Button>
-        </CardHeader>
-        <CardContent>
-          <AuthRoleSelect onRoleSelect={handleRoleSelect} />
-        </CardContent>
-      </Card>
+      <div>
+        <AuthRoleSelect onRoleSelect={handleRoleSelect} />
+      </div>
     );
   }
 
   if (step === 'form') {
     return (
-      <Card className="w-full max-w-md">
-        <CardHeader>
+      <div>
+        <div className="mb-6">
           <Button 
             variant="ghost" 
             size="sm" 
-            className="w-fit -ml-2 mb-2"
+            className="w-fit -ml-2 mb-4 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 active:scale-95 transition-all duration-100"
             onClick={() => setStep('role')}
           >
             <ArrowLeft className="h-4 w-4 mr-1" />
             Back to Role Selection
           </Button>
-          <CardTitle className="text-2xl font-bold">Complete Registration</CardTitle>
-          <p className="text-muted-foreground">
-            {selectedRole === 'parent' ? 'Create your parent account' : 'Apply for advocate access'}
-          </p>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleFormSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="firstName">First Name</Label>
-                <Input
-                  id="firstName"
-                  type="text"
-                  placeholder="Enter first name"
-                  value={formData.firstName}
-                  onChange={handleInputChange('firstName')}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="lastName">Last Name</Label>
-                <Input
-                  id="lastName"
-                  type="text"
-                  placeholder="Enter last name"
-                  value={formData.lastName}
-                  onChange={handleInputChange('lastName')}
-                  required
-                />
-              </div>
-            </div>
+          <div className="space-y-2">
+            <h2 className="text-2xl font-bold">Complete Registration</h2>
+            <p className="text-muted-foreground">
+              {selectedRole === 'parent' ? 'Create your parent account' : 'Apply for advocate access'}
+            </p>
+          </div>
+        </div>
+        <form onSubmit={handleFormSubmit} className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="firstName">First Name</Label>
               <Input
-                id="email"
-                type="email"
-                placeholder="Enter your email"
-                value={formData.email}
-                onChange={handleInputChange('email')}
+                id="firstName"
+                type="text"
+                placeholder="Enter first name"
+                className="focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                value={formData.firstName}
+                onChange={handleInputChange('firstName')}
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="lastName">Last Name</Label>
               <Input
-                id="password"
-                type="password"
-                placeholder="Create a password"
-                value={formData.password}
-                onChange={handleInputChange('password')}
+                id="lastName"
+                type="text"
+                placeholder="Enter last name"
+                className="focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                value={formData.lastName}
+                onChange={handleInputChange('lastName')}
                 required
               />
             </div>
-            <Button type="submit" className="w-full">
-              {selectedRole === 'parent' ? 'Continue to Plans' : 'Submit Application'}
-            </Button>
-          </form>
-        </CardContent>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="Enter your email"
+              className="focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+              value={formData.email}
+              onChange={handleInputChange('email')}
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="password">Password</Label>
+            <Input
+              id="password"
+              type="password"
+              placeholder="Create a password"
+              className="focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+              value={formData.password}
+              onChange={handleInputChange('password')}
+              required
+            />
+          </div>
+          <Button 
+            type="submit" 
+            className="w-full focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 active:scale-95 transition-all duration-100"
+          >
+            {selectedRole === 'parent' ? 'Continue to Plans' : 'Submit Application'}
+          </Button>
+        </form>
         
         <PricingModal 
           isOpen={showPricingModal} 
           onClose={() => setShowPricingModal(false)} 
         />
-      </Card>
+      </div>
     );
   }
 
