@@ -17,9 +17,9 @@ export default function Navbar() {
 
   const navItems = [
     { path: "/dashboard", label: "Dashboard" },
+    { path: "/goals", label: "Goals" },
     { path: "/documents", label: "Documents" },
-    { path: "/progress", label: "Progress" },
-    { path: "/messages", label: "Messages" },
+    { path: "/subscribe", label: "Subscribe" },
   ];
 
   const NavLinks = ({ mobile = false }) => (

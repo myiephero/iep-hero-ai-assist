@@ -8,6 +8,7 @@ import NotFound from "@/pages/not-found";
 import Login from "@/pages/login";
 import Dashboard from "@/pages/dashboard";
 import Documents from "@/pages/documents";
+import Goals from "@/pages/goals";
 import Subscribe from "@/pages/subscribe";
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
@@ -45,6 +46,11 @@ function Router() {
       <Route path="/documents">
         <AuthGuard>
           <Documents />
+        </AuthGuard>
+      </Route>
+      <Route path="/goals">
+        <AuthGuard>
+          <Goals />
         </AuthGuard>
       </Route>
       <Route path="/">

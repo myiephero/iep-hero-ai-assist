@@ -18,7 +18,7 @@ export default function Dashboard() {
   const [showSubscription, setShowSubscription] = useState(false);
 
   // Fetch dashboard data
-  const { data: goals = [], isLoading: goalsLoading } = useQuery({
+  const { data: goals = [], isLoading: goalsLoading } = useQuery<any[]>({
     queryKey: ["/api/goals"],
   });
 
@@ -36,7 +36,7 @@ export default function Dashboard() {
 
   // Calculate stats
   const stats = {
-    activeGoals: goals.filter((goal: any) => goal.status === "active").length,
+    activeGoals: goals.filter((goal: any) => goal.status === "In Progress" || goal.status === "Not Started").length,
     progressRate: goals.length > 0 
       ? Math.round(goals.reduce((acc: number, goal: any) => acc + (goal.progress || 0), 0) / goals.length)
       : 0,
