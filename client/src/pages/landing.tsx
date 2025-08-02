@@ -35,16 +35,16 @@ export default function Landing() {
             </div>
             <div className="flex items-center space-x-3">
               <Button 
-                variant="outline" 
+                variant="ghost" 
                 size="sm"
-                className="text-sm font-medium border-primary text-primary hover:bg-primary hover:text-primary-foreground" 
+                className="text-sm font-medium" 
                 onClick={handleSignInNav}
               >
                 Sign In
               </Button>
               <Button 
                 size="sm"
-                className="text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90" 
+                className="text-sm font-medium" 
                 onClick={handleSignUp}
               >
                 Sign Up
