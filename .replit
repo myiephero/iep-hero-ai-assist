@@ -1,5 +1,5 @@
 [run]
-command = "npx vite --config vite.config.ts"
+command = "npx vite"
 
 [nix]
 channel = "stable"
