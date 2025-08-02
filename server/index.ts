@@ -1,3 +1,2 @@
-// tsx is broken - redirect to pure JS server
-console.log("🔄 tsx failing, trying pure JS...");
-import('../server-js.js');
+// This file is no longer used - server-js.js runs directly via .replit
+console.log("This TypeScript server is bypassed - using pure JS server instead");
