@@ -9,11 +9,8 @@ import { Badge } from "../components/ui/badge";
 import { CheckCircle } from "lucide-react";
 import { useToast } from "../hooks/use-toast";
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY!);
-
-if (!import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY) {
-  throw new Error("VITE_STRIPE_PUBLISHABLE_KEY is required");
-}
+// Replace with your Stripe publishable key - this is safe to expose publicly
+const stripePromise = loadStripe("pk_test_51234567890abcdef..."); // Replace with your actual publishable key
 
 interface Plan {
   id: string;
