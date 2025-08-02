@@ -4,13 +4,11 @@ import path from "path";
 import { fileURLToPath, URL } from "url";
 import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 import { componentTagger } from "lovable-tagger";
-import tailwindcss from "@tailwindcss/vite";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig(({ mode }) => ({
   plugins: [
-    tailwindcss(),
     react(),
     mode === 'development' && componentTagger(),
     runtimeErrorOverlay(),
