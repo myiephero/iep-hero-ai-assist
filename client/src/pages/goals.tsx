@@ -13,7 +13,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon, Plus, Edit, Trash2, Target, TrendingUp } from "lucide-react";
+import { CalendarIcon, Plus, Edit, Trash2, Target, TrendingUp, BarChart3 } from "lucide-react";
+import GoalProgressChart from "@/components/charts/goal-progress-chart";
 import { format } from "date-fns";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -154,6 +155,13 @@ export default function Goals() {
 
   const completedGoals = goals.filter((goal: Goal) => goal.status === "Completed").length;
   const inProgressGoals = goals.filter((goal: Goal) => goal.status === "In Progress").length;
+
+  // Sort goals by due date descending (most recent due dates first)
+  const sortedGoals = [...goals].sort((a, b) => {
+    const dateA = new Date(a.dueDate).getTime();
+    const dateB = new Date(b.dueDate).getTime();
+    return dateB - dateA;
+  });
 
   if (isLoading) {
     return (
@@ -346,6 +354,11 @@ export default function Goals() {
         </Dialog>
       </div>
 
+      {/* Goal Progress Chart Section */}
+      <div className="mb-8">
+        <GoalProgressChart goals={goals} />
+      </div>
+
       {/* Progress Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card>
@@ -355,7 +368,10 @@ export default function Goals() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{overallProgress}%</div>
-            <Progress value={overallProgress} className="mt-2" />
+            <Progress 
+              value={overallProgress} 
+              className="mt-2 transition-all duration-1000 ease-out" 
+            />
           </CardContent>
         </Card>
 
@@ -403,8 +419,15 @@ export default function Goals() {
             </CardContent>
           </Card>
         ) : (
-          goals.map((goal: Goal) => (
-            <Card key={goal.id} className="hover:shadow-md transition-shadow">
+          sortedGoals.map((goal: Goal, index: number) => (
+            <Card 
+              key={goal.id} 
+              className="hover:shadow-md transition-all duration-300"
+              style={{ 
+                animationDelay: `${index * 100}ms`,
+                animation: "fadeInUp 0.6s ease-out forwards"
+              }}
+            >
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div className="space-y-1">
@@ -445,7 +468,11 @@ export default function Goals() {
                       <span>Progress</span>
                       <span>{goal.progress || 0}%</span>
                     </div>
-                    <Progress value={goal.progress || 0} />
+                    <Progress 
+                      value={goal.progress || 0} 
+                      className="transition-all duration-1000 ease-out"
+                      style={{ animationDelay: `${index * 200}ms` }}
+                    />
                   </div>
                   <div className="flex justify-between text-sm text-gray-500">
                     <span>Due: {format(new Date(goal.dueDate), "PPP")}</span>
