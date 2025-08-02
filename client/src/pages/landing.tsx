@@ -9,6 +9,7 @@ export default function Landing() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPricingModal, setShowPricingModal] = useState(false);
+  const [authMode, setAuthMode] = useState<"signin" | "signup">("signin");
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,23 +33,6 @@ export default function Landing() {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
               <span className="text-xl font-semibold text-foreground">My IEP Hero</span>
-            </div>
-            <div className="flex items-center space-x-3">
-              <Button 
-                variant="ghost" 
-                size="sm"
-                className="text-sm font-medium" 
-                onClick={handleSignInNav}
-              >
-                Sign In
-              </Button>
-              <Button 
-                size="sm"
-                className="text-sm font-medium" 
-                onClick={handleSignUp}
-              >
-                Sign Up
-              </Button>
             </div>
           </div>
         </div>
@@ -102,6 +86,28 @@ export default function Landing() {
         <div className="w-full lg:w-1/2 flex items-center justify-center px-4 sm:px-6 lg:px-8 bg-muted/30">
           <Card className="w-full max-w-md" id="signin-form">
             <CardHeader className="space-y-1">
+              {/* Auth Mode Tabs */}
+              <div className="flex space-x-1 bg-muted p-1 rounded-lg mb-4">
+                <Button
+                  variant={authMode === "signin" ? "default" : "ghost"}
+                  size="sm"
+                  className="flex-1 text-sm"
+                  onClick={() => setAuthMode("signin")}
+                >
+                  Sign In
+                </Button>
+                <Button
+                  variant={authMode === "signup" ? "default" : "ghost"}
+                  size="sm"
+                  className="flex-1 text-sm"
+                  onClick={() => {
+                    setAuthMode("signup");
+                    handleSignUp();
+                  }}
+                >
+                  Sign Up
+                </Button>
+              </div>
               <CardTitle className="text-2xl font-bold">Welcome Back</CardTitle>
               <p className="text-muted-foreground">Sign in to your My IEP Hero account</p>
             </CardHeader>
