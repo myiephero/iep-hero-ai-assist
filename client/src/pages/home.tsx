@@ -1,13 +1,13 @@
 import { useEffect } from "react";
-import { useAuth } from "@/hooks/useAuth";
-import { useToast } from "@/hooks/use-toast";
-import Navigation from "@/components/Navigation";
-import Footer from "@/components/Footer";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { useAuth } from "../hooks/useAuth";
+import { useToast } from "../hooks/use-toast";
+import Navigation from "../components/Navigation";
+import Footer from "../components/Footer";
+import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
+import { Button } from "../components/ui/button";
 import { Link } from "wouter";
 import { Calendar, FileText, Phone, Users, CheckCircle, Clock, AlertCircle } from "lucide-react";
-import type { User } from "@shared/schema";
+import type { User } from "../../../shared/schema";
 
 export default function Home() {
   const { user, isLoading } = useAuth() as { user: User | undefined; isLoading: boolean };

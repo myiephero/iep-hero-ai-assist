@@ -1,7 +1,7 @@
 import { useAuth } from "../hooks/useAuth";
 import { Button } from "./ui/button";
 import { Link } from "wouter";
-import type { User } from "@shared/schema";
+import type { User } from "../../../shared/schema";
 
 export default function Navigation() {
   const { isAuthenticated, user } = useAuth() as { isAuthenticated: boolean; user: User | undefined };
