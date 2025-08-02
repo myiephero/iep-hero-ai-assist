@@ -2,11 +2,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
+import { PricingModal } from "../components/PricingModal";
 import { useState } from "react";
 
 export default function Landing() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPricingModal, setShowPricingModal] = useState(false);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -15,8 +17,7 @@ export default function Landing() {
   };
 
   const handleSignUp = () => {
-    // Add sign up navigation logic here
-    window.location.href = "/api/auth/signup";
+    setShowPricingModal(true);
   };
 
   const handleSignInNav = () => {
@@ -34,13 +35,15 @@ export default function Landing() {
             </div>
             <div className="flex items-center space-x-3">
               <Button 
-                variant="ghost" 
-                className="text-sm font-medium text-primary hover:text-primary/80 hover:bg-primary/10" 
+                variant="outline" 
+                size="sm"
+                className="text-sm font-medium border-primary text-primary hover:bg-primary hover:text-primary-foreground" 
                 onClick={handleSignInNav}
               >
                 Sign In
               </Button>
               <Button 
+                size="sm"
                 className="text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90" 
                 onClick={handleSignUp}
               >
@@ -136,6 +139,11 @@ export default function Landing() {
           </Card>
         </div>
       </div>
+      
+      <PricingModal 
+        isOpen={showPricingModal} 
+        onClose={() => setShowPricingModal(false)} 
+      />
     </div>
   );
 }
