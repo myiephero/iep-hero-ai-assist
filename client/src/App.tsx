@@ -5,6 +5,7 @@ import { Toaster } from "./components/ui/toaster";
 import { TooltipProvider } from "./components/ui/tooltip";
 import NotFound from "./pages/not-found";
 import Landing from "./pages/landing";
+import Dashboard from "./pages/dashboard";
 import Home from "./pages/home";
 import Subscribe from "./pages/subscribe";
 import Success from "./pages/success";
@@ -16,6 +17,7 @@ function Router() {
   return (
     <Switch>
       {/* Public routes available to everyone */}
+      <Route path="/dashboard" component={Dashboard} />
       <Route path="/subscribe" component={Subscribe} />
       <Route path="/success" component={Success} />
       <Route path="/terms" component={Terms} />
