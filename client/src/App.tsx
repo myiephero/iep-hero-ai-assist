@@ -6,6 +6,7 @@ import { TooltipProvider } from "./components/ui/tooltip";
 import NotFound from "./pages/not-found";
 import Landing from "./pages/landing";
 import Dashboard from "./pages/dashboard";
+import Settings from "./pages/settings";
 import Home from "./pages/home";
 import Subscribe from "./pages/subscribe";
 import Success from "./pages/success";
@@ -18,6 +19,7 @@ function Router() {
     <Switch>
       {/* Public routes available to everyone */}
       <Route path="/dashboard" component={Dashboard} />
+      <Route path="/settings" component={Settings} />
       <Route path="/subscribe" component={Subscribe} />
       <Route path="/success" component={Success} />
       <Route path="/terms" component={Terms} />
