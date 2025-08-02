@@ -38,136 +38,117 @@ export default function Landing() {
       </nav>
 
       {/* Main Content */}
-      <div className="flex flex-col lg:flex-row min-h-[calc(100vh-4rem)]">
-        {/* Left side - Hero content */}
-        <div className="w-full lg:w-1/2 flex flex-col justify-center px-4 sm:px-6 lg:px-8 py-12 bg-background">
-          <div className="max-w-lg mx-auto lg:mx-0">
-            <h1 className="text-4xl lg:text-6xl font-bold mb-6">
-              <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                My IEP Hero
-              </span>
-            </h1>
-            <p className="text-xl text-muted-foreground mb-8">
-              Secure IEP advocacy and parent support platform
-            </p>
-            <p className="text-lg text-muted-foreground mb-8">
-              Connect with expert advocates, get AI-powered IEP analysis, and ensure your child receives the educational support they deserve.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 mb-12">
-              <Button size="lg" className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 text-primary-foreground px-8" onClick={handleSignUp}>
-                Get Started Today
-              </Button>
-              <Button variant="outline" size="lg" className="px-8" onClick={handleSignInNav}>
-                Learn More
-              </Button>
-            </div>
-            
-            {/* Trust Indicators */}
-            <div className="flex flex-wrap gap-6 text-sm text-muted-foreground">
-              <div className="flex items-center">
-                <div className="w-2 h-2 bg-success rounded-full mr-2"></div>
-                FERPA Compliant
-              </div>
-              <div className="flex items-center">
-                <div className="w-2 h-2 bg-success rounded-full mr-2"></div>
-                Secure & Encrypted
-              </div>
-              <div className="flex items-center">
-                <div className="w-2 h-2 bg-success rounded-full mr-2"></div>
-                Expert Support
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Right side - Auth form */}
-        <div className="w-full lg:w-1/2 flex items-center justify-center px-4 sm:px-6 lg:px-8 bg-muted/30">
-          {authMode === "signin" ? (
-            <Card className="w-full max-w-md" id="signin-form">
-              <CardHeader className="space-y-1">
-                {/* Auth Mode Tabs */}
-                <div className="flex space-x-1 bg-muted p-1 rounded-lg mb-4">
-                  <Button
-                    variant="default"
-                    size="sm"
-                    className="flex-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 active:scale-95 transition-all duration-100"
-                    onClick={() => setAuthMode("signin")}
-                  >
-                    Sign In
+      <div className="min-h-[calc(100vh-4rem)]">
+        {authMode === "signin" ? (
+          <div className="flex flex-col lg:flex-row min-h-[calc(100vh-4rem)]">
+            {/* Left side - Hero content */}
+            <div className="w-full lg:w-1/2 flex flex-col justify-center px-4 sm:px-6 lg:px-8 py-12 bg-background">
+              <div className="max-w-lg mx-auto lg:mx-0">
+                <h1 className="text-4xl lg:text-6xl font-bold mb-6">
+                  <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                    My IEP Hero
+                  </span>
+                </h1>
+                <p className="text-xl text-muted-foreground mb-8">
+                  Secure IEP advocacy and parent support platform
+                </p>
+                <p className="text-lg text-muted-foreground mb-8">
+                  Connect with expert advocates, get AI-powered IEP analysis, and ensure your child receives the educational support they deserve.
+                </p>
+                
+                <div className="flex flex-col sm:flex-row gap-4 mb-12">
+                  <Button size="lg" className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 text-primary-foreground px-8" onClick={handleSignUp}>
+                    Get Started Today
                   </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="flex-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 active:scale-95 transition-all duration-100"
-                    onClick={() => setAuthMode("signup")}
-                  >
-                    Sign Up
+                  <Button variant="outline" size="lg" className="px-8" onClick={handleSignInNav}>
+                    Learn More
                   </Button>
                 </div>
-                <CardTitle className="text-2xl font-bold">Welcome Back</CardTitle>
-                <p className="text-muted-foreground">Sign in to your My IEP Hero account</p>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <form onSubmit={handleSignIn} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="Enter your email"
-                      className="w-full focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                    />
+                
+                {/* Trust Indicators */}
+                <div className="flex flex-wrap gap-6 text-sm text-muted-foreground">
+                  <div className="flex items-center">
+                    <div className="w-2 h-2 bg-success rounded-full mr-2"></div>
+                    FERPA Compliant
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="password">Password</Label>
-                    <Input
-                      id="password"
-                      type="password"
-                      placeholder="Enter your password"
-                      className="w-full focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                    />
+                  <div className="flex items-center">
+                    <div className="w-2 h-2 bg-success rounded-full mr-2"></div>
+                    Secure & Encrypted
                   </div>
-                  <Button 
-                    type="submit" 
-                    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 active:scale-95 transition-all duration-100"
-                  >
-                    Sign In
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="w-full max-w-md">
-              {/* Auth Mode Tabs for Sign Up */}
-              <div className="flex space-x-1 bg-muted p-1 rounded-lg mb-4">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="flex-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 active:scale-95 transition-all duration-100"
-                  onClick={() => setAuthMode("signin")}
-                >
-                  Sign In
-                </Button>
-                <Button
-                  variant="default"
-                  size="sm"
-                  className="flex-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 active:scale-95 transition-all duration-100"
-                  onClick={() => setAuthMode("signup")}
-                >
-                  Sign Up
-                </Button>
+                  <div className="flex items-center">
+                    <div className="w-2 h-2 bg-success rounded-full mr-2"></div>
+                    Expert Support
+                  </div>
+                </div>
               </div>
-              <SignUp onBackToSignIn={() => setAuthMode("signin")} />
             </div>
-          )}
-        </div>
+
+            {/* Right side - Sign In form */}
+            <div className="w-full lg:w-1/2 flex items-center justify-center px-4 sm:px-6 lg:px-8 bg-muted/30">
+              <Card className="w-full max-w-md" id="signin-form">
+                <CardHeader className="space-y-1">
+                  {/* Auth Mode Tabs */}
+                  <div className="flex space-x-1 bg-muted p-1 rounded-lg mb-4">
+                    <Button
+                      variant="default"
+                      size="sm"
+                      className="flex-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 active:scale-95 transition-all duration-100"
+                      onClick={() => setAuthMode("signin")}
+                    >
+                      Sign In
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="flex-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 active:scale-95 transition-all duration-100"
+                      onClick={() => setAuthMode("signup")}
+                    >
+                      Sign Up
+                    </Button>
+                  </div>
+                  <CardTitle className="text-2xl font-bold">Welcome Back</CardTitle>
+                  <p className="text-muted-foreground">Sign in to your My IEP Hero account</p>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <form onSubmit={handleSignIn} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="email">Email</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="Enter your email"
+                        className="w-full focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="password">Password</Label>
+                      <Input
+                        id="password"
+                        type="password"
+                        placeholder="Enter your password"
+                        className="w-full focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <Button 
+                      type="submit" 
+                      className="w-full bg-primary hover:bg-primary/90 text-primary-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 active:scale-95 transition-all duration-100"
+                    >
+                      Sign In
+                    </Button>
+                  </form>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        ) : (
+          <SignUp onBackToSignIn={() => setAuthMode("signin")} />
+        )}
       </div>
     </div>
   );

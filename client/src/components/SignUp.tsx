@@ -1,146 +1,100 @@
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
-import { Label } from "./ui/label";
-import { AuthRoleSelect } from "./AuthRoleSelect";
-import { PricingModal } from "./PricingModal";
-import { ArrowLeft } from "lucide-react";
+import { useState } from 'react';
+import { cn } from '../lib/utils';
+import { Button } from './ui/button';
+import { Card } from './ui/card';
+import { UserIcon, BriefcaseIcon, ShieldCheckIcon } from 'lucide-react';
+
+const roles = [
+  {
+    label: 'Parent',
+    description: "Get expert support for your child's IEP journey",
+    badge: 'Free to Join',
+    icon: <UserIcon className="h-5 w-5 text-blue-500" />,
+    value: 'parent',
+  },
+  {
+    label: 'Advocate',
+    description: 'Help families navigate special education',
+    badge: 'Apply Now',
+    icon: <BriefcaseIcon className="h-5 w-5 text-green-500" />,
+    value: 'advocate',
+  },
+  {
+    label: 'Administrator',
+    description: 'Manage platform and user oversight',
+    badge: 'Invite Only',
+    icon: <ShieldCheckIcon className="h-5 w-5 text-indigo-500" />,
+    value: 'admin',
+  },
+];
 
 interface SignUpProps {
   onBackToSignIn: () => void;
 }
 
 export function SignUp({ onBackToSignIn }: SignUpProps) {
-  const [step, setStep] = useState<'role' | 'form' | 'pricing'>('role');
-  const [selectedRole, setSelectedRole] = useState<'parent' | 'advocate' | 'administrator' | null>(null);
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: ''
-  });
-  const [showPricingModal, setShowPricingModal] = useState(false);
+  const [selected, setSelected] = useState('parent');
 
-  const handleRoleSelect = (role: 'parent' | 'advocate' | 'administrator') => {
-    setSelectedRole(role);
-    if (role === 'administrator') {
-      // Handle invite-only flow differently
-      alert('Administrator accounts are invite-only. Please contact support for access.');
-      return;
-    }
-    setStep('form');
-  };
-
-  const handleFormSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (selectedRole === 'parent') {
-      setShowPricingModal(true);
-    } else if (selectedRole === 'advocate') {
-      // Handle advocate application process
-      console.log('Advocate application:', formData);
-      alert('Thank you for your application. We will review and contact you soon.');
-    }
-  };
-
-  const handleInputChange = (field: keyof typeof formData) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({ ...prev, [field]: e.target.value }));
-  };
-
-  if (step === 'role') {
-    return (
-      <div>
-        <AuthRoleSelect onRoleSelect={handleRoleSelect} />
-      </div>
-    );
-  }
-
-  if (step === 'form') {
-    return (
-      <div>
-        <div className="mb-6">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="w-fit -ml-2 mb-4 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 active:scale-95 transition-all duration-100"
-            onClick={() => setStep('role')}
-          >
-            <ArrowLeft className="h-4 w-4 mr-1" />
-            Back to Role Selection
+  return (
+    <div className="flex flex-col md:flex-row items-center justify-between px-8 py-16 max-w-7xl mx-auto">
+      <div className="max-w-lg mb-10 md:mb-0">
+        <h1 className="text-4xl md:text-5xl font-extrabold leading-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-emerald-400">
+          My IEP Hero
+        </h1>
+        <p className="mt-4 text-lg text-muted-foreground max-w-md">
+          Connect with expert advocates, get AI-powered IEP analysis,
+          and ensure your child receives the educational support they deserve.
+        </p>
+        <div className="mt-6 flex gap-4">
+          <Button className="bg-gradient-to-r from-blue-500 to-emerald-400 text-white shadow-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-400 transition-transform duration-100 active:scale-95">
+            Get Started Today
           </Button>
-          <div className="space-y-2">
-            <h2 className="text-2xl font-bold">Complete Registration</h2>
-            <p className="text-muted-foreground">
-              {selectedRole === 'parent' ? 'Create your parent account' : 'Apply for advocate access'}
-            </p>
-          </div>
+          <Button variant="outline">Learn More</Button>
         </div>
-        <form onSubmit={handleFormSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="firstName">First Name</Label>
-              <Input
-                id="firstName"
-                type="text"
-                placeholder="Enter first name"
-                className="focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-                value={formData.firstName}
-                onChange={handleInputChange('firstName')}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="lastName">Last Name</Label>
-              <Input
-                id="lastName"
-                type="text"
-                placeholder="Enter last name"
-                className="focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-                value={formData.lastName}
-                onChange={handleInputChange('lastName')}
-                required
-              />
-            </div>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="Enter your email"
-              className="focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-              value={formData.email}
-              onChange={handleInputChange('email')}
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="Create a password"
-              className="focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-              value={formData.password}
-              onChange={handleInputChange('password')}
-              required
-            />
-          </div>
-          <Button 
-            type="submit" 
-            className="w-full focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 active:scale-95 transition-all duration-100"
-          >
-            {selectedRole === 'parent' ? 'Continue to Plans' : 'Submit Application'}
-          </Button>
-        </form>
-        
-        <PricingModal 
-          isOpen={showPricingModal} 
-          onClose={() => setShowPricingModal(false)} 
-        />
+        <div className="mt-6 flex space-x-4 text-sm text-green-600">
+          <span className="before:content-['•'] before:mr-1">FERPA Compliant</span>
+          <span className="before:content-['•'] before:mr-1">Secure & Encrypted</span>
+          <span className="before:content-['•'] before:mr-1">Expert Support</span>
+        </div>
       </div>
-    );
-  }
 
-  return null;
+      <div className="w-full max-w-md">
+        <div className="flex justify-center space-x-4 mb-6">
+          <Button variant="ghost" onClick={onBackToSignIn}>Sign In</Button>
+          <Button variant="ghost" className="border-b-2 border-blue-500 rounded-none">Sign Up</Button>
+        </div>
+
+        <Card className="p-6 shadow-md">
+          <h2 className="text-xl font-semibold mb-4">Create Account</h2>
+          <p className="text-sm text-muted-foreground mb-6">
+            Join My IEP Hero and get the support you need
+          </p>
+
+          <div className="space-y-4">
+            {roles.map((role) => (
+              <button
+                key={role.value}
+                className={cn(
+                  'w-full text-left border rounded-lg p-4 flex items-center justify-between hover:shadow-md transition focus:outline-none focus:ring-2 focus:ring-blue-400 active:scale-95',
+                  selected === role.value && 'border-blue-500 bg-blue-50'
+                )}
+                onClick={() => setSelected(role.value)}
+              >
+                <div className="flex items-center gap-3">
+                  {role.icon}
+                  <div>
+                    <div className="font-medium text-sm">{role.label}</div>
+                    <div className="text-xs text-muted-foreground">{role.description}</div>
+                  </div>
+                </div>
+                <span className="text-xs font-semibold bg-green-200 text-green-700 px-2 py-1 rounded-full">
+                  {role.badge}
+                </span>
+              </button>
+            ))}
+          </div>
+        </Card>
+      </div>
+    </div>
+  );
 }
