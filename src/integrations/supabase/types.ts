@@ -14,6 +14,62 @@ export type Database = {
   }
   public: {
     Tables: {
+      availabilities: {
+        Row: {
+          advocate_id: string
+          created_at: string | null
+          date: string
+          end_time: string
+          id: string
+          is_available: boolean | null
+          is_recurring: boolean | null
+          max_bookings: number | null
+          recurring_pattern: string | null
+          recurring_until: string | null
+          start_time: string
+          timezone: string
+          updated_at: string | null
+        }
+        Insert: {
+          advocate_id: string
+          created_at?: string | null
+          date: string
+          end_time: string
+          id?: string
+          is_available?: boolean | null
+          is_recurring?: boolean | null
+          max_bookings?: number | null
+          recurring_pattern?: string | null
+          recurring_until?: string | null
+          start_time: string
+          timezone?: string
+          updated_at?: string | null
+        }
+        Update: {
+          advocate_id?: string
+          created_at?: string | null
+          date?: string
+          end_time?: string
+          id?: string
+          is_available?: boolean | null
+          is_recurring?: boolean | null
+          max_bookings?: number | null
+          recurring_pattern?: string | null
+          recurring_until?: string | null
+          start_time?: string
+          timezone?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "availabilities_advocate_id_fkey"
+            columns: ["advocate_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       children: {
         Row: {
           created_at: string
@@ -109,6 +165,107 @@ export type Database = {
         }
         Relationships: []
       }
+      meetings: {
+        Row: {
+          advocate_id: string
+          advocate_notes: string | null
+          availability_id: string | null
+          cancellation_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          created_at: string | null
+          duration_minutes: number | null
+          follow_up_sent: boolean | null
+          id: string
+          meeting_datetime: string
+          meeting_link: string | null
+          meeting_location: string | null
+          meeting_phone: string | null
+          meeting_topic: string | null
+          parent_id: string
+          parent_notes: string | null
+          reminder_sent: boolean | null
+          status: string | null
+          timezone: string
+          updated_at: string | null
+        }
+        Insert: {
+          advocate_id: string
+          advocate_notes?: string | null
+          availability_id?: string | null
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
+          cancelled_by?: string | null
+          created_at?: string | null
+          duration_minutes?: number | null
+          follow_up_sent?: boolean | null
+          id?: string
+          meeting_datetime: string
+          meeting_link?: string | null
+          meeting_location?: string | null
+          meeting_phone?: string | null
+          meeting_topic?: string | null
+          parent_id: string
+          parent_notes?: string | null
+          reminder_sent?: boolean | null
+          status?: string | null
+          timezone: string
+          updated_at?: string | null
+        }
+        Update: {
+          advocate_id?: string
+          advocate_notes?: string | null
+          availability_id?: string | null
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
+          cancelled_by?: string | null
+          created_at?: string | null
+          duration_minutes?: number | null
+          follow_up_sent?: boolean | null
+          id?: string
+          meeting_datetime?: string
+          meeting_link?: string | null
+          meeting_location?: string | null
+          meeting_phone?: string | null
+          meeting_topic?: string | null
+          parent_id?: string
+          parent_notes?: string | null
+          reminder_sent?: boolean | null
+          status?: string | null
+          timezone?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meetings_advocate_id_fkey"
+            columns: ["advocate_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "meetings_availability_id_fkey"
+            columns: ["availability_id"]
+            isOneToOne: false
+            referencedRelation: "availabilities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "meetings_cancelled_by_fkey"
+            columns: ["cancelled_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "meetings_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -157,6 +314,45 @@ export type Database = {
           specializations?: string[] | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      user_profiles: {
+        Row: {
+          auth_id: string | null
+          bio: string | null
+          created_at: string | null
+          email: string
+          full_name: string
+          id: string
+          organization: string | null
+          role: string
+          timezone: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          auth_id?: string | null
+          bio?: string | null
+          created_at?: string | null
+          email: string
+          full_name: string
+          id?: string
+          organization?: string | null
+          role: string
+          timezone?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          auth_id?: string | null
+          bio?: string | null
+          created_at?: string | null
+          email?: string
+          full_name?: string
+          id?: string
+          organization?: string | null
+          role?: string
+          timezone?: string | null
+          updated_at?: string | null
         }
         Relationships: []
       }
