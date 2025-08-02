@@ -32,17 +32,16 @@ export default function Landing() {
             <div className="flex items-center">
               <span className="text-xl font-semibold text-foreground">My IEP Hero</span>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-3">
               <Button 
                 variant="ghost" 
-                className="text-sm font-medium text-foreground hover:text-primary hover:bg-accent" 
+                className="text-sm font-medium text-primary hover:text-primary/80 hover:bg-primary/10" 
                 onClick={handleSignInNav}
               >
                 Sign In
               </Button>
               <Button 
-                variant="outline" 
-                className="text-sm font-medium border-border text-foreground hover:bg-accent hover:text-accent-foreground" 
+                className="text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90" 
                 onClick={handleSignUp}
               >
                 Sign Up
