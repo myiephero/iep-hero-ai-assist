@@ -1,5 +1,5 @@
-import { useAuth } from "@/hooks/useAuth";
-import { Button } from "@/components/ui/button";
+import { useAuth } from "../hooks/useAuth";
+import { Button } from "./ui/button";
 import { Link } from "wouter";
 import type { User } from "@shared/schema";
 

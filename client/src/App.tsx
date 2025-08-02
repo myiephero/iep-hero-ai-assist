@@ -1,15 +1,15 @@
 import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { Toaster } from "@/components/ui/toaster";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import NotFound from "@/pages/not-found";
-import Landing from "@/pages/landing";
-import Home from "@/pages/home";
-import Subscribe from "@/pages/subscribe";
-import Success from "@/pages/success";
-import Terms from "@/pages/terms";
-import Privacy from "@/pages/privacy";
+import { Toaster } from "./components/ui/toaster";
+import { TooltipProvider } from "./components/ui/tooltip";
+import NotFound from "./pages/not-found";
+import Landing from "./pages/landing";
+import Home from "./pages/home";
+import Subscribe from "./pages/subscribe";
+import Success from "./pages/success";
+import Terms from "./pages/terms";
+import Privacy from "./pages/privacy";
 // Authentication temporarily disabled to fix infinite loop
 
 function Router() {
