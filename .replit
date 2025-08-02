@@ -1,8 +1,9 @@
 [run]
-command = "npx vite"
+command = "npx vite --config vite.config.ts"
 
 [nix]
 channel = "stable"
 
 [env]
 NODE_ENV = "development"
+PORT = "8080"

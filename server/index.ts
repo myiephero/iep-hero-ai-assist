@@ -1,2 +1,17 @@
-// This file is no longer used - server-js.js runs directly via .replit
-console.log("This TypeScript server is bypassed - using pure JS server instead");
+import { spawn } from 'child_process';
+
+console.log("🚀 Starting Vite development server...");
+
+// Start Vite from the project root
+const vite = spawn('npx', ['vite', '--config', 'vite.config.ts'], {
+  stdio: 'inherit',
+  shell: true
+});
+
+vite.on('error', (error) => {
+  console.error('❌ Failed to start Vite:', error);
+});
+
+vite.on('close', (code) => {
+  console.log(`Vite process exited with code ${code}`);
+});
