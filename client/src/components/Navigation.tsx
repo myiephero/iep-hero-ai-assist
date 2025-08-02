@@ -4,7 +4,7 @@ import { Link } from "wouter";
 import type { User } from "../../../shared/schema";
 
 export default function Navigation() {
-  const { isAuthenticated, user } = useAuth() as { isAuthenticated: boolean; user: User | undefined };
+  const { isAuthenticated, user, isLoading } = useAuth() as { isAuthenticated: boolean; user: any | undefined; isLoading: boolean };
 
   return (
     <nav className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
