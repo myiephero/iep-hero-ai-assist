@@ -10,16 +10,21 @@ const app = express();
 console.log("🔧 Setting up basic routes...");
 
 // Serve static files from client directory
-app.use(express.static(path.join(__dirname, '../client')));
+const clientPath = path.join(__dirname, 'client');
+console.log(`📁 Looking for client files at: ${clientPath}`);
+app.use(express.static(clientPath));
 
 // Simple health check
 app.get('/api/health', (req, res) => {
+  console.log("🏥 Health check requested");
   res.json({ status: 'OK', message: 'Pure JS server working!' });
 });
 
 // Serve index.html for all routes
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/index.html'));
+  const indexPath = path.join(__dirname, 'client/index.html');
+  console.log(`📄 Serving index.html from: ${indexPath}`);
+  res.sendFile(indexPath);
 });
 
 const port = parseInt(process.env.PORT || '5000', 10);
