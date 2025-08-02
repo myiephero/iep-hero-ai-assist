@@ -18,10 +18,12 @@ export const users = pgTable("users", {
 export const iepGoals = pgTable("iep_goals", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").notNull().references(() => users.id),
+  studentId: varchar("student_id"), // Optional student identifier for multi-student households
   title: text("title").notNull(),
   description: text("description").notNull(),
   progress: integer("progress").default(0), // percentage 0-100
-  status: text("status").notNull().default("active"), // active, completed, on_hold
+  status: text("status").notNull().default("Not Started"), // Not Started, In Progress, Completed
+  dueDate: timestamp("due_date").notNull(),
   targetDate: timestamp("target_date"),
   createdAt: timestamp("created_at").default(sql`now()`),
   updatedAt: timestamp("updated_at").default(sql`now()`),
@@ -70,6 +72,9 @@ export const insertGoalSchema = createInsertSchema(iepGoals).omit({
   userId: true,
   createdAt: true,
   updatedAt: true,
+}).extend({
+  status: z.enum(["Not Started", "In Progress", "Completed"]).default("Not Started"),
+  progress: z.number().min(0).max(100).default(0),
 });
 
 export const insertDocumentSchema = createInsertSchema(documents).omit({

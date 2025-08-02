@@ -44,6 +44,70 @@ export class MemStorage implements IStorage {
     this.documents = new Map();
     this.events = new Map();
     this.messages = new Map();
+    
+    // Add sample data for development
+    this.initializeSampleData();
+  }
+  
+  private initializeSampleData() {
+    // Create sample user
+    const sampleUser: User = {
+      id: "sample-user-1",
+      email: "demo@example.com",
+      username: "Demo User",
+      password: "hashed-password",
+      role: "parent",
+      stripeCustomerId: null,
+      stripeSubscriptionId: null,
+      subscriptionTier: "free",
+      createdAt: new Date()
+    };
+    this.users.set("sample-user-1", sampleUser);
+    
+    // Add sample goals
+    const sampleGoals = [
+      {
+        id: "goal-1",
+        userId: "sample-user-1",
+        studentId: "student-001",
+        title: "Improve Reading Comprehension",
+        description: "Student will read grade-level texts and answer comprehension questions with 80% accuracy",
+        progress: 65,
+        status: "In Progress",
+        dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
+        targetDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        id: "goal-2", 
+        userId: "sample-user-1",
+        studentId: "student-001",
+        title: "Math Problem Solving",
+        description: "Student will solve multi-step word problems using appropriate strategies with minimal prompting",
+        progress: 40,
+        status: "In Progress",
+        dueDate: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000), // 45 days from now
+        targetDate: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000),
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        id: "goal-3",
+        userId: "sample-user-1", 
+        studentId: "student-001",
+        title: "Social Communication Skills",
+        description: "Student will initiate conversations with peers during structured activities",
+        progress: 100,
+        status: "Completed",
+        dueDate: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000), // 10 days ago
+        targetDate: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    ];
+    
+    sampleGoals.forEach(goal => this.goals.set(goal.id, goal as Goal));
   }
 
   async getUser(id: string): Promise<User | undefined> {
