@@ -1,5 +1,5 @@
 [run]
-command = "node server-js.js"
+command = "npx vite"
 
 [nix]
 channel = "stable"
