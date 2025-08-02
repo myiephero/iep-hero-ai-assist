@@ -45,6 +45,10 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  console.log("🚀 Starting server...");
+  console.log("NODE_ENV:", process.env.NODE_ENV);
+  console.log("Port:", process.env.PORT || '5000');
+  
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
@@ -59,8 +63,11 @@ app.use((req, res, next) => {
   // setting up all the other routes so the catch-all route
   // doesn't interfere with the other routes
   if (app.get("env") === "development") {
+    console.log("🔧 Setting up Vite in development mode...");
     await setupVite(app, server);
+    console.log("✅ Vite setup complete");
   } else {
+    console.log("📦 Serving static files in production mode...");
     serveStatic(app);
   }
 
@@ -74,6 +81,7 @@ app.use((req, res, next) => {
     host: "0.0.0.0",
     reusePort: true,
   }, () => {
+    console.log(`🌟 Server successfully started on port ${port}`);
     log(`serving on port ${port}`);
   });
 })();
