@@ -25,20 +25,25 @@ const getOidcConfig = memoize(
 export function getSession() {
   const sessionTtl = 7 * 24 * 60 * 60 * 1000; // 1 week
   const pgStore = connectPg(session);
-  const sessionStore = new pgStore({
-    conString: process.env.DATABASE_URL,
-    createTableIfMissing: false,
-    ttl: sessionTtl,
-    tableName: "sessions",
-  });
+  
+  // Use a fallback session store if DATABASE_URL is not configured
+  const sessionStore = process.env.DATABASE_URL && process.env.DATABASE_URL !== "postgresql://dummy:dummy@localhost:5432/dummy" 
+    ? new pgStore({
+        conString: process.env.DATABASE_URL,
+        createTableIfMissing: false,
+        ttl: sessionTtl,
+        tableName: "sessions",
+      })
+    : null;
+    
   return session({
-    secret: process.env.SESSION_SECRET!,
-    store: sessionStore,
+    secret: process.env.SESSION_SECRET || "dev-secret-please-change-in-production",
+    store: sessionStore || undefined,
     resave: false,
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: true,
+      secure: false, // Allow non-HTTPS in development
       maxAge: sessionTtl,
     },
   });
