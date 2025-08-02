@@ -61,15 +61,15 @@ export default function Landing() {
               Connect with expert advocates, get AI-powered IEP analysis, and ensure your child receives the educational support they deserve.
             </p>
             
+            
             <div className="flex flex-col sm:flex-row gap-4 mb-12">
-              <Button size="lg" className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 text-white px-8">
+              <Button size="lg" className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 text-white px-8" onClick={handleSignUp}>
                 Get Started Today
               </Button>
-              <Button variant="outline" size="lg" className="px-8">
+              <Button variant="outline" size="lg" className="px-8" onClick={handleSignInNav}>
                 Learn More
               </Button>
             </div>
-            
             {/* Trust Indicators */}
             <div className="flex flex-wrap gap-6 text-sm text-muted-foreground">
               <div className="flex items-center">
