@@ -8,6 +8,12 @@ import Landing from "./pages/landing";
 import Dashboard from "./pages/dashboard";
 import Settings from "./pages/settings";
 import LetterGenerator from "./pages/letter-generator";
+import MeetingPrep from "./pages/meeting-prep";
+import Documents from "./pages/documents";
+import ProgressPage from "./pages/progress";
+import Rights from "./pages/rights";
+import Scheduling from "./pages/scheduling";
+import Messages from "./pages/messages";
 import Home from "./pages/home";
 import Subscribe from "./pages/subscribe";
 import Success from "./pages/success";
@@ -22,6 +28,12 @@ function Router() {
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/settings" component={Settings} />
       <Route path="/letter-generator" component={LetterGenerator} />
+      <Route path="/meeting-prep" component={MeetingPrep} />
+      <Route path="/documents" component={Documents} />
+      <Route path="/progress" component={ProgressPage} />
+      <Route path="/rights" component={Rights} />
+      <Route path="/scheduling" component={Scheduling} />
+      <Route path="/messages" component={Messages} />
       <Route path="/subscribe" component={Subscribe} />
       <Route path="/success" component={Success} />
       <Route path="/terms" component={Terms} />
