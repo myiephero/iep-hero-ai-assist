@@ -10,7 +10,7 @@ import { CheckCircle } from "lucide-react";
 import { useToast } from "../hooks/use-toast";
 
 // Replace with your Stripe publishable key - this is safe to expose publicly
-const stripePromise = loadStripe("pk_test_51234567890abcdef..."); // Replace with your actual publishable key
+const stripePromise = loadStripe("pk_test_51Rr3Ot8iKZXV0srZoLgITuaO6CwtlWVW4PVYgYVa3sfdcFbOy1t6OipSEXr9cYCFPrtOfL0kP8z8UTdvD0pa91tx00wNX0ZmGX");
 
 interface Plan {
   id: string;
