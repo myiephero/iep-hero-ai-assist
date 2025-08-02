@@ -51,8 +51,15 @@ export function AuthRoleSelect({ onRoleSelect }: AuthRoleSelectProps) {
           return (
             <Card 
               key={role.id}
-              className="relative cursor-pointer transition-all hover:shadow-lg hover:scale-[1.02]"
+              className="relative cursor-pointer transition-all duration-100 hover:shadow-lg hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 active:scale-95"
               onClick={() => onRoleSelect(role.id)}
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  onRoleSelect(role.id);
+                }
+              }}
             >
               <div className={`absolute inset-0 bg-gradient-to-r ${role.gradient} opacity-5 rounded-lg`}></div>
               <CardHeader className="relative">
