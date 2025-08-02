@@ -12,6 +12,7 @@ console.log("🔧 Setting up basic routes...");
 // Serve static files from client directory
 const clientPath = path.join(__dirname, 'client');
 console.log(`📁 Looking for client files at: ${clientPath}`);
+console.log(`📁 Current directory: ${__dirname}`);
 app.use(express.static(clientPath));
 
 // Simple health check
