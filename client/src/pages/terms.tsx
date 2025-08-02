@@ -4,164 +4,173 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function Terms() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <Navigation />
       
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Terms of Service</h1>
-          <p className="text-lg text-gray-600">Last updated: December 2024</p>
+      <div className="py-20 px-4">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-12">
+            <h1 className="text-4xl font-bold mb-4">Terms of Service</h1>
+            <p className="text-muted-foreground">
+              Last updated: {new Date().toLocaleDateString()}
+            </p>
+          </div>
+
+          <div className="space-y-8">
+            <Card>
+              <CardHeader>
+                <CardTitle>1. Agreement to Terms</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p>
+                  By accessing and using IEP Advocacy services, you accept and agree to be bound by 
+                  the terms and provision of this agreement. If you do not agree to abide by the above, 
+                  please do not use this service.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>2. Service Description</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="mb-4">
+                  IEP Advocacy provides consultation, support, and advocacy services related to 
+                  Individual Education Programs (IEPs) for children with disabilities. Our services include:
+                </p>
+                <ul className="list-disc pl-6 space-y-2">
+                  <li>IEP document review and analysis</li>
+                  <li>Meeting preparation and support</li>
+                  <li>Educational advocacy guidance</li>
+                  <li>Resource and template access</li>
+                </ul>
+                <p className="mt-4 font-semibold">
+                  IMPORTANT: We do not provide legal advice. Our services are educational and 
+                  supportive in nature. For legal matters, please consult with a qualified attorney.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>3. Subscription Terms</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="font-semibold">Billing</h4>
+                    <p>
+                      Subscriptions are billed monthly in advance. All fees are non-refundable 
+                      except as required by law.
+                    </p>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold">Payment</h4>
+                    <p>
+                      You agree to pay all fees associated with your subscription plan. Payment 
+                      is due monthly in advance.
+                    </p>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold">Cancellation</h4>
+                    <p>
+                      You may cancel your subscription at any time. Cancellation will take effect 
+                      at the end of your current billing period.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>4. User Responsibilities</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="mb-4">You agree to:</p>
+                <ul className="list-disc pl-6 space-y-2">
+                  <li>Provide accurate and complete information</li>
+                  <li>Maintain the confidentiality of your account credentials</li>
+                  <li>Use our services in accordance with applicable laws</li>
+                  <li>Not share your account access with unauthorized parties</li>
+                  <li>Respect the intellectual property rights of our materials</li>
+                </ul>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>5. Confidentiality and Privacy</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p>
+                  We are committed to protecting your privacy and the confidentiality of your 
+                  child's educational information. All information shared with us will be treated 
+                  as confidential and used solely for the purpose of providing our services. 
+                  Please refer to our Privacy Policy for detailed information about how we 
+                  collect, use, and protect your data.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>6. Limitation of Liability</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p>
+                  IEP Advocacy provides information and support services but cannot guarantee 
+                  specific outcomes in your child's educational program. We are not responsible 
+                  for decisions made by school districts or the results of IEP meetings. Our 
+                  liability is limited to the amount you paid for our services.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>7. Termination</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p>
+                  We reserve the right to terminate or suspend your account if you violate these 
+                  terms of service. Upon termination, your right to use our services will cease 
+                  immediately.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>8. Changes to Terms</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p>
+                  We reserve the right to modify these terms at any time. We will notify you of 
+                  any material changes via email or through our website. Your continued use of 
+                  our services after such notification constitutes acceptance of the new terms.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>9. Contact Information</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p>
+                  If you have any questions about these Terms of Service, please contact us at:
+                </p>
+                <div className="mt-4">
+                  <p>Email: legal@iepadvocacy.com</p>
+                  <p>Phone: (555) 123-4567</p>
+                  <p>Address: 123 Education Way, Suite 100, City, State 12345</p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Agreement to Terms</CardTitle>
-          </CardHeader>
-          <CardContent className="prose max-w-none">
-            <p>
-              By accessing and using IEP Advocacy services, you agree to be bound by these Terms of Service 
-              and all applicable laws and regulations. If you do not agree with any of these terms, you are 
-              prohibited from using our services.
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="mt-8">
-          <CardHeader>
-            <CardTitle>Service Description</CardTitle>
-          </CardHeader>
-          <CardContent className="prose max-w-none">
-            <p>
-              IEP Advocacy provides educational advocacy services, consultation, and support for families 
-              navigating the Individualized Education Program (IEP) process. Our services include:
-            </p>
-            <ul>
-              <li>Educational advocacy consultation</li>
-              <li>IEP meeting support and preparation</li>
-              <li>Document review and guidance</li>
-              <li>Educational rights information</li>
-              <li>Resource library access</li>
-            </ul>
-            <p>
-              <strong>Important:</strong> Our services do not constitute legal advice. We are educational 
-              advocates, not attorneys. For legal matters, we can provide referrals to qualified attorneys.
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="mt-8">
-          <CardHeader>
-            <CardTitle>Subscription Terms</CardTitle>
-          </CardHeader>
-          <CardContent className="prose max-w-none">
-            <h4>Billing and Payment</h4>
-            <ul>
-              <li>Subscriptions are billed monthly in advance</li>
-              <li>Payment is processed automatically via Stripe</li>
-              <li>Prices are subject to change with 30 days notice</li>
-              <li>No refunds for partial months of service</li>
-            </ul>
-            
-            <h4>Cancellation</h4>
-            <ul>
-              <li>You may cancel your subscription at any time</li>
-              <li>Cancellation takes effect at the end of the current billing period</li>
-              <li>You retain access to services until the end of the paid period</li>
-              <li>Canceled accounts cannot be reactivated; you must subscribe again</li>
-            </ul>
-          </CardContent>
-        </Card>
-
-        <Card className="mt-8">
-          <CardHeader>
-            <CardTitle>User Responsibilities</CardTitle>
-          </CardHeader>
-          <CardContent className="prose max-w-none">
-            <p>You agree to:</p>
-            <ul>
-              <li>Provide accurate and current information</li>
-              <li>Maintain the security of your account credentials</li>
-              <li>Use services only for lawful purposes</li>
-              <li>Respect the confidentiality of other families</li>
-              <li>Not share your account access with others</li>
-            </ul>
-          </CardContent>
-        </Card>
-
-        <Card className="mt-8">
-          <CardHeader>
-            <CardTitle>Confidentiality and Privacy</CardTitle>
-          </CardHeader>
-          <CardContent className="prose max-w-none">
-            <p>
-              We maintain strict confidentiality regarding all client information and educational records. 
-              Our advocates are bound by professional ethical standards. We will not share your information 
-              without your written consent, except as required by law.
-            </p>
-            <p>
-              For details on how we collect and use your personal information, please review our Privacy Policy.
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="mt-8">
-          <CardHeader>
-            <CardTitle>Limitation of Liability</CardTitle>
-          </CardHeader>
-          <CardContent className="prose max-w-none">
-            <p>
-              IEP Advocacy services are provided on an "as is" basis. We make no warranties regarding the 
-              outcome of educational advocacy efforts. Educational decisions remain with school districts 
-              and educational teams.
-            </p>
-            <p>
-              Our liability is limited to the amount paid for services in the month when any alleged 
-              damage occurred. We are not liable for indirect, consequential, or punitive damages.
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="mt-8">
-          <CardHeader>
-            <CardTitle>Termination</CardTitle>
-          </CardHeader>
-          <CardContent className="prose max-w-none">
-            <p>
-              We reserve the right to terminate or suspend your account and access to services immediately, 
-              without prior notice, for any violation of these Terms of Service or for any other reason 
-              deemed necessary by us.
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="mt-8">
-          <CardHeader>
-            <CardTitle>Changes to Terms</CardTitle>
-          </CardHeader>
-          <CardContent className="prose max-w-none">
-            <p>
-              We reserve the right to modify these Terms of Service at any time. Changes will be posted 
-              on this page with an updated "Last updated" date. Continued use of our services after 
-              changes constitutes acceptance of the new terms.
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="mt-8">
-          <CardHeader>
-            <CardTitle>Contact Information</CardTitle>
-          </CardHeader>
-          <CardContent className="prose max-w-none">
-            <p>
-              If you have questions about these Terms of Service, please contact us:
-            </p>
-            <ul>
-              <li>Email: legal@iepadvocacy.com</li>
-              <li>Phone: 1-800-IEP-HELP</li>
-              <li>Mail: IEP Advocacy Services, 123 Education Way, Suite 100, Learning City, LC 12345</li>
-            </ul>
-          </CardContent>
-        </Card>
       </div>
 
       <Footer />
