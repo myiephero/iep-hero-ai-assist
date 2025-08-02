@@ -45,9 +45,9 @@ export default function Landing() {
       </nav>
 
       {/* Main Content */}
-      <div className="flex min-h-[calc(100vh-4rem)]">
+      <div className="flex flex-col lg:flex-row min-h-[calc(100vh-4rem)]">
         {/* Left side - Hero content */}
-        <div className="flex-1 flex flex-col justify-center px-4 sm:px-6 lg:px-8 py-12">
+        <div className="flex-1 flex flex-col justify-center px-4 sm:px-6 lg:px-8 py-12 bg-background">
         <div className="max-w-lg mx-auto lg:mx-0">
             <h1 className="text-4xl lg:text-6xl font-bold mb-6">
               <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
@@ -63,7 +63,7 @@ export default function Landing() {
             
             
             <div className="flex flex-col sm:flex-row gap-4 mb-12">
-              <Button size="lg" className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 text-white px-8" onClick={handleSignUp}>
+              <Button size="lg" className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 text-primary-foreground px-8" onClick={handleSignUp}>
                 Get Started Today
               </Button>
               <Button variant="outline" size="lg" className="px-8" onClick={handleSignInNav}>
