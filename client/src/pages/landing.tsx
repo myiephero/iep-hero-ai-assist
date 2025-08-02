@@ -86,6 +86,25 @@ export default function Landing() {
           {authMode === "signin" ? (
             <Card className="w-full max-w-md" id="signin-form">
               <CardHeader className="space-y-1">
+                {/* Auth Mode Tabs */}
+                <div className="flex space-x-1 bg-muted p-1 rounded-lg mb-4">
+                  <Button
+                    variant="default"
+                    size="sm"
+                    className="flex-1 text-sm"
+                    onClick={() => setAuthMode("signin")}
+                  >
+                    Sign In
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="flex-1 text-sm"
+                    onClick={() => setAuthMode("signup")}
+                  >
+                    Sign Up
+                  </Button>
+                </div>
                 <CardTitle className="text-2xl font-bold">Welcome Back</CardTitle>
                 <p className="text-muted-foreground">Sign in to your My IEP Hero account</p>
               </CardHeader>
@@ -119,19 +138,35 @@ export default function Landing() {
                     Sign In
                   </Button>
                 </form>
-                <div className="text-center mt-4">
-                  <Button 
-                    variant="link" 
-                    className="text-sm text-muted-foreground"
-                    onClick={() => setAuthMode("signup")}
-                  >
-                    Don't have an account? Sign up
-                  </Button>
-                </div>
               </CardContent>
             </Card>
           ) : (
-            <SignUp onBackToSignIn={() => setAuthMode("signin")} />
+            <Card className="w-full max-w-md">
+              <CardHeader className="space-y-1">
+                {/* Auth Mode Tabs */}
+                <div className="flex space-x-1 bg-muted p-1 rounded-lg mb-4">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="flex-1 text-sm"
+                    onClick={() => setAuthMode("signin")}
+                  >
+                    Sign In
+                  </Button>
+                  <Button
+                    variant="default"
+                    size="sm"
+                    className="flex-1 text-sm"
+                    onClick={() => setAuthMode("signup")}
+                  >
+                    Sign Up
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <SignUp onBackToSignIn={() => setAuthMode("signin")} />
+              </CardContent>
+            </Card>
           )}
         </div>
       </div>
