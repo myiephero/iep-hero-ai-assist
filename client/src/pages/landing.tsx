@@ -28,15 +28,23 @@ export default function Landing() {
       {/* Navigation */}
       <nav className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
+          <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
               <span className="text-xl font-semibold text-foreground">My IEP Hero</span>
             </div>
             <div className="flex items-center space-x-4">
-              <Button variant="ghost" className="text-sm font-medium" onClick={handleSignInNav}>
+              <Button 
+                variant="ghost" 
+                className="text-sm font-medium text-foreground hover:text-primary hover:bg-accent" 
+                onClick={handleSignInNav}
+              >
                 Sign In
               </Button>
-              <Button variant="outline" className="text-sm font-medium" onClick={handleSignUp}>
+              <Button 
+                variant="outline" 
+                className="text-sm font-medium border-border text-foreground hover:bg-accent hover:text-accent-foreground" 
+                onClick={handleSignUp}
+              >
                 Sign Up
               </Button>
             </div>
