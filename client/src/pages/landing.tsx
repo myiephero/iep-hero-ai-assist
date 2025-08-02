@@ -2,8 +2,27 @@ import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
+import { useState } from "react";
 
 export default function Landing() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    // Add sign in logic here
+    console.log("Sign in attempt:", { email, password });
+  };
+
+  const handleSignUp = () => {
+    // Add sign up navigation logic here
+    window.location.href = "/api/auth/signup";
+  };
+
+  const handleSignInNav = () => {
+    // Scroll to sign in form
+    document.getElementById('signin-form')?.scrollIntoView({ behavior: 'smooth' });
+  };
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
@@ -14,10 +33,10 @@ export default function Landing() {
               <span className="text-xl font-semibold text-foreground">My IEP Hero</span>
             </div>
             <div className="flex items-center space-x-4">
-              <Button variant="ghost" className="text-sm font-medium">
+              <Button variant="ghost" className="text-sm font-medium" onClick={handleSignInNav}>
                 Sign In
               </Button>
-              <Button variant="outline" className="text-sm font-medium">
+              <Button variant="outline" className="text-sm font-medium" onClick={handleSignUp}>
                 Sign Up
               </Button>
             </div>
@@ -71,33 +90,41 @@ export default function Landing() {
 
         {/* Right side - Sign in form */}
         <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 bg-muted/30">
-          <Card className="w-full max-w-md">
+          <Card className="w-full max-w-md" id="signin-form">
             <CardHeader className="space-y-1">
               <CardTitle className="text-2xl font-bold">Welcome Back</CardTitle>
               <p className="text-muted-foreground">Sign in to your My IEP Hero account</p>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="Enter your email"
-                  className="w-full"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Enter your password"
-                  className="w-full"
-                />
-              </div>
-              <Button className="w-full bg-primary hover:bg-primary/90 text-white">
-                Sign In
-              </Button>
+              <form onSubmit={handleSignIn} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="Enter your email"
+                    className="w-full"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="password">Password</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="Enter your password"
+                    className="w-full"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                </div>
+                <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
+                  Sign In
+                </Button>
+              </form>
             </CardContent>
           </Card>
         </div>
