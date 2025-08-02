@@ -2,13 +2,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
-import { PricingModal } from "../components/PricingModal";
+import { SignUp } from "../components/SignUp";
 import { useState } from "react";
 
 export default function Landing() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPricingModal, setShowPricingModal] = useState(false);
   const [authMode, setAuthMode] = useState<"signin" | "signup">("signin");
 
   const handleSignIn = async (e: React.FormEvent) => {
@@ -18,7 +17,7 @@ export default function Landing() {
   };
 
   const handleSignUp = () => {
-    setShowPricingModal(true);
+    setAuthMode("signup");
   };
 
   const handleSignInNav = () => {
@@ -82,74 +81,60 @@ export default function Landing() {
           </div>
         </div>
 
-        {/* Right side - Sign in form */}
+        {/* Right side - Auth form */}
         <div className="w-full lg:w-1/2 flex items-center justify-center px-4 sm:px-6 lg:px-8 bg-muted/30">
-          <Card className="w-full max-w-md" id="signin-form">
-            <CardHeader className="space-y-1">
-              {/* Auth Mode Tabs */}
-              <div className="flex space-x-1 bg-muted p-1 rounded-lg mb-4">
-                <Button
-                  variant={authMode === "signin" ? "default" : "ghost"}
-                  size="sm"
-                  className="flex-1 text-sm"
-                  onClick={() => setAuthMode("signin")}
-                >
-                  Sign In
-                </Button>
-                <Button
-                  variant={authMode === "signup" ? "default" : "ghost"}
-                  size="sm"
-                  className="flex-1 text-sm"
-                  onClick={() => {
-                    setAuthMode("signup");
-                    handleSignUp();
-                  }}
-                >
-                  Sign Up
-                </Button>
-              </div>
-              <CardTitle className="text-2xl font-bold">Welcome Back</CardTitle>
-              <p className="text-muted-foreground">Sign in to your My IEP Hero account</p>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <form onSubmit={handleSignIn} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="Enter your email"
-                    className="w-full"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
+          {authMode === "signin" ? (
+            <Card className="w-full max-w-md" id="signin-form">
+              <CardHeader className="space-y-1">
+                <CardTitle className="text-2xl font-bold">Welcome Back</CardTitle>
+                <p className="text-muted-foreground">Sign in to your My IEP Hero account</p>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <form onSubmit={handleSignIn} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="Enter your email"
+                      className="w-full"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="password">Password</Label>
+                    <Input
+                      id="password"
+                      type="password"
+                      placeholder="Enter your password"
+                      className="w-full"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
+                    Sign In
+                  </Button>
+                </form>
+                <div className="text-center mt-4">
+                  <Button 
+                    variant="link" 
+                    className="text-sm text-muted-foreground"
+                    onClick={() => setAuthMode("signup")}
+                  >
+                    Don't have an account? Sign up
+                  </Button>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="Enter your password"
-                    className="w-full"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                </div>
-                <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
-                  Sign In
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          ) : (
+            <SignUp onBackToSignIn={() => setAuthMode("signin")} />
+          )}
         </div>
       </div>
-      
-      <PricingModal 
-        isOpen={showPricingModal} 
-        onClose={() => setShowPricingModal(false)} 
-      />
     </div>
   );
 }
