@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { cn } from '../lib/utils';
-import { Button } from './ui/button';
-import { Card } from './ui/card';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { UserIcon, BriefcaseIcon, ShieldCheckIcon } from 'lucide-react';
 
 const roles = [
@@ -28,11 +28,7 @@ const roles = [
   },
 ];
 
-interface SignUpProps {
-  onBackToSignIn: () => void;
-}
-
-export function SignUp({ onBackToSignIn }: SignUpProps) {
+export default function SignUp() {
   const [selected, setSelected] = useState('parent');
 
   return (
@@ -60,7 +56,7 @@ export function SignUp({ onBackToSignIn }: SignUpProps) {
 
       <div className="w-full max-w-md">
         <div className="flex justify-center space-x-4 mb-6">
-          <Button variant="ghost" onClick={onBackToSignIn}>Sign In</Button>
+          <Button variant="ghost">Sign In</Button>
           <Button variant="ghost" className="border-b-2 border-blue-500 rounded-none">Sign Up</Button>
         </div>
 

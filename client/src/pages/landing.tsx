@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
-import { SignUp } from "../components/SignUp";
+import SignUp from "../components/SignUp";
 import { useState } from "react";
 
 export default function Landing() {
@@ -147,7 +147,7 @@ export default function Landing() {
             </div>
           </div>
         ) : (
-          <SignUp onBackToSignIn={() => setAuthMode("signin")} />
+          <SignUp />
         )}
       </div>
     </div>
