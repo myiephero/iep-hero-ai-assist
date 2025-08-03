@@ -14,6 +14,282 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_settings: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          id: string
+          setting_key: string
+          setting_type: string
+          setting_value: Json
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          setting_key: string
+          setting_type: string
+          setting_value: Json
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          setting_key?: string
+          setting_type?: string
+          setting_value?: Json
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_settings_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      advocate_assignments: {
+        Row: {
+          advocate_id: string
+          assigned_at: string | null
+          assigned_by: string | null
+          created_at: string | null
+          id: string
+          notes: string | null
+          parent_id: string
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          advocate_id: string
+          assigned_at?: string | null
+          assigned_by?: string | null
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          parent_id: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          advocate_id?: string
+          assigned_at?: string | null
+          assigned_by?: string | null
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          parent_id?: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "advocate_assignments_advocate_id_fkey"
+            columns: ["advocate_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "advocate_assignments_assigned_by_fkey"
+            columns: ["assigned_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "advocate_assignments_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      advocate_notes: {
+        Row: {
+          advocate_id: string
+          content: string
+          created_at: string | null
+          id: string
+          is_private: boolean | null
+          note_type: string | null
+          parent_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          advocate_id: string
+          content: string
+          created_at?: string | null
+          id?: string
+          is_private?: boolean | null
+          note_type?: string | null
+          parent_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          advocate_id?: string
+          content?: string
+          created_at?: string | null
+          id?: string
+          is_private?: boolean | null
+          note_type?: string | null
+          parent_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "advocate_notes_advocate_id_fkey"
+            columns: ["advocate_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "advocate_notes_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_reviews: {
+        Row: {
+          advocate_additional_flags: Json | null
+          advocate_additional_questions: Json | null
+          advocate_id: string | null
+          advocate_refined_summary: string | null
+          advocate_review_requested_at: string | null
+          advocate_reviewed_at: string | null
+          ai_confidence_score: number | null
+          ai_model_used: string | null
+          compliance_flags: Json | null
+          created_at: string | null
+          ferpa_disclaimer_shown: boolean | null
+          file_id: string
+          file_name: string
+          file_size: number | null
+          id: string
+          parent_consent_to_advocate_review: boolean | null
+          parent_id: string
+          parent_requested_advocate_review: boolean | null
+          pdf_export_count: number | null
+          pdf_exported: boolean | null
+          plain_english_summary: string
+          raw_analysis: Json | null
+          shared_at: string | null
+          shared_with_parent: boolean | null
+          status: string | null
+          suggested_questions: Json | null
+          updated_at: string | null
+          uploaded_at: string | null
+        }
+        Insert: {
+          advocate_additional_flags?: Json | null
+          advocate_additional_questions?: Json | null
+          advocate_id?: string | null
+          advocate_refined_summary?: string | null
+          advocate_review_requested_at?: string | null
+          advocate_reviewed_at?: string | null
+          ai_confidence_score?: number | null
+          ai_model_used?: string | null
+          compliance_flags?: Json | null
+          created_at?: string | null
+          ferpa_disclaimer_shown?: boolean | null
+          file_id: string
+          file_name: string
+          file_size?: number | null
+          id?: string
+          parent_consent_to_advocate_review?: boolean | null
+          parent_id: string
+          parent_requested_advocate_review?: boolean | null
+          pdf_export_count?: number | null
+          pdf_exported?: boolean | null
+          plain_english_summary: string
+          raw_analysis?: Json | null
+          shared_at?: string | null
+          shared_with_parent?: boolean | null
+          status?: string | null
+          suggested_questions?: Json | null
+          updated_at?: string | null
+          uploaded_at?: string | null
+        }
+        Update: {
+          advocate_additional_flags?: Json | null
+          advocate_additional_questions?: Json | null
+          advocate_id?: string | null
+          advocate_refined_summary?: string | null
+          advocate_review_requested_at?: string | null
+          advocate_reviewed_at?: string | null
+          ai_confidence_score?: number | null
+          ai_model_used?: string | null
+          compliance_flags?: Json | null
+          created_at?: string | null
+          ferpa_disclaimer_shown?: boolean | null
+          file_id?: string
+          file_name?: string
+          file_size?: number | null
+          id?: string
+          parent_consent_to_advocate_review?: boolean | null
+          parent_id?: string
+          parent_requested_advocate_review?: boolean | null
+          pdf_export_count?: number | null
+          pdf_exported?: boolean | null
+          plain_english_summary?: string
+          raw_analysis?: Json | null
+          shared_at?: string | null
+          shared_with_parent?: boolean | null
+          status?: string | null
+          suggested_questions?: Json | null
+          updated_at?: string | null
+          uploaded_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_reviews_advocate_id_fkey"
+            columns: ["advocate_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_reviews_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      assignments: {
+        Row: {
+          advocate_id: string | null
+          assigned_at: string | null
+          id: string
+          parent_id: string | null
+        }
+        Insert: {
+          advocate_id?: string | null
+          assigned_at?: string | null
+          id?: string
+          parent_id?: string | null
+        }
+        Update: {
+          advocate_id?: string | null
+          assigned_at?: string | null
+          id?: string
+          parent_id?: string | null
+        }
+        Relationships: []
+      }
       availabilities: {
         Row: {
           advocate_id: string
@@ -107,6 +383,30 @@ export type Database = {
             referencedColumns: ["user_id"]
           },
         ]
+      }
+      email_events: {
+        Row: {
+          email_type: string | null
+          event_type: string | null
+          id: string
+          parent_id: string | null
+          timestamp: string | null
+        }
+        Insert: {
+          email_type?: string | null
+          event_type?: string | null
+          id?: string
+          parent_id?: string | null
+          timestamp?: string | null
+        }
+        Update: {
+          email_type?: string | null
+          event_type?: string | null
+          id?: string
+          parent_id?: string | null
+          timestamp?: string | null
+        }
+        Relationships: []
       }
       iep_analyses: {
         Row: {
@@ -317,6 +617,50 @@ export type Database = {
         }
         Relationships: []
       }
+      usage_logs: {
+        Row: {
+          action: string
+          created_at: string | null
+          id: string
+          ip_address: unknown | null
+          metadata: Json | null
+          resource_id: string | null
+          resource_type: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          metadata?: Json | null
+          resource_id?: string | null
+          resource_type?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          metadata?: Json | null
+          resource_id?: string | null
+          resource_type?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "usage_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_profiles: {
         Row: {
           auth_id: string | null
@@ -369,7 +713,44 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      auto_assign_advocate_to_review: {
+        Args: { review_id: string }
+        Returns: boolean
+      }
+      get_ai_review_with_advocate: {
+        Args: { review_id: string }
+        Returns: {
+          review_data: Json
+          advocate_info: Json
+          assignment_info: Json
+        }[]
+      }
+      get_assigned_parents: {
+        Args: { advocate_uuid: string }
+        Returns: {
+          parent_id: string
+          full_name: string
+          email: string
+          assigned_at: string
+          assignment_status: string
+          total_documents: number
+          total_preps: number
+          total_letters: number
+          upcoming_meetings: number
+          last_activity: string
+        }[]
+      }
+      get_parent_case_data: {
+        Args: { advocate_uuid: string; parent_uuid: string }
+        Returns: {
+          parent_info: Json
+          documents: Json
+          meeting_preps: Json
+          letters: Json
+          meetings: Json
+          advocate_notes: Json
+        }[]
+      }
     }
     Enums: {
       user_role: "parent" | "advocate" | "admin"
