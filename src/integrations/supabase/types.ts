@@ -163,108 +163,44 @@ export type Database = {
       }
       ai_reviews: {
         Row: {
-          advocate_additional_flags: Json | null
-          advocate_additional_questions: Json | null
-          advocate_id: string | null
-          advocate_refined_summary: string | null
-          advocate_review_requested_at: string | null
-          advocate_reviewed_at: string | null
-          ai_confidence_score: number | null
-          ai_model_used: string | null
-          compliance_flags: Json | null
+          concerns: string | null
           created_at: string | null
-          ferpa_disclaimer_shown: boolean | null
-          file_id: string
-          file_name: string
-          file_size: number | null
+          goals: string | null
           id: string
-          parent_consent_to_advocate_review: boolean | null
-          parent_id: string
-          parent_requested_advocate_review: boolean | null
-          pdf_export_count: number | null
-          pdf_exported: boolean | null
-          plain_english_summary: string
-          raw_analysis: Json | null
-          shared_at: string | null
-          shared_with_parent: boolean | null
-          status: string | null
-          suggested_questions: Json | null
-          updated_at: string | null
-          uploaded_at: string | null
+          key_dates: string | null
+          services: string | null
+          summary: string | null
+          upload_id: string
+          user_id: string
         }
         Insert: {
-          advocate_additional_flags?: Json | null
-          advocate_additional_questions?: Json | null
-          advocate_id?: string | null
-          advocate_refined_summary?: string | null
-          advocate_review_requested_at?: string | null
-          advocate_reviewed_at?: string | null
-          ai_confidence_score?: number | null
-          ai_model_used?: string | null
-          compliance_flags?: Json | null
+          concerns?: string | null
           created_at?: string | null
-          ferpa_disclaimer_shown?: boolean | null
-          file_id: string
-          file_name: string
-          file_size?: number | null
-          id?: string
-          parent_consent_to_advocate_review?: boolean | null
-          parent_id: string
-          parent_requested_advocate_review?: boolean | null
-          pdf_export_count?: number | null
-          pdf_exported?: boolean | null
-          plain_english_summary: string
-          raw_analysis?: Json | null
-          shared_at?: string | null
-          shared_with_parent?: boolean | null
-          status?: string | null
-          suggested_questions?: Json | null
-          updated_at?: string | null
-          uploaded_at?: string | null
+          goals?: string | null
+          id: string
+          key_dates?: string | null
+          services?: string | null
+          summary?: string | null
+          upload_id: string
+          user_id: string
         }
         Update: {
-          advocate_additional_flags?: Json | null
-          advocate_additional_questions?: Json | null
-          advocate_id?: string | null
-          advocate_refined_summary?: string | null
-          advocate_review_requested_at?: string | null
-          advocate_reviewed_at?: string | null
-          ai_confidence_score?: number | null
-          ai_model_used?: string | null
-          compliance_flags?: Json | null
+          concerns?: string | null
           created_at?: string | null
-          ferpa_disclaimer_shown?: boolean | null
-          file_id?: string
-          file_name?: string
-          file_size?: number | null
+          goals?: string | null
           id?: string
-          parent_consent_to_advocate_review?: boolean | null
-          parent_id?: string
-          parent_requested_advocate_review?: boolean | null
-          pdf_export_count?: number | null
-          pdf_exported?: boolean | null
-          plain_english_summary?: string
-          raw_analysis?: Json | null
-          shared_at?: string | null
-          shared_with_parent?: boolean | null
-          status?: string | null
-          suggested_questions?: Json | null
-          updated_at?: string | null
-          uploaded_at?: string | null
+          key_dates?: string | null
+          services?: string | null
+          summary?: string | null
+          upload_id?: string
+          user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "ai_reviews_advocate_id_fkey"
-            columns: ["advocate_id"]
+            foreignKeyName: "ai_reviews_upload_id_fkey"
+            columns: ["upload_id"]
             isOneToOne: false
-            referencedRelation: "user_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "ai_reviews_parent_id_fkey"
-            columns: ["parent_id"]
-            isOneToOne: false
-            referencedRelation: "user_profiles"
+            referencedRelation: "smart_uploads"
             referencedColumns: ["id"]
           },
         ]
@@ -613,6 +549,33 @@ export type Database = {
           role?: Database["public"]["Enums"]["user_role"]
           specializations?: string[] | null
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      smart_uploads: {
+        Row: {
+          file_name: string
+          id: string
+          status: string | null
+          storage_path: string
+          upload_time: string | null
+          user_id: string
+        }
+        Insert: {
+          file_name: string
+          id: string
+          status?: string | null
+          storage_path: string
+          upload_time?: string | null
+          user_id: string
+        }
+        Update: {
+          file_name?: string
+          id?: string
+          status?: string | null
+          storage_path?: string
+          upload_time?: string | null
           user_id?: string
         }
         Relationships: []
