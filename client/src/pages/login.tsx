@@ -25,8 +25,11 @@ export default function Login() {
     e.preventDefault();
     setIsLoading(true);
 
+    console.log('🔄 Starting login process for:', loginData.email);
+
     try {
-      await login(loginData.email, loginData.password);
+      const result = await login(loginData.email, loginData.password);
+      console.log('✅ Login successful, result:', result);
       
       // Success animation
       toast({
@@ -34,12 +37,11 @@ export default function Login() {
         description: "Successfully signed in to your account",
       });
       
-      // Small delay for UX
-      setTimeout(() => {
-        setLocation("/dashboard");
-      }, 500);
+      // Immediate redirect on success
+      setLocation("/dashboard");
       
     } catch (error: any) {
+      console.error('❌ Login failed:', error);
       toast({
         title: "Sign in failed",
         description: error.message || "Please check your email and password",
