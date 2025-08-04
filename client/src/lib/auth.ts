@@ -5,6 +5,7 @@ export interface AuthUser {
   email: string;
   username: string;
   role: string;
+  planStatus?: string;
   subscriptionTier?: string;
 }
 

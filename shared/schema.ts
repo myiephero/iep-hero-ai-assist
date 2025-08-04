@@ -12,6 +12,7 @@ export const users = pgTable("users", {
   stripeCustomerId: text("stripe_customer_id"),
   stripeSubscriptionId: text("stripe_subscription_id"),
   subscriptionTier: text("subscription_tier").default("free"), // free, basic, professional, enterprise
+  planStatus: text("plan_status").default("free").notNull(), // free, heroOffer, retainer
   advocateEmail: text("advocate_email"),
   emailVerified: boolean("email_verified").default(false),
   verificationToken: text("verification_token"),
