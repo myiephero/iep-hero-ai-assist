@@ -265,7 +265,7 @@ export default function Dashboard() {
                       <span className="text-sm font-medium text-amber-300">Upcoming IEP Meeting</span>
                     </div>
                     <p className="text-sm text-slate-300">
-                      {events.length > 0 
+                      {(events as Event[]).length > 0 
                         ? `${format(new Date((events as Event[])[0].date), "MMMM d, yyyy")} - Prepare transition goals discussion`
                         : "No upcoming meetings scheduled"
                       }
