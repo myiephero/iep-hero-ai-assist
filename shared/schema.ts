@@ -13,6 +13,8 @@ export const users = pgTable("users", {
   stripeSubscriptionId: text("stripe_subscription_id"),
   subscriptionTier: text("subscription_tier").default("free"), // free, basic, professional, enterprise
   advocateEmail: text("advocate_email"),
+  emailVerified: boolean("email_verified").default(false),
+  verificationToken: text("verification_token"),
   createdAt: timestamp("created_at").default(sql`now()`),
 });
 
@@ -74,6 +76,9 @@ export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
   role: true,
+}).extend({
+  emailVerified: z.boolean().optional(),
+  verificationToken: z.string().optional(),
 });
 
 export const insertGoalSchema = createInsertSchema(iepGoals).omit({

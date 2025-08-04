@@ -12,6 +12,8 @@ import { Strategy as LocalStrategy } from "passport-local";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+import { Resend } from "resend";
+import { randomUUID } from "crypto";
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
@@ -20,6 +22,9 @@ if (!process.env.STRIPE_SECRET_KEY) {
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: "2025-07-30.basil" as any,
 });
+
+// Initialize Resend for email functionality
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Configure multer for file uploads
 const upload = multer({
@@ -102,22 +107,124 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'User already exists' });
       }
       
-      // Hash password
+      // Hash password and generate verification token
       const hashedPassword = await bcrypt.hash(userData.password, 10);
+      const verificationToken = randomUUID();
       
       const user = await storage.createUser({
         ...userData,
-        password: hashedPassword
+        password: hashedPassword,
+        emailVerified: false,
+        verificationToken
       });
       
-      req.login(user, (err) => {
-        if (err) {
-          return res.status(500).json({ message: 'Login error' });
-        }
-        res.json({ user: { id: user.id, email: user.email, username: user.username, role: user.role } });
+      // Send welcome email with verification link
+      try {
+        const verificationUrl = `${req.protocol}://${req.get('host')}/verify-email?token=${verificationToken}`;
+        
+        await resend.emails.send({
+          from: 'My IEP Hero <noreply@myiephero.com>',
+          to: user.email,
+          subject: 'Welcome to My IEP Hero - Verify Your Email',
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+              <h1 style="color: #2563eb;">Welcome to My IEP Hero!</h1>
+              <p>Hi ${user.username},</p>
+              <p>Thank you for joining My IEP Hero! We're excited to help you navigate your IEP journey.</p>
+              
+              <div style="background-color: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                <h2 style="color: #1e40af; margin-top: 0;">Get Started</h2>
+                <p>To complete your registration and access your account, please verify your email address:</p>
+                <a href="${verificationUrl}" style="background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; margin: 10px 0;">
+                  Verify Email & Access Account
+                </a>
+              </div>
+              
+              <h3>What's Next?</h3>
+              <ul>
+                <li>Set up your IEP goals and track progress</li>
+                <li>Upload and organize important documents</li>
+                <li>Use our AI-powered Memory Q&A feature</li>
+                <li>Connect with advocates for expert guidance</li>
+              </ul>
+              
+              <p>If you have any questions, we're here to help!</p>
+              <p>Best regards,<br>The My IEP Hero Team</p>
+            </div>
+          `
+        });
+        
+        console.log(`✅ Welcome email sent to ${user.email}`);
+      } catch (emailError) {
+        console.error('❌ Failed to send welcome email:', emailError);
+        // Continue with registration even if email fails
+      }
+      
+      res.json({ 
+        message: 'Registration successful! Please check your email to verify your account.',
+        user: { id: user.id, email: user.email, username: user.username, role: user.role }
       });
     } catch (error: any) {
       res.status(400).json({ message: error.message });
+    }
+  });
+
+  // Email verification route
+  app.get("/verify-email", async (req, res) => {
+    try {
+      const { token } = req.query;
+      
+      if (!token) {
+        return res.status(400).send(`
+          <html><body style="font-family: Arial, sans-serif; text-align: center; padding: 50px;">
+            <h1 style="color: #dc2626;">Invalid Verification Link</h1>
+            <p>This verification link is invalid or expired.</p>
+            <a href="/" style="color: #2563eb;">Return to My IEP Hero</a>
+          </body></html>
+        `);
+      }
+      
+      const user = await storage.getUserByVerificationToken(token as string);
+      
+      if (!user) {
+        return res.status(400).send(`
+          <html><body style="font-family: Arial, sans-serif; text-align: center; padding: 50px;">
+            <h1 style="color: #dc2626;">Invalid Verification Link</h1>
+            <p>This verification link is invalid or has already been used.</p>
+            <a href="/" style="color: #2563eb;">Return to My IEP Hero</a>
+          </body></html>
+        `);
+      }
+      
+      // Verify the user's email
+      await storage.verifyUserEmail(user.id);
+      
+      // Log them in automatically
+      req.login(user, (err) => {
+        if (err) {
+          console.error('Auto-login error:', err);
+        }
+      });
+      
+      res.send(`
+        <html><body style="font-family: Arial, sans-serif; text-align: center; padding: 50px;">
+          <h1 style="color: #16a34a;">Email Verified Successfully!</h1>
+          <p>Welcome to My IEP Hero, ${user.username}!</p>
+          <p>Your account is now active and ready to use.</p>
+          <a href="/dashboard" style="background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; margin: 20px 0;">
+            Go to Dashboard
+          </a>
+        </body></html>
+      `);
+    } catch (error: any) {
+      console.error('Email verification error:', error);
+      res.status(500).send(`
+        <html><body style="font-family: Arial, sans-serif; text-align: center; padding: 50px;">
+          <h1 style="color: #dc2626;">Verification Error</h1>
+          <p>Something went wrong during verification. Please try again.</p>
+          <a href="/" style="color: #2563eb;">Return to My IEP Hero</a>
+        </body></html>
+      `);
     }
   });
 
