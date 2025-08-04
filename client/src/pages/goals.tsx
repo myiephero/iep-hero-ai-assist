@@ -172,11 +172,12 @@ export default function Goals() {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      <div className="container mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">IEP Goal Tracker</h1>
-          <p className="text-gray-600">Manage and track your IEP goals progress</p>
+          <h1 className="text-3xl font-bold text-white">IEP Goal Tracker</h1>
+          <p className="text-gray-300">Manage and track your IEP goals progress</p>
         </div>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
@@ -483,6 +484,7 @@ export default function Goals() {
             </Card>
           ))
         )}
+      </div>
       </div>
     </div>
   );

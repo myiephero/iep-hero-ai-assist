@@ -76,7 +76,7 @@ export default function Subscribe() {
 
   useEffect(() => {
     // Create subscription as soon as the page loads
-    apiRequest("POST", "/api/create-subscription", { priceId })
+    apiRequest("POST", "/api/get-or-create-subscription", { priceId })
       .then((res) => res.json())
       .then((data) => {
         setClientSecret(data.clientSecret);
