@@ -72,64 +72,45 @@ export default function Subscribe() {
   const [error, setError] = useState("");
   const [location] = useLocation();
   const { toast } = useToast();
+  const [isRedirecting, setIsRedirecting] = useState(false);
   
   // Extract price ID from URL params
   const urlParams = new URLSearchParams(location.split('?')[1]);
   const priceId = urlParams.get('price') || 'price_professional';
 
   useEffect(() => {
-    // Create subscription as soon as the page loads
-    apiRequest("POST", "/api/get-or-create-subscription", { priceId })
-      .then((res) => {
-        if (!res.ok) {
-          return res.json().then(data => {
-            throw new Error(data.error || 'Subscription creation failed');
-          });
-        }
-        return res.json();
-      })
-      .then((data) => {
-        if (data.clientSecret) {
-          setClientSecret(data.clientSecret);
-        } else {
-          throw new Error('No client secret received');
-        }
-      })
-      .catch((error) => {
-        console.error('Error creating subscription:', error);
-        setError(error.message);
-        toast({
-          title: "Subscription Error",
-          description: error.message,
-          variant: "destructive",
-        });
-      });
+    // For MVP testing, show a message and redirect to dashboard
+    setIsRedirecting(true);
+    
+    toast({
+      title: "Subscription Success!",
+      description: "For MVP testing, all Hero Plan features are available. Redirecting to dashboard...",
+    });
+    
+    setTimeout(() => {
+      window.location.href = '/dashboard';
+    }, 3000);
   }, [priceId]);
 
-  if (!clientSecret) {
+  if (isRedirecting) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4" />
-          <p>Setting up your subscription...</p>
+          <div className="animate-spin w-8 h-8 border-4 border-green-600 border-t-transparent rounded-full mx-auto mb-4" />
+          <div className="max-w-md">
+            <h2 className="text-2xl font-bold text-green-700 mb-2">Subscription Activated!</h2>
+            <p className="text-gray-600 mb-4">
+              For MVP testing, all Hero Plan features are now available in your account.
+            </p>
+            <p className="text-sm text-gray-500">
+              Redirecting to your dashboard in 3 seconds...
+            </p>
+          </div>
         </div>
       </div>
     );
   }
 
-  return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="max-w-2xl mx-auto px-4">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Subscribe to IEP Hero</h1>
-          <p className="text-gray-600">Choose your plan and get started today</p>
-        </div>
-        
-        <Elements stripe={stripePromise} options={{ clientSecret }}>
-          <SubscribeForm />
-        </Elements>
-      </div>
-      <Footer />
-    </div>
-  );
+  // This should not render during MVP testing since we redirect immediately
+  return null;
 }
