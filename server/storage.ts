@@ -1,5 +1,8 @@
-import { type User, type InsertUser, type Goal, type InsertGoal, type Document, type InsertDocument, type Event, type InsertEvent, type Message, type InsertMessage, type SharedMemory, type InsertSharedMemory } from "@shared/schema";
+import { type User, type InsertUser, type Goal, type InsertGoal, type Document, type InsertDocument, type Event, type InsertEvent, type Message, type InsertMessage, type SharedMemory, type InsertSharedMemory, users, iepGoals, documents, events, messages, sharedMemories } from "@shared/schema";
 import { randomUUID } from "crypto";
+import { drizzle } from "drizzle-orm/neon-http";
+import { neon } from "@neondatabase/serverless";
+import { eq, and } from "drizzle-orm";
 
 export interface IStorage {
   // User management
@@ -268,4 +271,184 @@ export class MemStorage implements IStorage {
   }
 }
 
+// Database Storage Implementation using Drizzle ORM
+export class DbStorage implements IStorage {
+  private db: ReturnType<typeof drizzle>;
+
+  constructor() {
+    if (!process.env.DATABASE_URL) {
+      throw new Error('DATABASE_URL is required');
+    }
+    const sql = neon(process.env.DATABASE_URL);
+    this.db = drizzle(sql);
+  }
+
+  // User management
+  async getUser(id: string): Promise<User | undefined> {
+    const result = await this.db.select().from(users).where(eq(users.id, id)).limit(1);
+    return result[0];
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const result = await this.db.select().from(users).where(eq(users.email, email)).limit(1);
+    return result[0];
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const result = await this.db.select().from(users).where(eq(users.username, username)).limit(1);
+    return result[0];
+  }
+
+  async createUser(user: InsertUser): Promise<User> {
+    const id = randomUUID();
+    const newUser = {
+      ...user,
+      id,
+      createdAt: new Date(),
+      role: user.role || "parent",
+      stripeCustomerId: null,
+      stripeSubscriptionId: null,
+      subscriptionTier: "free",
+      advocateEmail: null
+    };
+    
+    const result = await this.db.insert(users).values(newUser).returning();
+    return result[0];
+  }
+
+  async updateUserStripeInfo(userId: string, customerId: string, subscriptionId: string): Promise<User> {
+    const result = await this.db
+      .update(users)
+      .set({ 
+        stripeCustomerId: customerId, 
+        stripeSubscriptionId: subscriptionId || null,
+        subscriptionTier: subscriptionId ? "hero" : "free"
+      })
+      .where(eq(users.id, userId))
+      .returning();
+    return result[0];
+  }
+
+  async updateSubscriptionTier(userId: string, tier: string): Promise<User> {
+    const result = await this.db
+      .update(users)
+      .set({ subscriptionTier: tier })
+      .where(eq(users.id, userId))
+      .returning();
+    return result[0];
+  }
+
+  // IEP Goals
+  async getGoalsByUserId(userId: string): Promise<Goal[]> {
+    return await this.db.select().from(iepGoals).where(eq(iepGoals.userId, userId));
+  }
+
+  async createGoal(userId: string, goal: InsertGoal): Promise<Goal> {
+    const id = randomUUID();
+    const newGoal = {
+      ...goal,
+      id,
+      userId,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    
+    const result = await this.db.insert(iepGoals).values(newGoal).returning();
+    return result[0];
+  }
+
+  async updateGoal(goalId: string, updates: Partial<InsertGoal>): Promise<Goal> {
+    const result = await this.db
+      .update(iepGoals)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(iepGoals.id, goalId))
+      .returning();
+    return result[0];
+  }
+
+  async deleteGoal(goalId: string): Promise<void> {
+    await this.db.delete(iepGoals).where(eq(iepGoals.id, goalId));
+  }
+
+  // Documents
+  async getDocumentsByUserId(userId: string): Promise<Document[]> {
+    return await this.db.select().from(documents).where(eq(documents.userId, userId));
+  }
+
+  async createDocument(userId: string, document: InsertDocument): Promise<Document> {
+    const id = randomUUID();
+    const newDocument = {
+      ...document,
+      id,
+      userId,
+      uploadedAt: new Date()
+    };
+    
+    const result = await this.db.insert(documents).values(newDocument).returning();
+    return result[0];
+  }
+
+  async deleteDocument(documentId: string): Promise<void> {
+    await this.db.delete(documents).where(eq(documents.id, documentId));
+  }
+
+  // Events
+  async getEventsByUserId(userId: string): Promise<Event[]> {
+    return await this.db.select().from(events).where(eq(events.userId, userId));
+  }
+
+  async createEvent(userId: string, event: InsertEvent): Promise<Event> {
+    const id = randomUUID();
+    const newEvent = {
+      ...event,
+      id,
+      userId,
+      createdAt: new Date()
+    };
+    
+    const result = await this.db.insert(events).values(newEvent).returning();
+    return result[0];
+  }
+
+  // Messages
+  async getMessagesByUserId(userId: string): Promise<Message[]> {
+    return await this.db.select().from(messages).where(
+      eq(messages.senderId, userId) // or eq(messages.receiverId, userId) - adjust based on your needs
+    );
+  }
+
+  async createMessage(message: InsertMessage): Promise<Message> {
+    const id = randomUUID();
+    const newMessage = {
+      ...message,
+      id,
+      sentAt: new Date()
+    };
+    
+    const result = await this.db.insert(messages).values(newMessage).returning();
+    return result[0];
+  }
+
+  async markMessageAsRead(messageId: string): Promise<void> {
+    await this.db
+      .update(messages)
+      .set({ read: true })
+      .where(eq(messages.id, messageId));
+  }
+
+  // Shared Memories
+  async createSharedMemory(sharedMemory: InsertSharedMemory): Promise<SharedMemory> {
+    const id = randomUUID();
+    const newSharedMemory = {
+      ...sharedMemory,
+      id,
+      sharedAt: new Date()
+    };
+    
+    const result = await this.db.insert(sharedMemories).values(newSharedMemory).returning();
+    return result[0];
+  }
+}
+
+// Temporarily use memory storage until database connection is resolved
 export const storage = new MemStorage();
