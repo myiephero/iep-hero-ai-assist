@@ -41,15 +41,21 @@ export function useAuthState() {
   const login = async (email: string, password: string) => {
     try {
       const result = await authApi.login({ email, password });
+      console.log('Login successful:', result);
       setUser(result.user);
       return result;
-    } catch (error) {
-      console.error('Login error:', error);
-      throw error;
+    } catch (error: any) {
+      console.error('Login error details:', error);
+      // Extract meaningful error message
+      let errorMessage = 'Invalid email or password';
+      if (error.message && error.message.includes(':')) {
+        errorMessage = error.message.split(': ')[1] || errorMessage;
+      }
+      throw new Error(errorMessage);
     }
   };
 
-  const register = async (email: string, username: string, password: string, role: string, planStatus?: string) => {
+  const register = async (email: string, username: string, password: string, role: string, planStatus: string = "free") => {
     const result = await authApi.register({ email, username, password, role, planStatus });
     setUser(result.user);
     return result;
