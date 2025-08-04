@@ -7,7 +7,8 @@ import { AuthContext, useAuth, useAuthState } from "@/hooks/use-auth";
 import NotFound from "@/pages/not-found";
 import Login from "@/pages/login";
 import Register from "@/pages/register";
-import PremiumDashboard from "@/pages/dashboard-premium";
+import DashboardAdvocate from "@/pages/dashboard-premium";
+import DashboardParent from "@/pages/dashboard-parent";
 import Documents from "@/pages/documents";
 import Goals from "@/pages/goals";
 import Subscribe from "@/pages/subscribe";
@@ -40,6 +41,16 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+function DashboardRouter() {
+  const { user } = useAuth();
+  
+  if (user?.role === 'parent') {
+    return <Redirect to="/dashboard-parent" />;
+  } else {
+    return <Redirect to="/dashboard-advocate" />;
+  }
+}
+
 function Router() {
   return (
     <Switch>
@@ -54,8 +65,19 @@ function Router() {
       <Route path="/pricing" component={Pricing} />
       <Route path="/dashboard">
         <AuthGuard>
+          <DashboardRouter />
+        </AuthGuard>
+      </Route>
+      <Route path="/dashboard-parent">
+        <AuthGuard>
           <Navbar />
-          <PremiumDashboard />
+          <DashboardParent />
+        </AuthGuard>
+      </Route>
+      <Route path="/dashboard-advocate">
+        <AuthGuard>
+          <Navbar />
+          <DashboardAdvocate />
         </AuthGuard>
       </Route>
       <Route path="/documents">

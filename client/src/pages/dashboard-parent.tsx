@@ -1,0 +1,164 @@
+// dashboard-parent.tsx
+import React, { useState } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { useAuth } from '@/hooks/use-auth';
+
+const parentTools = [
+  {
+    name: 'IEP Goal Generator',
+    description: 'Create SMART goals tailored to your child\'s needs',
+    icon: '🎯'
+  },
+  {
+    name: 'Progress Analyzer',
+    description: 'See how your child is progressing toward goals',
+    icon: '📈'
+  },
+  {
+    name: 'Meeting Prep Assistant',
+    description: 'Get talking points and prep for your next IEP meeting',
+    icon: '🗒️'
+  },
+  {
+    name: 'Ask AI About My Docs',
+    description: 'Ask questions about your uploaded IEP documents',
+    icon: '💬'
+  }
+];
+
+export default function ParentDashboard() {
+  const { user } = useAuth();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedTool, setSelectedTool] = useState<string | null>(null);
+  const [upload, setUpload] = useState<File | null>(null);
+
+  const displayUser = user || { username: "demo_parent", planStatus: "heroOffer" };
+  const isHeroPlan = displayUser.planStatus === 'heroOffer';
+
+  const openToolModal = (tool: string) => {
+    setSelectedTool(tool);
+    setModalOpen(true);
+  };
+
+  const handleSubmit = () => {
+    if (selectedTool === "Ask AI About My Docs" && upload) {
+      alert(`Uploaded ${upload.name} for AI analysis`);
+    } else {
+      alert(`${selectedTool} activated! Feature coming soon.`);
+    }
+    setModalOpen(false);
+    setUpload(null);
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-[#f2f7fd] to-[#eaf0f8] px-6 py-10 text-slate-800">
+      <div className="max-w-5xl mx-auto">
+        <h1 className="text-3xl font-bold mb-2 text-slate-900">
+          Welcome back, {displayUser.username}!
+        </h1>
+        <p className="text-slate-600 mb-8">
+          You're doing amazing. Let's check on your child's progress and get prepared for what's next.
+        </p>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <Card className="bg-white shadow-sm border border-slate-200">
+            <CardContent className="p-4">
+              <div className="text-slate-600 text-sm">Active Goals</div>
+              <div className="text-2xl font-bold text-slate-900">2</div>
+            </CardContent>
+          </Card>
+          <Card className="bg-white shadow-sm border border-slate-200">
+            <CardContent className="p-4">
+              <div className="text-slate-600 text-sm">Progress Rate</div>
+              <div className="text-2xl font-bold text-slate-900">67%</div>
+            </CardContent>
+          </Card>
+          <Card className="bg-white shadow-sm border border-slate-200">
+            <CardContent className="p-4">
+              <div className="text-slate-600 text-sm">Upcoming Meeting</div>
+              <div className="text-2xl font-bold text-slate-900">Aug 15</div>
+            </CardContent>
+          </Card>
+          <Card className="bg-white shadow-sm border border-slate-200">
+            <CardContent className="p-4">
+              <div className="text-slate-600 text-sm">Documents</div>
+              <div className="text-2xl font-bold text-slate-900">5</div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Parent Tools Section */}
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold mb-6 text-slate-900">Helpful Tools Just for You</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+            {parentTools.map(tool => (
+              <Card 
+                key={tool.name} 
+                className="bg-white hover:shadow-xl transition-all duration-200 cursor-pointer group border border-slate-200"
+                onClick={() => openToolModal(tool.name)}
+              >
+                <CardContent className="p-6">
+                  <div className="text-4xl mb-3 group-hover:scale-110 transition-transform">
+                    {tool.icon}
+                  </div>
+                  <h3 className="font-bold text-lg mb-2 text-slate-900">{tool.name}</h3>
+                  <p className="text-sm text-slate-600 mb-4 line-clamp-2">{tool.description}</p>
+                  <Button 
+                    variant="outline" 
+                    className="w-full border-blue-200 text-blue-700 hover:bg-blue-50"
+                    disabled={!isHeroPlan && tool.name !== "Ask AI About My Docs"}
+                  >
+                    {isHeroPlan || tool.name === "Ask AI About My Docs" ? "Use Tool" : "Upgrade Required"}
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        {/* Tool Modal */}
+        <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+          <DialogContent className="bg-white border border-slate-200">
+            <DialogHeader>
+              <DialogTitle className="text-xl font-semibold text-slate-900">{selectedTool}</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <p className="text-sm text-slate-600">
+                {selectedTool === "Ask AI About My Docs" 
+                  ? "Upload a document to ask questions about it" 
+                  : "This tool will help you with your child's IEP management."}
+              </p>
+              {selectedTool === "Ask AI About My Docs" && (
+                <Input 
+                  type="file" 
+                  accept=".pdf,.doc,.docx"
+                  onChange={(e) => setUpload(e.target.files?.[0] || null)}
+                  className="border-slate-300"
+                />
+              )}
+              <div className="flex gap-2">
+                <Button 
+                  onClick={handleSubmit}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  {selectedTool === "Ask AI About My Docs" ? "Upload & Ask" : "Start Tool"}
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => setModalOpen(false)}
+                  className="border-slate-300 text-slate-700 hover:bg-slate-50"
+                >
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+    </div>
+  );
+}
