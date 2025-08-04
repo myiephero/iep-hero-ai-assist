@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type Goal, type InsertGoal, type Document, type InsertDocument, type Event, type InsertEvent, type Message, type InsertMessage } from "@shared/schema";
+import { type User, type InsertUser, type Goal, type InsertGoal, type Document, type InsertDocument, type Event, type InsertEvent, type Message, type InsertMessage, type SharedMemory, type InsertSharedMemory } from "@shared/schema";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
@@ -29,6 +29,9 @@ export interface IStorage {
   getMessagesByUserId(userId: string): Promise<Message[]>;
   createMessage(message: InsertMessage): Promise<Message>;
   markMessageAsRead(messageId: string): Promise<void>;
+  
+  // Shared Memories
+  createSharedMemory(sharedMemory: InsertSharedMemory): Promise<SharedMemory>;
 }
 
 export class MemStorage implements IStorage {
@@ -37,6 +40,7 @@ export class MemStorage implements IStorage {
   private documents: Map<string, Document>;
   private events: Map<string, Event>;
   private messages: Map<string, Message>;
+  private sharedMemories: Map<string, SharedMemory>;
 
   constructor() {
     this.users = new Map();
@@ -44,6 +48,7 @@ export class MemStorage implements IStorage {
     this.documents = new Map();
     this.events = new Map();
     this.messages = new Map();
+    this.sharedMemories = new Map();
     
     // Add sample data for development
     this.initializeSampleData();
@@ -60,6 +65,7 @@ export class MemStorage implements IStorage {
       stripeCustomerId: null,
       stripeSubscriptionId: null,
       subscriptionTier: "free",
+      advocateEmail: "advocate@iephere.com",
       createdAt: new Date()
     };
     this.users.set("sample-user-1", sampleUser);
@@ -248,6 +254,16 @@ export class MemStorage implements IStorage {
       const updatedMessage = { ...message, read: true };
       this.messages.set(messageId, updatedMessage);
     }
+  }
+
+  async createSharedMemory(sharedMemory: InsertSharedMemory): Promise<SharedMemory> {
+    const newSharedMemory: SharedMemory = {
+      id: randomUUID(),
+      ...sharedMemory,
+      sharedAt: new Date(),
+    };
+    this.sharedMemories.set(newSharedMemory.id, newSharedMemory);
+    return newSharedMemory;
   }
 }
 
