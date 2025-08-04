@@ -9,7 +9,9 @@ export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
+  getUserByVerificationToken(token: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  verifyUserEmail(userId: string): Promise<User>;
   updateUserStripeInfo(userId: string, customerId: string, subscriptionId: string): Promise<User>;
   updateSubscriptionTier(userId: string, tier: string): Promise<User>;
   
@@ -666,6 +668,24 @@ export const storage = new class LocalDbStorage implements IStorage {
     };
     
     const result = await this.db.insert(sharedMemories).values(newSharedMemory).returning();
+    return result[0];
+  }
+
+  // Email verification methods
+  async getUserByVerificationToken(token: string): Promise<User | undefined> {
+    const result = await this.db.select().from(users).where(eq(users.verificationToken, token)).limit(1);
+    return result[0];
+  }
+
+  async verifyUserEmail(userId: string): Promise<User> {
+    const result = await this.db
+      .update(users)
+      .set({ 
+        emailVerified: true, 
+        verificationToken: null 
+      })
+      .where(eq(users.id, userId))
+      .returning();
     return result[0];
   }
 }();
