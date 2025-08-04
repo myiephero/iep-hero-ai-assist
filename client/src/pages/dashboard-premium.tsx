@@ -32,6 +32,7 @@ import { PlanStatusBadge } from "@/components/PlanStatusBadge";
 
 import MemoryQA from "@/components/MemoryQA";
 import { IEPTools } from "@/components/IEPTools";
+import IEPAnalyzer from "@/components/IEPAnalyzer";
 import Footer from "@/components/layout/footer";
 
 export default function PremiumDashboard() {
@@ -206,6 +207,27 @@ export default function PremiumDashboard() {
             <IEPTools isHeroPlan={true} userId={user?.id || ''} />
           </CardContent>
         </Card>
+
+        {/* AI IEP Document Analyzer */}
+        {isHeroPlan && (
+          <Card className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 backdrop-blur-lg border-blue-400/30 mb-8">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-white flex items-center gap-2 text-xl">
+                <FileText className="w-7 h-7 text-blue-400" />
+                AI IEP Document Analyzer
+                <Badge className="bg-gradient-to-r from-purple-400 to-blue-500 text-white text-xs px-2 py-1">
+                  NEW FEATURE
+                </Badge>
+              </CardTitle>
+              <p className="text-blue-200 text-base">
+                Upload your IEP documents for comprehensive AI-powered analysis and professional recommendations
+              </p>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <IEPAnalyzer />
+            </CardContent>
+          </Card>
+        )}
 
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

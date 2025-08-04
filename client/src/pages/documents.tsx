@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import Navbar from "@/components/layout/navbar";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -50,7 +50,7 @@ export default function Documents() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Navbar />
+
         <div className="flex items-center justify-center h-96">
           <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
         </div>
@@ -60,7 +60,6 @@ export default function Documents() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
       
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 sm:px-0">
@@ -81,7 +80,7 @@ export default function Documents() {
           </div>
 
           {/* Documents Grid */}
-          {documents.length === 0 ? (
+          {!Array.isArray(documents) || documents.length === 0 ? (
             <Card>
               <CardContent className="py-12">
                 <div className="text-center">
@@ -101,7 +100,7 @@ export default function Documents() {
             </Card>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {documents.map((document: Document) => (
+              {(documents as Document[]).map((document: Document) => (
                 <Card key={document.id} className="hover:shadow-md transition-shadow">
                   <CardHeader>
                     <div className="flex items-start justify-between">
@@ -125,7 +124,7 @@ export default function Documents() {
                       </p>
                     )}
                     <div className="text-xs text-gray-500 mb-4">
-                      Uploaded {format(new Date(document.uploadedAt), "MMM d, yyyy")}
+                      Uploaded {document.uploadedAt ? format(new Date(document.uploadedAt), "MMM d, yyyy") : "Recently"}
                     </div>
                     <div className="flex space-x-2">
                       <Button variant="outline" size="sm" className="flex-1">
