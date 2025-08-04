@@ -56,6 +56,10 @@ My IEP Hero is a comprehensive SaaS platform for Individualized Education Progra
 - ✓ Role-based tools for parents and advocates with professional layout
 - ✓ Split-panel design: left for lists/CRM, right for previews/chat/notes
 - ✓ Integrated file upload, document management, and AI analysis workflow
+- ✓ Hero Plan dashboard with dark mode design and AI-powered IEP tools
+- ✓ Conditional tool access based on subscription tier (Hero vs Free)
+- ✓ Professional dark theme with accessible contrast and modern gradients
+- ✓ AI tools section with 8 comprehensive IEP management tools
 
 # User Preferences
 
