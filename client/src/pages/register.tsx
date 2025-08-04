@@ -10,7 +10,7 @@ import { authApi } from "@/lib/auth";
 import { GraduationCap, Users, UserCheck, ArrowLeft, Check, Star, Zap, Shield } from "lucide-react";
 
 type UserRole = "parent" | "advocate" | "professional";
-type PlanType = "free" | "heroOffer" | "retainer";
+type PlanType = "free" | "heroOffer";
 
 interface RoleInfo {
   title: string;
@@ -306,7 +306,7 @@ export default function Register() {
           <div className="mb-4 p-3 bg-gray-50 rounded-lg">
             <div className="text-sm text-gray-600 mb-1">Selected:</div>
             <div className="font-medium">{ROLES[selectedRole!].title}</div>
-            <div className="font-medium text-blue-600">{PLANS[selectedPlan].name}</div>
+            <div className="font-medium text-blue-600">{PLANS[selectedPlan as keyof typeof PLANS].name}</div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
