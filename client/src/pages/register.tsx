@@ -1,13 +1,12 @@
 import { useState } from "react";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { authApi } from "@/lib/auth";
-import { GraduationCap, Users, UserCheck, ArrowLeft, Check, Star, Zap, Shield } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
+import { GraduationCap, Users, UserCheck, ArrowLeft, Check, Star, ArrowRight } from "lucide-react";
 
 type UserRole = "parent" | "advocate" | "professional";
 type PlanType = "free" | "heroOffer";
@@ -96,6 +95,7 @@ const PLANS = {
 
 export default function Register() {
   const [, setLocation] = useLocation();
+  const { register } = useAuth();
   const { toast } = useToast();
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null);
@@ -123,22 +123,28 @@ export default function Register() {
 
     setIsLoading(true);
     try {
-      await authApi.register({
-        ...formData,
-        role: selectedRole,
-        planStatus: selectedPlan
-      });
+      await register(
+        formData.email,
+        formData.username,
+        formData.password,
+        selectedRole,
+        selectedPlan
+      );
 
       toast({
-        title: "Account created successfully!",
-        description: "Please check your email to verify your account.",
+        title: "Account Created!",
+        description: "Welcome to My IEP Hero! Redirecting to dashboard...",
       });
 
-      setLocation("/login");
+      // Small delay for UX
+      setTimeout(() => {
+        setLocation("/dashboard");
+      }, 1000);
+      
     } catch (error: any) {
       toast({
-        title: "Registration failed",
-        description: error.message || "Something went wrong. Please try again.",
+        title: "Registration Failed",
+        description: error.message || "Please try again",
         variant: "destructive",
       });
     } finally {
