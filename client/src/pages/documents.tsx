@@ -25,34 +25,37 @@ export default function Documents() {
   });
 
   // Mock documents for demo
-  const mockDocuments: (Document & { size: string })[] = [
+  const mockDocuments: any[] = [
     {
       id: "1",
-      title: "IEP_Report_March.pdf",
+      filename: "IEP_Report_March.pdf",
       type: "iep",
       userId: "demo",
-      filename: "IEP_Report_March.pdf",
-      filePath: "/uploads/demo1.pdf",
+      originalName: "IEP_Report_March.pdf",
+      description: null,
+      fileUrl: "/uploads/demo1.pdf",
       uploadedAt: new Date("2024-03-15"),
       size: "2.4 MB",
     },
     {
       id: "2", 
-      title: "ReadingEval_Results.pdf",
+      filename: "ReadingEval_Results.pdf",
       type: "assessment",
       userId: "demo",
-      filename: "ReadingEval_Results.pdf", 
-      filePath: "/uploads/demo2.pdf",
+      originalName: "ReadingEval_Results.pdf", 
+      description: null,
+      fileUrl: "/uploads/demo2.pdf",
       uploadedAt: new Date("2024-02-20"),
       size: "1.8 MB",
     },
     {
       id: "3",
-      title: "Notes_AprilMeeting.pdf", 
+      filename: "Notes_AprilMeeting.pdf", 
       type: "meeting_notes",
       userId: "demo",
-      filename: "Notes_AprilMeeting.pdf",
-      filePath: "/uploads/demo3.pdf",
+      originalName: "Notes_AprilMeeting.pdf",
+      description: null,
+      fileUrl: "/uploads/demo3.pdf",
       uploadedAt: new Date("2024-04-10"),
       size: "1.2 MB",
     },
@@ -154,7 +157,7 @@ export default function Documents() {
                         <FileText className="w-8 h-8 text-blue-400" />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-white mb-1">{doc.title}</h3>
+                        <h3 className="font-semibold text-white mb-1">{doc.filename}</h3>
                         <div className="flex items-center gap-2 mb-2">
                           <Badge className={getDocumentTypeColor(doc.type)}>
                             {getDocumentTypeLabel(doc.type)}
@@ -164,7 +167,7 @@ export default function Documents() {
                           )}
                         </div>
                         <p className="text-sm text-slate-400">
-                          Uploaded {format(new Date(doc.uploadedAt), "MMM d, yyyy")}
+                          Uploaded {doc.uploadedAt ? format(new Date(doc.uploadedAt), "MMM d, yyyy") : "Unknown"}
                         </p>
                       </div>
                     </div>

@@ -1,7 +1,6 @@
-// Version adapted for dashboard-premium.tsx with Wouter, shadcn/ui, and TanStack support
+// dashboard-advocate.tsx - Professional advocate dashboard with full AI toolkit
 
 import React, { useState } from "react";
-import { useLocation } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -9,26 +8,24 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/use-auth";
 
-const heroTools = [
-  { name: "AI IEP Review", desc: "AI analysis of IEP documents", icon: "🧠" },
-  { name: "IEP Goal Generator", desc: "Generate measurable IEP goals", icon: "🎯" },
-  { name: "Template Builder", desc: "Create reusable IEP templates", icon: "📄" },
-  { name: "Progress Analyzer", desc: "Analyze progress & trends", icon: "📊" },
-  { name: "Meeting Prep Assistant", desc: "Auto-generate meeting prep notes", icon: "🗣️" },
-  { name: "Compliance Checker", desc: "Validate IEP legal compliance", icon: "✅" },
-  { name: "Accommodation Builder", desc: "Generate modifications & supports", icon: "⚙️" },
-  { name: "Transition Planner", desc: "Plan for post-secondary goals", icon: "📆" },
+const advocateTools = [
+  { name: 'AI IEP Review', desc: 'Analyze existing IEPs for quality & improvement', icon: '🧠' },
+  { name: 'IEP Goal Generator', desc: 'Craft measurable objectives quickly', icon: '🎯' },
+  { name: 'Template Builder', desc: 'Design reusable IEP templates and forms', icon: '📄' },
+  { name: 'Progress Analyzer', desc: 'Data-driven recommendations for IEP goals', icon: '📊' },
+  { name: 'Meeting Prep Assistant', desc: 'Generate talking points and meeting notes', icon: '🗣️' },
+  { name: 'Compliance Checker', desc: 'Ensure legal adherence to IEP policies', icon: '✅' },
+  { name: 'Accommodation Builder', desc: 'Auto-generate accommodations by diagnosis', icon: '⚙️' },
+  { name: 'Transition Planner', desc: 'Create plans for post-secondary success', icon: '📆' }
 ];
 
 export default function DashboardAdvocate() {
-  const [, setLocation] = useLocation();
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedTool, setSelectedTool] = useState<string | null>(null);
   const [upload, setUpload] = useState<File | null>(null);
   const { user } = useAuth();
 
-  // Use real user or fallback to demo user for Hero plan demonstration
-  const displayUser = user || { email: "parent@demo.com", planStatus: "heroOffer", username: "demo_parent" };
+  const displayUser = user || { email: "advocate@demo.com", planStatus: "heroOffer", username: "demo_advocate", role: "advocate" };
   const isHeroPlan = displayUser.planStatus === 'heroOffer';
 
   const openToolModal = (tool: string) => {
@@ -48,11 +45,11 @@ export default function DashboardAdvocate() {
       <div className="px-6 pb-10">
         {/* Welcome Section */}
         <div className="pt-8 pb-6">
-          <h2 className="text-2xl font-bold mb-2 text-white">
-            Welcome back, {displayUser.username || 'demo_parent'}!
-          </h2>
+          <h1 className="text-2xl font-bold mb-2 text-white">
+            Welcome, {displayUser.username || 'Professional'}!
+          </h1>
           <p className="text-slate-300 mb-6">
-            Manage your child's IEP progress and goals with AI-powered tools
+            Access your complete suite of AI-powered IEP management tools
           </p>
         </div>
 
@@ -60,26 +57,26 @@ export default function DashboardAdvocate() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
           <Card className="bg-[#3E4161]/70 border-slate-600">
             <CardContent className="p-4">
-              <div className="text-slate-300 text-sm">Active Goals</div>
-              <div className="text-2xl font-bold text-white">0</div>
+              <div className="text-slate-300 text-sm">Families Supported</div>
+              <div className="text-2xl font-bold text-white">4</div>
             </CardContent>
           </Card>
           <Card className="bg-[#3E4161]/70 border-slate-600">
             <CardContent className="p-4">
-              <div className="text-slate-300 text-sm">Progress Rate</div>
-              <div className="text-2xl font-bold text-white">0%</div>
+              <div className="text-slate-300 text-sm">Documents Reviewed</div>
+              <div className="text-2xl font-bold text-white">12</div>
             </CardContent>
           </Card>
           <Card className="bg-[#3E4161]/70 border-slate-600">
             <CardContent className="p-4">
-              <div className="text-slate-300 text-sm">Meetings</div>
-              <div className="text-2xl font-bold text-white">0</div>
+              <div className="text-slate-300 text-sm">Goals Generated</div>
+              <div className="text-2xl font-bold text-white">28</div>
             </CardContent>
           </Card>
           <Card className="bg-[#3E4161]/70 border-slate-600">
             <CardContent className="p-4">
-              <div className="text-slate-300 text-sm">Documents</div>
-              <div className="text-2xl font-bold text-white">3</div>
+              <div className="text-slate-300 text-sm">Compliance Flags</div>
+              <div className="text-2xl font-bold text-white">1</div>
             </CardContent>
           </Card>
         </div>
@@ -96,7 +93,7 @@ export default function DashboardAdvocate() {
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {heroTools.map((tool) => (
+            {advocateTools.map((tool) => (
               <Card 
                 key={tool.name} 
                 className="bg-[#3E4161] hover:bg-[#4A4E76] border-slate-500 transition-all duration-200 cursor-pointer group"

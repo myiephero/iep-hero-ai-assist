@@ -44,9 +44,16 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 function DashboardRouter() {
   const { user } = useAuth();
   
+  console.log('🔄 Dashboard Router - User role:', user?.role);
+  
   if (user?.role === 'parent') {
+    console.log('👨‍👩‍👧‍👦 Routing parent to parent dashboard');
     return <Redirect to="/dashboard-parent" />;
+  } else if (user?.role === 'advocate' || user?.role === 'professional') {
+    console.log('👩‍💼 Routing advocate/professional to advocate dashboard');
+    return <Redirect to="/dashboard-advocate" />;
   } else {
+    console.log('❓ Unknown role, defaulting to advocate dashboard');
     return <Redirect to="/dashboard-advocate" />;
   }
 }
