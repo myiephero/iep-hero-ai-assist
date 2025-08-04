@@ -1,6 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { setupDemoAccounts } from "./demo-setup";
 
 const app = express();
 app.use(express.json());
@@ -38,6 +39,13 @@ app.use((req, res, next) => {
 
 (async () => {
   const server = await registerRoutes(app);
+  
+  // Setup demo accounts for production
+  try {
+    await setupDemoAccounts();
+  } catch (error: any) {
+    console.error("Demo account setup failed:", error.message);
+  }
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
