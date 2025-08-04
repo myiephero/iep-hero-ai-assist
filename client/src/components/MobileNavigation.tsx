@@ -1,4 +1,4 @@
-import { Home, FileText, Target, User, MessageCircle } from 'lucide-react';
+import { Home, FileText, Target, User, MessageCircle, Star } from 'lucide-react';
 import { Link, useLocation } from 'wouter';
 import { cn } from '@/lib/utils';
 import { useMobile } from '@/hooks/use-mobile';
@@ -27,6 +27,12 @@ const navigationItems = [
     href: '/goals',
     icon: Target,
     description: 'Track progress'
+  },
+  {
+    name: 'Plans',
+    href: '/pricing',
+    icon: Star,
+    description: 'Upgrade plan'
   },
   {
     name: 'Profile',
