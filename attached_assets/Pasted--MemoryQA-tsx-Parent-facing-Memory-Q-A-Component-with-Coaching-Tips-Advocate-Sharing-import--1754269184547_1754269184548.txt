@@ -85,3 +85,17 @@ export default function MemoryQA({ userId }: { userId: string }) {
     </div>
   );
 }
+
+// ✅ memory-query.ts – Backend route that uses AIService.queryIEPMemory
+import { AIService } from "@/utils/ai-service";
+
+export async function POST(req: Request) {
+  const { userId, prompt } = await req.json();
+
+  try {
+    const answer = await AIService.queryIEPMemory(userId, prompt);
+    return Response.json({ answer });
+  } catch (error) {
+    return Response.json({ error: "Failed to query memory" }, { status: 500 });
+  }
+}
