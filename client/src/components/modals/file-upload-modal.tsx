@@ -18,6 +18,7 @@ export default function FileUploadModal({ open, onOpenChange }: FileUploadModalP
   const [file, setFile] = useState<File | null>(null);
   const [type, setType] = useState<string>("");
   const [description, setDescription] = useState("");
+  const [isDragOver, setIsDragOver] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -62,7 +63,38 @@ export default function FileUploadModal({ open, onOpenChange }: FileUploadModalP
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
+      console.log('File selected:', selectedFile.name, selectedFile.type, selectedFile.size);
       setFile(selectedFile);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    
+    const droppedFile = e.dataTransfer.files[0];
+    if (droppedFile) {
+      const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+      if (allowedTypes.includes(droppedFile.type)) {
+        console.log('File dropped:', droppedFile.name, droppedFile.type, droppedFile.size);
+        setFile(droppedFile);
+      } else {
+        toast({
+          title: "Invalid file type",
+          description: "Only PDF, DOC, and DOCX files are allowed",
+          variant: "destructive",
+        });
+      }
     }
   };
 
@@ -77,6 +109,7 @@ export default function FileUploadModal({ open, onOpenChange }: FileUploadModalP
       return;
     }
 
+    console.log('Uploading file:', file.name, 'Type:', type, 'Description:', description);
     uploadMutation.mutate({ file, type, description });
   };
 
@@ -94,7 +127,17 @@ export default function FileUploadModal({ open, onOpenChange }: FileUploadModalP
           <DialogTitle>Upload IEP Document</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-primary transition-colors">
+          <div 
+            className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors cursor-pointer ${
+              isDragOver 
+                ? 'border-primary bg-primary/5' 
+                : 'border-gray-300 hover:border-primary'
+            }`}
+            onClick={() => document.getElementById('file-upload')?.click()}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+          >
             <CloudUpload className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <h4 className="text-lg font-medium text-gray-900 mb-2">
               Drop files here or click to browse
@@ -102,18 +145,16 @@ export default function FileUploadModal({ open, onOpenChange }: FileUploadModalP
             <p className="text-sm text-gray-500 mb-4">
               Supports PDF, DOC, DOCX files up to 10MB
             </p>
-            <Input
+            <input
               type="file"
               accept=".pdf,.doc,.docx"
               onChange={handleFileChange}
               className="hidden"
               id="file-upload"
             />
-            <Label htmlFor="file-upload" className="cursor-pointer">
-              <Button type="button" variant="outline">
-                Choose File
-              </Button>
-            </Label>
+            <Button type="button" variant="outline">
+              Choose File
+            </Button>
             {file && (
               <p className="mt-2 text-sm text-gray-600">
                 Selected: {file.name}
