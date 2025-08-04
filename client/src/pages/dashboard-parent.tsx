@@ -54,12 +54,20 @@ export default function ParentDashboard() {
       setLocation("/tools/ask-ai-docs");
       return;
     }
+    if (tool === "Progress Analyzer") {
+      setLocation("/tools/progress-analyzer");
+      return;
+    }
+    if (tool === "Meeting Prep") {
+      setLocation("/tools/meeting-prep");
+      return;
+    }
     setSelectedTool(tool);
     setModalOpen(true);
   };
 
   const handleSubmit = () => {
-    // This should not be called for Ask AI About My Docs since it routes directly
+    // This should not be called since all tools now route directly to their pages
     alert(`${selectedTool} activated! Feature coming soon.`);
     setModalOpen(false);
     setUpload(null);
