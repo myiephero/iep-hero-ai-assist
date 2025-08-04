@@ -18,15 +18,45 @@ export default function MemoryQA({ userId }: { userId: string }) {
     setLoading(true);
     setAnswer("Thinking...");
 
-    const res = await fetch("/api/memory-query", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId, prompt })
-    });
+    try {
+      const res = await fetch("/api/memory-query", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, prompt })
+      });
 
-    const data = await res.json();
-    setAnswer(data.answer || "No answer returned.");
-    setLoading(false);
+      const data = await res.json();
+      const aiAnswer = data.answer || "No answer returned.";
+      setAnswer(aiAnswer);
+
+      // If sharing with advocate is enabled, send the share request
+      if (shareWithAdvocate) {
+        try {
+          const shareRes = await fetch("/api/share-memory", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ 
+              question: prompt, 
+              answer: aiAnswer 
+            })
+          });
+
+          if (shareRes.ok) {
+            // Add visual indication that it was shared
+            setAnswer(aiAnswer + "\n\n✅ Shared with your advocate");
+          } else {
+            console.error("Failed to share with advocate");
+          }
+        } catch (shareError) {
+          console.error("Error sharing with advocate:", shareError);
+        }
+      }
+    } catch (error) {
+      console.error("Error querying memory:", error);
+      setAnswer("Sorry, I couldn't process your question right now.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (

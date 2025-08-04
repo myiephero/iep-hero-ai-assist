@@ -12,6 +12,7 @@ export const users = pgTable("users", {
   stripeCustomerId: text("stripe_customer_id"),
   stripeSubscriptionId: text("stripe_subscription_id"),
   subscriptionTier: text("subscription_tier").default("free"), // free, basic, professional, enterprise
+  advocateEmail: text("advocate_email"),
   createdAt: timestamp("created_at").default(sql`now()`),
 });
 
@@ -59,6 +60,14 @@ export const messages = pgTable("messages", {
   sentAt: timestamp("sent_at").default(sql`now()`),
 });
 
+export const sharedMemories = pgTable("shared_memories", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  question: text("question").notNull(),
+  answer: text("answer").notNull(),
+  sharedAt: timestamp("shared_at").default(sql`now()`),
+});
+
 // Schemas
 export const insertUserSchema = createInsertSchema(users).pick({
   email: true,
@@ -94,6 +103,11 @@ export const insertMessageSchema = createInsertSchema(messages).omit({
   sentAt: true,
 });
 
+export const insertSharedMemorySchema = createInsertSchema(sharedMemories).omit({
+  id: true,
+  sharedAt: true,
+});
+
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -105,3 +119,5 @@ export type InsertEvent = z.infer<typeof insertEventSchema>;
 export type Event = typeof events.$inferSelect;
 export type InsertMessage = z.infer<typeof insertMessageSchema>;
 export type Message = typeof messages.$inferSelect;
+export type InsertSharedMemory = z.infer<typeof insertSharedMemorySchema>;
+export type SharedMemory = typeof sharedMemories.$inferSelect;
