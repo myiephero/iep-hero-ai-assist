@@ -29,9 +29,14 @@ export function useAuthState() {
 
   const checkAuth = async () => {
     try {
+      console.log('🔍 Checking auth status...');
       const result = await authApi.getCurrentUser();
-      setUser(result?.user || null);
+      console.log('🔍 Auth check result:', result);
+      const userData = result?.user || null;
+      setUser(userData);
+      console.log('🔍 User state set to:', userData);
     } catch (error) {
+      console.log('❌ Auth check failed:', error);
       setUser(null);
     } finally {
       setIsLoading(false);
