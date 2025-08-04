@@ -42,7 +42,9 @@ My IEP Hero is a comprehensive SaaS platform for Individualized Education Progra
 - ✓ Beautiful plan status badges and cards displaying user's subscription level
 - ✓ Dashboard shows clear plan status with upgrade options for free users
 - ✓ Plan-specific features and benefits clearly communicated throughout UI
-- ✓ Demo login credentials created for testing and demonstrations
+- ✓ Demo login credentials with proper plan assignments:
+  - parent@demo.com/demo123 → Hero Plan ($495/year) with full features
+  - advocate@demo.com/demo123 → Free Plan with basic features
 - ✓ Stunning dark theme with glass-morphism effects and animations implemented
 - ✓ Login and registration flows completely redesigned with premium UX
 - ✓ Authentication system working correctly with proper session management
