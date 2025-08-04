@@ -15,6 +15,7 @@ import Pricing from "@/pages/pricing";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 import { MobileNavigation } from "@/components/MobileNavigation";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
+import Navbar from "@/components/layout/navbar";
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
@@ -46,22 +47,26 @@ function Router() {
       <Route path="/register" component={Register} />
       <Route path="/subscribe">
         <AuthGuard>
+          <Navbar />
           <Subscribe />
         </AuthGuard>
       </Route>
       <Route path="/pricing" component={Pricing} />
       <Route path="/dashboard">
         <AuthGuard>
+          <Navbar />
           <PremiumDashboard />
         </AuthGuard>
       </Route>
       <Route path="/documents">
         <AuthGuard>
+          <Navbar />
           <Documents />
         </AuthGuard>
       </Route>
       <Route path="/goals">
         <AuthGuard>
+          <Navbar />
           <Goals />
         </AuthGuard>
       </Route>
