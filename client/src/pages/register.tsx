@@ -171,7 +171,8 @@ export default function Register() {
         username: formData.username,
         email: formData.email,
         password: formData.password,
-        role: selectedRole
+        role: selectedRole,
+        planStatus: selectedPlan === "hero" ? "heroOffer" : "free"
       });
 
       if (response.ok) {

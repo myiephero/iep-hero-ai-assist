@@ -115,7 +115,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ...userData,
         password: hashedPassword,
         emailVerified: false,
-        verificationToken
+        verificationToken,
+        planStatus: req.body.planStatus || "free" // Track plan selection
       });
       
       // Send welcome email with verification link

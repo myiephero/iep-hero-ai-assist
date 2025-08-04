@@ -11,6 +11,7 @@ import SubscriptionModal from "@/components/modals/subscription-modal";
 import MemoryQA from "@/components/MemoryQA";
 import { MobileMemoryQA } from "@/components/MobileMemoryQA";
 import { MobileLayout } from "@/components/MobileLayout";
+import { PlanStatusBadge, PlanStatusCard } from "@/components/PlanStatusBadge";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
@@ -85,19 +86,30 @@ export default function Dashboard() {
         <div className="px-4 py-6 sm:px-0">
           <div className="bg-white shadow rounded-lg">
             <div className="px-4 py-5 sm:p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-900">
-                    Welcome back, {user?.username}!
-                  </h1>
-                  <p className="mt-1 text-sm text-gray-600">
-                    Here's an overview of your child's IEP progress and upcoming activities.
-                  </p>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h1 className="text-2xl font-bold text-gray-900">
+                      Welcome back, {user?.username}!
+                    </h1>
+                    <p className="mt-1 text-sm text-gray-600">
+                      Here's an overview of your child's IEP progress and upcoming activities.
+                    </p>
+                  </div>
+                  <Button onClick={() => setShowSubscription(true)}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add New Goal
+                  </Button>
                 </div>
-                <Button onClick={() => setShowSubscription(true)}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add New Goal
-                </Button>
+                
+                {/* Plan Status Display */}
+                <div className="pt-4 border-t border-gray-200">
+                  <PlanStatusBadge 
+                    planStatus={user?.planStatus || "free"} 
+                    role={user?.role}
+                    onUpgrade={() => setShowSubscription(true)}
+                  />
+                </div>
               </div>
             </div>
           </div>
