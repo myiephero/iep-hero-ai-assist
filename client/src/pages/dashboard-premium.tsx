@@ -1,469 +1,407 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useAuth } from "@/hooks/use-auth";
-import { useMobile } from "@/hooks/use-mobile";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 import { 
-  Crown, 
-  Target, 
-  TrendingUp, 
-  Calendar, 
+  Users, 
   FileText, 
-  MessageSquare,
-  Plus,
-  Star,
-  Users,
-  BookOpen,
+  Calendar, 
+  MessageSquare, 
+  Upload,
+  Target,
+  CheckCircle,
   Brain,
-  Sparkles,
-  BarChart3,
+  Star,
+  BookOpen,
+  Settings,
+  Search,
+  Filter,
+  Plus,
   Clock,
-  CheckCircle2,
-  AlertCircle,
-  Share2,
+  User,
+  Edit,
+  Trash2,
   Download,
-  Bell
+  AlertCircle
 } from "lucide-react";
-import { PlanStatusBadge } from "@/components/PlanStatusBadge";
-
-import MemoryQA from "@/components/MemoryQA";
-import { IEPTools } from "@/components/IEPTools";
-import IEPAnalyzer from "@/components/IEPAnalyzer";
-import Footer from "@/components/layout/footer";
+import { useAuth } from "@/hooks/use-auth";
 import FileUploadModal from "@/components/modals/file-upload-modal";
+import type { Goal, Document, Event } from "@shared/schema";
+import { format } from "date-fns";
 
-export default function PremiumDashboard() {
+export default function Dashboard() {
   const { user } = useAuth();
-  const { isMobile } = useMobile();
-  const [activeTab, setActiveTab] = useState('overview');
   const [showFileUpload, setShowFileUpload] = useState(false);
+  const [selectedView, setSelectedView] = useState("iep-tracker");
+  const [searchTerm, setSearchTerm] = useState("");
 
-  // Fetch dashboard data
-  const { data: goals = [], isLoading: goalsLoading } = useQuery<any[]>({
+  // Data fetching
+  const { data: goals = [] } = useQuery({
     queryKey: ["/api/goals"],
   });
 
-  const { data: events = [], isLoading: eventsLoading } = useQuery({
-    queryKey: ["/api/events"],
-  });
-
-  const { data: documents = [], isLoading: documentsLoading } = useQuery({
+  const { data: documents = [] } = useQuery({
     queryKey: ["/api/documents"],
   });
 
-  // Hero Plan Features Check
-  const isHeroPlan = user?.planStatus === 'heroOffer' || user?.subscriptionTier === 'heroOffer';
-  
-  // Debug logging for plan status
-  console.log('🔍 Dashboard Debug:', {
-    user,
-    userPlanStatus: user?.planStatus,
-    userSubscriptionTier: user?.subscriptionTier,
-    isHeroPlan,
-    userObject: JSON.stringify(user, null, 2)
+  const { data: events = [] } = useQuery({
+    queryKey: ["/api/events"],
   });
 
-  const stats = {
-    activeGoals: goals.filter((goal: any) => goal.status === "In Progress" || goal.status === "Not Started").length,
-    completedGoals: goals.filter((goal: any) => goal.status === "Completed").length,
-    progressRate: goals.length > 0 
-      ? Math.round(goals.reduce((acc: number, goal: any) => acc + (goal.progress || 0), 0) / goals.length)
-      : 0,
-    upcomingMeetings: Array.isArray(events) ? (events as any[]).filter((event: any) => 
-      new Date(event.date) > new Date() && event.type === "meeting"
-    ).length : 0,
-    documents: Array.isArray(documents) ? (documents as any[]).length : 0,
-  };
+  const isParent = user?.role === "parent";
+  const isAdvocate = user?.role === "advocate";
 
-  if (goalsLoading || eventsLoading || documentsLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
-        <div className="flex items-center justify-center h-96">
-          <div className="animate-spin w-8 h-8 border-4 border-blue-400 border-t-transparent rounded-full" />
-        </div>
-      </div>
-    );
-  }
+  const parentTools = [
+    { id: "iep-tracker", name: "IEP Tracker", icon: Target },
+    { id: "document-vault", name: "Document Vault", icon: FileText },
+    { id: "letter-generator", name: "Letter Generator", icon: Edit },
+    { id: "meeting-prep", name: "Meeting Prep Wizard", icon: Calendar },
+    { id: "progress-tracker", name: "Progress Tracker", icon: CheckCircle }
+  ];
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative overflow-hidden">
-      {/* Animated Background Effects */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
-        <div className="absolute top-40 left-40 w-80 h-80 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
-      </div>
-      
-      <div className="relative z-10 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
-        {/* Hero Header */}
-        <div className="mb-8">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <div className="flex items-center gap-3 mb-2">
-                <h1 className="text-3xl sm:text-4xl font-bold text-white">
-                  Welcome back, {user?.username}!
-                </h1>
-                {isHeroPlan && (
-                  <div className="flex items-center gap-2 px-3 py-1 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full">
-                    <Crown className="w-4 h-4 text-white" />
-                    <span className="text-white font-semibold text-sm">HERO</span>
-                  </div>
-                )}
-              </div>
-              <p className="text-blue-200 text-lg">
-                {isHeroPlan 
-                  ? "Your premium IEP management suite with AI-powered insights"
-                  : "Manage your child's IEP progress and goals"
-                }
-              </p>
-            </div>
-            
-            <div className="flex items-center gap-3">
-              <PlanStatusBadge planStatus={'heroOffer'} />
-              <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold">
+  const advocateTools = [
+    { id: "case-crm", name: "Case CRM", icon: Users },
+    { id: "scheduling", name: "Scheduling", icon: Calendar },
+    { id: "intake-forms", name: "Intake Forms", icon: FileText },
+    { id: "templates", name: "Templates & Letters", icon: BookOpen }
+  ];
+
+  const renderLeftPanel = () => {
+    switch (selectedView) {
+      case "iep-tracker":
+        return (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold">IEP Goals & Timeline</h3>
+              <Button size="sm" onClick={() => setShowFileUpload(true)}>
                 <Plus className="w-4 h-4 mr-2" />
                 Add Goal
               </Button>
             </div>
-          </div>
-        </div>
-
-        {/* Quick Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <Card className="bg-white/10 backdrop-blur-lg border-white/20 text-white">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-blue-200 text-sm font-medium">Active Goals</p>
-                  <p className="text-3xl font-bold">{stats.activeGoals}</p>
-                </div>
-                <div className="h-12 w-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
-                  <Target className="h-6 w-6 text-blue-400" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/10 backdrop-blur-lg border-white/20 text-white">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-green-200 text-sm font-medium">Progress Rate</p>
-                  <p className="text-3xl font-bold">{stats.progressRate}%</p>
-                </div>
-                <div className="h-12 w-12 bg-green-500/20 rounded-lg flex items-center justify-center">
-                  <TrendingUp className="h-6 w-6 text-green-400" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/10 backdrop-blur-lg border-white/20 text-white">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-purple-200 text-sm font-medium">Meetings</p>
-                  <p className="text-3xl font-bold">{stats.upcomingMeetings}</p>
-                </div>
-                <div className="h-12 w-12 bg-purple-500/20 rounded-lg flex items-center justify-center">
-                  <Calendar className="h-6 w-6 text-purple-400" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/10 backdrop-blur-lg border-white/20 text-white">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-orange-200 text-sm font-medium">Documents</p>
-                  <p className="text-3xl font-bold">{stats.documents}</p>
-                </div>
-                <div className="h-12 w-12 bg-orange-500/20 rounded-lg flex items-center justify-center">
-                  <FileText className="h-6 w-6 text-orange-400" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* IEP AI Tools Section - Always show for demo, check Hero status */}
-        <Card className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 backdrop-blur-lg border-purple-400/30 mb-8">
-          <CardHeader className="pb-4">
-            <CardTitle className="text-white flex items-center gap-2 text-xl">
-              <Brain className="w-7 h-7 text-purple-400" />
-              AI-Powered IEP Professional Tools
-              <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs px-2 py-1">
-                HERO EXCLUSIVE
-              </Badge>
-            </CardTitle>
-            <p className="text-purple-200 text-base">
-              Complete AI suite for professional IEP management, document analysis, and compliance checking
-            </p>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <IEPTools isHeroPlan={true} userId={user?.id || ''} />
-          </CardContent>
-        </Card>
-
-        {/* AI IEP Document Analyzer */}
-        {isHeroPlan && (
-          <Card className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 backdrop-blur-lg border-blue-400/30 mb-8">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-white flex items-center gap-2 text-xl">
-                <FileText className="w-7 h-7 text-blue-400" />
-                AI IEP Document Analyzer
-                <Badge className="bg-gradient-to-r from-purple-400 to-blue-500 text-white text-xs px-2 py-1">
-                  NEW FEATURE
-                </Badge>
-              </CardTitle>
-              <p className="text-blue-200 text-base">
-                Upload your IEP documents for comprehensive AI-powered analysis and professional recommendations
-              </p>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <IEPAnalyzer />
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column - Goals & Progress */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Current IEP Goals */}
-            <Card className="bg-white/10 backdrop-blur-lg border-white/20">
-              <CardHeader className="pb-4">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <Target className="w-5 h-5 text-blue-400" />
-                    Current IEP Goals
-                  </CardTitle>
-                  <Button variant="ghost" className="text-blue-400 hover:text-blue-300">
-                    <Plus className="w-4 h-4 mr-2" />
-                    Add Goal
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                {goals.length === 0 ? (
-                  <div className="text-center py-12">
-                    <div className="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Target className="w-8 h-8 text-blue-400" />
+            <div className="space-y-3">
+              {goals.map((goal: Goal) => (
+                <Card key={goal.id} className="p-4">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <h4 className="font-medium text-sm">{goal.description}</h4>
+                      <div className="flex items-center gap-2 mt-2">
+                        <Badge variant="outline" className="text-xs">
+                          {goal.category}
+                        </Badge>
+                        <span className="text-xs text-gray-500">
+                          Due: {goal.targetDate ? format(new Date(goal.targetDate), "MMM d") : "No date"}
+                        </span>
+                      </div>
                     </div>
-                    <h3 className="text-white font-semibold mb-2">No goals yet</h3>
-                    <p className="text-blue-200 mb-4">Start by adding your first IEP goal</p>
-                    <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700">
-                      Add Your First Goal
-                    </Button>
+                    <CheckCircle className="w-4 h-4 text-green-500" />
                   </div>
-                ) : (
-                  <div className="space-y-4">
-                    {goals.slice(0, 3).map((goal: any, index: number) => (
-                      <div key={index} className="bg-white/5 rounded-lg p-4 border border-white/10">
-                        <div className="flex items-start justify-between mb-2">
-                          <h4 className="text-white font-medium">{goal.title || `Goal ${index + 1}`}</h4>
-                          <Badge variant="outline" className="text-blue-400 border-blue-400">
-                            {goal.status || 'In Progress'}
-                          </Badge>
-                        </div>
-                        <p className="text-blue-200 text-sm mb-3">{goal.description || 'No description available'}</p>
-                        <div className="flex items-center justify-between">
-                          <div className="flex-1 bg-white/10 rounded-full h-2 mr-3">
-                            <div 
-                              className="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all duration-300"
-                              style={{ width: `${goal.progress || 0}%` }}
-                            />
-                          </div>
-                          <span className="text-white text-sm font-medium">{goal.progress || 0}%</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Quick Actions for Hero Plan */}
-            {isHeroPlan && (
-              <Card className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 backdrop-blur-lg border-yellow-400/30">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <Sparkles className="w-5 h-5 text-yellow-400" />
-                    Hero Plan Features
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <Button variant="ghost" className="h-auto p-4 text-left justify-start bg-white/10 hover:bg-white/20">
-                      <div className="flex items-center gap-3">
-                        <Brain className="w-6 h-6 text-yellow-400" />
-                        <div>
-                          <p className="text-white font-medium">AI Memory Q&A</p>
-                          <p className="text-yellow-200 text-xs">Ask questions about your IEP</p>
-                        </div>
-                      </div>
-                    </Button>
-                    
-                    <Button variant="ghost" className="h-auto p-4 text-left justify-start bg-white/10 hover:bg-white/20">
-                      <div className="flex items-center gap-3">
-                        <BarChart3 className="w-6 h-6 text-yellow-400" />
-                        <div>
-                          <p className="text-white font-medium">Advanced Analytics</p>
-                          <p className="text-yellow-200 text-xs">Detailed progress reports</p>
-                        </div>
-                      </div>
-                    </Button>
-                    
-                    <Button variant="ghost" className="h-auto p-4 text-left justify-start bg-white/10 hover:bg-white/20">
-                      <div className="flex items-center gap-3">
-                        <Share2 className="w-6 h-6 text-yellow-400" />
-                        <div>
-                          <p className="text-white font-medium">Advocate Sharing</p>
-                          <p className="text-yellow-200 text-xs">Share insights with advocates</p>
-                        </div>
-                      </div>
-                    </Button>
-                    
-                    <Button variant="ghost" className="h-auto p-4 text-left justify-start bg-white/10 hover:bg-white/20">
-                      <div className="flex items-center gap-3">
-                        <Download className="w-6 h-6 text-yellow-400" />
-                        <div>
-                          <p className="text-white font-medium">Generate Reports</p>
-                          <p className="text-yellow-200 text-xs">Professional IEP reports</p>
-                        </div>
-                      </div>
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+                </Card>
+              ))}
+            </div>
           </div>
+        );
 
-          {/* Right Column - AI Q&A and Activities */}
-          <div className="space-y-6">
-            {/* AI Memory Q&A */}
-            {isHeroPlan ? (
-              <Card className="bg-white/10 backdrop-blur-lg border-white/20">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <Brain className="w-5 h-5 text-purple-400" />
-                    Ask About Your IEP
-                    <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs">
-                      HERO
-                    </Badge>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <MemoryQA userId={user?.id || ''} />
-                </CardContent>
-              </Card>
-            ) : (
-              <Card className="bg-white/10 backdrop-blur-lg border-white/20">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <Brain className="w-5 h-5 text-gray-400" />
-                    AI Memory Q&A
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="text-center py-8">
-                  <div className="w-16 h-16 bg-yellow-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Crown className="w-8 h-8 text-yellow-400" />
-                  </div>
-                  <h3 className="text-white font-semibold mb-2">Hero Plan Feature</h3>
-                  <p className="text-blue-200 text-sm mb-4">
-                    Ask AI questions about your IEP documents and get instant insights
-                  </p>
-                  <Button className="bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white">
-                    Upgrade to Hero
-                  </Button>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Upcoming Events */}
-            <Card className="bg-white/10 backdrop-blur-lg border-white/20">
-              <CardHeader>
-                <CardTitle className="text-white flex items-center gap-2">
-                  <Calendar className="w-5 h-5 text-green-400" />
-                  Upcoming Events
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {!Array.isArray(events) || events.length === 0 ? (
-                  <div className="text-center py-6">
-                    <Clock className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                    <p className="text-blue-200 text-sm">No upcoming events</p>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {(events as any[]).slice(0, 3).map((event: any, index: number) => (
-                      <div key={index} className="flex items-center gap-3 p-3 bg-white/5 rounded-lg">
-                        <div className="w-2 h-2 bg-green-400 rounded-full" />
-                        <div className="flex-1">
-                          <p className="text-white text-sm font-medium">{event.title || `Event ${index + 1}`}</p>
-                          <p className="text-blue-200 text-xs">{event.date || 'Date TBD'}</p>
-                        </div>
+      case "document-vault":
+        return (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold">Document Vault</h3>
+              <Button size="sm" onClick={() => setShowFileUpload(true)}>
+                <Upload className="w-4 h-4 mr-2" />
+                Upload
+              </Button>
+            </div>
+            <div className="relative">
+              <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder="Search documents..."
+                className="pl-10"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <div className="space-y-3">
+              {documents.map((doc: Document) => (
+                <Card key={doc.id} className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <FileText className="w-5 h-5 text-blue-500" />
+                      <div>
+                        <h4 className="font-medium text-sm">{doc.originalName}</h4>
+                        <p className="text-xs text-gray-500">
+                          {doc.uploadedAt ? format(new Date(doc.uploadedAt), "MMM d, yyyy") : "Recently"}
+                        </p>
                       </div>
-                    ))}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button variant="ghost" size="sm">
+                        <Download className="w-4 h-4" />
+                      </Button>
+                      <Button variant="ghost" size="sm">
+                        <Brain className="w-4 h-4" />
+                      </Button>
+                    </div>
                   </div>
-                )}
-              </CardContent>
-            </Card>
+                </Card>
+              ))}
+            </div>
+          </div>
+        );
 
-            {/* Recent Documents */}
-            <Card className="bg-white/10 backdrop-blur-lg border-white/20">
-              <CardHeader>
-                <CardTitle className="text-white flex items-center gap-2">
-                  <FileText className="w-5 h-5 text-orange-400" />
-                  Recent Documents
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {!Array.isArray(documents) || documents.length === 0 ? (
-                  <div className="text-center py-6">
-                    <FileText className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                    <p className="text-blue-200 text-sm">No documents yet</p>
-                    <Button 
-                      variant="ghost" 
-                      className="text-blue-400 hover:text-blue-300 mt-2" 
-                      size="sm"
-                      onClick={() => setShowFileUpload(true)}
-                    >
-                      <Plus className="w-4 h-4 mr-1" />
-                      Upload Document
-                    </Button>
+      case "case-crm":
+        return (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold">Client Cases</h3>
+              <Button size="sm">
+                <Plus className="w-4 h-4 mr-2" />
+                New Case
+              </Button>
+            </div>
+            <div className="relative">
+              <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder="Search clients..."
+                className="pl-10"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <div className="space-y-3">
+              <Card className="p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <User className="w-5 h-5 text-purple-500" />
+                    <div>
+                      <h4 className="font-medium text-sm">Sarah Johnson</h4>
+                      <p className="text-xs text-gray-500">IEP Review - Next meeting: Dec 15</p>
+                    </div>
                   </div>
-                ) : (
-                  <div className="space-y-3">
-                    {(documents as any[]).slice(0, 3).map((doc: any, index: number) => (
-                      <div key={index} className="flex items-center gap-3 p-3 bg-white/5 rounded-lg hover:bg-white/10 cursor-pointer transition-colors">
-                        <div className="w-8 h-8 bg-orange-500/20 rounded-lg flex items-center justify-center">
-                          <FileText className="w-4 h-4 text-orange-400" />
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-white text-sm font-medium">{doc.name || `Document ${index + 1}`}</p>
-                          <p className="text-blue-200 text-xs">{doc.date || 'Recently uploaded'}</p>
-                        </div>
-                      </div>
-                    ))}
+                  <Badge variant="outline">Active</Badge>
+                </div>
+              </Card>
+              <Card className="p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <User className="w-5 h-5 text-green-500" />
+                    <div>
+                      <h4 className="font-medium text-sm">Michael Chen</h4>
+                      <p className="text-xs text-gray-500">504 Plan - Assessment pending</p>
+                    </div>
                   </div>
-                )}
-              </CardContent>
-            </Card>
+                  <Badge variant="secondary">Review</Badge>
+                </div>
+              </Card>
+            </div>
+          </div>
+        );
+
+      default:
+        return (
+          <div className="flex items-center justify-center h-64 text-gray-500">
+            <div className="text-center">
+              <FileText className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+              <p>Select a tool to get started</p>
+            </div>
+          </div>
+        );
+    }
+  };
+
+  return (
+    <div className="flex min-h-screen flex-col bg-gray-50">
+      {/* Header */}
+      <header className="sticky top-0 z-50 bg-white shadow px-6 py-4 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <h1 className="text-xl font-bold text-blue-600">My IEP Hero</h1>
+          <Badge variant="outline" className="text-xs">
+            {user?.planStatus === 'heroOffer' ? 'Hero Plan' : 'Free Plan'}
+          </Badge>
+        </div>
+        <nav className="hidden md:flex space-x-4">
+          <Button variant="ghost" className="text-sm">Dashboard</Button>
+          <Button variant="ghost" className="text-sm">Templates</Button>
+          <Button variant="ghost" className="text-sm">Chat</Button>
+          <Button variant="ghost" className="text-sm">Settings</Button>
+        </nav>
+        <div className="flex items-center gap-3">
+          <div className="text-right">
+            <div className="text-sm font-medium">{user?.username}</div>
+            <div className="text-xs text-gray-500 capitalize">{user?.role}</div>
+          </div>
+          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+            <User className="w-4 h-4 text-blue-600" />
           </div>
         </div>
+      </header>
+
+      <div className="flex flex-1">
+        {/* Sidebar */}
+        <aside className="w-64 bg-white border-r p-4 space-y-6">
+          {(isParent || !isAdvocate) && (
+            <div>
+              <div className="font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                <Target className="w-4 h-4" />
+                Parent Tools
+              </div>
+              <div className="space-y-2">
+                {parentTools.map((tool) => (
+                  <Button
+                    key={tool.id}
+                    variant={selectedView === tool.id ? "default" : "ghost"}
+                    className="w-full justify-start text-sm h-auto py-2"
+                    onClick={() => setSelectedView(tool.id)}
+                  >
+                    <tool.icon className="w-4 h-4 mr-2" />
+                    {tool.name}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {isAdvocate && (
+            <div>
+              <div className="font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                <Users className="w-4 h-4" />
+                Advocate Tools
+              </div>
+              <div className="space-y-2">
+                {advocateTools.map((tool) => (
+                  <Button
+                    key={tool.id}
+                    variant={selectedView === tool.id ? "default" : "ghost"}
+                    className="w-full justify-start text-sm h-auto py-2"
+                    onClick={() => setSelectedView(tool.id)}
+                  >
+                    <tool.icon className="w-4 h-4 mr-2" />
+                    {tool.name}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div>
+            <div className="font-semibold text-gray-700 mb-3 flex items-center gap-2">
+              <BookOpen className="w-4 h-4" />
+              Resources
+            </div>
+            <div className="space-y-2">
+              <Button variant="ghost" className="w-full justify-start text-sm h-auto py-2">
+                <BookOpen className="w-4 h-4 mr-2" />
+                Knowledge Base
+              </Button>
+              <Button variant="ghost" className="w-full justify-start text-sm h-auto py-2">
+                <Settings className="w-4 h-4 mr-2" />
+                Settings
+              </Button>
+            </div>
+          </div>
+        </aside>
+
+        {/* Main Content Area */}
+        <main className="flex-1 flex">
+          {/* Left Panel - List/CRM */}
+          <div className="w-1/2 p-6 overflow-y-auto border-r bg-white">
+            {renderLeftPanel()}
+          </div>
+
+          {/* Right Panel - Preview/Details */}
+          <div className="w-1/2 p-6 overflow-y-auto">
+            <Tabs defaultValue="preview" className="w-full">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="preview">Live Preview</TabsTrigger>
+                <TabsTrigger value="chat">Chat</TabsTrigger>
+                <TabsTrigger value="notes">Notes</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="preview" className="mt-4">
+                <Card>
+                  <CardContent className="p-0">
+                    <div className="bg-gray-100 rounded-lg p-8 text-center">
+                      <FileText className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+                      <h3 className="text-lg font-medium text-gray-700 mb-2">Document Preview</h3>
+                      <p className="text-gray-500 mb-4">
+                        Select a document or goal to view its details and preview
+                      </p>
+                      <Button onClick={() => setShowFileUpload(true)}>
+                        <Upload className="w-4 h-4 mr-2" />
+                        Upload Document
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="chat" className="mt-4">
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="space-y-4">
+                      <div className="bg-blue-50 p-3 rounded-lg">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Brain className="w-4 h-4 text-blue-600" />
+                          <span className="text-sm font-medium text-blue-800">AI Assistant</span>
+                        </div>
+                        <p className="text-sm text-blue-700">
+                          Hello! I'm here to help you with IEP questions, document analysis, and advocacy guidance. 
+                          What would you like to know?
+                        </p>
+                      </div>
+                      <Textarea 
+                        placeholder="Ask about IEP processes, document analysis, or get advocacy advice..." 
+                        className="min-h-[100px]" 
+                      />
+                      <Button className="w-full">
+                        <MessageSquare className="w-4 h-4 mr-2" />
+                        Send Message
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="notes" className="mt-4">
+                <Card>
+                  <CardContent className="p-4 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-medium">Meeting Notes & To-Dos</h3>
+                      <Button size="sm">
+                        <Plus className="w-4 h-4 mr-2" />
+                        Add Note
+                      </Button>
+                    </div>
+                    <Textarea 
+                      placeholder="Add meeting notes, to-dos, or important reminders..."
+                      className="min-h-[200px]"
+                    />
+                    <div className="space-y-2">
+                      <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                        <div className="flex items-center gap-2">
+                          <Clock className="w-4 h-4 text-yellow-600" />
+                          <span className="text-sm font-medium">Upcoming IEP Meeting</span>
+                        </div>
+                        <p className="text-sm text-gray-600 mt-1">
+                          December 15, 2024 - Prepare transition goals discussion
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
+          </div>
+        </main>
       </div>
-      
-      <Footer />
-      
+
+      {/* File Upload Modal */}
       <FileUploadModal 
         open={showFileUpload} 
-        onOpenChange={setShowFileUpload} 
+        onOpenChange={setShowFileUpload}
       />
     </div>
   );
