@@ -80,6 +80,7 @@ export const insertUserSchema = createInsertSchema(users).pick({
 }).extend({
   emailVerified: z.boolean().optional(),
   verificationToken: z.string().optional(),
+  planStatus: z.string().optional(),
 });
 
 export const insertGoalSchema = createInsertSchema(iepGoals).omit({
