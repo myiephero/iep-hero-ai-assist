@@ -123,7 +123,7 @@ export default function Register() {
 
     setIsLoading(true);
     try {
-      await register(
+      const result = await register(
         formData.email,
         formData.username,
         formData.password,
@@ -142,6 +142,7 @@ export default function Register() {
       }, 1000);
       
     } catch (error: any) {
+      console.error('Registration error:', error);
       toast({
         title: "Registration Failed",
         description: error.message || "Please try again",
