@@ -122,40 +122,7 @@ export default function Documents() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#1A1B2E] to-[#2C2F48] text-white">
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-[#2C2F48]/95 backdrop-blur shadow-lg px-6 py-4 flex items-center justify-between border-b border-slate-600">
-        <div className="flex items-center gap-4">
-          <h1 className="text-xl font-bold text-white">My IEP Hero</h1>
-          {isHeroPlan && (
-            <Badge className="bg-blue-600 hover:bg-blue-700 text-white">
-              Hero Plan
-            </Badge>
-          )}
-        </div>
-        <nav className="space-x-4 flex items-center">
-          <Link href="/dashboard">
-            <Button variant="ghost" className="text-slate-300 hover:text-white hover:bg-slate-700">
-              Dashboard
-            </Button>
-          </Link>
-          <Link href="/goals">
-            <Button variant="ghost" className="text-slate-300 hover:text-white hover:bg-slate-700">
-              Goals
-            </Button>
-          </Link>
-          <Button variant="ghost" className="text-white bg-slate-700">
-            Documents
-          </Button>
-          <div className="flex items-center gap-2 ml-4">
-            <div className="text-right">
-              <div className="text-sm font-medium text-white">{user?.username}</div>
-              <div className="text-xs text-slate-400 capitalize">
-                {user?.planStatus === 'heroOffer' ? 'Hero Plan' : 'Free Plan'}
-              </div>
-            </div>
-          </div>
-        </nav>
-      </header>
+
 
       <div className="p-6">
         <div className="flex justify-between items-center mb-6">

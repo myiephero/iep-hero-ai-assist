@@ -1,0 +1,49 @@
+// dashboard-advocate.tsx
+import React from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+
+const advocateTools = [
+  { name: 'AI IEP Review', desc: 'Analyze existing IEPs for quality & improvement', icon: '🧠' },
+  { name: 'IEP Goal Generator', desc: 'Craft measurable objectives quickly', icon: '🎯' },
+  { name: 'Template Builder', desc: 'Design reusable IEP templates and forms', icon: '📄' },
+  { name: 'Progress Analyzer', desc: 'Data-driven recommendations for IEP goals', icon: '📊' },
+  { name: 'Meeting Prep Assistant', desc: 'Generate talking points and meeting notes', icon: '🗣️' },
+  { name: 'Compliance Checker', desc: 'Ensure legal adherence to IEP policies', icon: '✅' },
+  { name: 'Accommodation Builder', desc: 'Auto-generate accommodations by diagnosis', icon: '⚙️' },
+  { name: 'Transition Planner', desc: 'Create plans for post-secondary success', icon: '📆' }
+];
+
+export default function AdvocateDashboard() {
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-[#1F2233] to-[#2D314A] px-6 py-10 text-white">
+      <div className="max-w-6xl mx-auto">
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-semibold">Welcome, Advocate!</h1>
+          <Button variant="secondary">demo_advocate@demo.com</Button>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <Card><CardContent className="p-4">Families Supported: <strong>4</strong></CardContent></Card>
+          <Card><CardContent className="p-4">Documents Reviewed: <strong>12</strong></CardContent></Card>
+          <Card><CardContent className="p-4">Goals Generated: <strong>28</strong></CardContent></Card>
+          <Card><CardContent className="p-4">Compliance Flags: <strong>1</strong></CardContent></Card>
+        </div>
+
+        <h2 className="text-xl font-semibold mb-4">AI-Powered IEP Tools</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {advocateTools.map((tool) => (
+            <Card key={tool.name} className="bg-[#353857] hover:bg-[#444872] cursor-pointer">
+              <CardContent className="p-4">
+                <div className="text-2xl mb-2">{tool.icon}</div>
+                <div className="font-semibold text-white mb-1">{tool.name}</div>
+                <p className="text-sm text-slate-300">{tool.desc}</p>
+                <Button variant="outline" className="mt-4 w-full">Use Tool</Button>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
