@@ -83,14 +83,14 @@ export default function Dashboard() {
               </Button>
             </div>
             <div className="space-y-3">
-              {goals.map((goal: Goal) => (
+              {(goals as Goal[]).map((goal: Goal) => (
                 <Card key={goal.id} className="p-4">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <h4 className="font-medium text-sm">{goal.description}</h4>
                       <div className="flex items-center gap-2 mt-2">
                         <Badge variant="outline" className="text-xs">
-                          {goal.category}
+                          {goal.status}
                         </Badge>
                         <span className="text-xs text-gray-500">
                           Due: {goal.targetDate ? format(new Date(goal.targetDate), "MMM d") : "No date"}
@@ -125,7 +125,7 @@ export default function Dashboard() {
               />
             </div>
             <div className="space-y-3">
-              {documents.map((doc: Document) => (
+              {(documents as Document[]).map((doc: Document) => (
                 <Card key={doc.id} className="p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
