@@ -192,17 +192,19 @@ export default function PremiumDashboard() {
 
         {/* IEP AI Tools Section - Always show for demo, check Hero status */}
         <Card className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 backdrop-blur-lg border-purple-400/30 mb-8">
-          <CardHeader>
-            <CardTitle className="text-white flex items-center gap-2">
-              <Brain className="w-6 h-6 text-purple-400" />
-              AI-Powered IEP Tools
-              <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-white flex items-center gap-2 text-xl">
+              <Brain className="w-7 h-7 text-purple-400" />
+              AI-Powered IEP Professional Tools
+              <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs px-2 py-1">
                 HERO EXCLUSIVE
               </Badge>
             </CardTitle>
-            <p className="text-purple-200">Professional IEP management tools powered by artificial intelligence</p>
+            <p className="text-purple-200 text-base">
+              Complete AI suite for professional IEP management, document analysis, and compliance checking
+            </p>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-0">
             <IEPTools isHeroPlan={true} userId={user?.id || ''} />
           </CardContent>
         </Card>
