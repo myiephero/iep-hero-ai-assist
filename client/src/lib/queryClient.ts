@@ -3,6 +3,7 @@ import { QueryClient, QueryFunction } from "@tanstack/react-query";
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
     const text = (await res.text()) || res.statusText;
+    console.error('Response error:', { status: res.status, text });
     throw new Error(`${res.status}: ${text}`);
   }
 }
@@ -19,7 +20,17 @@ export async function apiRequest(
     credentials: "include",
   });
 
-  await throwIfResNotOk(res);
+  // Log response for debugging
+  if (!res.ok) {
+    const text = await res.text();
+    console.error(`API Request failed: ${method} ${url}`, {
+      status: res.status,
+      statusText: res.statusText,
+      response: text
+    });
+    throw new Error(`${res.status}: ${text || res.statusText}`);
+  }
+  
   return res;
 }
 
