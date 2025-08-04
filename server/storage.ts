@@ -276,15 +276,14 @@ export class DbStorage implements IStorage {
   private db: ReturnType<typeof drizzle>;
 
   constructor() {
-    // Use SUPABASE_DATABASE_URL if available, otherwise fall back to DATABASE_URL
-    const databaseUrl = process.env.SUPABASE_DATABASE_URL || process.env.DATABASE_URL;
+    // Use local Replit PostgreSQL database
+    const databaseUrl = process.env.DATABASE_URL;
     
     if (!databaseUrl) {
-      throw new Error('SUPABASE_DATABASE_URL or DATABASE_URL is required');
+      throw new Error('DATABASE_URL is required');
     }
     
     const sql = postgres(databaseUrl, { 
-      ssl: { rejectUnauthorized: false },
       max: 1,
       connect_timeout: 10,
       idle_timeout: 20
@@ -459,29 +458,28 @@ export class DbStorage implements IStorage {
   }
 }
 
-// Initialize storage with connection retry
+// Initialize storage with database connection
 async function createStorage(): Promise<IStorage> {
-  const databaseUrl = process.env.SUPABASE_DATABASE_URL || process.env.DATABASE_URL;
-  
-  if (!databaseUrl) {
-    console.log('No database URL found, using memory storage');
-    return new MemStorage();
-  }
-
   try {
-    console.log('Attempting database connection...');
+    console.log('Attempting local database connection...');
+    const databaseUrl = process.env.DATABASE_URL;
+    
+    if (!databaseUrl) {
+      console.log('No DATABASE_URL found, using memory storage');
+      return new MemStorage();
+    }
+    
     const sql = postgres(databaseUrl, { 
-      ssl: { rejectUnauthorized: false },
       max: 1,
-      connect_timeout: 5,
-      idle_timeout: 10
+      connect_timeout: 10,
+      idle_timeout: 20
     });
     
     // Test connection
     await sql`SELECT 1`;
     await sql.end();
     
-    console.log('✅ Database connection successful, using DbStorage');
+    console.log('✅ Local database connection successful, using DbStorage');
     return new DbStorage();
   } catch (error) {
     console.warn('⚠️ Database connection failed, using memory storage:', error.message);
@@ -489,12 +487,14 @@ async function createStorage(): Promise<IStorage> {
   }
 }
 
-// For now, use memory storage until database connection is resolved
-export const storage = new MemStorage();
+// Try database storage, fall back to memory storage if connection fails
+let storage: IStorage = new MemStorage(); // Default fallback
 
-// Log database connection attempt but don't block startup
 createStorage().then(s => {
-  console.log('Database connection test completed');
+  storage = s;
+  console.log('Storage initialization completed');
 }).catch(err => {
-  console.log('Using in-memory storage for development');
+  console.error('Storage initialization failed:', err);
 });
+
+export { storage };
