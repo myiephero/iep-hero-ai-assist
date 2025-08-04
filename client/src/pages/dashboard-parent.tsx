@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/hooks/use-auth';
+import { useLocation } from 'wouter';
 import IEPGoalGenerator from '@/components/IEPGoalGenerator';
 
 const parentTools = [
@@ -32,6 +33,7 @@ const parentTools = [
 
 export default function ParentDashboard() {
   const { user } = useAuth();
+  const [, setLocation] = useLocation();
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedTool, setSelectedTool] = useState<string | null>(null);
   const [upload, setUpload] = useState<File | null>(null);
@@ -40,6 +42,10 @@ export default function ParentDashboard() {
   const isHeroPlan = displayUser.planStatus === 'heroOffer';
 
   const openToolModal = (tool: string) => {
+    if (tool === "IEP Goal Generator") {
+      setLocation("/tools/iep-goal-generator");
+      return;
+    }
     setSelectedTool(tool);
     setModalOpen(true);
   };

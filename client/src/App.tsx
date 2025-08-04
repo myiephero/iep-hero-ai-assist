@@ -11,6 +11,7 @@ import DashboardAdvocate from "@/pages/dashboard-premium";
 import DashboardParent from "@/pages/dashboard-parent";
 import Documents from "@/pages/documents";
 import Goals from "@/pages/goals";
+import IEPGoalGeneratorPage from "@/pages/iep-goal-generator";
 import Subscribe from "@/pages/subscribe";
 import Pricing from "@/pages/pricing";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
@@ -97,6 +98,11 @@ function Router() {
         <AuthGuard>
           <Navbar />
           <Goals />
+        </AuthGuard>
+      </Route>
+      <Route path="/tools/iep-goal-generator">
+        <AuthGuard>
+          <IEPGoalGeneratorPage />
         </AuthGuard>
       </Route>
       <Route path="/">

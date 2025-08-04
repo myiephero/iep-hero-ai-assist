@@ -71,6 +71,9 @@ My IEP Hero is a comprehensive SaaS platform for Individualized Education Progra
 - ✓ Implemented role-based routing: parents → /dashboard-parent, advocates → /dashboard-advocate
 - ✓ Removed duplicate navigation headers, now using single top navbar consistently
 - ✓ Parent dashboard features: IEP Goal Generator, Progress Analyzer, Meeting Prep, Ask AI About Docs
+- ✓ Created dedicated /tools/iep-goal-generator route with full-page component
+- ✓ AI-powered IEP goal generation using OpenAI GPT-4o with SMART criteria
+- ✓ Professional goal display with next steps and educational tips
 
 # User Preferences
 
