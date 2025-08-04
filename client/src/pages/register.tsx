@@ -104,8 +104,15 @@ export default function Register() {
         // If Hero plan selected, redirect to payment after email verification
         if (selectedPlan === "hero") {
           toast({
-            title: "Next Step",
-            description: "After verifying your email, you'll be prompted to complete your Hero Plan subscription.",
+            title: "Hero Plan Selected - Payment Required",
+            description: "After verifying your email, you'll complete your $495/year Hero Plan payment to unlock all features.",
+          });
+          // Store the selected plan in localStorage for after email verification
+          localStorage.setItem('selectedPlan', 'hero');
+        } else {
+          toast({
+            title: "FREE Account Created!",
+            description: "Your free My IEP Hero account is ready. Check your email to verify and start using your free features.",
           });
         }
         
@@ -185,7 +192,7 @@ export default function Register() {
                         : 'bg-gray-600 hover:bg-gray-700'
                     }`}
                   >
-                    {plan.id === 'free' ? 'Start Free' : 'Choose Hero Plan'}
+                    {plan.id === 'free' ? 'Create FREE Account' : 'Select Hero Plan - $495/year'}
                   </Button>
                 </CardContent>
               </Card>
@@ -209,17 +216,44 @@ export default function Register() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center py-12 px-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">Create Your Account</CardTitle>
-          <CardDescription>
-            Selected: <span className="font-semibold text-blue-600">
-              {pricingPlans.find(p => p.id === selectedPlan)?.name}
-            </span>
+          <CardTitle className="text-2xl font-bold">
+            {selectedPlan === 'free' 
+              ? "You're creating a FREE My IEP Hero account" 
+              : "You're unlocking the $495 Hero Family Offer"
+            }
+          </CardTitle>
+          <CardDescription className="mt-4">
+            {selectedPlan === 'free' ? (
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                <p className="text-green-800 font-semibold">✅ FREE Forever Access Includes:</p>
+                <ul className="text-sm text-green-700 mt-2 space-y-1">
+                  <li>• Basic IEP goal tracking</li>
+                  <li>• Document storage (up to 10 files)</li>
+                  <li>• Calendar for IEP meetings</li>
+                  <li>• Progress monitoring</li>
+                </ul>
+              </div>
+            ) : (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <p className="text-blue-800 font-semibold">🌟 Hero Family Offer ($495/year) Includes:</p>
+                <ul className="text-sm text-blue-700 mt-2 space-y-1">
+                  <li>• Everything in Free Plan</li>
+                  <li>• AI-powered Memory Q&A</li>
+                  <li>• Advocate sharing & collaboration</li>
+                  <li>• Unlimited document storage</li>
+                  <li>• Monthly expert consultations</li>
+                </ul>
+                <p className="text-xs text-blue-600 mt-3 font-medium">
+                  Payment will be processed after account creation
+                </p>
+              </div>
+            )}
           </CardDescription>
           <Button
             variant="outline"
             size="sm"
             onClick={() => setShowRegistrationForm(false)}
-            className="mt-2"
+            className="mt-4"
           >
             Change Plan
           </Button>
@@ -284,7 +318,11 @@ export default function Register() {
               className="w-full"
               disabled={isLoading}
             >
-              {isLoading ? "Creating Account..." : "Create Account & Send Welcome Email"}
+              {isLoading ? "Creating Account..." : 
+                selectedPlan === 'free' 
+                  ? "Create FREE Account & Send Welcome Email"
+                  : "Create Account & Proceed to Payment ($495/year)"
+              }
             </Button>
           </form>
 
