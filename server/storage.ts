@@ -487,14 +487,5 @@ async function createStorage(): Promise<IStorage> {
   }
 }
 
-// Try database storage, fall back to memory storage if connection fails
-let storage: IStorage = new MemStorage(); // Default fallback
-
-createStorage().then(s => {
-  storage = s;
-  console.log('Storage initialization completed');
-}).catch(err => {
-  console.error('Storage initialization failed:', err);
-});
-
-export { storage };
+// Use database storage directly - the database is confirmed working
+export const storage = new DbStorage();
