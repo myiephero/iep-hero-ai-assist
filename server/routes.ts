@@ -206,11 +206,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       });
       
+      // Check if user had selected Hero plan during registration
+      const isHeroUser = user.subscriptionTier === 'hero' || user.stripeSubscriptionId;
+      
       res.send(`
         <html><body style="font-family: Arial, sans-serif; text-align: center; padding: 50px;">
           <h1 style="color: #16a34a;">Email Verified Successfully!</h1>
           <p>Welcome to My IEP Hero, ${user.username}!</p>
-          <p>Your account is now active and ready to use.</p>
+          
+          ${isHeroUser ? `
+            <div style="background-color: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 20px; margin: 20px 0;">
+              <h2 style="color: #92400e; margin: 0;">🌟 Hero Plan Active</h2>
+              <p style="color: #92400e; margin: 10px 0;">You have full access to all Hero features including AI Memory Q&A, advocate sharing, and expert consultations.</p>
+            </div>
+          ` : `
+            <div style="background-color: #ecfdf5; border: 2px solid #10b981; border-radius: 8px; padding: 20px; margin: 20px 0;">
+              <h2 style="color: #065f46; margin: 0;">✅ FREE Account Active</h2>
+              <p style="color: #065f46; margin: 10px 0;">You have access to basic IEP goal tracking, document storage (10 files), and meeting calendar.</p>
+              <a href="/pricing" style="background-color: #2563eb; color: white; padding: 8px 16px; text-decoration: none; border-radius: 4px; font-size: 14px; margin-top: 10px; display: inline-block;">
+                Upgrade to Hero Plan ($495/year)
+              </a>
+            </div>
+          `}
+          
           <a href="/dashboard" style="background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; margin: 20px 0;">
             Go to Dashboard
           </a>
