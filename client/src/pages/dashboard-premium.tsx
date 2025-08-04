@@ -20,7 +20,7 @@ const heroTools = [
   { name: "Transition Planner", desc: "Plan for post-secondary goals", icon: "📆" },
 ];
 
-export default function DashboardPremium() {
+export default function DashboardAdvocate() {
   const [, setLocation] = useLocation();
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedTool, setSelectedTool] = useState<string | null>(null);
