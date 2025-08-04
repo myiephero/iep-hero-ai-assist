@@ -49,9 +49,10 @@ export function useAuthState() {
     }
   };
 
-  const register = async (email: string, username: string, password: string, role: string) => {
-    const result = await authApi.register({ email, username, password, role });
+  const register = async (email: string, username: string, password: string, role: string, planStatus?: string) => {
+    const result = await authApi.register({ email, username, password, role, planStatus });
     setUser(result.user);
+    return result;
   };
 
   const logout = async () => {
