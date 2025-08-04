@@ -68,7 +68,9 @@ const SubscribeForm = () => {
 
 export default function Subscribe() {
   const [clientSecret, setClientSecret] = useState("");
+  const [error, setError] = useState("");
   const [location] = useLocation();
+  const { toast } = useToast();
   
   // Extract price ID from URL params
   const urlParams = new URLSearchParams(location.split('?')[1]);
@@ -77,12 +79,29 @@ export default function Subscribe() {
   useEffect(() => {
     // Create subscription as soon as the page loads
     apiRequest("POST", "/api/get-or-create-subscription", { priceId })
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) {
+          return res.json().then(data => {
+            throw new Error(data.error || 'Subscription creation failed');
+          });
+        }
+        return res.json();
+      })
       .then((data) => {
-        setClientSecret(data.clientSecret);
+        if (data.clientSecret) {
+          setClientSecret(data.clientSecret);
+        } else {
+          throw new Error('No client secret received');
+        }
       })
       .catch((error) => {
         console.error('Error creating subscription:', error);
+        setError(error.message);
+        toast({
+          title: "Subscription Error",
+          description: error.message,
+          variant: "destructive",
+        });
       });
   }, [priceId]);
 
