@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthContext, useAuthState } from "@/hooks/use-auth";
 import NotFound from "@/pages/not-found";
 import Login from "@/pages/login";
+import Register from "@/pages/register";
 import Dashboard from "@/pages/dashboard";
 import Documents from "@/pages/documents";
 import Goals from "@/pages/goals";
@@ -37,6 +38,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/login" component={Login} />
+      <Route path="/register" component={Register} />
       <Route path="/subscribe">
         <AuthGuard>
           <Subscribe />
