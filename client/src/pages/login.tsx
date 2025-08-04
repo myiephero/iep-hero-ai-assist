@@ -39,7 +39,9 @@ export default function Login() {
       
       // Force immediate redirect using window.location for reliable navigation
       console.log('🔄 Redirecting to dashboard...');
-      window.location.href = "/dashboard";
+      setTimeout(() => {
+        window.location.href = "/dashboard";
+      }, 1000); // Give time for state updates
       
     } catch (error: any) {
       console.error('❌ Login failed:', error);
