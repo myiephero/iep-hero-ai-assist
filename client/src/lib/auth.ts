@@ -14,6 +14,7 @@ export interface RegisterData {
   username: string;
   password: string;
   role: string;
+  planStatus?: string;
 }
 
 export interface LoginData {
