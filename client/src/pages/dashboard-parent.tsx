@@ -15,14 +15,14 @@ const parentTools = [
     icon: '🎯'
   },
   {
+    name: 'AI IEP Review',
+    description: 'Get comprehensive AI analysis of your child\'s IEP',
+    icon: '📋'
+  },
+  {
     name: 'Progress Analyzer',
     description: 'See how your child is progressing toward goals',
     icon: '📈'
-  },
-  {
-    name: 'Meeting Prep Assistant',
-    description: 'Get talking points and prep for your next IEP meeting',
-    icon: '🗒️'
   },
   {
     name: 'Ask AI About My Docs',
@@ -44,6 +44,10 @@ export default function ParentDashboard() {
   const openToolModal = (tool: string) => {
     if (tool === "IEP Goal Generator") {
       setLocation("/tools/iep-goal-generator");
+      return;
+    }
+    if (tool === "AI IEP Review") {
+      setLocation("/tools/ai-iep-review");
       return;
     }
     setSelectedTool(tool);
