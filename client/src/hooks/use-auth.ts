@@ -33,6 +33,10 @@ export function useAuthState() {
       const result = await authApi.getCurrentUser();
       console.log('🔍 Auth check result:', result);
       const userData = result?.user || null;
+      // Ensure subscription tier is mapped correctly
+      if (userData) {
+        userData.planStatus = userData.subscriptionTier || userData.planStatus || 'free';
+      }
       setUser(userData);
       console.log('🔍 User state set to:', userData);
     } catch (error) {
@@ -50,6 +54,9 @@ export function useAuthState() {
       
       // Ensure user state is set immediately and force re-render
       const userData = result.user;
+      if (userData) {
+        userData.planStatus = userData.subscriptionTier || userData.planStatus || 'free';
+      }
       setUser(userData);
       setIsLoading(false); // Ensure loading state is cleared
       console.log('✅ User state updated:', userData);

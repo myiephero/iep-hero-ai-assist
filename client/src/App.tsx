@@ -7,7 +7,7 @@ import { AuthContext, useAuth, useAuthState } from "@/hooks/use-auth";
 import NotFound from "@/pages/not-found";
 import Login from "@/pages/login";
 import Register from "@/pages/register";
-import Dashboard from "@/pages/dashboard";
+import PremiumDashboard from "@/pages/dashboard-premium";
 import Documents from "@/pages/documents";
 import Goals from "@/pages/goals";
 import Subscribe from "@/pages/subscribe";
@@ -52,7 +52,7 @@ function Router() {
       <Route path="/pricing" component={Pricing} />
       <Route path="/dashboard">
         <AuthGuard>
-          <Dashboard />
+          <PremiumDashboard />
         </AuthGuard>
       </Route>
       <Route path="/documents">
