@@ -465,6 +465,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // AI IEP Review route
+  app.post("/api/review-iep", requireAuth, upload.single('file'), async (req, res) => {
+    try {
+      const user = req.user as any;
+      
+      if (!req.file) {
+        return res.status(400).json({ message: 'No file uploaded' });
+      }
+
+      console.log(`📋 Analyzing IEP document: ${req.file.originalname}`);
+      
+      // Construct full file path
+      const filePath = `uploads/${req.file.filename}`;
+      
+      // Perform comprehensive IEP analysis
+      const analysis = await analyzeIEPDocument(filePath, 'iep');
+      
+      // Transform the analysis into the expected format for the frontend
+      const reviewResult = {
+        summary: analysis.summary,
+        strengths: analysis.strengths,
+        weaknesses: analysis.improvements, // Map improvements to weaknesses
+        recommendations: analysis.nextSteps,
+        complianceScore: Math.round((analysis.complianceCheck.ideaCompliance + analysis.complianceCheck.stateCompliance) / 2)
+      };
+
+      // Log the analysis for record keeping
+      console.log(`✅ IEP analysis completed for ${req.file.originalname}:`, {
+        overallScore: analysis.overallScore,
+        complianceScore: reviewResult.complianceScore,
+        priority: analysis.priority
+      });
+      
+      res.json(reviewResult);
+      
+    } catch (error: any) {
+      console.error('IEP review error:', error);
+      res.status(500).json({ 
+        message: 'IEP analysis failed', 
+        error: error.message 
+      });
+    }
+  });
+
   // Events routes
   app.get("/api/events", requireAuth, async (req, res) => {
     try {
