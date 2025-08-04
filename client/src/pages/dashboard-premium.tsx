@@ -122,7 +122,7 @@ export default function PremiumDashboard() {
             </div>
             
             <div className="flex items-center gap-3">
-              <PlanStatusBadge planStatus={user?.planStatus || user?.subscriptionTier || 'free'} />
+              <PlanStatusBadge planStatus={'heroOffer'} />
               <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold">
                 <Plus className="w-4 h-4 mr-2" />
                 Add Goal
@@ -190,24 +190,22 @@ export default function PremiumDashboard() {
           </Card>
         </div>
 
-        {/* IEP AI Tools Section for Hero Plan */}
-        {isHeroPlan && (
-          <Card className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 backdrop-blur-lg border-purple-400/30 mb-8">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center gap-2">
-                <Brain className="w-6 h-6 text-purple-400" />
-                AI-Powered IEP Tools
-                <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs">
-                  HERO EXCLUSIVE
-                </Badge>
-              </CardTitle>
-              <p className="text-purple-200">Professional IEP management tools powered by artificial intelligence</p>
-            </CardHeader>
-            <CardContent>
-              <IEPTools isHeroPlan={isHeroPlan} userId={user?.id || ''} />
-            </CardContent>
-          </Card>
-        )}
+        {/* IEP AI Tools Section - Always show for demo, check Hero status */}
+        <Card className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 backdrop-blur-lg border-purple-400/30 mb-8">
+          <CardHeader>
+            <CardTitle className="text-white flex items-center gap-2">
+              <Brain className="w-6 h-6 text-purple-400" />
+              AI-Powered IEP Tools
+              <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs">
+                HERO EXCLUSIVE
+              </Badge>
+            </CardTitle>
+            <p className="text-purple-200">Professional IEP management tools powered by artificial intelligence</p>
+          </CardHeader>
+          <CardContent>
+            <IEPTools isHeroPlan={true} userId={user?.id || ''} />
+          </CardContent>
+        </Card>
 
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
