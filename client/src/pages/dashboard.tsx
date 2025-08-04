@@ -8,7 +8,7 @@ import RecentMessages from "@/components/dashboard/recent-messages";
 import QuickActions from "@/components/dashboard/quick-actions";
 import FileUploadModal from "@/components/modals/file-upload-modal";
 import SubscriptionModal from "@/components/modals/subscription-modal";
-import MemoryQA from "@/components/memory/memory-qa";
+import MemoryQA from "@/components/MemoryQA";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
@@ -41,10 +41,10 @@ export default function Dashboard() {
     progressRate: goals.length > 0 
       ? Math.round(goals.reduce((acc: number, goal: any) => acc + (goal.progress || 0), 0) / goals.length)
       : 0,
-    upcomingMeetings: events.filter((event: any) => 
+    upcomingMeetings: Array.isArray(events) ? events.filter((event: any) => 
       new Date(event.date) > new Date() && event.type === "meeting"
-    ).length,
-    documents: documents.length,
+    ).length : 0,
+    documents: Array.isArray(documents) ? documents.length : 0,
   };
 
   const handleUploadDocument = () => {
@@ -114,9 +114,9 @@ export default function Dashboard() {
 
             {/* Sidebar Content */}
             <div className="space-y-6">
-              <MemoryQA />
-              <UpcomingEvents events={events} />
-              <RecentMessages messages={messages} />
+              <MemoryQA userId={user?.id || ""} />
+              <UpcomingEvents events={Array.isArray(events) ? events : []} />
+              <RecentMessages messages={Array.isArray(messages) ? messages : []} />
               <QuickActions
                 onUploadDocument={handleUploadDocument}
                 onScheduleMeeting={handleScheduleMeeting}

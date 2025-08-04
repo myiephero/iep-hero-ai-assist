@@ -4,19 +4,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { MessageCircle, Brain, Send, Loader2 } from "lucide-react";
-import { useAuth } from "@/hooks/use-auth";
+
 import { useToast } from "@/hooks/use-toast";
 
 interface MemoryQAProps {
+  userId: string;
   className?: string;
 }
 
-export default function MemoryQA({ className }: MemoryQAProps) {
+export default function MemoryQA({ userId, className }: MemoryQAProps) {
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
   const [loading, setLoading] = useState(false);
   const [conversationHistory, setConversationHistory] = useState<Array<{question: string, answer: string, timestamp: Date}>>([]);
-  const { user } = useAuth();
+
   const { toast } = useToast();
 
   const suggestedQuestions = [
@@ -44,7 +45,7 @@ export default function MemoryQA({ className }: MemoryQAProps) {
       const res = await fetch("/api/memory-query", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: user?.id, prompt: question })
+        body: JSON.stringify({ userId, prompt: question })
       });
 
       if (!res.ok) {
