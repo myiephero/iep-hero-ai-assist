@@ -59,11 +59,8 @@ export default function ParentDashboard() {
   };
 
   const handleSubmit = () => {
-    if (selectedTool === "Ask AI About My Docs" && upload) {
-      alert(`Uploaded ${upload.name} for AI analysis`);
-    } else {
-      alert(`${selectedTool} activated! Feature coming soon.`);
-    }
+    // This should not be called for Ask AI About My Docs since it routes directly
+    alert(`${selectedTool} activated! Feature coming soon.`);
     setModalOpen(false);
     setUpload(null);
   };
