@@ -14,6 +14,8 @@ import { format } from "date-fns";
 export default function Dashboard() {
   const { user } = useAuth();
   const [showFileUpload, setShowFileUpload] = useState(false);
+  
+  console.log('🎨 PREMIUM DASHBOARD LOADED - Hero Plan user:', user?.planStatus === 'heroOffer');
 
   // Data fetching
   const { data: goals = [] } = useQuery({
@@ -65,8 +67,8 @@ export default function Dashboard() {
   const stats = getStatsData();
 
   return (
-    <div className="flex min-h-screen flex-col bg-gradient-to-b from-slate-900 to-slate-800 text-slate-100">
-      <header className="sticky top-0 z-50 bg-slate-800/95 backdrop-blur shadow-lg px-6 py-4 flex items-center justify-between border-b border-slate-700">
+    <div className="flex min-h-screen flex-col bg-gradient-to-b from-[#1A1B2E] to-[#2C2F48] text-white">
+      <header className="sticky top-0 z-50 bg-[#2C2F48]/95 backdrop-blur shadow-lg px-6 py-4 flex items-center justify-between border-b border-slate-600">
         <div className="flex items-center gap-4">
           <h1 className="text-xl font-bold text-white">My IEP Hero</h1>
           {isHeroPlan && (
@@ -285,4 +287,4 @@ export default function Dashboard() {
       />
     </div>
   );
-}
+}/* Force cache refresh */
