@@ -32,6 +32,7 @@ import { PlanStatusBadge } from "@/components/PlanStatusBadge";
 
 import MemoryQA from "@/components/MemoryQA";
 import { IEPTools } from "@/components/IEPTools";
+import Footer from "@/components/layout/footer";
 
 export default function PremiumDashboard() {
   const { user } = useAuth();
@@ -428,6 +429,8 @@ export default function PremiumDashboard() {
           </div>
         </div>
       </div>
+      
+      <Footer />
     </div>
   );
 }

@@ -8,6 +8,7 @@ import FileUploadModal from "@/components/modals/file-upload-modal";
 import { FileText, Upload, Download, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import type { Document } from "@shared/schema";
+import Footer from "@/components/layout/footer";
 
 export default function Documents() {
   const [showFileUpload, setShowFileUpload] = useState(false);
@@ -147,6 +148,8 @@ export default function Documents() {
         open={showFileUpload} 
         onOpenChange={setShowFileUpload}
       />
+      
+      <Footer />
     </div>
   );
 }

@@ -21,6 +21,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { cn } from "@/lib/utils";
 import type { Goal } from "@shared/schema";
+import Footer from "@/components/layout/footer";
 
 const goalFormSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -486,6 +487,8 @@ export default function Goals() {
         )}
       </div>
       </div>
+      
+      <Footer />
     </div>
   );
 }
