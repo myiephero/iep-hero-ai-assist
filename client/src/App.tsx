@@ -54,7 +54,6 @@ function Router() {
       <Route path="/pricing" component={Pricing} />
       <Route path="/dashboard">
         <AuthGuard>
-          <Navbar />
           <PremiumDashboard />
         </AuthGuard>
       </Route>
