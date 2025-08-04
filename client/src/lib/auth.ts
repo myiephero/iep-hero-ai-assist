@@ -7,6 +7,7 @@ export interface AuthUser {
   role: string;
   planStatus?: string;
   subscriptionTier?: string;
+  plan?: string;
 }
 
 export interface RegisterData {
