@@ -11,11 +11,15 @@ import { PlanStatusBadge } from "@/components/PlanStatusBadge";
 const NavLinks = ({ mobile = false }: { mobile?: boolean }) => {
   const [location] = useLocation();
   
+  const { user } = useAuth();
+  
+  // Dynamic nav items based on user plan
   const navItems = [
     { href: "/dashboard", label: "Dashboard", icon: Sparkles },
     { href: "/goals", label: "Goals", icon: Target },
     { href: "/documents", label: "Documents", icon: FileText },
-    { href: "/subscribe", label: "Subscribe", icon: CreditCard },
+    // Only show Subscribe for free plan users
+    ...(user?.planStatus === 'free' ? [{ href: "/subscribe", label: "Subscribe", icon: CreditCard }] : [])
   ];
 
   const linkClass = mobile 

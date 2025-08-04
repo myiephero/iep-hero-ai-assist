@@ -29,7 +29,7 @@ import {
   Bell
 } from "lucide-react";
 import { PlanStatusBadge } from "@/components/PlanStatusBadge";
-import Navbar from "@/components/layout/navbar";
+
 import MemoryQA from "@/components/MemoryQA";
 import { IEPTools } from "@/components/IEPTools";
 
@@ -78,7 +78,6 @@ export default function PremiumDashboard() {
   if (goalsLoading || eventsLoading || documentsLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
-        <Navbar />
         <div className="flex items-center justify-center h-96">
           <div className="animate-spin w-8 h-8 border-4 border-blue-400 border-t-transparent rounded-full" />
         </div>
@@ -94,8 +93,6 @@ export default function PremiumDashboard() {
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
         <div className="absolute top-40 left-40 w-80 h-80 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
       </div>
-
-      <Navbar />
       
       <div className="relative z-10 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
         {/* Hero Header */}
