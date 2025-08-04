@@ -175,7 +175,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           name: user.username,
         });
         customerId = customer.id;
-        await storage.updateUserStripeInfo(user.id, customerId, null);
+        await storage.updateUserStripeInfo(user.id, customerId, "");
       }
 
       const subscription = await stripe.subscriptions.create({
