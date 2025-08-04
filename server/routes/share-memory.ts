@@ -3,8 +3,8 @@ import { storage } from "../storage";
 import { insertSharedMemorySchema } from "@shared/schema";
 import { Resend } from "resend";
 
-// Initialize Resend (you'll need to add RESEND_API_KEY to your environment)
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Initialize Resend only if API key is available
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 export function registerShareMemoryRoutes(app: Express) {
   // Share memory route
@@ -42,7 +42,7 @@ export function registerShareMemoryRoutes(app: Express) {
 
       // Send email to advocate using Resend
       try {
-        if (process.env.RESEND_API_KEY) {
+        if (resend && process.env.RESEND_API_KEY) {
           await resend.emails.send({
             from: "My IEP Hero <noreply@iephero.com>",
             to: [fullUser.advocateEmail],
