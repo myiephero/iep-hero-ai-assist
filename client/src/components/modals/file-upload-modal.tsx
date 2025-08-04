@@ -35,7 +35,8 @@ export default function FileUploadModal({ open, onOpenChange }: FileUploadModalP
       });
 
       if (!response.ok) {
-        throw new Error("Upload failed");
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `Upload failed with status ${response.status}`);
       }
 
       return response.json();
@@ -48,10 +49,11 @@ export default function FileUploadModal({ open, onOpenChange }: FileUploadModalP
       queryClient.invalidateQueries({ queryKey: ["/api/documents"] });
       handleClose();
     },
-    onError: (error) => {
+    onError: (error: any) => {
+      console.error('Upload error:', error);
       toast({
-        title: "Error",
-        description: "Failed to upload document",
+        title: "Upload Failed",
+        description: error.message || "Failed to upload document. Please check file type and size.",
         variant: "destructive",
       });
     },
