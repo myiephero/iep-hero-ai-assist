@@ -3,7 +3,7 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { AuthContext, useAuthState } from "@/hooks/use-auth";
+import { AuthContext, useAuth, useAuthState } from "@/hooks/use-auth";
 import NotFound from "@/pages/not-found";
 import Login from "@/pages/login";
 import Register from "@/pages/register";
@@ -17,9 +17,12 @@ import { MobileNavigation } from "@/components/MobileNavigation";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
-  const { user, isLoading } = useAuthState();
+  const { user, isLoading } = useAuth();
+
+  console.log('🔍 AuthGuard check:', { user, isLoading });
 
   if (isLoading) {
+    console.log('⏳ AuthGuard: Still loading...');
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
@@ -28,9 +31,11 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
   }
 
   if (!user) {
+    console.log('❌ AuthGuard: No user, redirecting to login');
     return <Redirect to="/login" />;
   }
 
+  console.log('✅ AuthGuard: User authenticated, showing dashboard');
   return <>{children}</>;
 }
 
