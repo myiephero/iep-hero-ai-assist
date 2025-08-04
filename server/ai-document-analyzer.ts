@@ -156,6 +156,64 @@ The AI should conduct a thorough analysis focusing on: IDEA compliance requireme
   }
 }
 
+export async function generateIEPGoalsFromArea(area: string): Promise<string[]> {
+  try {
+    console.log(`🎯 Generating IEP goals for area: ${area}`);
+
+    const prompt = `
+You are an expert special education professional who creates high-quality, SMART IEP goals. 
+
+Create 3-4 measurable, specific IEP goals for a student who needs support in the following area:
+
+AREA OF NEED: ${area}
+
+For each goal, ensure it follows SMART criteria:
+- Specific: Clearly defined skill or behavior
+- Measurable: Includes criteria for measurement (percentage, frequency, accuracy)
+- Achievable: Realistic for a student receiving special education services
+- Relevant: Directly addresses the identified need
+- Time-bound: Includes timeframe (typically one school year)
+
+Format each goal as a complete, professional IEP goal statement that includes:
+1. The specific skill/behavior to be developed
+2. The conditions under which it will be performed
+3. The criteria for success (measurable outcomes)
+4. The timeframe
+
+Respond with a JSON array of goal strings:
+["Goal 1", "Goal 2", "Goal 3", "Goal 4"]
+
+Each goal should be 2-3 sentences and sound professional for inclusion in an official IEP document.
+`;
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+      messages: [
+        { role: "system", content: "You are an expert IEP goal writer with deep knowledge of special education best practices and IDEA compliance." },
+        { role: "user", content: prompt }
+      ],
+      response_format: { type: "json_object" },
+      temperature: 0.7,
+    });
+
+    const result = JSON.parse(response.choices[0].message.content || '{"goals": []}');
+    
+    if (Array.isArray(result) && result.length > 0) {
+      console.log(`✅ Generated ${result.length} goals for ${area}`);
+      return result;
+    } else if (result.goals && Array.isArray(result.goals)) {
+      console.log(`✅ Generated ${result.goals.length} goals for ${area}`);
+      return result.goals;
+    } else {
+      throw new Error('Invalid response format from OpenAI');
+    }
+    
+  } catch (error: any) {
+    console.error('Error generating IEP goals:', error);
+    throw new Error(`Failed to generate IEP goals: ${error?.message || 'Unknown error'}`);
+  }
+}
+
 export async function generateIEPGoals(studentInfo: string, needs: string[]): Promise<string[]> {
   try {
     const prompt = `
