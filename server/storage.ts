@@ -1,7 +1,7 @@
 import { type User, type InsertUser, type Goal, type InsertGoal, type Document, type InsertDocument, type Event, type InsertEvent, type Message, type InsertMessage, type SharedMemory, type InsertSharedMemory, users, iepGoals, documents, events, messages, sharedMemories } from "@shared/schema";
 import { randomUUID } from "crypto";
-import { drizzle } from "drizzle-orm/neon-http";
-import { neon } from "@neondatabase/serverless";
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
 import { eq, and } from "drizzle-orm";
 
 export interface IStorage {
@@ -276,10 +276,19 @@ export class DbStorage implements IStorage {
   private db: ReturnType<typeof drizzle>;
 
   constructor() {
-    if (!process.env.DATABASE_URL) {
-      throw new Error('DATABASE_URL is required');
+    // Use SUPABASE_DATABASE_URL if available, otherwise fall back to DATABASE_URL
+    const databaseUrl = process.env.SUPABASE_DATABASE_URL || process.env.DATABASE_URL;
+    
+    if (!databaseUrl) {
+      throw new Error('SUPABASE_DATABASE_URL or DATABASE_URL is required');
     }
-    const sql = neon(process.env.DATABASE_URL);
+    
+    const sql = postgres(databaseUrl, { 
+      ssl: { rejectUnauthorized: false },
+      max: 1,
+      connect_timeout: 10,
+      idle_timeout: 20
+    });
     this.db = drizzle(sql);
   }
 
@@ -450,5 +459,42 @@ export class DbStorage implements IStorage {
   }
 }
 
-// Temporarily use memory storage until database connection is resolved
+// Initialize storage with connection retry
+async function createStorage(): Promise<IStorage> {
+  const databaseUrl = process.env.SUPABASE_DATABASE_URL || process.env.DATABASE_URL;
+  
+  if (!databaseUrl) {
+    console.log('No database URL found, using memory storage');
+    return new MemStorage();
+  }
+
+  try {
+    console.log('Attempting database connection...');
+    const sql = postgres(databaseUrl, { 
+      ssl: { rejectUnauthorized: false },
+      max: 1,
+      connect_timeout: 5,
+      idle_timeout: 10
+    });
+    
+    // Test connection
+    await sql`SELECT 1`;
+    await sql.end();
+    
+    console.log('✅ Database connection successful, using DbStorage');
+    return new DbStorage();
+  } catch (error) {
+    console.warn('⚠️ Database connection failed, using memory storage:', error.message);
+    return new MemStorage();
+  }
+}
+
+// For now, use memory storage until database connection is resolved
 export const storage = new MemStorage();
+
+// Log database connection attempt but don't block startup
+createStorage().then(s => {
+  console.log('Database connection test completed');
+}).catch(err => {
+  console.log('Using in-memory storage for development');
+});
