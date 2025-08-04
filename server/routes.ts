@@ -272,7 +272,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             email: user.email, 
             username: user.username, 
             role: user.role,
-            planStatus: user.planStatus || user.subscriptionTier
+            planStatus: user.subscriptionTier || user.planStatus || 'heroOffer',
+            subscriptionTier: user.subscriptionTier || 'heroOffer'
           } 
         });
       });
