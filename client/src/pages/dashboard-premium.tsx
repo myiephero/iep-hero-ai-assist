@@ -6,7 +6,9 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/use-auth";
+import { Link } from "wouter";
 import FileUploadModal from "@/components/modals/file-upload-modal";
 import type { Goal, Document, Event } from "@shared/schema";
 import { format } from "date-fns";
@@ -14,6 +16,9 @@ import { format } from "date-fns";
 export default function Dashboard() {
   const { user } = useAuth();
   const [showFileUpload, setShowFileUpload] = useState(false);
+  const [selectedTool, setSelectedTool] = useState<string | null>(null);
+  const [aiModalOpen, setAiModalOpen] = useState(false);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   
   console.log('🎨 PREMIUM DASHBOARD LOADED - Hero Plan user:', user?.planStatus === 'heroOffer');
 
@@ -44,11 +49,19 @@ export default function Dashboard() {
   ];
 
   const launchTool = (tool: string) => {
-    if (tool === "AI IEP Review") {
+    setSelectedTool(tool);
+    setAiModalOpen(true);
+  };
+
+  const handleToolSubmit = () => {
+    if (selectedTool === "AI IEP Review" && uploadedFile) {
+      alert(`Uploaded ${uploadedFile.name} to ${selectedTool}`);
       setShowFileUpload(true);
-    } else {
-      alert(`${tool} is coming soon!`);
+    } else if (selectedTool && !uploadedFile) {
+      alert(`${selectedTool} activated! Feature coming soon.`);
     }
+    setAiModalOpen(false);
+    setUploadedFile(null);
   };
 
   const getStatsData = () => {
@@ -78,19 +91,27 @@ export default function Dashboard() {
           )}
         </div>
         <nav className="space-x-4 flex items-center">
-          <Button variant="ghost" className="text-slate-300 hover:text-white hover:bg-slate-700">
-            Dashboard
-          </Button>
-          <Button variant="ghost" className="text-slate-300 hover:text-white hover:bg-slate-700">
-            Goals
-          </Button>
-          <Button variant="ghost" className="text-slate-300 hover:text-white hover:bg-slate-700">
-            Documents
-          </Button>
+          <Link href="/dashboard">
+            <Button variant="ghost" className="text-slate-300 hover:text-white hover:bg-slate-700">
+              Dashboard
+            </Button>
+          </Link>
+          <Link href="/goals">
+            <Button variant="ghost" className="text-slate-300 hover:text-white hover:bg-slate-700">
+              Goals
+            </Button>
+          </Link>
+          <Link href="/documents">
+            <Button variant="ghost" className="text-slate-300 hover:text-white hover:bg-slate-700">
+              Documents
+            </Button>
+          </Link>
           <div className="flex items-center gap-2 ml-4">
             <div className="text-right">
               <div className="text-sm font-medium text-white">{user?.username}</div>
-              <div className="text-xs text-slate-400 capitalize">{user?.role}</div>
+              <div className="text-xs text-slate-400 capitalize">
+                {user?.planStatus === 'heroOffer' ? 'Hero Plan' : 'Free Plan'}
+              </div>
             </div>
           </div>
         </nav>
@@ -108,27 +129,27 @@ export default function Dashboard() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
-          <Card className="bg-slate-800/50 border-slate-700">
+          <Card className="bg-[#3E4161]/70 border-slate-600">
             <CardContent className="p-4">
-              <div className="text-slate-400 text-sm">Active Goals</div>
+              <div className="text-slate-300 text-sm">Active Goals</div>
               <div className="text-2xl font-bold text-white">{stats.activeGoals}</div>
             </CardContent>
           </Card>
-          <Card className="bg-slate-800/50 border-slate-700">
+          <Card className="bg-[#3E4161]/70 border-slate-600">
             <CardContent className="p-4">
-              <div className="text-slate-400 text-sm">Progress Rate</div>
+              <div className="text-slate-300 text-sm">Progress Rate</div>
               <div className="text-2xl font-bold text-white">{stats.progressRate}%</div>
             </CardContent>
           </Card>
-          <Card className="bg-slate-800/50 border-slate-700">
+          <Card className="bg-[#3E4161]/70 border-slate-600">
             <CardContent className="p-4">
-              <div className="text-slate-400 text-sm">Meetings</div>
+              <div className="text-slate-300 text-sm">Meetings</div>
               <div className="text-2xl font-bold text-white">{stats.meetings}</div>
             </CardContent>
           </Card>
-          <Card className="bg-slate-800/50 border-slate-700">
+          <Card className="bg-[#3E4161]/70 border-slate-600">
             <CardContent className="p-4">
-              <div className="text-slate-400 text-sm">Documents</div>
+              <div className="text-slate-300 text-sm">Documents</div>
               <div className="text-2xl font-bold text-white">{stats.documents}</div>
             </CardContent>
           </Card>
@@ -151,7 +172,7 @@ export default function Dashboard() {
             {heroTools.map((tool) => (
               <Card 
                 key={tool.name} 
-                className="bg-slate-800/70 border-slate-600 hover:bg-slate-700/70 transition-all duration-200 cursor-pointer group"
+                className="bg-[#3E4161] hover:bg-[#4A4E76] border-slate-500 transition-all duration-200 cursor-pointer group"
                 onClick={() => launchTool(tool.name)}
               >
                 <CardContent className="p-4">
@@ -161,7 +182,7 @@ export default function Dashboard() {
                   <div className="font-semibold text-white mb-2">
                     {tool.name}
                   </div>
-                  <div className="text-sm text-slate-400 mb-4 line-clamp-2">
+                  <div className="text-sm text-slate-300 mb-4 line-clamp-2">
                     {tool.desc}
                   </div>
                   <Button 
@@ -280,6 +301,45 @@ export default function Dashboard() {
         </Tabs>
       </div>
 
+      {/* AI Tool Modal */}
+      <Dialog open={aiModalOpen} onOpenChange={setAiModalOpen}>
+        <DialogContent className="bg-[#2C2F48] border-slate-600 text-white">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-semibold">{selectedTool}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-sm text-slate-300">
+              {selectedTool === "AI IEP Review" 
+                ? "Upload a document to begin AI analysis" 
+                : "This AI tool will help you with IEP management."}
+            </p>
+            {selectedTool === "AI IEP Review" && (
+              <Input 
+                type="file" 
+                accept=".pdf,.doc,.docx"
+                onChange={(e) => setUploadedFile(e.target.files?.[0] || null)}
+                className="bg-[#3E4161] border-slate-500 text-white"
+              />
+            )}
+            <div className="flex gap-2">
+              <Button 
+                onClick={handleToolSubmit}
+                className="flex-1 bg-blue-600 hover:bg-blue-700"
+              >
+                {selectedTool === "AI IEP Review" ? "Upload & Analyze" : "Activate Tool"}
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={() => setAiModalOpen(false)}
+                className="border-slate-500 text-slate-300 hover:bg-slate-700"
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* File Upload Modal */}
       <FileUploadModal 
         open={showFileUpload} 
@@ -287,4 +347,4 @@ export default function Dashboard() {
       />
     </div>
   );
-}/* Force cache refresh */
+}
