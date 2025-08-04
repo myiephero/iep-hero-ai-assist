@@ -15,6 +15,7 @@ import fs from "fs";
 import { Resend } from "resend";
 import { randomUUID } from "crypto";
 import { analyzeIEPDocument, generateIEPGoals, generateIEPGoalsFromArea } from "./ai-document-analyzer";
+import OpenAI from "openai";
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
@@ -632,7 +633,81 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Add Ask AI Docs endpoint
+  app.post("/api/ask-docs", requireAuth, async (req, res) => {
+    const { mode, docId, question } = req.body;
+
+    if (!question?.trim()) {
+      return res.status(400).json({ message: "Question is required" });
+    }
+
+    if (mode === 'single' && !docId) {
+      return res.status(400).json({ message: "Document ID is required for single mode" });
+    }
+
+    try {
+      let text = '';
+
+      if (mode === 'single') {
+        // For single document mode, get the specific document
+        const user = req.user as any;
+        const documents = await storage.getDocumentsByUserId(user.id);
+        const document = documents.find(doc => doc.id === docId);
+        
+        if (!document) {
+          return res.status(404).json({ message: "Document not found" });
+        }
+
+        // In a real implementation, you would parse the document content
+        // For now, we'll use a placeholder
+        text = `Document: ${document.originalName}\nContent: This is placeholder content for the document. In a real implementation, this would be the actual parsed content from the uploaded file.`;
+      } else {
+        // For all documents mode, get all user documents
+        const user = req.user as any;
+        const documents = await storage.getDocumentsByUserId(user.id);
+        
+        if (documents.length === 0) {
+          return res.status(400).json({ message: "No documents found. Please upload some documents first." });
+        }
+
+        // Combine all document content
+        text = documents.map(doc => 
+          `Document: ${doc.originalName}\nContent: This is placeholder content for ${doc.originalName}. In a real implementation, this would be the actual parsed content from the uploaded file.`
+        ).join('\n---\n');
+      }
+
+      // Use OpenAI to analyze the documents and answer the question
+      const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+      
+      const prompt = `Answer this question based on the IEP documents below:
+
+Question: ${question}
+
+Documents:
+${text}
+
+Please provide a helpful, accurate answer based on the document content. If the information isn't available in the documents, please say so clearly.`;
+
+      const response = await openai.chat.completions.create({
+        model: 'gpt-4o', // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.7,
+        max_tokens: 1000
+      });
+
+      const answer = response.choices[0].message.content;
+      res.json({ answer });
+    } catch (error: any) {
+      console.error("Ask AI Docs error:", error);
+      res.status(500).json({ 
+        message: "Failed to analyze documents", 
+        error: error.message 
+      });
+    }
+  });
+
   const httpServer = createServer(app);
+
   return httpServer;
 }
 

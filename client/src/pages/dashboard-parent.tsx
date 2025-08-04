@@ -50,6 +50,10 @@ export default function ParentDashboard() {
       setLocation("/tools/ai-iep-review");
       return;
     }
+    if (tool === "Ask AI About My Docs") {
+      setLocation("/tools/ask-ai-docs");
+      return;
+    }
     setSelectedTool(tool);
     setModalOpen(true);
   };

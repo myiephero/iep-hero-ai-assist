@@ -13,6 +13,7 @@ import Documents from "@/pages/documents";
 import Goals from "@/pages/goals";
 import IEPGoalGeneratorPage from "@/pages/iep-goal-generator";
 import AIIEPReviewPage from "@/pages/ai-iep-review";
+import AskAiAboutDocs from "@/pages/ask-ai-about-docs";
 import Subscribe from "@/pages/subscribe";
 import Pricing from "@/pages/pricing";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
@@ -109,6 +110,11 @@ function Router() {
       <Route path="/tools/ai-iep-review">
         <AuthGuard>
           <AIIEPReviewPage />
+        </AuthGuard>
+      </Route>
+      <Route path="/tools/ask-ai-docs">
+        <AuthGuard>
+          <AskAiAboutDocs />
         </AuthGuard>
       </Route>
       <Route path="/">
