@@ -6,28 +6,6 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Users, 
-  FileText, 
-  Calendar, 
-  MessageSquare, 
-  Upload,
-  Target,
-  CheckCircle,
-  Brain,
-  Star,
-  BookOpen,
-  Settings,
-  Search,
-  Filter,
-  Plus,
-  Clock,
-  User,
-  Edit,
-  Trash2,
-  Download,
-  AlertCircle
-} from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import FileUploadModal from "@/components/modals/file-upload-modal";
 import type { Goal, Document, Event } from "@shared/schema";
@@ -36,8 +14,6 @@ import { format } from "date-fns";
 export default function Dashboard() {
   const { user } = useAuth();
   const [showFileUpload, setShowFileUpload] = useState(false);
-  const [selectedView, setSelectedView] = useState("iep-tracker");
-  const [searchTerm, setSearchTerm] = useState("");
 
   // Data fetching
   const { data: goals = [] } = useQuery({
@@ -52,350 +28,254 @@ export default function Dashboard() {
     queryKey: ["/api/events"],
   });
 
-  const isParent = user?.role === "parent";
-  const isAdvocate = user?.role === "advocate";
+  const isHeroPlan = user?.planStatus === 'heroOffer';
 
-  const parentTools = [
-    { id: "iep-tracker", name: "IEP Tracker", icon: Target },
-    { id: "document-vault", name: "Document Vault", icon: FileText },
-    { id: "letter-generator", name: "Letter Generator", icon: Edit },
-    { id: "meeting-prep", name: "Meeting Prep Wizard", icon: Calendar },
-    { id: "progress-tracker", name: "Progress Tracker", icon: CheckCircle }
+  const heroTools = [
+    { name: "AI IEP Review", desc: "Comprehensive AI analysis of existing IEP documents", icon: "🧠" },
+    { name: "IEP Goal Generator", desc: "AI-powered IEP goal creation with measurable objectives", icon: "🎯" },
+    { name: "Template Builder", desc: "Create custom IEP document templates", icon: "📄" },
+    { name: "Progress Analyzer", desc: "AI analysis of student progress", icon: "📊" },
+    { name: "Meeting Prep Assistant", desc: "AI-generated talking points for IEP meetings", icon: "🗣️" },
+    { name: "Compliance Checker", desc: "Ensure IEP compliance with state/federal laws", icon: "✅" },
+    { name: "Accommodation Builder", desc: "Generate accommodations/modifications", icon: "⚙️" },
+    { name: "Transition Planner", desc: "Planning for post-secondary goals", icon: "📆" },
   ];
 
-  const advocateTools = [
-    { id: "case-crm", name: "Case CRM", icon: Users },
-    { id: "scheduling", name: "Scheduling", icon: Calendar },
-    { id: "intake-forms", name: "Intake Forms", icon: FileText },
-    { id: "templates", name: "Templates & Letters", icon: BookOpen }
-  ];
-
-  const renderLeftPanel = () => {
-    switch (selectedView) {
-      case "iep-tracker":
-        return (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold">IEP Goals & Timeline</h3>
-              <Button size="sm" onClick={() => setShowFileUpload(true)}>
-                <Plus className="w-4 h-4 mr-2" />
-                Add Goal
-              </Button>
-            </div>
-            <div className="space-y-3">
-              {(goals as Goal[]).map((goal: Goal) => (
-                <Card key={goal.id} className="p-4">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <h4 className="font-medium text-sm">{goal.description}</h4>
-                      <div className="flex items-center gap-2 mt-2">
-                        <Badge variant="outline" className="text-xs">
-                          {goal.status}
-                        </Badge>
-                        <span className="text-xs text-gray-500">
-                          Due: {goal.targetDate ? format(new Date(goal.targetDate), "MMM d") : "No date"}
-                        </span>
-                      </div>
-                    </div>
-                    <CheckCircle className="w-4 h-4 text-green-500" />
-                  </div>
-                </Card>
-              ))}
-            </div>
-          </div>
-        );
-
-      case "document-vault":
-        return (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold">Document Vault</h3>
-              <Button size="sm" onClick={() => setShowFileUpload(true)}>
-                <Upload className="w-4 h-4 mr-2" />
-                Upload
-              </Button>
-            </div>
-            <div className="relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-              <Input
-                placeholder="Search documents..."
-                className="pl-10"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-            <div className="space-y-3">
-              {(documents as Document[]).map((doc: Document) => (
-                <Card key={doc.id} className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <FileText className="w-5 h-5 text-blue-500" />
-                      <div>
-                        <h4 className="font-medium text-sm">{doc.originalName}</h4>
-                        <p className="text-xs text-gray-500">
-                          {doc.uploadedAt ? format(new Date(doc.uploadedAt), "MMM d, yyyy") : "Recently"}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Button variant="ghost" size="sm">
-                        <Download className="w-4 h-4" />
-                      </Button>
-                      <Button variant="ghost" size="sm">
-                        <Brain className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          </div>
-        );
-
-      case "case-crm":
-        return (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold">Client Cases</h3>
-              <Button size="sm">
-                <Plus className="w-4 h-4 mr-2" />
-                New Case
-              </Button>
-            </div>
-            <div className="relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-              <Input
-                placeholder="Search clients..."
-                className="pl-10"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-            <div className="space-y-3">
-              <Card className="p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <User className="w-5 h-5 text-purple-500" />
-                    <div>
-                      <h4 className="font-medium text-sm">Sarah Johnson</h4>
-                      <p className="text-xs text-gray-500">IEP Review - Next meeting: Dec 15</p>
-                    </div>
-                  </div>
-                  <Badge variant="outline">Active</Badge>
-                </div>
-              </Card>
-              <Card className="p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <User className="w-5 h-5 text-green-500" />
-                    <div>
-                      <h4 className="font-medium text-sm">Michael Chen</h4>
-                      <p className="text-xs text-gray-500">504 Plan - Assessment pending</p>
-                    </div>
-                  </div>
-                  <Badge variant="secondary">Review</Badge>
-                </div>
-              </Card>
-            </div>
-          </div>
-        );
-
-      default:
-        return (
-          <div className="flex items-center justify-center h-64 text-gray-500">
-            <div className="text-center">
-              <FileText className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-              <p>Select a tool to get started</p>
-            </div>
-          </div>
-        );
+  const launchTool = (tool: string) => {
+    if (tool === "AI IEP Review") {
+      setShowFileUpload(true);
+    } else {
+      alert(`${tool} is coming soon!`);
     }
   };
 
+  const getStatsData = () => {
+    const goalsArray = goals as Goal[];
+    const documentsArray = documents as Document[];
+    const eventsArray = events as Event[];
+    
+    return {
+      activeGoals: goalsArray.length,
+      progressRate: goalsArray.length > 0 ? Math.round((goalsArray.filter(g => g.status === 'completed').length / goalsArray.length) * 100) : 0,
+      meetings: eventsArray.length,
+      documents: documentsArray.length
+    };
+  };
+
+  const stats = getStatsData();
+
   return (
-    <div className="flex min-h-screen flex-col bg-gray-50">
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-white shadow px-6 py-4 flex items-center justify-between">
+    <div className="flex min-h-screen flex-col bg-gradient-to-b from-slate-900 to-slate-800 text-slate-100">
+      <header className="sticky top-0 z-50 bg-slate-800/95 backdrop-blur shadow-lg px-6 py-4 flex items-center justify-between border-b border-slate-700">
         <div className="flex items-center gap-4">
-          <h1 className="text-xl font-bold text-blue-600">My IEP Hero</h1>
-          <Badge variant="outline" className="text-xs">
-            {user?.planStatus === 'heroOffer' ? 'Hero Plan' : 'Free Plan'}
-          </Badge>
+          <h1 className="text-xl font-bold text-white">My IEP Hero</h1>
+          {isHeroPlan && (
+            <Badge className="bg-blue-600 hover:bg-blue-700 text-white">
+              Hero Plan
+            </Badge>
+          )}
         </div>
-        <nav className="hidden md:flex space-x-4">
-          <Button variant="ghost" className="text-sm">Dashboard</Button>
-          <Button variant="ghost" className="text-sm">Templates</Button>
-          <Button variant="ghost" className="text-sm">Chat</Button>
-          <Button variant="ghost" className="text-sm">Settings</Button>
+        <nav className="space-x-4 flex items-center">
+          <Button variant="ghost" className="text-slate-300 hover:text-white hover:bg-slate-700">
+            Dashboard
+          </Button>
+          <Button variant="ghost" className="text-slate-300 hover:text-white hover:bg-slate-700">
+            Goals
+          </Button>
+          <Button variant="ghost" className="text-slate-300 hover:text-white hover:bg-slate-700">
+            Documents
+          </Button>
+          <div className="flex items-center gap-2 ml-4">
+            <div className="text-right">
+              <div className="text-sm font-medium text-white">{user?.username}</div>
+              <div className="text-xs text-slate-400 capitalize">{user?.role}</div>
+            </div>
+          </div>
         </nav>
-        <div className="flex items-center gap-3">
-          <div className="text-right">
-            <div className="text-sm font-medium">{user?.username}</div>
-            <div className="text-xs text-gray-500 capitalize">{user?.role}</div>
-          </div>
-          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-            <User className="w-4 h-4 text-blue-600" />
-          </div>
-        </div>
       </header>
 
-      <div className="flex flex-1">
-        {/* Sidebar */}
-        <aside className="w-64 bg-white border-r p-4 space-y-6">
-          {(isParent || !isAdvocate) && (
-            <div>
-              <div className="font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                <Target className="w-4 h-4" />
-                Parent Tools
-              </div>
-              <div className="space-y-2">
-                {parentTools.map((tool) => (
-                  <Button
-                    key={tool.id}
-                    variant={selectedView === tool.id ? "default" : "ghost"}
-                    className="w-full justify-start text-sm h-auto py-2"
-                    onClick={() => setSelectedView(tool.id)}
-                  >
-                    <tool.icon className="w-4 h-4 mr-2" />
+      <div className="flex-1 px-6 py-6">
+        <div className="mb-8">
+          <h2 className="text-3xl font-bold text-white mb-2">
+            Welcome back, {user?.username}!
+          </h2>
+          <p className="text-slate-400">
+            Manage your child's IEP progress and goals with AI-powered tools
+          </p>
+        </div>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+          <Card className="bg-slate-800/50 border-slate-700">
+            <CardContent className="p-4">
+              <div className="text-slate-400 text-sm">Active Goals</div>
+              <div className="text-2xl font-bold text-white">{stats.activeGoals}</div>
+            </CardContent>
+          </Card>
+          <Card className="bg-slate-800/50 border-slate-700">
+            <CardContent className="p-4">
+              <div className="text-slate-400 text-sm">Progress Rate</div>
+              <div className="text-2xl font-bold text-white">{stats.progressRate}%</div>
+            </CardContent>
+          </Card>
+          <Card className="bg-slate-800/50 border-slate-700">
+            <CardContent className="p-4">
+              <div className="text-slate-400 text-sm">Meetings</div>
+              <div className="text-2xl font-bold text-white">{stats.meetings}</div>
+            </CardContent>
+          </Card>
+          <Card className="bg-slate-800/50 border-slate-700">
+            <CardContent className="p-4">
+              <div className="text-slate-400 text-sm">Documents</div>
+              <div className="text-2xl font-bold text-white">{stats.documents}</div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* AI Tools Section */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-xl font-bold text-white">
+              AI-Powered IEP Professional Tools
+            </h3>
+            {!isHeroPlan && (
+              <Badge variant="outline" className="border-amber-500 text-amber-400">
+                Upgrade to Hero Plan for full access
+              </Badge>
+            )}
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {heroTools.map((tool) => (
+              <Card 
+                key={tool.name} 
+                className="bg-slate-800/70 border-slate-600 hover:bg-slate-700/70 transition-all duration-200 cursor-pointer group"
+                onClick={() => launchTool(tool.name)}
+              >
+                <CardContent className="p-4">
+                  <div className="text-3xl mb-3 group-hover:scale-110 transition-transform">
+                    {tool.icon}
+                  </div>
+                  <div className="font-semibold text-white mb-2">
                     {tool.name}
-                  </Button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {isAdvocate && (
-            <div>
-              <div className="font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                <Users className="w-4 h-4" />
-                Advocate Tools
-              </div>
-              <div className="space-y-2">
-                {advocateTools.map((tool) => (
-                  <Button
-                    key={tool.id}
-                    variant={selectedView === tool.id ? "default" : "ghost"}
-                    className="w-full justify-start text-sm h-auto py-2"
-                    onClick={() => setSelectedView(tool.id)}
+                  </div>
+                  <div className="text-sm text-slate-400 mb-4 line-clamp-2">
+                    {tool.desc}
+                  </div>
+                  <Button 
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                    disabled={!isHeroPlan && tool.name !== "AI IEP Review"}
                   >
-                    <tool.icon className="w-4 h-4 mr-2" />
-                    {tool.name}
+                    {isHeroPlan || tool.name === "AI IEP Review" ? "Use Tool" : "Upgrade Required"}
                   </Button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          <div>
-            <div className="font-semibold text-gray-700 mb-3 flex items-center gap-2">
-              <BookOpen className="w-4 h-4" />
-              Resources
-            </div>
-            <div className="space-y-2">
-              <Button variant="ghost" className="w-full justify-start text-sm h-auto py-2">
-                <BookOpen className="w-4 h-4 mr-2" />
-                Knowledge Base
-              </Button>
-              <Button variant="ghost" className="w-full justify-start text-sm h-auto py-2">
-                <Settings className="w-4 h-4 mr-2" />
-                Settings
-              </Button>
-            </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
-        </aside>
+        </div>
 
-        {/* Main Content Area */}
-        <main className="flex-1 flex">
-          {/* Left Panel - List/CRM */}
-          <div className="w-1/2 p-6 overflow-y-auto border-r bg-white">
-            {renderLeftPanel()}
-          </div>
+        {/* Tabs Section */}
+        <Tabs defaultValue="preview" className="w-full">
+          <TabsList className="bg-slate-800 border-slate-700">
+            <TabsTrigger 
+              value="preview" 
+              className="data-[state=active]:bg-slate-700 data-[state=active]:text-white text-slate-400"
+            >
+              Live Preview
+            </TabsTrigger>
+            <TabsTrigger 
+              value="chat" 
+              className="data-[state=active]:bg-slate-700 data-[state=active]:text-white text-slate-400"
+            >
+              AI Chat
+            </TabsTrigger>
+            <TabsTrigger 
+              value="notes" 
+              className="data-[state=active]:bg-slate-700 data-[state=active]:text-white text-slate-400"
+            >
+              Notes
+            </TabsTrigger>
+          </TabsList>
 
-          {/* Right Panel - Preview/Details */}
-          <div className="w-1/2 p-6 overflow-y-auto">
-            <Tabs defaultValue="preview" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="preview">Live Preview</TabsTrigger>
-                <TabsTrigger value="chat">Chat</TabsTrigger>
-                <TabsTrigger value="notes">Notes</TabsTrigger>
-              </TabsList>
+          <TabsContent value="preview" className="mt-4">
+            <Card className="bg-slate-800/50 border-slate-700">
+              <CardContent className="p-6">
+                <div className="bg-slate-900/50 rounded-lg p-8 text-center border border-slate-700">
+                  <div className="text-4xl mb-4">📄</div>
+                  <h3 className="text-lg font-semibold text-white mb-2">
+                    Document Preview
+                  </h3>
+                  <p className="text-slate-400 mb-6">
+                    Upload an IEP document to see AI analysis and recommendations
+                  </p>
+                  <Button 
+                    onClick={() => setShowFileUpload(true)}
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    Upload Document
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-              <TabsContent value="preview" className="mt-4">
-                <Card>
-                  <CardContent className="p-0">
-                    <div className="bg-gray-100 rounded-lg p-8 text-center">
-                      <FileText className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                      <h3 className="text-lg font-medium text-gray-700 mb-2">Document Preview</h3>
-                      <p className="text-gray-500 mb-4">
-                        Select a document or goal to view its details and preview
-                      </p>
-                      <Button onClick={() => setShowFileUpload(true)}>
-                        <Upload className="w-4 h-4 mr-2" />
-                        Upload Document
-                      </Button>
+          <TabsContent value="chat" className="mt-4">
+            <Card className="bg-slate-800/50 border-slate-700">
+              <CardContent className="p-6">
+                <div className="space-y-4">
+                  <div className="bg-blue-900/30 p-4 rounded-lg border border-blue-800/50">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="text-2xl">🧠</div>
+                      <span className="text-sm font-medium text-blue-300">AI Assistant</span>
                     </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
+                    <p className="text-sm text-slate-300">
+                      Hello! I'm here to help you with IEP questions, document analysis, and advocacy guidance. 
+                      What would you like to know about your child's educational plan?
+                    </p>
+                  </div>
+                  <Textarea 
+                    placeholder="Ask about IEP processes, goals, accommodations, or get advocacy advice..." 
+                    className="min-h-[120px] bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500" 
+                  />
+                  <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">
+                    Send Message
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-              <TabsContent value="chat" className="mt-4">
-                <Card>
-                  <CardContent className="p-4">
-                    <div className="space-y-4">
-                      <div className="bg-blue-50 p-3 rounded-lg">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Brain className="w-4 h-4 text-blue-600" />
-                          <span className="text-sm font-medium text-blue-800">AI Assistant</span>
-                        </div>
-                        <p className="text-sm text-blue-700">
-                          Hello! I'm here to help you with IEP questions, document analysis, and advocacy guidance. 
-                          What would you like to know?
-                        </p>
-                      </div>
-                      <Textarea 
-                        placeholder="Ask about IEP processes, document analysis, or get advocacy advice..." 
-                        className="min-h-[100px]" 
-                      />
-                      <Button className="w-full">
-                        <MessageSquare className="w-4 h-4 mr-2" />
-                        Send Message
-                      </Button>
+          <TabsContent value="notes" className="mt-4">
+            <Card className="bg-slate-800/50 border-slate-700">
+              <CardContent className="p-6 space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-semibold text-white">Meeting Notes & To-Dos</h3>
+                  <Button size="sm" className="bg-slate-700 hover:bg-slate-600 text-white">
+                    Add Note
+                  </Button>
+                </div>
+                <Textarea 
+                  placeholder="Add meeting notes, to-dos, or important reminders..."
+                  className="min-h-[200px] bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500"
+                />
+                <div className="space-y-3">
+                  <div className="p-4 bg-amber-900/20 border border-amber-800/50 rounded-lg">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="text-amber-400">⏰</div>
+                      <span className="text-sm font-medium text-amber-300">Upcoming IEP Meeting</span>
                     </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="notes" className="mt-4">
-                <Card>
-                  <CardContent className="p-4 space-y-4">
-                    <div className="flex items-center justify-between">
-                      <h3 className="font-medium">Meeting Notes & To-Dos</h3>
-                      <Button size="sm">
-                        <Plus className="w-4 h-4 mr-2" />
-                        Add Note
-                      </Button>
-                    </div>
-                    <Textarea 
-                      placeholder="Add meeting notes, to-dos, or important reminders..."
-                      className="min-h-[200px]"
-                    />
-                    <div className="space-y-2">
-                      <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                        <div className="flex items-center gap-2">
-                          <Clock className="w-4 h-4 text-yellow-600" />
-                          <span className="text-sm font-medium">Upcoming IEP Meeting</span>
-                        </div>
-                        <p className="text-sm text-gray-600 mt-1">
-                          December 15, 2024 - Prepare transition goals discussion
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-            </Tabs>
-          </div>
-        </main>
+                    <p className="text-sm text-slate-300">
+                      {events.length > 0 
+                        ? `${format(new Date((events as Event[])[0].date), "MMMM d, yyyy")} - Prepare transition goals discussion`
+                        : "No upcoming meetings scheduled"
+                      }
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
 
       {/* File Upload Modal */}
