@@ -10,6 +10,7 @@ import Dashboard from "@/pages/dashboard";
 import Documents from "@/pages/documents";
 import Goals from "@/pages/goals";
 import Subscribe from "@/pages/subscribe";
+import Pricing from "@/pages/pricing";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 import { MobileNavigation } from "@/components/MobileNavigation";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
@@ -41,6 +42,7 @@ function Router() {
           <Subscribe />
         </AuthGuard>
       </Route>
+      <Route path="/pricing" component={Pricing} />
       <Route path="/dashboard">
         <AuthGuard>
           <Dashboard />
