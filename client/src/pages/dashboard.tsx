@@ -9,12 +9,16 @@ import QuickActions from "@/components/dashboard/quick-actions";
 import FileUploadModal from "@/components/modals/file-upload-modal";
 import SubscriptionModal from "@/components/modals/subscription-modal";
 import MemoryQA from "@/components/MemoryQA";
+import { MobileMemoryQA } from "@/components/MobileMemoryQA";
+import { MobileLayout } from "@/components/MobileLayout";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { useMobile } from "@/hooks/use-mobile";
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const { isMobile } = useMobile();
   const [showFileUpload, setShowFileUpload] = useState(false);
   const [showSubscription, setShowSubscription] = useState(false);
 
@@ -73,7 +77,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <MobileLayout className="min-h-screen bg-gray-50">
       <Navbar />
       
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
@@ -114,7 +118,11 @@ export default function Dashboard() {
 
             {/* Sidebar Content */}
             <div className="space-y-6">
-              <MemoryQA userId={user?.id || ""} />
+              {isMobile ? (
+                <MobileMemoryQA />
+              ) : (
+                <MemoryQA userId={user?.id || ""} />
+              )}
               <UpcomingEvents events={Array.isArray(events) ? events : []} />
               <RecentMessages messages={Array.isArray(messages) ? messages : []} />
               <QuickActions
@@ -136,6 +144,6 @@ export default function Dashboard() {
         open={showSubscription} 
         onOpenChange={setShowSubscription}
       />
-    </div>
+    </MobileLayout>
   );
 }
