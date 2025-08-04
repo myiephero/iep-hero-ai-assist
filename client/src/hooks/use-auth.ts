@@ -39,8 +39,14 @@ export function useAuthState() {
   };
 
   const login = async (email: string, password: string) => {
-    const result = await authApi.login({ email, password });
-    setUser(result.user);
+    try {
+      const result = await authApi.login({ email, password });
+      setUser(result.user);
+      return result;
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
+    }
   };
 
   const register = async (email: string, username: string, password: string, role: string) => {

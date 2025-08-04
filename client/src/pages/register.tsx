@@ -149,45 +149,67 @@ export default function Register() {
   // Step 1: Role Selection
   if (step === 1) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-        <div className="w-full max-w-4xl">
-          <div className="text-center mb-8">
-            <div className="flex justify-center mb-4">
-              <GraduationCap className="h-12 w-12 text-blue-600" />
-            </div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome to IEP Hero</h1>
-            <p className="text-lg text-gray-600">Choose your role to get started with personalized features</p>
-          </div>
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative overflow-hidden">
+        {/* Animated Background */}
+        <div className="absolute inset-0">
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-400/10 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-indigo-400/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-cyan-400/5 rounded-full blur-2xl animate-pulse delay-500"></div>
+        </div>
 
-          <div className="grid md:grid-cols-3 gap-6">
-            {Object.entries(ROLES).map(([key, role]) => (
-              <Card 
-                key={key}
-                className={`cursor-pointer transition-all hover:shadow-lg hover:scale-105 ${role.color}`}
-                onClick={() => handleRoleSelect(key as UserRole)}
-              >
-                <CardHeader className="text-center">
-                  <div className="flex justify-center mb-3">
-                    {role.icon}
-                  </div>
-                  <CardTitle className="text-xl">{role.title}</CardTitle>
-                  <CardDescription>{role.subtitle}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2">
-                    {role.benefits.map((benefit, index) => (
-                      <li key={index} className="flex items-center text-sm">
-                        <Check className="h-4 w-4 text-green-600 mr-2 flex-shrink-0" />
-                        {benefit}
-                      </li>
-                    ))}
-                  </ul>
-                  <Button className="w-full mt-4">
-                    Select {role.title}
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
+        <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
+          <div className="w-full max-w-6xl">
+            <div className="text-center mb-12">
+              <div className="flex justify-center mb-6">
+                <div className="p-4 bg-gradient-to-br from-blue-400 to-indigo-600 rounded-2xl shadow-2xl">
+                  <GraduationCap className="h-12 w-12 text-white" />
+                </div>
+              </div>
+              <h1 className="text-5xl font-bold text-white mb-4 tracking-tight">Welcome to My IEP Hero</h1>
+              <p className="text-xl text-blue-200 max-w-2xl mx-auto">Choose your role to unlock personalized features and transform your IEP journey</p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8">
+              {Object.entries(ROLES).map(([key, role]) => (
+                <Card 
+                  key={key}
+                  className="cursor-pointer transition-all duration-300 hover:shadow-2xl hover:scale-105 backdrop-blur-xl bg-white/10 border-white/20 group"
+                  onClick={() => handleRoleSelect(key as UserRole)}
+                >
+                  <CardHeader className="text-center pb-6">
+                    <div className="flex justify-center mb-6">
+                      <div className="p-4 bg-gradient-to-br from-blue-400/20 to-indigo-600/20 rounded-2xl group-hover:from-blue-400/30 group-hover:to-indigo-600/30 transition-all">
+                        {role.icon}
+                      </div>
+                    </div>
+                    <CardTitle className="text-2xl text-white mb-2">{role.title}</CardTitle>
+                    <CardDescription className="text-blue-200 text-base">{role.subtitle}</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <ul className="space-y-3">
+                      {role.benefits.map((benefit, index) => (
+                        <li key={index} className="flex items-center text-blue-100">
+                          <Check className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" />
+                          <span className="text-sm">{benefit}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <Button className="w-full h-12 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all group-hover:scale-105">
+                      Choose {role.title}
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+            
+            <div className="text-center mt-12">
+              <p className="text-blue-200">
+                Already have an account?{" "}
+                <Link href="/login" className="text-blue-400 hover:text-white underline font-semibold transition-colors">
+                  Sign in here
+                </Link>
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -197,77 +219,93 @@ export default function Register() {
   // Step 2: Plan Selection  
   if (step === 2) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-        <div className="w-full max-w-4xl">
-          <div className="text-center mb-8">
-            <Button 
-              variant="ghost" 
-              onClick={() => setStep(1)}
-              className="absolute left-4 top-4"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back
-            </Button>
-            
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Choose Your Plan</h1>
-            <p className="text-lg text-gray-600">
-              Perfect for <span className="font-semibold">{ROLES[selectedRole!].title}</span>
-            </p>
-          </div>
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative overflow-hidden">
+        {/* Animated Background */}
+        <div className="absolute inset-0">
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-400/10 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-indigo-400/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        </div>
 
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {Object.entries(PLANS).map(([key, plan]) => (
-              <Card 
-                key={key}
-                className={`cursor-pointer transition-all hover:shadow-lg ${
-                  selectedPlan === key ? 'ring-2 ring-blue-500' : ''
-                } ${plan.color} ${plan.highlight ? 'scale-105' : ''}`}
-                onClick={() => setSelectedPlan(key as PlanType)}
+        <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
+          <div className="w-full max-w-5xl">
+            <div className="text-center mb-12">
+              <Button 
+                variant="ghost" 
+                onClick={() => setStep(1)}
+                className="absolute left-4 top-4 text-blue-200 hover:text-white hover:bg-white/10"
               >
-                <CardHeader className="text-center">
-                  {plan.highlight && (
-                    <div className="flex justify-center mb-2">
-                      <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center">
-                        <Star className="h-4 w-4 mr-1" />
-                        Most Popular
-                      </span>
-                    </div>
-                  )}
-                  <CardTitle className="text-2xl">{plan.name}</CardTitle>
-                  <div className="text-3xl font-bold text-blue-600">
-                    {plan.price}
-                    <span className="text-sm font-normal text-gray-600">/{plan.period}</span>
-                  </div>
-                  <CardDescription>{plan.description}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-3 mb-6">
-                    {plan.features.map((feature, index) => (
-                      <li key={index} className="flex items-center text-sm">
-                        <Check className="h-4 w-4 text-green-600 mr-3 flex-shrink-0" />
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
-                  <Button 
-                    className="w-full" 
-                    variant={selectedPlan === key ? "default" : "outline"}
-                  >
-                    {selectedPlan === key ? "Selected" : `Choose ${plan.name}`}
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Roles
+              </Button>
+              
+              <h1 className="text-4xl font-bold text-white mb-4">Choose Your Plan</h1>
+              <p className="text-xl text-blue-200">
+                Perfect for <span className="font-semibold text-blue-400">{ROLES[selectedRole!].title}</span>
+              </p>
+            </div>
 
-          <div className="text-center mt-8">
-            <Button 
-              onClick={() => handlePlanSelect(selectedPlan)}
-              size="lg"
-              className="px-8"
-            >
-              Continue to Registration
-            </Button>
+            <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+              {Object.entries(PLANS).map(([key, plan]) => (
+                <Card 
+                  key={key}
+                  className={`cursor-pointer transition-all duration-300 hover:shadow-2xl hover:scale-105 backdrop-blur-xl bg-white/10 border-white/20 ${
+                    selectedPlan === key ? 'ring-2 ring-blue-400 bg-white/20' : ''
+                  } ${plan.highlight ? 'border-blue-400/50' : ''} group`}
+                  onClick={() => setSelectedPlan(key as PlanType)}
+                >
+                  <CardHeader className="text-center pb-6">
+                    {plan.highlight && (
+                      <div className="flex justify-center mb-4">
+                        <span className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-4 py-2 rounded-full text-sm font-medium flex items-center shadow-lg">
+                          <Star className="h-4 w-4 mr-2 animate-pulse" />
+                          Most Popular Choice
+                        </span>
+                      </div>
+                    )}
+                    <CardTitle className="text-3xl text-white mb-4">{plan.name}</CardTitle>
+                    <div className="mb-4">
+                      <span className="text-4xl font-bold text-blue-400">{plan.price}</span>
+                      <span className="text-blue-200 ml-2">/{plan.period}</span>
+                    </div>
+                    <CardDescription className="text-blue-200 text-base">{plan.description}</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <ul className="space-y-4">
+                      {plan.features.map((feature, index) => (
+                        <li key={index} className="flex items-center text-blue-100">
+                          <Check className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" />
+                          <span className="text-sm">{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <Button 
+                      className={`w-full h-12 font-semibold rounded-lg shadow-lg transition-all group-hover:scale-105 ${
+                        selectedPlan === key 
+                          ? 'bg-blue-500 hover:bg-blue-600 text-white ring-2 ring-blue-400' 
+                          : plan.highlight
+                            ? 'bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white'
+                            : 'bg-white/20 hover:bg-white/30 text-white border-white/30'
+                      }`}
+                    >
+                      {selectedPlan === key ? '✓ Selected' : `Choose ${plan.name}`}
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            <div className="text-center mt-12">
+              <Button 
+                onClick={() => handlePlanSelect(selectedPlan)}
+                size="lg"
+                className="px-12 h-14 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold rounded-lg shadow-xl hover:shadow-2xl transition-all duration-200 group"
+              >
+                <div className="flex items-center gap-3">
+                  Continue to Registration
+                  <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -276,75 +314,112 @@ export default function Register() {
 
   // Step 3: Registration Form
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <Button 
-            variant="ghost" 
-            onClick={() => setStep(2)}
-            className="absolute left-4 top-4"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back
-          </Button>
-          
-          <div className="flex justify-center mb-4">
-            <GraduationCap className="h-8 w-8 text-blue-600" />
-          </div>
-          <CardTitle className="text-2xl">Complete Your Registration</CardTitle>
-          <CardDescription>
-            {selectedPlan === "free" ? (
-              "You're creating a FREE account"
-            ) : (
-              <span className="text-blue-600 font-semibold">
-                You're unlocking the $495 Hero Family Offer
-              </span>
-            )}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="mb-4 p-3 bg-gray-50 rounded-lg">
-            <div className="text-sm text-gray-600 mb-1">Selected:</div>
-            <div className="font-medium">{ROLES[selectedRole!].title}</div>
-            <div className="font-medium text-blue-600">{PLANS[selectedPlan as keyof typeof PLANS].name}</div>
-          </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative overflow-hidden">
+      {/* Animated Background */}
+      <div className="absolute inset-0">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-400/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-indigo-400/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+      </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="username">Username</Label>
-              <Input
-                id="username"
-                value={formData.username}
-                onChange={(e) => setFormData(prev => ({ ...prev, username: e.target.value }))}
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                value={formData.password}
-                onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                required
-              />
-            </div>
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Creating Account..." : "Create Account"}
+      <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
+        <Card className="w-full max-w-lg backdrop-blur-xl bg-white/10 border-white/20 shadow-2xl">
+          <CardHeader className="text-center pb-8">
+            <Button 
+              variant="ghost" 
+              onClick={() => setStep(2)}
+              className="absolute left-4 top-4 text-blue-200 hover:text-white hover:bg-white/10"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Plans
             </Button>
-          </form>
-        </CardContent>
-      </Card>
+            
+            <div className="flex justify-center mb-6">
+              <div className="p-4 bg-gradient-to-br from-blue-400 to-indigo-600 rounded-2xl shadow-2xl">
+                <GraduationCap className="h-8 w-8 text-white" />
+              </div>
+            </div>
+            <CardTitle className="text-3xl text-white mb-4">Complete Your Registration</CardTitle>
+            <CardDescription className="text-lg">
+              {selectedPlan === "free" ? (
+                <span className="text-green-400 font-semibold">✅ You're creating a FREE account</span>
+              ) : (
+                <span className="text-blue-400 font-semibold">🌟 You're unlocking the $495 Hero Family Offer</span>
+              )}
+            </CardDescription>
+          </CardHeader>
+          
+          <CardContent className="space-y-6">
+            {/* Selection Summary */}
+            <div className="p-4 bg-white/10 rounded-lg border border-white/20">
+              <div className="text-sm text-blue-200 mb-2">Your Selection:</div>
+              <div className="font-semibold text-white">{ROLES[selectedRole!].title}</div>
+              <div className="font-semibold text-blue-400">{PLANS[selectedPlan as keyof typeof PLANS].name}</div>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-white font-medium">Email Address</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="Enter your email"
+                  value={formData.email}
+                  onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                  className="bg-white/10 border-white/20 text-white placeholder-blue-200 h-12 focus:bg-white/20 focus:border-blue-400 transition-all"
+                  required
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="username" className="text-white font-medium">Username</Label>
+                <Input
+                  id="username"
+                  placeholder="Choose a username"
+                  value={formData.username}
+                  onChange={(e) => setFormData(prev => ({ ...prev, username: e.target.value }))}
+                  className="bg-white/10 border-white/20 text-white placeholder-blue-200 h-12 focus:bg-white/20 focus:border-blue-400 transition-all"
+                  required
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="password" className="text-white font-medium">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="Create a secure password"
+                  value={formData.password}
+                  onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+                  className="bg-white/10 border-white/20 text-white placeholder-blue-200 h-12 focus:bg-white/20 focus:border-blue-400 transition-all"
+                  required
+                />
+              </div>
+              
+              <Button 
+                type="submit" 
+                className="w-full h-14 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold rounded-lg shadow-xl hover:shadow-2xl transition-all duration-200 group"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <div className="flex items-center gap-3">
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    Creating Your Account...
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-3">
+                    {selectedPlan === "free" ? "Create Free Account" : "Create Hero Account"}
+                    <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                )}
+              </Button>
+            </form>
+
+            <div className="text-center text-sm text-blue-200">
+              By creating an account, you agree to our Terms of Service and Privacy Policy
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
