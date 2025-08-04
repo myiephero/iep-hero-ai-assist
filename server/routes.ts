@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import Stripe from "stripe";
 import { storage } from "./storage";
 import { registerShareMemoryRoutes } from "./routes/share-memory";
+import { registerTestMemoryRoutes } from "./routes/test-memory";
 import { insertUserSchema, insertGoalSchema, insertDocumentSchema, insertEventSchema, insertMessageSchema } from "@shared/schema";
 import bcrypt from "bcrypt";
 import session from "express-session";
@@ -343,6 +344,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Register share memory routes
   registerShareMemoryRoutes(app);
+  
+  // Register test routes
+  registerTestMemoryRoutes(app);
 
   // Serve uploaded files
   app.use('/uploads', requireAuth, (req, res, next) => {
