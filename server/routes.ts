@@ -304,60 +304,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Stripe subscription route
+  // Subscription endpoint - temporarily disabled for MVP testing
   app.post('/api/create-subscription', requireAuth, async (req, res) => {
-    const user = req.user as any;
-    const { priceId, planType } = req.body;
+    console.log("Subscription request received - temporarily disabled for MVP");
+    res.status(503).json({ 
+      error: "Subscription service temporarily unavailable during MVP testing. All Hero Plan features are available for testing." 
+    });
+  });
 
-    try {
-      if (user.stripeSubscriptionId) {
-        const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
-        res.json({
-          subscriptionId: subscription.id,
-          clientSecret: (subscription.latest_invoice as any)?.payment_intent?.client_secret,
-        });
-        return;
-      }
-
-      // Determine price ID based on plan type or use provided priceId
-      let finalPriceId = priceId;
-      if (planType === "hero" && !priceId) {
-        finalPriceId = process.env.STRIPE_PRICE_ID;
-        if (!finalPriceId) {
-          throw new Error("Hero Plan price ID not configured. Please contact support.");
-        }
-      }
-
-      if (!finalPriceId) {
-        throw new Error("Price ID is required");
-      }
-
-      let customerId = user.stripeCustomerId;
-      if (!customerId) {
-        const customer = await stripe.customers.create({
-          email: user.email,
-          name: user.username,
-        });
-        customerId = customer.id;
-        await storage.updateUserStripeInfo(user.id, customerId, "");
-      }
-
-      const subscription = await stripe.subscriptions.create({
-        customer: customerId,
-        items: [{ price: finalPriceId }],
-        payment_behavior: 'default_incomplete',
-        expand: ['latest_invoice.payment_intent'],
-      });
-
-      await storage.updateUserStripeInfo(user.id, customerId, subscription.id);
-
-      res.json({
-        subscriptionId: subscription.id,
-        clientSecret: (subscription.latest_invoice as any)?.payment_intent?.client_secret,
-      });
-    } catch (error: any) {
-      console.error("Subscription creation error:", error);
-      res.status(400).json({ error: { message: error.message } });
-    }
+  // Legacy subscription endpoint support  
+  app.post('/api/get-or-create-subscription', requireAuth, async (req, res) => {
+    console.log("Legacy subscription request received - temporarily disabled for MVP");
+    res.status(503).json({ 
+      error: "Subscription service temporarily unavailable during MVP testing. All Hero Plan features are available for testing." 
+    });
   });
 
   // Goals routes
@@ -538,12 +498,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { content } = req.body;
       const user = req.user as any;
       
-      // Check if user has Hero plan
-      if (user.planStatus !== 'heroOffer') {
-        return res.status(403).json({ 
-          error: "IEP Analysis is a Hero Plan exclusive feature. Please upgrade to access this tool." 
-        });
-      }
+      // MVP Testing: Allow all users to access Hero features
+      // if (user.planStatus !== 'heroOffer') {
+      //   return res.status(403).json({ 
+      //     error: "IEP Analysis is a Hero Plan exclusive feature. Please upgrade to access this tool." 
+      //   });
+      // }
 
       if (!content || content.trim().length < 100) {
         return res.status(400).json({ 

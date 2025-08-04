@@ -102,6 +102,12 @@ export function IEPTools({ isHeroPlan, userId }: IEPToolsProps) {
   const handleGenerateContent = async (toolId: string) => {
     setIsGenerating(true);
     try {
+      // For MVP testing, remove Hero Plan gating
+      if (!isHeroPlan) {
+        // Temporarily allow all users to access Hero features for testing
+        console.log("Hero Plan feature access enabled for testing");
+      }
+      
       // Simulate AI generation
       await new Promise(resolve => setTimeout(resolve, 2000));
       
@@ -235,7 +241,7 @@ NEXT REVIEW: 4 weeks`
             className={`bg-white/10 backdrop-blur-lg border-white/20 cursor-pointer transition-all duration-300 hover:bg-white/15 ${
               activeTool === tool.id ? 'ring-2 ring-blue-400' : ''
             }`}
-            onClick={() => isHeroPlan ? setActiveTool(tool.id) : null}
+            onClick={() => setActiveTool(tool.id)}
           >
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
@@ -252,41 +258,31 @@ NEXT REVIEW: 4 weeks`
             </CardHeader>
             <CardContent>
               <p className="text-blue-200 text-sm mb-4">{tool.description}</p>
-              {isHeroPlan ? (
-                <Button 
-                  variant="ghost" 
-                  className="w-full text-blue-400 hover:text-blue-300 hover:bg-white/10"
-                  onClick={() => handleGenerateContent(tool.id)}
-                  disabled={isGenerating}
-                >
-                  {isGenerating ? (
-                    <>
-                      <div className="animate-spin w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full mr-2" />
-                      Generating...
-                    </>
-                  ) : (
-                    <>
-                      <Zap className="w-4 h-4 mr-2" />
-                      Use Tool
-                    </>
-                  )}
-                </Button>
-              ) : (
-                <Button 
-                  variant="ghost" 
-                  className="w-full text-gray-400 cursor-not-allowed" 
-                  disabled
-                >
-                  Hero Plan Required
-                </Button>
-              )}
+              <Button 
+                variant="ghost" 
+                className="w-full text-blue-400 hover:text-blue-300 hover:bg-white/10"
+                onClick={() => handleGenerateContent(tool.id)}
+                disabled={isGenerating}
+              >
+                {isGenerating ? (
+                  <>
+                    <div className="animate-spin w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full mr-2" />
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <Zap className="w-4 h-4 mr-2" />
+                    Use Tool
+                  </>
+                )}
+              </Button>
             </CardContent>
           </Card>
         ))}
       </div>
 
       {/* Active Tool Content */}
-      {activeTool && isHeroPlan && (
+      {activeTool && (
         <Card className="bg-white/10 backdrop-blur-lg border-white/20">
           <CardHeader>
             <div className="flex items-center justify-between">
@@ -323,21 +319,14 @@ NEXT REVIEW: 4 weeks`
             ) : (
               <div className="text-center py-8">
                 <BookOpen className="w-12 h-12 text-blue-400 mx-auto mb-4" />
-                <p className="text-blue-200">Click "Use Tool" to generate content</p>
+                <p className="text-white">Click "Use Tool" to generate content</p>
               </div>
             )}
           </CardContent>
         </Card>
       )}
 
-      {/* Upgrade prompt for free users */}
-      {!isHeroPlan && (
-        <Card className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 backdrop-blur-lg border-yellow-400/30">
-          <CardContent className="p-6">
-            <HeroPlanUpgrade />
-          </CardContent>
-        </Card>
-      )}
+      {/* Upgrade prompt removed for MVP testing */}
     </div>
   );
 }
