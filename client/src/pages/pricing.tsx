@@ -28,7 +28,7 @@ export default function Pricing() {
     try {
       // For Hero Plan - $495/year subscription
       const response = await apiRequest("POST", "/api/create-subscription", {
-        priceId: "price_hero_plan_495_yearly" // This will need to be set up in Stripe
+        planType: "hero" // Let the server determine the price ID
       });
       const data = await response.json();
       
