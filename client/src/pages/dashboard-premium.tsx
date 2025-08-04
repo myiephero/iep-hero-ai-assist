@@ -34,11 +34,13 @@ import MemoryQA from "@/components/MemoryQA";
 import { IEPTools } from "@/components/IEPTools";
 import IEPAnalyzer from "@/components/IEPAnalyzer";
 import Footer from "@/components/layout/footer";
+import FileUploadModal from "@/components/modals/file-upload-modal";
 
 export default function PremiumDashboard() {
   const { user } = useAuth();
   const { isMobile } = useMobile();
   const [activeTab, setActiveTab] = useState('overview');
+  const [showFileUpload, setShowFileUpload] = useState(false);
 
   // Fetch dashboard data
   const { data: goals = [], isLoading: goalsLoading } = useQuery<any[]>({
@@ -426,7 +428,12 @@ export default function PremiumDashboard() {
                   <div className="text-center py-6">
                     <FileText className="w-8 h-8 text-gray-400 mx-auto mb-2" />
                     <p className="text-blue-200 text-sm">No documents yet</p>
-                    <Button variant="ghost" className="text-blue-400 hover:text-blue-300 mt-2" size="sm">
+                    <Button 
+                      variant="ghost" 
+                      className="text-blue-400 hover:text-blue-300 mt-2" 
+                      size="sm"
+                      onClick={() => setShowFileUpload(true)}
+                    >
                       <Plus className="w-4 h-4 mr-1" />
                       Upload Document
                     </Button>
@@ -453,6 +460,11 @@ export default function PremiumDashboard() {
       </div>
       
       <Footer />
+      
+      <FileUploadModal 
+        open={showFileUpload} 
+        onOpenChange={setShowFileUpload} 
+      />
     </div>
   );
 }
