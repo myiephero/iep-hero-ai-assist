@@ -61,6 +61,11 @@ export function useAuthState() {
       setIsLoading(false); // Ensure loading state is cleared
       console.log('✅ User state updated:', userData);
       
+      // After login, immediately refresh user data to get latest from database
+      setTimeout(() => {
+        checkAuth();
+      }, 100);
+      
       return result;
     } catch (error: any) {
       console.error('❌ Login error details:', error);

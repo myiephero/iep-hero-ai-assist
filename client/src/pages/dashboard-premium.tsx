@@ -53,6 +53,15 @@ export default function PremiumDashboard() {
 
   // Hero Plan Features Check
   const isHeroPlan = user?.planStatus === 'heroOffer' || user?.subscriptionTier === 'heroOffer';
+  
+  // Debug logging for plan status
+  console.log('🔍 Dashboard Debug:', {
+    user,
+    userPlanStatus: user?.planStatus,
+    userSubscriptionTier: user?.subscriptionTier,
+    isHeroPlan,
+    userObject: JSON.stringify(user, null, 2)
+  });
 
   const stats = {
     activeGoals: goals.filter((goal: any) => goal.status === "In Progress" || goal.status === "Not Started").length,
