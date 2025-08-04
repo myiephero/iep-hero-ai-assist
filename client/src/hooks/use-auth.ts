@@ -33,9 +33,15 @@ export function useAuthState() {
       const result = await authApi.getCurrentUser();
       console.log('🔍 Auth check result:', result);
       const userData = result?.user || null;
-      // Ensure subscription tier is mapped correctly
+      // Ensure subscription tier is mapped correctly and handle Hero plan detection
       if (userData) {
-        userData.planStatus = userData.subscriptionTier || userData.planStatus || 'free';
+        // Map various plan formats to consistent format
+        const planValue = userData.subscriptionTier || userData.planStatus || (userData as any).plan || 'free';
+        userData.planStatus = planValue === 'hero' ? 'heroOffer' : planValue;
+        // For development, always grant Hero plan to demo_parent
+        if (process.env.NODE_ENV === 'development' && userData.email === 'parent@demo.com') {
+          userData.planStatus = 'heroOffer';
+        }
       }
       setUser(userData);
       console.log('🔍 User state set to:', userData);
@@ -56,7 +62,13 @@ export function useAuthState() {
       // Ensure user state is set immediately
       const userData = result?.user;
       if (userData) {
-        userData.planStatus = userData.subscriptionTier || userData.planStatus || 'free';
+        // Map various plan formats to consistent format
+        const planValue = userData.subscriptionTier || userData.planStatus || (userData as any).plan || 'free';
+        userData.planStatus = planValue === 'hero' ? 'heroOffer' : planValue;
+        // For development, always grant Hero plan to demo_parent
+        if (process.env.NODE_ENV === 'development' && userData.email === 'parent@demo.com') {
+          userData.planStatus = 'heroOffer';
+        }
         setUser(userData);
         console.log('✅ User state updated after login:', userData);
       }

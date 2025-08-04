@@ -76,7 +76,7 @@ const UserMenu = () => {
             <p className="font-medium text-gray-900">{user.username || "User"}</p>
             <p className="text-xs text-gray-600">{user.email}</p>
             <div className="mt-2">
-              <PlanStatusBadge planStatus={user.planStatus} size="sm" />
+              <PlanStatusBadge planStatus={user.planStatus || 'free'} size="sm" />
             </div>
           </div>
         </div>
