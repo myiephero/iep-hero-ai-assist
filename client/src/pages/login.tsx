@@ -37,8 +37,11 @@ export default function Login() {
         description: "Successfully signed in to your account",
       });
       
-      // Immediate redirect on success
-      setLocation("/dashboard");
+      // Force immediate redirect after small delay for state to update
+      console.log('🔄 Redirecting to dashboard...');
+      setTimeout(() => {
+        window.location.href = "/dashboard";
+      }, 100);
       
     } catch (error: any) {
       console.error('❌ Login failed:', error);
