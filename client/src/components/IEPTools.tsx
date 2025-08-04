@@ -34,35 +34,43 @@ export function IEPTools({ isHeroPlan, userId }: IEPToolsProps) {
 
   const tools = [
     {
+      id: "iep-review",
+      title: "AI IEP Review",
+      description: "Comprehensive AI analysis of existing IEP documents with improvement recommendations",
+      icon: <Brain className="w-6 h-6" />,
+      color: "blue",
+      premium: true
+    },
+    {
       id: "goal-generator",
       title: "IEP Goal Generator",
       description: "AI-powered IEP goal creation with measurable objectives",
       icon: <Target className="w-6 h-6" />,
-      color: "blue",
+      color: "green",
       premium: true
     },
     {
       id: "template-builder",
       title: "Template Builder", 
-      description: "Create custom IEP document templates",
+      description: "Create custom IEP document templates and forms",
       icon: <FileText className="w-6 h-6" />,
-      color: "green",
+      color: "purple",
       premium: true
     },
     {
       id: "progress-analyzer",
       title: "Progress Analyzer",
-      description: "AI analysis of student progress and recommendations",
+      description: "AI analysis of student progress and data-driven recommendations",
       icon: <BarChart3 className="w-6 h-6" />,
-      color: "purple",
+      color: "orange",
       premium: true
     },
     {
       id: "meeting-prep",
       title: "Meeting Prep Assistant",
-      description: "Prepare for IEP meetings with AI-generated talking points",
+      description: "AI-generated talking points and meeting preparation materials",
       icon: <Users className="w-6 h-6" />,
-      color: "orange",
+      color: "teal",
       premium: true
     },
     {
@@ -76,9 +84,17 @@ export function IEPTools({ isHeroPlan, userId }: IEPToolsProps) {
     {
       id: "accommodation-builder",
       title: "Accommodation Builder",
-      description: "Generate appropriate accommodations and modifications",
+      description: "Generate evidence-based accommodations and modifications",
       icon: <Settings className="w-6 h-6" />,
-      color: "teal",
+      color: "indigo",
+      premium: true
+    },
+    {
+      id: "transition-planner",
+      title: "Transition Planner",
+      description: "AI-assisted transition planning for post-secondary goals",
+      icon: <Calendar className="w-6 h-6" />,
+      color: "pink",
       premium: true
     }
   ];
@@ -90,47 +106,100 @@ export function IEPTools({ isHeroPlan, userId }: IEPToolsProps) {
       await new Promise(resolve => setTimeout(resolve, 2000));
       
       const templates = {
-        "goal-generator": `ANNUAL GOAL: By [DATE], when given grade-level reading passages, [STUDENT NAME] will read with 95% accuracy and answer comprehension questions with 80% accuracy across 4 out of 5 consecutive trials as measured by curriculum-based assessments.
+        "iep-review": `🤖 AI IEP DOCUMENT ANALYSIS COMPLETE
 
-BENCHMARKS/SHORT-TERM OBJECTIVES:
-1. By [DATE], [STUDENT NAME] will decode grade-level words with 90% accuracy
-2. By [DATE], [STUDENT NAME] will identify main ideas with 75% accuracy  
-3. By [DATE], [STUDENT NAME] will answer inferential questions with 70% accuracy
+OVERALL ASSESSMENT: ⭐⭐⭐⭐☆ (4/5 - STRONG IEP)
 
-EVALUATION CRITERIA: Weekly progress monitoring using curriculum-based measurements
-EVALUATION PROCEDURES: Data collection sheets, work samples, teacher observation`,
+KEY STRENGTHS IDENTIFIED:
+✅ Goals are specific and measurable
+✅ Present levels of performance well documented
+✅ Appropriate accommodations listed
+✅ Services align with identified needs
 
-        "template-builder": `IEP MEETING AGENDA TEMPLATE
+AREAS FOR IMPROVEMENT:
+🔶 Transition planning could be more detailed (if age-appropriate)
+🔶 Consider adding assistive technology goals
+🔶 Progress monitoring frequency could be increased
 
-1. INTRODUCTIONS & TEAM ROLES
-2. REVIEW OF CURRENT PERFORMANCE
-   - Academic Achievement
-   - Functional Performance
-   - Progress on Current Goals
-3. DISCUSSION OF NEEDS
-4. GOAL DEVELOPMENT/REVISION
-5. PLACEMENT DECISIONS
-6. RELATED SERVICES
-7. ACCOMMODATIONS & MODIFICATIONS
-8. TRANSITION PLANNING (if applicable)
-9. NEXT STEPS & MEETING CLOSURE`,
+COMPLIANCE CHECK:
+✅ IDEA Requirements Met: 95%
+✅ State Standards Aligned: 92%
+⚠️  Minor formatting improvements needed
 
-        "progress-analyzer": `PROGRESS ANALYSIS REPORT
+RECOMMENDED NEXT STEPS:
+1. Schedule team meeting to discuss transition services
+2. Evaluate need for AT assessment
+3. Review progress monitoring schedule
+4. Update parent communication plan
 
-STUDENT: [Name]
-REPORTING PERIOD: [Dates]
+PRIORITY RATING: Medium - Schedule review within 30 days`,
 
-GOAL PERFORMANCE SUMMARY:
-✅ Reading Comprehension: 78% - ON TRACK
-⚠️ Math Problem Solving: 62% - NEEDS ATTENTION  
-✅ Social Skills: 85% - EXCEEDING
+        "goal-generator": `🎯 AI-GENERATED IEP GOALS
 
-RECOMMENDATIONS:
-• Increase visual supports for math concepts
-• Consider peer tutoring for reading fluency
-• Continue current social skills interventions
+READING COMPREHENSION GOAL:
+By [DATE], when given grade-level reading passages, [STUDENT] will read with 95% accuracy and answer comprehension questions with 80% accuracy across 4 out of 5 consecutive trials as measured by curriculum-based assessments.
 
-DATA TRENDS: Consistent growth in reading, plateau in math requires intervention adjustment.`
+BENCHMARKS:
+• Decode grade-level words with 90% accuracy
+• Identify main ideas with 75% accuracy  
+• Answer inferential questions with 70% accuracy
+
+MATH PROBLEM SOLVING GOAL:
+By [DATE], when presented with multi-step word problems, [STUDENT] will solve problems using appropriate strategies with 75% accuracy in 4 out of 5 trials.
+
+SOCIAL SKILLS GOAL:
+By [DATE], [STUDENT] will initiate and maintain appropriate peer interactions during structured activities for 15 minutes with minimal prompting in 8 out of 10 opportunities.`,
+
+        "template-builder": `📋 CUSTOM IEP TEMPLATE GENERATED
+
+=== IEP MEETING AGENDA ===
+Date: ___________  Time: ___________
+
+ATTENDEES:
+□ Parent/Guardian: ________________
+□ General Ed Teacher: _____________
+□ Special Ed Teacher: _____________
+□ School Administrator: ___________
+□ Related Service Providers: ______
+
+AGENDA:
+1. Welcome & Introductions (5 min)
+2. Review Previous IEP & Progress (15 min)
+3. Present Levels Discussion (20 min)
+4. Goals & Objectives Review (25 min)
+5. Services & Placement (15 min)
+6. Accommodations & Modifications (10 min)
+7. Assessment Participation (5 min)
+8. Transition Planning (15 min)
+9. Next Steps & Signatures (10 min)
+
+NOTES SECTION:
+_________________________________
+_________________________________`,
+
+        "progress-analyzer": `📊 AI PROGRESS ANALYSIS REPORT
+
+STUDENT: [Name] | PERIOD: [Dates]
+
+PERFORMANCE DASHBOARD:
+📈 Reading: 78% (↗️ +12% from last quarter)
+⚠️  Math: 62% (↔️ Plateau - needs intervention)
+🎯 Social Skills: 85% (↗️ +8% improvement)
+✅ Behavior: 92% (↗️ Excellent progress)
+
+AI INSIGHTS:
+• Reading growth trajectory suggests current interventions are effective
+• Math performance plateau indicates need for strategy modification
+• Social skills showing consistent improvement with peer interactions
+• Behavior goals nearly mastered - consider advancing objectives
+
+RECOMMENDED ACTIONS:
+1. 🔄 Modify math intervention - try concrete manipulatives
+2. 📅 Increase progress monitoring frequency for math
+3. 🎉 Celebrate reading success and maintain current approach
+4. 🎯 Advance social skills goals to more complex scenarios
+
+NEXT REVIEW: 4 weeks`
       };
 
       setGeneratedContent(templates[toolId as keyof typeof templates] || "Content generated successfully!");
@@ -159,7 +228,7 @@ DATA TRENDS: Consistent growth in reading, plateau in math requires intervention
   return (
     <div className="space-y-6">
       {/* Tools Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {tools.map((tool) => (
           <Card 
             key={tool.id} 
