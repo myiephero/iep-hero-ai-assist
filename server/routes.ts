@@ -301,6 +301,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Memory Query route for AI-powered IEP questions
+  app.post("/api/memory-query", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      const { prompt } = req.body;
+      
+      if (!prompt || prompt.trim().length === 0) {
+        return res.status(400).json({ error: "Prompt is required" });
+      }
+
+      // Get user's IEP data for context
+      const goals = await storage.getGoalsByUserId(user.id);
+      const documents = await storage.getDocumentsByUserId(user.id);
+      const events = await storage.getEventsByUserId(user.id);
+
+      // Build context from user's IEP data
+      const context = {
+        goals: goals.map(g => ({
+          title: g.title,
+          description: g.description,
+          status: g.status,
+          progress: g.progress,
+          dueDate: g.dueDate
+        })),
+        documentsCount: documents.length,
+        upcomingEvents: events.filter(e => new Date(e.date) > new Date()).length,
+        totalEvents: events.length
+      };
+
+      // Simple AI response based on context
+      let answer = generateIEPResponse(prompt, context);
+
+      res.json({ answer });
+    } catch (error: any) {
+      console.error("Memory query error:", error);
+      res.status(500).json({ error: "Failed to query memory" });
+    }
+  });
+
   // Serve uploaded files
   app.use('/uploads', requireAuth, (req, res, next) => {
     // Add file access control here if needed
@@ -309,4 +348,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   const httpServer = createServer(app);
   return httpServer;
+}
+
+// Simple AI response generator for IEP queries
+function generateIEPResponse(prompt: string, context: any): string {
+  const lowerPrompt = prompt.toLowerCase();
+  
+  if (lowerPrompt.includes('goal') || lowerPrompt.includes('progress')) {
+    if (context.goals.length === 0) {
+      return "You don't have any IEP goals recorded yet. You can add goals using the Goals section to track your child's progress.";
+    }
+    
+    const inProgressGoals = context.goals.filter((g: any) => g.status === "In Progress");
+    const completedGoals = context.goals.filter((g: any) => g.status === "Completed");
+    
+    return `You have ${context.goals.length} IEP goals total. ${completedGoals.length} are completed and ${inProgressGoals.length} are in progress. 
+
+Your current goals include:
+${context.goals.slice(0, 3).map((g: any) => `• ${g.title} (${g.status} - ${g.progress}% complete)`).join('\n')}
+
+The next due date is ${context.goals.length > 0 ? new Date(context.goals[0].dueDate).toLocaleDateString() : 'not set'}.`;
+  }
+  
+  if (lowerPrompt.includes('service') || lowerPrompt.includes('accommodation')) {
+    return "Your IEP services and accommodations are detailed in your uploaded documents. You currently have " + 
+           context.documentsCount + " documents on file. Please review your IEP document for specific services, " +
+           "accommodations, and modifications provided to support your child's learning.";
+  }
+  
+  if (lowerPrompt.includes('meeting') || lowerPrompt.includes('schedule')) {
+    return `You have ${context.upcomingEvents} upcoming events scheduled. Regular IEP meetings typically occur annually, ` +
+           "but you can request additional meetings if needed. Check your Events section for specific meeting dates and details.";
+  }
+  
+  if (lowerPrompt.includes('team') || lowerPrompt.includes('member')) {
+    return "Your IEP team typically includes general education teachers, special education teachers, school psychologist, " +
+           "and related service providers. The specific team members are listed in your IEP document. You can also " +
+           "communicate with team members through the Messages section.";
+  }
+  
+  if (lowerPrompt.includes('document') || lowerPrompt.includes('file')) {
+    return `You have ${context.documentsCount} documents uploaded to your account. These may include IEP documents, ` +
+           "assessments, progress reports, and meeting notes. You can view and manage these in the Documents section.";
+  }
+  
+  // Default response
+  return `Based on your current IEP data: You have ${context.goals.length} goals (${context.goals.filter((g: any) => g.status === "Completed").length} completed), ` +
+         `${context.documentsCount} documents, and ${context.upcomingEvents} upcoming events. ` +
+         "For specific questions about services, accommodations, or team members, please refer to your IEP document or contact your school team.";
 }
