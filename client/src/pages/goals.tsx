@@ -139,7 +139,7 @@ export default function Goals() {
     form.reset({
       title: goal.title,
       description: goal.description,
-      status: goal.status,
+      status: goal.status as "Not Started" | "In Progress" | "Completed",
       progress: goal.progress || 0,
       dueDate: new Date(goal.dueDate),
     });
