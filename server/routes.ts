@@ -143,7 +143,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Stripe subscription route
   app.post('/api/create-subscription', requireAuth, async (req, res) => {
     const user = req.user as any;
-    const { priceId } = req.body;
+    const { priceId, planType } = req.body;
 
     try {
       if (user.stripeSubscriptionId) {
@@ -155,6 +155,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return;
       }
 
+      // Determine price ID based on plan type or use provided priceId
+      let finalPriceId = priceId;
+      if (planType === "hero" && !priceId) {
+        finalPriceId = process.env.STRIPE_PRICE_ID;
+        if (!finalPriceId) {
+          throw new Error("Hero Plan price ID not configured. Please contact support.");
+        }
+      }
+
+      if (!finalPriceId) {
+        throw new Error("Price ID is required");
+      }
+
       let customerId = user.stripeCustomerId;
       if (!customerId) {
         const customer = await stripe.customers.create({
@@ -162,11 +175,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           name: user.username,
         });
         customerId = customer.id;
+        await storage.updateUserStripeInfo(user.id, customerId, null);
       }
 
       const subscription = await stripe.subscriptions.create({
         customer: customerId,
-        items: [{ price: priceId }],
+        items: [{ price: finalPriceId }],
         payment_behavior: 'default_incomplete',
         expand: ['latest_invoice.payment_intent'],
       });
@@ -178,6 +192,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         clientSecret: (subscription.latest_invoice as any)?.payment_intent?.client_secret,
       });
     } catch (error: any) {
+      console.error("Subscription creation error:", error);
       res.status(400).json({ error: { message: error.message } });
     }
   });
