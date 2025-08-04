@@ -31,6 +31,7 @@ import {
 import { PlanStatusBadge } from "@/components/PlanStatusBadge";
 import Navbar from "@/components/layout/navbar";
 import MemoryQA from "@/components/MemoryQA";
+import { IEPTools } from "@/components/IEPTools";
 
 export default function PremiumDashboard() {
   const { user } = useAuth();
@@ -179,6 +180,25 @@ export default function PremiumDashboard() {
             </CardContent>
           </Card>
         </div>
+
+        {/* IEP AI Tools Section for Hero Plan */}
+        {isHeroPlan && (
+          <Card className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 backdrop-blur-lg border-purple-400/30 mb-8">
+            <CardHeader>
+              <CardTitle className="text-white flex items-center gap-2">
+                <Brain className="w-6 h-6 text-purple-400" />
+                AI-Powered IEP Tools
+                <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs">
+                  HERO EXCLUSIVE
+                </Badge>
+              </CardTitle>
+              <p className="text-purple-200">Professional IEP management tools powered by artificial intelligence</p>
+            </CardHeader>
+            <CardContent>
+              <IEPTools isHeroPlan={isHeroPlan} userId={user?.id || ''} />
+            </CardContent>
+          </Card>
+        )}
 
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
