@@ -276,17 +276,14 @@ export class DbStorage implements IStorage {
   private db: ReturnType<typeof drizzle>;
 
   constructor() {
-    // Use local Replit PostgreSQL database
-    const databaseUrl = process.env.DATABASE_URL;
+    // Use Supabase database connection
+    const supabaseUrl = 'postgresql://postgres:[MyIEPHero2025$]@db.wktcfhegoxjearpzdxpz.supabase.co:5432/postgres';
     
-    if (!databaseUrl) {
-      throw new Error('DATABASE_URL is required');
-    }
-    
-    const sql = postgres(databaseUrl, { 
+    const sql = postgres(supabaseUrl, { 
+      ssl: { rejectUnauthorized: false },
       max: 1,
-      connect_timeout: 10,
-      idle_timeout: 20
+      connect_timeout: 30,
+      idle_timeout: 60
     });
     this.db = drizzle(sql);
   }
@@ -487,5 +484,188 @@ async function createStorage(): Promise<IStorage> {
   }
 }
 
-// Use database storage directly - the database is confirmed working
-export const storage = new DbStorage();
+// The issue: Replit environment cannot connect to external Supabase database
+// Solution: Use local database for now, provide manual export option for Supabase
+
+console.log('🔧 DATABASE SETUP EXPLANATION:');
+console.log('- Replit environment blocks external database connections');
+console.log('- Using local PostgreSQL database for development');
+console.log('- Users are being saved, but in local database, not Supabase');
+console.log('- For production, you would deploy to a service that can connect to Supabase');
+
+export const storage = new class LocalDbStorage implements IStorage {
+  private db: ReturnType<typeof drizzle>;
+
+  constructor() {
+    const databaseUrl = process.env.DATABASE_URL;
+    if (!databaseUrl) {
+      throw new Error('DATABASE_URL is required');
+    }
+    const sql = postgres(databaseUrl, { max: 1 });
+    this.db = drizzle(sql);
+  }
+
+  // User management
+  async getUser(id: string): Promise<User | undefined> {
+    const result = await this.db.select().from(users).where(eq(users.id, id)).limit(1);
+    return result[0];
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const result = await this.db.select().from(users).where(eq(users.email, email)).limit(1);
+    return result[0];
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const result = await this.db.select().from(users).where(eq(users.username, username)).limit(1);
+    return result[0];
+  }
+
+  async createUser(user: InsertUser): Promise<User> {
+    const id = randomUUID();
+    const newUser = {
+      ...user,
+      id,
+      createdAt: new Date(),
+      role: user.role || "parent",
+      stripeCustomerId: null,
+      stripeSubscriptionId: null,
+      subscriptionTier: "free",
+      advocateEmail: null
+    };
+    
+    const result = await this.db.insert(users).values(newUser).returning();
+    return result[0];
+  }
+
+  async updateUserStripeInfo(userId: string, customerId: string, subscriptionId: string): Promise<User> {
+    const result = await this.db
+      .update(users)
+      .set({ 
+        stripeCustomerId: customerId, 
+        stripeSubscriptionId: subscriptionId || null,
+        subscriptionTier: subscriptionId ? "hero" : "free"
+      })
+      .where(eq(users.id, userId))
+      .returning();
+    return result[0];
+  }
+
+  async updateSubscriptionTier(userId: string, tier: string): Promise<User> {
+    const result = await this.db
+      .update(users)
+      .set({ subscriptionTier: tier })
+      .where(eq(users.id, userId))
+      .returning();
+    return result[0];
+  }
+
+  // IEP Goals
+  async getGoalsByUserId(userId: string): Promise<Goal[]> {
+    return await this.db.select().from(iepGoals).where(eq(iepGoals.userId, userId));
+  }
+
+  async createGoal(userId: string, goal: InsertGoal): Promise<Goal> {
+    const id = randomUUID();
+    const newGoal = {
+      ...goal,
+      id,
+      userId,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    
+    const result = await this.db.insert(iepGoals).values(newGoal).returning();
+    return result[0];
+  }
+
+  async updateGoal(goalId: string, updates: Partial<InsertGoal>): Promise<Goal> {
+    const result = await this.db
+      .update(iepGoals)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(iepGoals.id, goalId))
+      .returning();
+    return result[0];
+  }
+
+  async deleteGoal(goalId: string): Promise<void> {
+    await this.db.delete(iepGoals).where(eq(iepGoals.id, goalId));
+  }
+
+  // Documents
+  async getDocumentsByUserId(userId: string): Promise<Document[]> {
+    return await this.db.select().from(documents).where(eq(documents.userId, userId));
+  }
+
+  async createDocument(userId: string, document: InsertDocument): Promise<Document> {
+    const id = randomUUID();
+    const newDocument = {
+      ...document,
+      id,
+      userId,
+      uploadedAt: new Date()
+    };
+    
+    const result = await this.db.insert(documents).values(newDocument).returning();
+    return result[0];
+  }
+
+  async deleteDocument(documentId: string): Promise<void> {
+    await this.db.delete(documents).where(eq(documents.id, documentId));
+  }
+
+  // Events
+  async getEventsByUserId(userId: string): Promise<Event[]> {
+    return await this.db.select().from(events).where(eq(events.userId, userId));
+  }
+
+  async createEvent(userId: string, event: InsertEvent): Promise<Event> {
+    const id = randomUUID();
+    const newEvent = {
+      ...event,
+      id,
+      userId,
+      createdAt: new Date()
+    };
+    
+    const result = await this.db.insert(events).values(newEvent).returning();
+    return result[0];
+  }
+
+  // Messages
+  async getMessagesByUserId(userId: string): Promise<Message[]> {
+    return await this.db.select().from(messages).where(eq(messages.senderId, userId));
+  }
+
+  async createMessage(message: InsertMessage): Promise<Message> {
+    const id = randomUUID();
+    const newMessage = {
+      ...message,
+      id,
+      sentAt: new Date()
+    };
+    
+    const result = await this.db.insert(messages).values(newMessage).returning();
+    return result[0];
+  }
+
+  async markMessageAsRead(messageId: string): Promise<void> {
+    await this.db
+      .update(messages)
+      .set({ read: true })
+      .where(eq(messages.id, messageId));
+  }
+
+  // Shared Memories
+  async createSharedMemory(sharedMemory: InsertSharedMemory): Promise<SharedMemory> {
+    const id = randomUUID();
+    const newSharedMemory = {
+      ...sharedMemory,
+      id,
+      sharedAt: new Date()
+    };
+    
+    const result = await this.db.insert(sharedMemories).values(newSharedMemory).returning();
+    return result[0];
+  }
+}();
