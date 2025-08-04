@@ -19,13 +19,13 @@ import { OfflineIndicator } from "@/components/OfflineIndicator";
 function AuthGuard({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
 
-  console.log('🔍 AuthGuard check:', { user, isLoading });
+  console.log('🔍 AuthGuard check:', { user: user?.email, isLoading });
 
   if (isLoading) {
     console.log('⏳ AuthGuard: Still loading...');
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
+        <div className="animate-spin w-8 h-8 border-4 border-blue-400 border-t-transparent rounded-full" />
       </div>
     );
   }
@@ -35,7 +35,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
     return <Redirect to="/login" />;
   }
 
-  console.log('✅ AuthGuard: User authenticated, showing dashboard');
+  console.log('✅ AuthGuard: User authenticated, showing content');
   return <>{children}</>;
 }
 

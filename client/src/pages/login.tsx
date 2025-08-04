@@ -37,9 +37,9 @@ export default function Login() {
         description: "Successfully signed in to your account",
       });
       
-      // Force immediate redirect - no delay needed now that auth context is shared
+      // Force immediate redirect using window.location for reliable navigation
       console.log('🔄 Redirecting to dashboard...');
-      setLocation("/dashboard");
+      window.location.href = "/dashboard";
       
     } catch (error: any) {
       console.error('❌ Login failed:', error);
