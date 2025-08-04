@@ -48,9 +48,10 @@ export function useAuthState() {
       const result = await authApi.login({ email, password });
       console.log('✅ Login API successful:', result);
       
-      // Ensure user state is set immediately
+      // Ensure user state is set immediately and force re-render
       const userData = result.user;
       setUser(userData);
+      setIsLoading(false); // Ensure loading state is cleared
       console.log('✅ User state updated:', userData);
       
       return result;
