@@ -10,6 +10,9 @@ import Dashboard from "@/pages/dashboard";
 import Documents from "@/pages/documents";
 import Goals from "@/pages/goals";
 import Subscribe from "@/pages/subscribe";
+import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
+import { MobileNavigation } from "@/components/MobileNavigation";
+import { OfflineIndicator } from "@/components/OfflineIndicator";
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuthState();
@@ -68,8 +71,11 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <AuthContext.Provider value={authState}>
         <TooltipProvider>
-          <Toaster />
+          <OfflineIndicator />
+          <PWAInstallPrompt />
           <Router />
+          <MobileNavigation />
+          <Toaster />
         </TooltipProvider>
       </AuthContext.Provider>
     </QueryClientProvider>
