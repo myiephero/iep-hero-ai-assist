@@ -14,6 +14,7 @@ import path from "path";
 import fs from "fs";
 import { Resend } from "resend";
 import { randomUUID } from "crypto";
+import { analyzeIEPDocument, generateIEPGoals } from "./ai-document-analyzer";
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
@@ -395,6 +396,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(document);
     } catch (error: any) {
       res.status(400).json({ message: error.message });
+    }
+  });
+
+  // AI Document Analysis route
+  app.post("/api/documents/:id/analyze", requireAuth, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const user = req.user as any;
+      
+      // Get document details
+      const documents = await storage.getDocumentsByUserId(user.id);
+      const document = documents.find((doc: any) => doc.id === id);
+      
+      if (!document) {
+        return res.status(404).json({ message: 'Document not found' });
+      }
+      
+      // Construct full file path
+      const filePath = `uploads/${document.filename}`;
+      
+      // Perform AI analysis
+      const analysis = await analyzeIEPDocument(filePath, document.type);
+      
+      res.json({
+        documentId: id,
+        documentName: document.originalName,
+        analysis
+      });
+      
+    } catch (error: any) {
+      console.error('Document analysis error:', error);
+      res.status(500).json({ 
+        message: 'Analysis failed', 
+        error: error.message 
+      });
+    }
+  });
+
+  // AI Goal Generation route
+  app.post("/api/generate-goals", requireAuth, async (req, res) => {
+    try {
+      const { studentInfo, needs } = req.body;
+      
+      if (!studentInfo || !Array.isArray(needs)) {
+        return res.status(400).json({ 
+          message: 'Missing required fields: studentInfo and needs array' 
+        });
+      }
+      
+      const goals = await generateIEPGoals(studentInfo, needs);
+      
+      res.json({ goals });
+      
+    } catch (error: any) {
+      console.error('Goal generation error:', error);
+      res.status(500).json({ 
+        message: 'Goal generation failed', 
+        error: error.message 
+      });
     }
   });
 
