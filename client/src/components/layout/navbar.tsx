@@ -13,14 +13,17 @@ const NavLinks = ({ mobile = false }: { mobile?: boolean }) => {
   
   const { user } = useAuth();
   
-  // Dynamic nav items based on user plan
+  // Dynamic nav items based on user plan - completely remove Subscribe for Hero users
   const navItems = [
     { href: "/dashboard", label: "Dashboard", icon: Sparkles },
     { href: "/goals", label: "Goals", icon: Target },
-    { href: "/documents", label: "Documents", icon: FileText },
-    // Only show Subscribe for free plan users
-    ...(user?.planStatus === 'free' ? [{ href: "/subscribe", label: "Subscribe", icon: CreditCard }] : [])
+    { href: "/documents", label: "Documents", icon: FileText }
   ];
+  
+  // Only add Subscribe for free plan users
+  if (user?.planStatus === 'free') {
+    navItems.push({ href: "/subscribe", label: "Subscribe", icon: CreditCard });
+  }
 
   const linkClass = mobile 
     ? "flex items-center gap-3 py-3 px-4 text-white/90 hover:text-white hover:bg-white/10 rounded-lg transition-all duration-200"
