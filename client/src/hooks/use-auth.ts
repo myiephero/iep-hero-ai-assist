@@ -49,22 +49,17 @@ export function useAuthState() {
 
   const login = async (email: string, password: string) => {
     try {
+      console.log('🔄 Starting login API call...');
       const result = await authApi.login({ email, password });
       console.log('✅ Login API successful:', result);
       
-      // Ensure user state is set immediately and force re-render
-      const userData = result.user;
+      // Ensure user state is set immediately
+      const userData = result?.user;
       if (userData) {
         userData.planStatus = userData.subscriptionTier || userData.planStatus || 'free';
+        setUser(userData);
+        console.log('✅ User state updated after login:', userData);
       }
-      setUser(userData);
-      setIsLoading(false); // Ensure loading state is cleared
-      console.log('✅ User state updated:', userData);
-      
-      // After login, immediately refresh user data to get latest from database
-      setTimeout(() => {
-        checkAuth();
-      }, 100);
       
       return result;
     } catch (error: any) {
