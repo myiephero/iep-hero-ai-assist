@@ -14,7 +14,7 @@ import path from "path";
 import fs from "fs";
 import { Resend } from "resend";
 import { randomUUID } from "crypto";
-import { analyzeIEPDocument, generateIEPGoals } from "./ai-document-analyzer";
+import { analyzeIEPDocument, generateIEPGoals, generateIEPGoalsFromArea } from "./ai-document-analyzer";
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
@@ -437,11 +437,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // AI Goal Generation route
   app.post("/api/generate-goals", requireAuth, async (req, res) => {
     try {
-      const { studentInfo, needs } = req.body;
+      const { area, studentInfo, needs } = req.body;
+      
+      // Support both simple area-based generation and detailed studentInfo/needs
+      if (area && typeof area === 'string') {
+        // Simple area-based generation for parent dashboard
+        const goals = await generateIEPGoalsFromArea(area);
+        return res.json({ goals });
+      }
       
       if (!studentInfo || !Array.isArray(needs)) {
         return res.status(400).json({ 
-          message: 'Missing required fields: studentInfo and needs array' 
+          message: 'Missing required fields: either "area" or "studentInfo and needs array"' 
         });
       }
       

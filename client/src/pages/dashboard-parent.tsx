@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/hooks/use-auth';
+import IEPGoalGenerator from '@/components/IEPGoalGenerator';
 
 const parentTools = [
   {
@@ -122,40 +123,45 @@ export default function ParentDashboard() {
 
         {/* Tool Modal */}
         <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-          <DialogContent className="bg-white border border-slate-200">
+          <DialogContent className="bg-white border border-slate-200 max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="text-xl font-semibold text-slate-900">{selectedTool}</DialogTitle>
             </DialogHeader>
-            <div className="space-y-4">
-              <p className="text-sm text-slate-600">
-                {selectedTool === "Ask AI About My Docs" 
-                  ? "Upload a document to ask questions about it" 
-                  : "This tool will help you with your child's IEP management."}
-              </p>
-              {selectedTool === "Ask AI About My Docs" && (
-                <Input 
-                  type="file" 
-                  accept=".pdf,.doc,.docx"
-                  onChange={(e) => setUpload(e.target.files?.[0] || null)}
-                  className="border-slate-300"
-                />
-              )}
-              <div className="flex gap-2">
-                <Button 
-                  onClick={handleSubmit}
-                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
-                >
-                  {selectedTool === "Ask AI About My Docs" ? "Upload & Ask" : "Start Tool"}
-                </Button>
-                <Button 
-                  variant="outline" 
-                  onClick={() => setModalOpen(false)}
-                  className="border-slate-300 text-slate-700 hover:bg-slate-50"
-                >
-                  Cancel
-                </Button>
+            
+            {selectedTool === "IEP Goal Generator" ? (
+              <IEPGoalGenerator />
+            ) : (
+              <div className="space-y-4">
+                <p className="text-sm text-slate-600">
+                  {selectedTool === "Ask AI About My Docs" 
+                    ? "Upload a document to ask questions about it" 
+                    : "This tool will help you with your child's IEP management."}
+                </p>
+                {selectedTool === "Ask AI About My Docs" && (
+                  <Input 
+                    type="file" 
+                    accept=".pdf,.doc,.docx"
+                    onChange={(e) => setUpload(e.target.files?.[0] || null)}
+                    className="border-slate-300"
+                  />
+                )}
+                <div className="flex gap-2">
+                  <Button 
+                    onClick={handleSubmit}
+                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    {selectedTool === "Ask AI About My Docs" ? "Upload & Ask" : "Start Tool"}
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setModalOpen(false)}
+                    className="border-slate-300 text-slate-700 hover:bg-slate-50"
+                  >
+                    Cancel
+                  </Button>
+                </div>
               </div>
-            </div>
+            )}
           </DialogContent>
         </Dialog>
       </div>
