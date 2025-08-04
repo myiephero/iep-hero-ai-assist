@@ -118,7 +118,7 @@ OVERALL ASSESSMENT: ⭐⭐⭐⭐☆ (4/5 - STRONG IEP)
 
 KEY STRENGTHS IDENTIFIED:
 ✅ Goals are specific and measurable
-✅ Present levels of performance well documented
+✅ Present levels of performance well documented  
 ✅ Appropriate accommodations listed
 ✅ Services align with identified needs
 
@@ -245,7 +245,7 @@ NEXT REVIEW: 4 weeks`
           >
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
-                <div className={`w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center`}>
+                <div className={`w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center text-white`}>
                   {tool.icon}
                 </div>
                 {tool.premium && (
@@ -257,16 +257,16 @@ NEXT REVIEW: 4 weeks`
               <CardTitle className="text-white text-lg">{tool.title}</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-blue-200 text-sm mb-4">{tool.description}</p>
+              <p className="text-white/80 text-sm mb-4">{tool.description}</p>
               <Button 
                 variant="ghost" 
-                className="w-full text-blue-400 hover:text-blue-300 hover:bg-white/10"
+                className="w-full text-white hover:text-white hover:bg-white/20 border border-white/20"
                 onClick={() => handleGenerateContent(tool.id)}
                 disabled={isGenerating}
               >
                 {isGenerating ? (
                   <>
-                    <div className="animate-spin w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full mr-2" />
+                    <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2" />
                     Generating...
                   </>
                 ) : (
@@ -293,7 +293,7 @@ NEXT REVIEW: 4 weeks`
               <Button 
                 variant="ghost" 
                 onClick={() => setActiveTool(null)}
-                className="text-white hover:text-gray-300"
+                className="text-white hover:text-white/80"
               >
                 ×
               </Button>
@@ -318,8 +318,8 @@ NEXT REVIEW: 4 weeks`
               </div>
             ) : (
               <div className="text-center py-8">
-                <BookOpen className="w-12 h-12 text-blue-400 mx-auto mb-4" />
-                <p className="text-white">Click "Use Tool" to generate content</p>
+                <BookOpen className="w-12 h-12 text-white mx-auto mb-4" />
+                <p className="text-white text-lg">Click "Use Tool" to generate content</p>
               </div>
             )}
           </CardContent>
