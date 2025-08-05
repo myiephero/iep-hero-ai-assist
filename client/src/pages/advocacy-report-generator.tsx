@@ -160,22 +160,29 @@ export default function AdvocacyReportGenerator() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-6">
-      <div className="max-w-2xl mx-auto">
-        <div className="flex items-center gap-4 mb-6">
-          <Link href="/dashboard-advocate">
-            <Button variant="ghost" size="sm" className="gap-2">
-              <ArrowLeft className="h-4 w-4" />
+    <div className="min-h-screen bg-gray-50/50">
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* Clean Header */}
+        <div className="mb-8">
+          <Link href="/dashboard-premium">
+            <Button variant="ghost" size="sm" className="mb-6 text-gray-600 hover:text-gray-900 hover:bg-white">
+              <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Dashboard
             </Button>
           </Link>
-          <div>
-            <h1 className="text-2xl font-bold text-slate-900">Advocacy Report Generator</h1>
-            <p className="text-slate-600">Create professional advocacy reports for IEP students</p>
+          
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center">
+              <FileText className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-semibold text-gray-900">One-Click Advocacy Report</h1>
+              <p className="text-gray-600">Generate comprehensive advocacy reports with legal framework</p>
+            </div>
           </div>
         </div>
 
-        <Card>
+        <Card className="bg-white border-0 shadow-sm rounded-xl">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <FileText className="h-5 w-5 text-blue-600" />

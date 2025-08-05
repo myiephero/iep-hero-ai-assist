@@ -175,45 +175,48 @@ export default function IEPGoalGeneratorPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#f2f7fd] to-[#eaf0f8] py-8">
-      <div className="max-w-4xl mx-auto px-6">
-        {/* Header with Back Button */}
+    <div className="min-h-screen bg-gray-50/50">
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* Clean Header */}
         <div className="mb-8">
-          <Link href={user?.role === 'advocate' ? '/dashboard-advocate' : '/dashboard-parent'}>
-            <Button variant="ghost" className="mb-4 text-slate-600 hover:text-slate-900">
+          <Link href={user?.role === 'advocate' ? '/dashboard-premium' : '/dashboard-parent'}>
+            <Button variant="ghost" size="sm" className="mb-6 text-gray-600 hover:text-gray-900 hover:bg-white">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Dashboard
             </Button>
           </Link>
           
-          <h1 className="text-3xl font-bold mb-3 text-slate-900">IEP Goal Generator</h1>
-          <p className="text-lg text-slate-600">
-            {user?.role === 'advocate' 
-              ? "Describe the area your student needs support in and we'll generate SMART IEP goals."
-              : "Describe the area your child needs support in and we'll generate SMART IEP goals for you."}
-          </p>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+              <Plus className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-semibold text-gray-900">IEP Goal Generator</h1>
+              <p className="text-gray-600">Create Goals</p>
+            </div>
+          </div>
         </div>
 
-        {/* Goal Generation Form */}
-        <Card className="bg-white shadow-sm border border-slate-200 mb-8">
-          <CardContent className="p-6">
+        {/* Clean Input Form */}
+        <Card className="bg-white border-0 shadow-sm rounded-xl mb-8">
+          <CardContent className="p-8">
             <div className="space-y-6">
               {(user?.role === 'parent' || user?.role === 'advocate') && (
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                <div className="space-y-3">
+                  <label className="text-sm font-medium text-gray-700">
                     Select Student
                   </label>
                   {students.length === 0 ? (
-                    <div className="p-4 border-2 border-dashed border-gray-300 rounded-lg text-center">
-                      <User className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-                      <p className="text-gray-600 mb-2">
+                    <div className="p-6 border border-dashed border-gray-200 rounded-lg text-center bg-gray-50">
+                      <User className="mx-auto h-8 w-8 text-gray-400 mb-3" />
+                      <p className="text-gray-600 mb-3">
                         {user?.role === 'advocate' 
                           ? "No students assigned to you yet." 
                           : "No students found"}
                       </p>
                       {user?.role === 'parent' && (
                         <Link href="/my-students">
-                          <Button variant="outline" size="sm">
+                          <Button variant="outline" size="sm" className="bg-white">
                             Create Student Profile
                           </Button>
                         </Link>
@@ -221,7 +224,7 @@ export default function IEPGoalGeneratorPage() {
                     </div>
                   ) : (
                     <Select value={selectedStudentId} onValueChange={setSelectedStudentId}>
-                      <SelectTrigger>
+                      <SelectTrigger className="h-12 border-gray-200 focus:border-blue-400 focus:ring-blue-100">
                         <SelectValue placeholder="Choose a student..." />
                       </SelectTrigger>
                       <SelectContent>
@@ -237,8 +240,8 @@ export default function IEPGoalGeneratorPage() {
                 </div>
               )}
 
-              <div>
-                <label htmlFor="area" className="block text-sm font-medium text-slate-700 mb-2">
+              <div className="space-y-3">
+                <label htmlFor="area" className="text-sm font-medium text-gray-700">
                   Area of Need
                 </label>
                 <Textarea
@@ -246,7 +249,7 @@ export default function IEPGoalGeneratorPage() {
                   value={area}
                   onChange={(e) => setArea(e.target.value)}
                   placeholder="e.g., reading comprehension, social skills, fine motor development, math problem solving, communication skills, behavior management"
-                  className="min-h-[120px] border-slate-300 focus:border-blue-500 focus:ring-blue-500"
+                  className="min-h-[120px] border-gray-200 focus:border-blue-400 focus:ring-blue-100 rounded-lg resize-none"
                   rows={5}
                 />
               </div>
@@ -254,8 +257,7 @@ export default function IEPGoalGeneratorPage() {
               <Button 
                 disabled={loading || !area.trim()} 
                 onClick={generateGoals}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 text-lg"
-                size="lg"
+                className="w-full bg-blue-500 hover:bg-blue-600 text-white h-12 font-medium rounded-lg transition-colors"
               >
                 {loading ? 'Generating SMART Goals...' : 'Generate IEP Goals'}
               </Button>
