@@ -1,0 +1,59 @@
+Awesome — here’s your Template Generator prompt set for the most common IEP-related letters. These are clean, direct, and optimized for parent use with a GPT backend.
+
+⸻
+
+📥 PROMPT LIBRARY: Template Generator (Smart Letters)
+
+Each letter can be pre-filled in a dropdown menu and sent to the AI with the corresponding prompt structure.
+
+⸻
+
+✉️ 1. Request for IEP Evaluation
+
+Generate a formal letter requesting a comprehensive special education evaluation for my child [Student Name] at [School Name]. Include references to IDEA, the parent’s right to request an evaluation, and the need to address concerns about [brief concern, e.g., reading delays, behavior issues]. Use a professional but assertive tone.
+
+
+⸻
+
+✉️ 2. Request for Functional Behavior Assessment (FBA)
+
+Create a letter requesting a Functional Behavior Assessment (FBA) for my child [Student Name] at [School Name]. State that the child is exhibiting [describe behaviors, e.g., aggressive outbursts, refusal to complete work] and that a formal behavior assessment is necessary to create a Behavior Intervention Plan. Cite IDEA provisions and request a written response within 10 school days.
+
+
+⸻
+
+✉️ 3. Request for Progress Reports or Data
+
+Write a professional letter requesting all available progress monitoring data and service records for my child [Student Name] related to their IEP goals. Ask for updates including frequency, method of data collection, and a timeline of services provided. Reference that this information is part of the parent’s rights under IDEA.
+
+
+⸻
+
+✉️ 4. Dispute or Complaint Letter
+
+Create a formal letter expressing concern about the school’s failure to [describe issue, e.g., provide speech services as outlined in the IEP]. State that this is a potential violation of the IEP and request a resolution meeting to address the issue. Use clear, factual language and request a written response.
+
+
+⸻
+
+✉️ 5. Prior Written Notice (PWN) Response
+
+Generate a parent response to a Prior Written Notice from [School Name]. Acknowledge receipt, and clearly state that I disagree with the proposed action to [describe action, e.g., deny requested service]. Request a meeting to discuss alternatives and formally note that I do not consent to this change at this time.
+
+
+⸻
+
+📦 How To Use in Replit
+
+Each prompt should:
+	•	Be mapped to a dropdown option
+	•	Allow insertion of [Student Name], [School Name], and optional [concern/issue] via text fields
+	•	Generate output in a clean letter format
+	•	Offer options:
+	•	Copy text
+	•	Download as PDF
+	•	Save to Document Vault (optional)
+
+⸻
+
+Let me know when you’re ready to do the same thing for the Meeting Prep Wizard or Progress Note Logger — both are easy wins to finish off the Hero stack.
