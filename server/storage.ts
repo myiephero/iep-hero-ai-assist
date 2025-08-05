@@ -291,7 +291,7 @@ export class MemStorage implements IStorage {
     return Array.from(this.documents.values()).filter(doc => doc.userId === userId);
   }
 
-  async createDocument(documentData: any): Promise<Document> {
+  async createDocument(documentData: InsertDocument): Promise<Document> {
     const id = randomUUID();
     const document: Document = {
       ...documentData,
