@@ -31,6 +31,8 @@ import AdvocacyReportGenerator from "@/pages/advocacy-report-generator";
 import Subscribe from "@/pages/subscribe";
 import Pricing from "@/pages/pricing";
 import Chat from "@/pages/chat";
+import MyStudents from "@/pages/my-students";
+import MyParents from "@/pages/my-parents";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 import { MobileNavigation } from "@/components/MobileNavigation";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
@@ -191,6 +193,16 @@ function Router() {
       <Route path="/chat">
         <AuthGuard>
           <Chat />
+        </AuthGuard>
+      </Route>
+      <Route path="/my-students">
+        <AuthGuard>
+          <MyStudents />
+        </AuthGuard>
+      </Route>
+      <Route path="/my-parents">
+        <AuthGuard>
+          <MyParents />
         </AuthGuard>
       </Route>
       <Route path="/">

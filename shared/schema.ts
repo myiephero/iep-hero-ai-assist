@@ -22,7 +22,7 @@ export const users = pgTable("users", {
 export const iepGoals = pgTable("iep_goals", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").notNull().references(() => users.id),
-  studentId: varchar("student_id"), // Optional student identifier for multi-student households
+  studentId: varchar("student_id").references(() => students.id), // Reference to specific student
   title: text("title").notNull(),
   description: text("description").notNull(),
   progress: integer("progress").default(0), // percentage 0-100
@@ -36,6 +36,7 @@ export const iepGoals = pgTable("iep_goals", {
 export const documents = pgTable("documents", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").notNull().references(() => users.id),
+  studentId: varchar("student_id").references(() => students.id), // Link documents to specific students
   filename: text("filename").notNull(),
   originalName: text("original_name").notNull(),
   displayName: text("display_name"), // User-editable display name
@@ -98,6 +99,42 @@ export const communicationLogs = pgTable("communication_logs", {
   responseReceived: boolean("response_received").default(false),
   dateResponse: text("date_response"),
   attachmentUrl: text("attachment_url"),
+  createdAt: timestamp("created_at").default(sql`now()`),
+});
+
+// Student profiles for multi-child families
+export const students = pgTable("students", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  parentId: varchar("parent_id").notNull().references(() => users.id),
+  advocateId: varchar("advocate_id").references(() => users.id), // Assigned advocate
+  firstName: text("first_name").notNull(),
+  lastName: text("last_name"),
+  dateOfBirth: text("date_of_birth"),
+  gradeLevel: text("grade_level"),
+  schoolName: text("school_name"),
+  schoolDistrict: text("school_district"),
+  disabilities: text("disabilities").array(),
+  currentServices: text("current_services").array(),
+  iepStatus: text("iep_status").default("active"), // active, pending, expired
+  lastIepDate: timestamp("last_iep_date"),
+  nextIepDate: timestamp("next_iep_date"),
+  caseNotes: text("case_notes"),
+  createdAt: timestamp("created_at").default(sql`now()`),
+  updatedAt: timestamp("updated_at").default(sql`now()`),
+});
+
+// Advocate-Parent relationships
+export const advocateClients = pgTable("advocate_clients", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  advocateId: varchar("advocate_id").notNull().references(() => users.id),
+  parentId: varchar("parent_id").notNull().references(() => users.id),
+  status: text("status").notNull().default("active"), // active, inactive, pending
+  assignedDate: timestamp("assigned_date").default(sql`now()`),
+  caseType: text("case_type"), // initial_iep, annual_review, due_process, etc.
+  priority: text("priority").default("medium"), // low, medium, high, urgent
+  lastContact: timestamp("last_contact"),
+  nextMeeting: timestamp("next_meeting"),
+  notes: text("notes"),
   createdAt: timestamp("created_at").default(sql`now()`),
 });
 
@@ -181,11 +218,27 @@ export const insertAdvocateMatchSchema = createInsertSchema(advocateMatches).omi
   documentUrls: z.array(z.string()).optional(),
 });
 
+export const insertStudentSchema = createInsertSchema(students).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertAdvocateClientSchema = createInsertSchema(advocateClients).omit({
+  id: true,
+  createdAt: true,
+  assignedDate: true,
+});
+
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertGoal = z.infer<typeof insertGoalSchema>;
 export type Goal = typeof iepGoals.$inferSelect;
+export type Student = typeof students.$inferSelect;
+export type InsertStudent = z.infer<typeof insertStudentSchema>;
+export type AdvocateClient = typeof advocateClients.$inferSelect;
+export type InsertAdvocateClient = z.infer<typeof insertAdvocateClientSchema>;
 export type InsertDocument = z.infer<typeof insertDocumentSchema>;
 export type Document = typeof documents.$inferSelect;
 export type InsertEvent = z.infer<typeof insertEventSchema>;
