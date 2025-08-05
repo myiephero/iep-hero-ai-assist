@@ -82,6 +82,19 @@ export const progressNotes = pgTable("progress_notes", {
   createdAt: timestamp("created_at").default(sql`now()`),
 });
 
+export const communicationLogs = pgTable("communication_logs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  dateSent: text("date_sent").notNull(),
+  communicationType: text("communication_type").notNull(), // email, in-person, phone, written
+  subject: text("subject").notNull(),
+  summary: text("summary").notNull(),
+  responseReceived: boolean("response_received").default(false),
+  dateResponse: text("date_response"),
+  attachmentUrl: text("attachment_url"),
+  createdAt: timestamp("created_at").default(sql`now()`),
+});
+
 // Schemas
 export const insertUserSchema = createInsertSchema(users).pick({
   email: true,
@@ -132,6 +145,12 @@ export const insertProgressNoteSchema = createInsertSchema(progressNotes).omit({
   createdAt: true,
 });
 
+export const insertCommunicationLogSchema = createInsertSchema(communicationLogs).omit({
+  id: true,
+  userId: true,
+  createdAt: true,
+});
+
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -147,3 +166,5 @@ export type InsertSharedMemory = z.infer<typeof insertSharedMemorySchema>;
 export type SharedMemory = typeof sharedMemories.$inferSelect;
 export type InsertProgressNote = z.infer<typeof insertProgressNoteSchema>;
 export type ProgressNote = typeof progressNotes.$inferSelect;
+export type InsertCommunicationLog = z.infer<typeof insertCommunicationLogSchema>;
+export type CommunicationLog = typeof communicationLogs.$inferSelect;

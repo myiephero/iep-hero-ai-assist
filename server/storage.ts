@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type Goal, type InsertGoal, type Document, type InsertDocument, type Event, type InsertEvent, type Message, type InsertMessage, type SharedMemory, type InsertSharedMemory, type ProgressNote, type InsertProgressNote, users, iepGoals, documents, events, messages, sharedMemories, progressNotes } from "@shared/schema";
+import { type User, type InsertUser, type Goal, type InsertGoal, type Document, type InsertDocument, type Event, type InsertEvent, type Message, type InsertMessage, type SharedMemory, type InsertSharedMemory, type ProgressNote, type InsertProgressNote, type CommunicationLog, type InsertCommunicationLog, users, iepGoals, documents, events, messages, sharedMemories, progressNotes, communicationLogs } from "@shared/schema";
 import { randomUUID } from "crypto";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
@@ -42,6 +42,10 @@ export interface IStorage {
   // Progress Notes
   getProgressNotesByUserId(userId: string): Promise<ProgressNote[]>;
   createProgressNote(userId: string, note: InsertProgressNote): Promise<ProgressNote>;
+  
+  // Communication Logs
+  getCommunicationLogsByUserId(userId: string): Promise<CommunicationLog[]>;
+  createCommunicationLog(userId: string, log: InsertCommunicationLog): Promise<CommunicationLog>;
 }
 
 export class MemStorage implements IStorage {
@@ -52,6 +56,7 @@ export class MemStorage implements IStorage {
   private messages: Map<string, Message>;
   private sharedMemories: Map<string, SharedMemory>;
   private progressNotes: Map<string, ProgressNote>;
+  private communicationLogs: Map<string, CommunicationLog>;
 
   constructor() {
     this.users = new Map();
@@ -61,6 +66,7 @@ export class MemStorage implements IStorage {
     this.messages = new Map();
     this.sharedMemories = new Map();
     this.progressNotes = new Map();
+    this.communicationLogs = new Map();
     
     // Add sample data for development
     this.initializeSampleData();
@@ -333,6 +339,22 @@ export class MemStorage implements IStorage {
     };
     this.progressNotes.set(id, newNote);
     return newNote;
+  }
+
+  async getCommunicationLogsByUserId(userId: string): Promise<CommunicationLog[]> {
+    return Array.from(this.communicationLogs.values()).filter(log => log.userId === userId);
+  }
+
+  async createCommunicationLog(userId: string, log: InsertCommunicationLog): Promise<CommunicationLog> {
+    const id = randomUUID();
+    const newLog: CommunicationLog = {
+      id,
+      userId,
+      ...log,
+      createdAt: new Date(),
+    };
+    this.communicationLogs.set(id, newLog);
+    return newLog;
   }
 }
 
@@ -749,6 +771,24 @@ export const storage = new class LocalDbStorage implements IStorage {
     };
     
     const result = await this.db.insert(progressNotes).values(newNote).returning();
+    return result[0];
+  }
+
+  // Communication Logs
+  async getCommunicationLogsByUserId(userId: string): Promise<CommunicationLog[]> {
+    return await this.db.select().from(communicationLogs).where(eq(communicationLogs.userId, userId));
+  }
+
+  async createCommunicationLog(userId: string, log: InsertCommunicationLog): Promise<CommunicationLog> {
+    const id = randomUUID();
+    const newLog = {
+      ...log,
+      id,
+      userId,
+      createdAt: new Date()
+    };
+    
+    const result = await this.db.insert(communicationLogs).values(newLog).returning();
     return result[0];
   }
 

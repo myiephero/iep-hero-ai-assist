@@ -96,7 +96,7 @@ export default function ParentDashboard() {
       return;
     }
     if (tool === "Communication Plan") {
-      setLocation("/tools/communication-plan");
+      setLocation("/tools/communication-tracker");
       return;
     }
     if (tool === "Know Your Rights") {
