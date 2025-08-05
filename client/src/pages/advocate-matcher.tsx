@@ -154,37 +154,59 @@ export default function AdvocateMatcher() {
             </Link>
           </div>
 
-          <Card className="text-center p-8">
-            <CardContent>
+          <Card className="max-w-2xl mx-auto">
+            <CardHeader className="text-center">
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <CheckCircle className="w-8 h-8 text-green-600" />
               </div>
-              <h2 className="text-2xl font-bold mb-2">Request Submitted Successfully!</h2>
-              <p className="text-gray-600 mb-6">
-                We're connecting you with an expert IEP advocate who matches your needs. 
-                You'll receive an email within 24 hours with:
-              </p>
-              <div className="text-left max-w-md mx-auto mb-6">
-                <ul className="space-y-2 text-sm text-gray-600">
+              <CardTitle className="text-2xl text-green-600">Request Submitted Successfully!</CardTitle>
+              <CardDescription>
+                Your advocate match request has been submitted and our team has been notified.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="text-center space-y-4">
+              <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+                <h3 className="font-semibold mb-2 text-green-800">Confirmation Details</h3>
+                <ul className="text-sm text-green-700 space-y-2 text-left">
                   <li className="flex items-center">
                     <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
-                    Your advocate's contact information
+                    Request submitted to our advocate matching system
                   </li>
                   <li className="flex items-center">
                     <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
-                    A Calendly link to schedule your first call
+                    Confirmation email sent to your inbox
                   </li>
                   <li className="flex items-center">
                     <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
-                    Preparation materials for your consultation
+                    Our team has been notified via Slack
+                  </li>
+                  <li className="flex items-center">
+                    <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
+                    Expert advocate will be assigned within 24 hours
                   </li>
                 </ul>
               </div>
-              <Link href="/dashboard-parent">
-                <Button className="bg-blue-600 hover:bg-blue-700">
-                  Return to Dashboard
+              
+              <div className="bg-blue-50 p-4 rounded-lg">
+                <h3 className="font-semibold mb-2">What happens next?</h3>
+                <ul className="text-sm text-gray-600 space-y-2">
+                  <li>📧 Check your email for detailed confirmation</li>
+                  <li>📞 Your advocate will contact you within 24 hours</li>
+                  <li>📋 Together you'll create an action plan for your child's IEP</li>
+                  <li>🤝 Get ongoing support throughout the entire process</li>
+                </ul>
+              </div>
+              
+              <div className="flex gap-3 justify-center">
+                <Link href="/dashboard-parent">
+                  <Button variant="outline">
+                    Back to Dashboard
+                  </Button>
+                </Link>
+                <Button onClick={() => window.location.reload()}>
+                  Submit Another Request
                 </Button>
-              </Link>
+              </div>
             </CardContent>
           </Card>
         </div>
