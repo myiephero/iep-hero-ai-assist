@@ -2,11 +2,10 @@ import { useState, useRef, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { useAuth } from '@/hooks/useAuth'
 import { useMessaging } from '@/hooks/useMessaging'
-import { Send, MessageCircle, User, Clock } from 'lucide-react'
+import { Send, MessageCircle, User } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import { formatDistanceToNow } from 'date-fns'
 
@@ -14,7 +13,6 @@ export function MessagingInterface() {
   const { user } = useAuth()
   const { toast } = useToast()
   const [messageInput, setMessageInput] = useState('')
-  const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   
   const {
@@ -22,11 +20,9 @@ export function MessagingInterface() {
     messages,
     loading,
     sending,
-    typingUsers,
-    activeConversation,
-    setActiveConversation,
-    sendMessage,
-    updateTypingStatus
+    activeConversationId,
+    setActiveConversationId,
+    sendMessage
   } = useMessaging()
 
   // Auto scroll to bottom when new messages arrive
@@ -36,19 +32,11 @@ export function MessagingInterface() {
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!messageInput.trim() || !activeConversation) return
-
-    const activeConv = conversations.find(c => c.id === activeConversation)
-    if (!activeConv) return
-
-    const receiverId = activeConv.parent_id === user?.id ? activeConv.advocate_id : activeConv.parent_id
+    if (!messageInput.trim()) return
 
     try {
-      await sendMessage(receiverId, messageInput)
+      await sendMessage(messageInput)
       setMessageInput('')
-      
-      // Stop typing indicator
-      updateTypingStatus(activeConversation, false)
     } catch (error) {
       toast({
         title: "Failed to send message",
@@ -58,30 +46,7 @@ export function MessagingInterface() {
     }
   }
 
-  const handleTyping = (value: string) => {
-    setMessageInput(value)
-    
-    if (!activeConversation) return
-
-    // Clear existing timeout
-    if (typingTimeout) {
-      clearTimeout(typingTimeout)
-    }
-
-    // Start typing indicator
-    updateTypingStatus(activeConversation, true)
-
-    // Set timeout to stop typing indicator
-    const timeout = setTimeout(() => {
-      updateTypingStatus(activeConversation, false)
-    }, 3000)
-    
-    setTypingTimeout(timeout)
-  }
-
-  const getOtherUserId = (conversation: typeof conversations[0]) => {
-    return conversation.parent_id === user?.id ? conversation.advocate_id : conversation.parent_id
-  }
+  const activeConversation = conversations.find(c => c.id === activeConversationId)
 
   if (loading) {
     return (
@@ -124,46 +89,30 @@ export function MessagingInterface() {
                   <div className="p-6 text-center text-gray-500">
                     <MessageCircle className="w-12 h-12 mx-auto mb-4 text-gray-300" />
                     <p>No conversations yet</p>
-                    <p className="text-sm">Start chatting with your advocates</p>
+                    <p className="text-sm">Send a message to start chatting</p>
                   </div>
                 ) : (
                   <div className="space-y-1">
                     {conversations.map((conversation) => (
                       <button
                         key={conversation.id}
-                        onClick={() => setActiveConversation(conversation.id)}
+                        onClick={() => setActiveConversationId(conversation.id)}
                         className={`w-full p-4 text-left hover:bg-gray-50 border-b border-gray-100 transition-colors ${
-                          activeConversation === conversation.id ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''
+                          activeConversationId === conversation.id ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''
                         }`}
                       >
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-1">
-                              <User className="w-4 h-4 text-gray-400" />
-                              <p className="font-medium text-gray-900 truncate">
-                                {conversation.otherUserName}
-                              </p>
-                              <Badge variant="outline" className="text-xs">
-                                {conversation.otherUserRole}
-                              </Badge>
-                            </div>
-                            {conversation.lastMessage && (
-                              <p className="text-sm text-gray-600 truncate">
-                                {conversation.lastMessage}
-                              </p>
-                            )}
-                            <div className="flex items-center gap-1 mt-1">
-                              <Clock className="w-3 h-3 text-gray-400" />
-                              <p className="text-xs text-gray-500">
-                                {formatDistanceToNow(new Date(conversation.last_message_at), { addSuffix: true })}
-                              </p>
-                            </div>
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                            <User className="w-5 h-5 text-white" />
                           </div>
-                          {conversation.unreadCount > 0 && (
-                            <Badge className="bg-red-500 text-white">
-                              {conversation.unreadCount}
-                            </Badge>
-                          )}
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-gray-900 truncate">
+                              {conversation.username}
+                            </p>
+                            <p className="text-sm text-gray-500 truncate">
+                              {conversation.email}
+                            </p>
+                          </div>
                         </div>
                       </button>
                     ))}
@@ -181,16 +130,14 @@ export function MessagingInterface() {
                   {/* Chat Header */}
                   <CardHeader className="border-b border-gray-100">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-                        <User className="w-4 h-4 text-white" />
+                      <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-blue-500 rounded-full flex items-center justify-center">
+                        <User className="w-5 h-5 text-white" />
                       </div>
                       <div>
                         <CardTitle className="text-lg">
-                          {conversations.find(c => c.id === activeConversation)?.otherUserName}
+                          {activeConversation.username}
                         </CardTitle>
-                        <Badge variant="outline" className="text-xs">
-                          {conversations.find(c => c.id === activeConversation)?.otherUserRole}
-                        </Badge>
+                        <p className="text-sm text-gray-500">{activeConversation.email}</p>
                       </div>
                     </div>
                   </CardHeader>
@@ -210,42 +157,32 @@ export function MessagingInterface() {
                             {messages.map((message) => (
                               <div
                                 key={message.id}
-                                className={`flex ${message.sender_id === user?.id ? 'justify-end' : 'justify-start'}`}
+                                className={`flex ${message.isCurrentUser ? 'justify-end' : 'justify-start'}`}
                               >
-                                <div
-                                  className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                                    message.sender_id === user?.id
-                                      ? 'bg-blue-500 text-white'
-                                      : 'bg-gray-100 text-gray-900'
-                                  }`}
-                                >
-                                  <p className="text-sm">{message.content}</p>
-                                  <div className="flex items-center justify-between mt-1">
-                                    <p className={`text-xs ${
-                                      message.sender_id === user?.id ? 'text-blue-100' : 'text-gray-500'
-                                    }`}>
+                                <div className="flex flex-col max-w-xs lg:max-w-md">
+                                  <div
+                                    className={`px-4 py-3 rounded-2xl ${
+                                      message.isCurrentUser
+                                        ? 'bg-blue-500 text-white rounded-br-md'
+                                        : 'bg-gray-100 text-gray-900 rounded-bl-md'
+                                    }`}
+                                  >
+                                    <p className="text-sm leading-relaxed">{message.message}</p>
+                                  </div>
+                                  <div className={`flex items-center gap-2 mt-1 px-2 ${
+                                    message.isCurrentUser ? 'justify-end' : 'justify-start'
+                                  }`}>
+                                    <p className="text-xs text-gray-500">
                                       {message.senderName}
                                     </p>
-                                    <p className={`text-xs ${
-                                      message.sender_id === user?.id ? 'text-blue-100' : 'text-gray-400'
-                                    }`}>
+                                    <span className="text-xs text-gray-400">•</span>
+                                    <p className="text-xs text-gray-400">
                                       {formatDistanceToNow(new Date(message.created_at), { addSuffix: true })}
                                     </p>
                                   </div>
                                 </div>
                               </div>
                             ))}
-                            
-                            {/* Typing indicator */}
-                            {typingUsers.length > 0 && (
-                              <div className="flex justify-start">
-                                <div className="bg-gray-100 px-4 py-2 rounded-lg">
-                                  <p className="text-sm text-gray-600 italic">
-                                    Typing...
-                                  </p>
-                                </div>
-                              </div>
-                            )}
                           </>
                         )}
                         <div ref={messagesEndRef} />
@@ -255,15 +192,20 @@ export function MessagingInterface() {
 
                   {/* Message Input */}
                   <div className="border-t border-gray-100 p-4">
-                    <form onSubmit={handleSendMessage} className="flex gap-2">
+                    <form onSubmit={handleSendMessage} className="flex gap-3">
                       <Input
                         value={messageInput}
-                        onChange={(e) => handleTyping(e.target.value)}
+                        onChange={(e) => setMessageInput(e.target.value)}
                         placeholder="Type your message..."
-                        className="flex-1"
+                        className="flex-1 rounded-full border-gray-200 focus:border-blue-500"
                         disabled={sending}
                       />
-                      <Button type="submit" disabled={sending || !messageInput.trim()}>
+                      <Button 
+                        type="submit" 
+                        disabled={sending || !messageInput.trim()}
+                        className="rounded-full w-10 h-10 p-0"
+                        size="sm"
+                      >
                         {sending ? (
                           <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
                         ) : (

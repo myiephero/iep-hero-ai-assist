@@ -1,62 +1,83 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/hooks/useAuth'
+import type { RealtimeChannel } from '@supabase/supabase-js'
+
 // Types for messaging
 interface Message {
   id: string;
   sender_id: string;
   receiver_id: string;
-  content: string;
-  created_at: string;
-  read_at?: string;
-  is_read: boolean;
-}
-
-interface Conversation {
-  id: string;
-  parent_id: string;
-  advocate_id: string;
-  last_message_at: string;
+  message: string;
   created_at: string;
 }
 
 interface MessageWithUser extends Message {
   senderName: string;
-  senderRole: 'parent' | 'advocate';
+  senderEmail: string;
+  isCurrentUser: boolean;
 }
 
-interface ConversationWithDetails extends Conversation {
-  otherUserName: string;
-  otherUserRole: 'parent' | 'advocate';
-  lastMessage?: string;
-  unreadCount: number;
+interface ConversationUser {
+  id: string;
+  email: string;
+  username?: string;
 }
 
 export function useMessaging() {
   const { user } = useAuth()
-  const [conversations, setConversations] = useState<ConversationWithDetails[]>([])
-  const [activeConversation, setActiveConversation] = useState<string | null>(null)
+  const [conversations, setConversations] = useState<ConversationUser[]>([])
+  const [activeConversationId, setActiveConversationId] = useState<string | null>(null)
   const [messages, setMessages] = useState<MessageWithUser[]>([])
   const [loading, setLoading] = useState(true)
   const [sending, setSending] = useState(false)
-  const [typingUsers, setTypingUsers] = useState<string[]>([])
+  const [realtimeChannel, setRealtimeChannel] = useState<RealtimeChannel | null>(null)
 
-  // Load conversations for current user
+  // Load unique conversation partners
   const loadConversations = useCallback(async () => {
     if (!user) return
 
     try {
-      // Use API endpoint instead of direct Supabase call for better compatibility
-      const response = await fetch('/api/conversations', {
-        credentials: 'include'
+      const { data: messagesData, error } = await supabase
+        .from('messages')
+        .select(`
+          sender_id,
+          receiver_id,
+          created_at,
+          sender:users!messages_sender_id_fkey(id, email, username),
+          receiver:users!messages_receiver_id_fkey(id, email, username)
+        `)
+        .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
+        .order('created_at', { ascending: false })
+
+      if (error) throw error
+
+      // Extract unique conversation partners
+      const partnersMap = new Map<string, ConversationUser>()
+      
+      messagesData?.forEach((msg: any) => {
+        let partner: ConversationUser | null = null
+        
+        if (msg.sender_id === user.id && msg.receiver) {
+          partner = {
+            id: msg.receiver.id,
+            email: msg.receiver.email,
+            username: msg.receiver.username || msg.receiver.email
+          }
+        } else if (msg.receiver_id === user.id && msg.sender) {
+          partner = {
+            id: msg.sender.id,
+            email: msg.sender.email,
+            username: msg.sender.username || msg.sender.email
+          }
+        }
+        
+        if (partner && !partnersMap.has(partner.id)) {
+          partnersMap.set(partner.id, partner)
+        }
       })
-      
-      if (!response.ok) {
-        throw new Error('Failed to load conversations')
-      }
-      
-      const conversationsWithDetails = await response.json()
-      setConversations(conversationsWithDetails)
+
+      setConversations(Array.from(partnersMap.values()))
     } catch (error) {
       console.error('Error loading conversations:', error)
     } finally {
@@ -65,108 +86,97 @@ export function useMessaging() {
   }, [user])
 
   // Load messages for active conversation
-  const loadMessages = useCallback(async (conversationId: string) => {
-    if (!user) return
+  const loadMessages = useCallback(async () => {
+    if (!user || !activeConversationId) return
 
     try {
-      const response = await fetch(`/api/conversations/${conversationId}/messages`, {
-        credentials: 'include'
-      })
-      
-      if (!response.ok) {
-        throw new Error('Failed to load messages')
-      }
-      
-      const messagesWithUser = await response.json()
-      setMessages(messagesWithUser)
+      const { data, error } = await supabase
+        .from('messages')
+        .select(`
+          *,
+          sender:users!messages_sender_id_fkey(id, email, username)
+        `)
+        .or(`and(sender_id.eq.${user.id},receiver_id.eq.${activeConversationId}),and(sender_id.eq.${activeConversationId},receiver_id.eq.${user.id})`)
+        .order('created_at', { ascending: true })
 
-      // Mark messages as read
-      if (messagesWithUser.length > 0) {
-        await markMessagesAsRead(conversationId)
-      }
+      if (error) throw error
+
+      const messagesWithUser: MessageWithUser[] = data.map((msg: any) => ({
+        ...msg,
+        senderName: msg.sender?.username || msg.sender?.email || 'Unknown User',
+        senderEmail: msg.sender?.email || '',
+        isCurrentUser: msg.sender_id === user.id
+      }))
+
+      setMessages(messagesWithUser)
     } catch (error) {
       console.error('Error loading messages:', error)
     }
-  }, [user])
+  }, [user, activeConversationId])
 
   // Send a new message
-  const sendMessage = useCallback(async (receiverId: string, content: string) => {
-    if (!user || !content.trim()) return
+  const sendMessage = useCallback(async (content: string) => {
+    if (!user || !activeConversationId || !content.trim()) return
 
     setSending(true)
     try {
-      const response = await fetch('/api/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          receiver_id: receiverId,
-          content: content.trim()
-        })
-      })
+      const { error } = await supabase
+        .from('messages')
+        .insert([{
+          sender_id: user.id,
+          receiver_id: activeConversationId,
+          message: content.trim()
+        }])
 
-      if (!response.ok) {
-        throw new Error('Failed to send message')
-      }
+      if (error) throw error
 
-      // Reload conversations and messages
-      loadConversations()
-      if (activeConversation) {
-        loadMessages(activeConversation)
-      }
-
+      // Messages will be updated via realtime subscription
     } catch (error) {
       console.error('Error sending message:', error)
       throw error
     } finally {
       setSending(false)
     }
-  }, [user, activeConversation, loadConversations, loadMessages])
+  }, [user, activeConversationId])
 
-  // Mark messages as read
-  const markMessagesAsRead = useCallback(async (conversationId: string) => {
-    if (!user) return
-
-    try {
-      await fetch(`/api/messages/${conversationId}/read`, {
-        method: 'PUT',
-        credentials: 'include'
-      })
-    } catch (error) {
-      console.error('Error marking messages as read:', error)
-    }
-  }, [user])
-
-  // Update typing status (simplified for demo)
-  const updateTypingStatus = useCallback(async (conversationId: string, isTyping: boolean) => {
-    if (!user) return
-
-    try {
-      // For demo purposes, we'll use a simple timeout approach
-      // In production, this would integrate with Supabase Realtime
-      console.log(`User ${user.id} ${isTyping ? 'started' : 'stopped'} typing in conversation ${conversationId}`)
-    } catch (error) {
-      console.error('Error updating typing status:', error)
-    }
-  }, [user])
-
-  // Set up polling for real-time updates (simplified approach)
+  // Set up Supabase Realtime subscription
   useEffect(() => {
     if (!user) return
 
-    const pollInterval = setInterval(() => {
-      loadConversations()
-      if (activeConversation) {
-        loadMessages(activeConversation)
-      }
-    }, 5000) // Poll every 5 seconds
+    const channel = supabase
+      .channel('messages')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+          filter: `or(sender_id.eq.${user.id},receiver_id.eq.${user.id})`
+        },
+        (payload) => {
+          console.log('New message received:', payload)
+          // Reload messages if it's for the active conversation
+          if (activeConversationId) {
+            const newMessage = payload.new as Message
+            if ((newMessage.sender_id === user.id && newMessage.receiver_id === activeConversationId) ||
+                (newMessage.sender_id === activeConversationId && newMessage.receiver_id === user.id)) {
+              loadMessages()
+            }
+          }
+          // Also reload conversations to update the list
+          loadConversations()
+        }
+      )
+      .subscribe()
+
+    setRealtimeChannel(channel)
 
     return () => {
-      clearInterval(pollInterval)
+      if (channel) {
+        supabase.removeChannel(channel)
+      }
     }
-  }, [user, activeConversation, loadConversations, loadMessages])
+  }, [user, activeConversationId, loadMessages, loadConversations])
 
   // Load conversations on mount
   useEffect(() => {
@@ -175,22 +185,21 @@ export function useMessaging() {
 
   // Load messages when active conversation changes
   useEffect(() => {
-    if (activeConversation) {
-      loadMessages(activeConversation)
+    if (activeConversationId) {
+      loadMessages()
+    } else {
+      setMessages([])
     }
-  }, [activeConversation, loadMessages])
+  }, [activeConversationId, loadMessages])
 
   return {
     conversations,
     messages,
     loading,
     sending,
-    typingUsers,
-    activeConversation,
-    setActiveConversation,
+    activeConversationId,
+    setActiveConversationId,
     sendMessage,
-    updateTypingStatus,
-    loadConversations,
-    loadMessages
+    loadConversations
   }
 }
