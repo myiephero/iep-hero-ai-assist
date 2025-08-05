@@ -50,6 +50,11 @@ const parentTools = [
     icon: '🗂️'
   },
   {
+    name: 'AI IEP Review',
+    description: 'Get comprehensive AI analysis of your child\'s IEP',
+    icon: '🧠'
+  },
+  {
     name: 'Ask AI About My Docs',
     description: 'Ask questions about your uploaded IEP documents',
     icon: '💬'
