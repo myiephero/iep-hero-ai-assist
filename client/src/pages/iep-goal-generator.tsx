@@ -4,14 +4,18 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Save, Plus } from 'lucide-react';
 import { Link } from 'wouter';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/queryClient';
 
 export default function IEPGoalGeneratorPage() {
   const [area, setArea] = useState('');
   const [goals, setGoals] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const generateGoals = async () => {
     if (!area.trim()) {
@@ -55,6 +59,88 @@ export default function IEPGoalGeneratorPage() {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const saveGoalsToDatabase = async () => {
+    if (goals.length === 0) {
+      toast({
+        title: "No goals to save",
+        description: "Please generate goals first before saving.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setSaving(true);
+    
+    try {
+      // Save each goal to the database
+      const savePromises = goals.map((goalText, index) => {
+        const goalData = {
+          title: `${area} Goal ${index + 1}`,
+          description: goalText,
+          status: 'not-started',
+          progress: 0,
+          dueDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 1 year from now
+          category: area || 'General'
+        };
+        
+        return apiRequest('POST', '/api/goals', goalData);
+      });
+
+      await Promise.all(savePromises);
+      
+      // Invalidate goals cache to refresh the data
+      await queryClient.invalidateQueries({ queryKey: ['/api/goals'] });
+      
+      toast({
+        title: "Goals Saved!",
+        description: `Successfully saved ${goals.length} goals to your IEP goals list.`,
+      });
+      
+      // Clear the generated goals since they're now saved
+      setGoals([]);
+      setArea('');
+      
+    } catch (error) {
+      console.error('Error saving goals:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save goals. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const saveIndividualGoal = async (goalText: string, index: number) => {
+    try {
+      const goalData = {
+        title: `${area} Goal ${index + 1}`,
+        description: goalText,
+        status: 'not-started',
+        progress: 0,
+        dueDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        category: area || 'General'
+      };
+      
+      await apiRequest('POST', '/api/goals', goalData);
+      await queryClient.invalidateQueries({ queryKey: ['/api/goals'] });
+      
+      toast({
+        title: "Goal Saved!",
+        description: `Goal ${index + 1} has been added to your IEP goals.`,
+      });
+      
+    } catch (error) {
+      console.error('Error saving individual goal:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save goal. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -111,7 +197,26 @@ export default function IEPGoalGeneratorPage() {
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-semibold text-slate-900">Generated IEP Goals</h2>
-              <span className="text-sm text-slate-500">{goals.length} goals generated</span>
+              <div className="flex items-center gap-4">
+                <span className="text-sm text-slate-500">{goals.length} goals generated</span>
+                <Button 
+                  onClick={saveGoalsToDatabase} 
+                  disabled={saving}
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                >
+                  {saving ? (
+                    <>
+                      <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4 mr-2" />
+                      Save All Goals
+                    </>
+                  )}
+                </Button>
+              </div>
             </div>
             
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
@@ -130,6 +235,15 @@ export default function IEPGoalGeneratorPage() {
                         Goal {index + 1}
                       </div>
                       <p className="text-slate-700 leading-relaxed flex-1">{goal}</p>
+                      <Button
+                        onClick={() => saveIndividualGoal(goal, index)}
+                        variant="outline"
+                        size="sm"
+                        className="shrink-0"
+                      >
+                        <Plus className="w-4 h-4 mr-1" />
+                        Save Goal
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
@@ -139,10 +253,11 @@ export default function IEPGoalGeneratorPage() {
             <div className="mt-8 p-6 bg-green-50 rounded-lg border border-green-200">
               <h3 className="font-semibold text-green-800 mb-2">Next Steps</h3>
               <ul className="text-sm text-green-700 space-y-1">
+                <li>• Click "Save All Goals" to add these to your IEP goals tracker</li>
                 <li>• Review these goals with your child's IEP team</li>
                 <li>• Customize the goals to better fit your child's specific needs</li>
-                <li>• Discuss data collection methods and progress monitoring</li>
-                <li>• Consider how these goals align with your child's current services</li>
+                <li>• Use the Progress Analyzer to monitor goal achievement</li>
+                <li>• Set up regular progress reviews in the Meeting Prep tool</li>
               </ul>
             </div>
           </div>
