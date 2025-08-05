@@ -675,6 +675,13 @@ Use professional, supportive language that empowers the parent while being legal
       // Perform AI analysis
       const analysis = await analyzeIEPDocument(filePath, document.type);
       
+      // Store analysis results in database
+      try {
+        await storage.saveDocumentAnalysis(id, analysis);
+      } catch (error) {
+        console.error('Failed to save analysis results:', error);
+      }
+      
       res.json({
         documentId: id,
         documentName: document.originalName,
@@ -687,6 +694,67 @@ Use professional, supportive language that empowers the parent while being legal
         message: 'Analysis failed', 
         error: error.message 
       });
+    }
+  });
+
+  // Update document name route
+  app.patch("/api/documents/:id/name", requireAuth, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { displayName } = req.body;
+      const user = req.user as any;
+      
+      if (!displayName?.trim()) {
+        return res.status(400).json({ message: 'Display name is required' });
+      }
+
+      // Check if document belongs to user
+      const documents = await storage.getDocumentsByUserId(user.id);
+      const document = documents.find((doc: any) => doc.id === id);
+      
+      if (!document) {
+        return res.status(404).json({ message: 'Document not found' });
+      }
+
+      const updatedDocument = await storage.updateDocumentName(id, displayName.trim());
+      res.json(updatedDocument);
+    } catch (error: any) {
+      console.error('Document name update error:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Download document route
+  app.get("/api/documents/:id/download", requireAuth, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const user = req.user as any;
+      
+      // Check if document belongs to user
+      const documents = await storage.getDocumentsByUserId(user.id);
+      const document = documents.find((doc: any) => doc.id === id);
+      
+      if (!document) {
+        return res.status(404).json({ message: 'Document not found' });
+      }
+
+      const filePath = path.join('uploads', document.filename);
+      
+      // Check if file exists
+      if (!fs.existsSync(filePath)) {
+        return res.status(404).json({ message: 'File not found on server' });
+      }
+
+      // Set appropriate headers for download
+      res.setHeader('Content-Disposition', `attachment; filename="${document.originalName}"`);
+      res.setHeader('Content-Type', 'application/octet-stream');
+      
+      // Stream the file
+      const fileStream = fs.createReadStream(filePath);
+      fileStream.pipe(res);
+    } catch (error: any) {
+      console.error('Document download error:', error);
+      res.status(500).json({ message: error.message });
     }
   });
 

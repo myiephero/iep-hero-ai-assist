@@ -3,8 +3,10 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import FileUploadModal from "@/components/modals/file-upload-modal";
-import { FileText, Upload, Download, Brain } from "lucide-react";
+import { FileText, Upload, Download, Brain, Edit2, Check, X, Eye } from "lucide-react";
 import { Link } from "wouter";
 import { format } from "date-fns";
 import type { Document } from "@shared/schema";
@@ -15,7 +17,9 @@ import { useAuth } from "@/hooks/use-auth";
 export default function Documents() {
   const [showFileUpload, setShowFileUpload] = useState(false);
   const [analyzingDocument, setAnalyzingDocument] = useState<string | null>(null);
-  const [analysisResults, setAnalysisResults] = useState<any>(null);
+  const [editingDocument, setEditingDocument] = useState<string | null>(null);
+  const [editingName, setEditingName] = useState("");
+  const [viewingAnalysis, setViewingAnalysis] = useState<any>(null);
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -64,6 +68,86 @@ export default function Documents() {
   const displayDocuments = documents.length > 0 ? documents : mockDocuments;
   const isHeroPlan = user?.planStatus === 'heroOffer';
 
+  // Mutation for updating document name
+  const updateDocumentNameMutation = useMutation({
+    mutationFn: async ({ documentId, displayName }: { documentId: string; displayName: string }) => {
+      const response = await apiRequest("PATCH", `/api/documents/${documentId}/name`, { displayName });
+      if (!response.ok) {
+        throw new Error("Failed to update document name");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/documents"] });
+      setEditingDocument(null);
+      setEditingName("");
+      toast({ 
+        title: "Success",
+        description: "Document name updated successfully"
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update document name",
+        variant: "destructive"
+      });
+    }
+  });
+
+  // Functions
+  const startEditingName = (doc: any) => {
+    setEditingDocument(doc.id);
+    setEditingName(doc.displayName || doc.originalName);
+  };
+
+  const saveDocumentName = () => {
+    if (editingDocument && editingName.trim()) {
+      updateDocumentNameMutation.mutate({
+        documentId: editingDocument,
+        displayName: editingName.trim()
+      });
+    }
+  };
+
+  const cancelEditing = () => {
+    setEditingDocument(null);
+    setEditingName("");
+  };
+
+  const downloadDocument = async (documentId: string, filename: string) => {
+    try {
+      const response = await fetch(`/api/documents/${documentId}/download`, {
+        credentials: 'include'
+      });
+      
+      if (!response.ok) {
+        throw new Error("Download failed");
+      }
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      
+      toast({
+        title: "Success",
+        description: "Document downloaded successfully"
+      });
+    } catch (error) {
+      toast({
+        title: "Error", 
+        description: "Failed to download document",
+        variant: "destructive"
+      });
+    }
+  };
+
   const analyzeDocument = async (documentId: string) => {
     setAnalyzingDocument(documentId);
     try {
@@ -74,12 +158,14 @@ export default function Documents() {
       }
       
       const result = await response.json();
-      setAnalysisResults(result);
       
       toast({
         title: "Analysis Complete!",
         description: `Your document has been analyzed by AI. Overall score: ${result.analysis.overallScore}/5 stars`,
       });
+
+      // Refresh documents to get updated analysis results
+      queryClient.invalidateQueries({ queryKey: ["/api/documents"] });
       
     } catch (error) {
       console.error("Analysis error:", error);
@@ -156,14 +242,63 @@ export default function Documents() {
                       <div className="p-3 bg-slate-700 rounded-lg">
                         <FileText className="w-8 h-8 text-blue-400" />
                       </div>
-                      <div>
-                        <h3 className="font-semibold text-white mb-1">{doc.filename}</h3>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          {editingDocument === doc.id ? (
+                            <div className="flex items-center gap-2">
+                              <Input
+                                value={editingName}
+                                onChange={(e) => setEditingName(e.target.value)}
+                                className="bg-slate-700 border-slate-600 text-white"
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') saveDocumentName();
+                                  if (e.key === 'Escape') cancelEditing();
+                                }}
+                              />
+                              <Button
+                                size="sm"
+                                onClick={saveDocumentName}
+                                disabled={updateDocumentNameMutation.isPending}
+                                className="bg-green-600 hover:bg-green-700"
+                              >
+                                <Check className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={cancelEditing}
+                                className="border-slate-500"
+                              >
+                                <X className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-2">
+                              <h3 className="font-semibold text-white">
+                                {doc.displayName || doc.originalName}
+                              </h3>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => startEditingName(doc)}
+                                className="p-1 h-auto text-slate-400 hover:text-white"
+                              >
+                                <Edit2 className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          )}
+                        </div>
                         <div className="flex items-center gap-2 mb-2">
                           <Badge className={getDocumentTypeColor(doc.type)}>
                             {getDocumentTypeLabel(doc.type)}
                           </Badge>
                           {doc.size && (
                             <span className="text-sm text-slate-400">{doc.size}</span>
+                          )}
+                          {doc.analysisResult && (
+                            <Badge className="bg-emerald-600 text-white">
+                              AI Analyzed
+                            </Badge>
                           )}
                         </div>
                         <p className="text-sm text-slate-400">
@@ -175,20 +310,37 @@ export default function Documents() {
                       <Button
                         variant="outline"
                         size="sm"
+                        onClick={() => downloadDocument(doc.id, doc.originalName)}
                         className="border-slate-500 text-slate-300 hover:bg-slate-700"
                       >
                         <Download className="w-4 h-4 mr-1" />
                         Download
                       </Button>
+                      {doc.analysisResult && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setViewingAnalysis(doc.analysisResult)}
+                          className="border-emerald-500 text-emerald-300 hover:bg-emerald-700"
+                        >
+                          <Eye className="w-4 h-4 mr-1" />
+                          View Analysis
+                        </Button>
+                      )}
                       <Button
                         onClick={() => analyzeDocument(doc.id)}
                         disabled={analyzingDocument === doc.id || !isHeroPlan}
-                        className="bg-blue-600 hover:bg-blue-700 text-white"
+                        className="bg-blue-600 hover:bg-blue-700 text-white disabled:bg-slate-600"
                         size="sm"
                       >
                         <Brain className="w-4 h-4 mr-1" />
-                        {analyzingDocument === doc.id ? "Analyzing..." : "AI Analyze"}
+                        {analyzingDocument === doc.id ? "Analyzing..." : doc.analysisResult ? "Re-analyze" : "AI Analyze"}
                       </Button>
+                      {!isHeroPlan && (
+                        <div className="text-xs text-slate-400 ml-2">
+                          Hero Plan required
+                        </div>
+                      )}
                     </div>
                   </div>
                 </CardContent>
@@ -217,6 +369,80 @@ export default function Documents() {
         open={showFileUpload} 
         onOpenChange={setShowFileUpload}
       />
+
+      {/* Analysis Results Dialog */}
+      <Dialog open={!!viewingAnalysis} onOpenChange={() => setViewingAnalysis(null)}>
+        <DialogContent className="bg-[#3E4161] border-slate-600 text-white max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-white">AI Document Analysis</DialogTitle>
+          </DialogHeader>
+          {viewingAnalysis && (
+            <div className="space-y-6">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="text-center p-4 bg-slate-700 rounded-lg">
+                  <div className="text-3xl font-bold text-blue-400">{viewingAnalysis.overallScore}/5</div>
+                  <div className="text-sm text-slate-300">Overall Score</div>
+                </div>
+                <div className="text-center p-4 bg-slate-700 rounded-lg">
+                  <div className="text-3xl font-bold text-emerald-400">{viewingAnalysis.complianceCheck?.ideaCompliance || 'N/A'}%</div>
+                  <div className="text-sm text-slate-300">IDEA Compliance</div>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold text-white mb-3">Summary</h3>
+                <p className="text-slate-300 bg-slate-700 p-4 rounded-lg">{viewingAnalysis.summary}</p>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold text-white mb-3">Strengths</h3>
+                <ul className="space-y-2">
+                  {viewingAnalysis.strengths?.map((strength: string, index: number) => (
+                    <li key={index} className="flex items-start gap-2 text-slate-300">
+                      <span className="text-emerald-400 mt-1">✓</span>
+                      {strength}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold text-white mb-3">Areas for Improvement</h3>
+                <ul className="space-y-2">
+                  {viewingAnalysis.improvements?.map((improvement: string, index: number) => (
+                    <li key={index} className="flex items-start gap-2 text-slate-300">
+                      <span className="text-yellow-400 mt-1">!</span>
+                      {improvement}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold text-white mb-3">Next Steps</h3>
+                <ul className="space-y-2">
+                  {viewingAnalysis.nextSteps?.map((step: string, index: number) => (
+                    <li key={index} className="flex items-start gap-2 text-slate-300">
+                      <span className="text-blue-400 mt-1">→</span>
+                      {step}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="flex items-center justify-between p-4 bg-slate-700 rounded-lg">
+                <span className="text-slate-300">Priority Level:</span>
+                <Badge className={
+                  viewingAnalysis.priority === 'High' ? 'bg-red-600' :
+                  viewingAnalysis.priority === 'Medium' ? 'bg-yellow-600' : 'bg-green-600'
+                }>
+                  {viewingAnalysis.priority || 'Low'}
+                </Badge>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

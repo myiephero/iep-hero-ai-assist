@@ -38,9 +38,11 @@ export const documents = pgTable("documents", {
   userId: varchar("user_id").notNull().references(() => users.id),
   filename: text("filename").notNull(),
   originalName: text("original_name").notNull(),
+  displayName: text("display_name"), // User-editable display name
   type: text("type").notNull(), // iep, assessment, progress_report, meeting_notes, other
   description: text("description"),
   fileUrl: text("file_url").notNull(),
+  analysisResult: jsonb("analysis_result"), // Store AI analysis results
   uploadedAt: timestamp("uploaded_at").default(sql`now()`),
 });
 

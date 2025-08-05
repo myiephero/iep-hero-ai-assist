@@ -27,6 +27,8 @@ export interface IStorage {
   getDocumentsByUserId(userId: string): Promise<Document[]>;
   createDocument(userId: string, document: InsertDocument): Promise<Document>;
   deleteDocument(documentId: string): Promise<void>;
+  updateDocumentName(documentId: string, displayName: string): Promise<Document>;
+  saveDocumentAnalysis(documentId: string, analysis: any): Promise<Document>;
   
   // Events
   getEventsByUserId(userId: string): Promise<Event[]>;
@@ -284,6 +286,26 @@ export class MemStorage implements IStorage {
 
   async deleteDocument(documentId: string): Promise<void> {
     this.documents.delete(documentId);
+  }
+
+  async updateDocumentName(documentId: string, displayName: string): Promise<Document> {
+    const document = this.documents.get(documentId);
+    if (!document) {
+      throw new Error("Document not found");
+    }
+    const updatedDocument = { ...document, displayName };
+    this.documents.set(documentId, updatedDocument);
+    return updatedDocument;
+  }
+
+  async saveDocumentAnalysis(documentId: string, analysis: any): Promise<Document> {
+    const document = this.documents.get(documentId);
+    if (!document) {
+      throw new Error("Document not found");
+    }
+    const updatedDocument = { ...document, analysisResult: analysis };
+    this.documents.set(documentId, updatedDocument);
+    return updatedDocument;
   }
 
   async getEventsByUserId(userId: string): Promise<Event[]> {
@@ -883,5 +905,57 @@ export const storage = new class LocalDbStorage implements IStorage {
       .where(eq(users.id, userId))
       .returning();
     return result[0];
+  }
+
+  async updateDocumentName(documentId: string, displayName: string): Promise<Document> {
+    const result = await this.db
+      .update(documents)
+      .set({ displayName })
+      .where(eq(documents.id, documentId))
+      .returning();
+    
+    if (result.length === 0) {
+      throw new Error("Document not found");
+    }
+    return result[0];
+  }
+
+  async saveDocumentAnalysis(documentId: string, analysis: any): Promise<Document> {
+    const result = await this.db
+      .update(documents)
+      .set({ analysisResult: analysis })
+      .where(eq(documents.id, documentId))
+      .returning();
+    
+    if (result.length === 0) {
+      throw new Error("Document not found");
+    }
+    return result[0];
+  }
+
+  async updateUserStripeInfo(userId: string, customerId: string, subscriptionId: string): Promise<User> {
+    const result = await this.db
+      .update(users)
+      .set({ 
+        stripeCustomerId: customerId, 
+        stripeSubscriptionId: subscriptionId,
+        subscriptionTier: subscriptionId ? "hero" : "free"
+      })
+      .where(eq(users.id, userId))
+      .returning();
+    return result[0];
+  }
+
+  async updateSubscriptionTier(userId: string, tier: string): Promise<User> {
+    const result = await this.db
+      .update(users)
+      .set({ subscriptionTier: tier })
+      .where(eq(users.id, userId))
+      .returning();
+    return result[0];
+  }
+
+  async getUsersByRole(role: string): Promise<User[]> {
+    return await this.db.select().from(users).where(eq(users.role, role));
   }
 }();
