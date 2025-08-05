@@ -20,6 +20,7 @@ import SmartLetterGenerator from "@/pages/smart-letter-generator";
 import ProgressNotes from "@/pages/progress-notes";
 import CommunicationPlan from "@/pages/communication-plan";
 import RightsExplainer from "@/pages/rights-explainer";
+import MeetingPrepWizard from "@/pages/meeting-prep-wizard";
 import Subscribe from "@/pages/subscribe";
 import Pricing from "@/pages/pricing";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
@@ -151,6 +152,11 @@ function Router() {
       <Route path="/tools/rights-explainer">
         <AuthGuard>
           <RightsExplainer />
+        </AuthGuard>
+      </Route>
+      <Route path="/tools/meeting-prep-wizard">
+        <AuthGuard>
+          <MeetingPrepWizard />
         </AuthGuard>
       </Route>
       <Route path="/">

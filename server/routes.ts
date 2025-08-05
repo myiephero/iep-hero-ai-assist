@@ -297,6 +297,83 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
+  // Generate Meeting Prep Sheet route
+  app.post("/api/generate-meeting-prep", requireAuth, async (req, res) => {
+    try {
+      console.log("Meeting prep generation request received");
+      const { formData } = req.body;
+
+      if (!process.env.OPENAI_API_KEY) {
+        console.error("OPENAI_API_KEY not found in environment");
+        return res.status(503).json({ 
+          error: "AI service temporarily unavailable. Please ensure OPENAI_API_KEY is configured." 
+        });
+      }
+
+      const prompt = `Create an IEP meeting preparation summary for a parent based on the following responses:
+
+- Meeting Concerns: ${formData.concerns || 'Not specified'}
+- Services in Question: ${formData.services || 'Not specified'}
+- Child Progress: ${formData.progress || 'Not specified'}
+- Behavior or Medical Changes: ${formData.changes || 'No'}
+- Goal/Placement Requests: ${formData.requests || 'No'}
+- Support Attendees: ${formData.attendees || 'No'}
+- Parent's Questions: ${formData.questions || 'None specified'}
+
+Format the output as a clean, bullet-point prep sheet including:
+- Meeting agenda overview
+- Suggested talking points
+- Questions to ask the team
+- Reminders of legal rights under IDEA
+- Areas to follow up after the meeting
+- Tips for effective advocacy
+
+Use professional, supportive language that empowers the parent while being legally appropriate.`;
+
+      console.log("Sending request to OpenAI...");
+      
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o', // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+          messages: [
+            {
+              role: 'system',
+              content: 'You are a professional IEP advocate helping parents prepare for important educational meetings. Provide practical, legally sound advice.'
+            },
+            {
+              role: 'user',
+              content: prompt
+            }
+          ],
+          max_tokens: 1500,
+          temperature: 0.7,
+        }),
+      });
+
+      if (!response.ok) {
+        console.error("OpenAI API error:", response.status, response.statusText);
+        throw new Error(`OpenAI API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const prepSheet = data.choices[0].message.content;
+
+      console.log("Meeting prep sheet generated successfully");
+      res.json({ prepSheet });
+    } catch (error: any) {
+      console.error('Error generating meeting prep:', error);
+      res.status(500).json({ 
+        error: 'Failed to generate meeting prep sheet. Please try again.',
+        details: error.message 
+      });
+    }
+  });
+
   app.get("/api/me", requireAuth, (req, res) => {
     const user = req.user as any;
     // Fix Hero Plan detection: parent@demo.com should always have Hero access

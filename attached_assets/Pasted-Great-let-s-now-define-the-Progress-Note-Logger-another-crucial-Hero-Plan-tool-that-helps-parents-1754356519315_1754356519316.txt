@@ -1,0 +1,140 @@
+Great — let’s now define the Progress Note Logger, another crucial Hero Plan tool that helps parents track whether their child is actually receiving the services promised in their IEP.
+
+⸻
+
+🧠 What Is the Progress Note Logger?
+
+A tool that allows parents to:
+	•	Quickly log service delivery updates (speech, OT, reading, etc.)
+	•	Compare what was promised vs. delivered
+	•	Store time-stamped notes for documentation (used in disputes or follow-ups)
+	•	Feed this data into the Progress Analyzer
+
+⸻
+
+🧩 UX Flow for Replit
+
+Step 1: Dashboard Card
+	•	Title: Progress Notes
+	•	Description: Log updates about the services your child is receiving and track what's happening at school.
+	•	CTA Button: Log Notes
+
+⸻
+
+Step 2: Add Note Form
+
+Each log entry should collect:
+	1.	Service Type (Dropdown):
+	•	Speech Therapy
+	•	Occupational Therapy
+	•	Reading Support
+	•	Behavior Intervention
+	•	Other (free text)
+	2.	Date of Service (default to today)
+	3.	Was the service provided?
+	•	Yes
+	•	No
+	•	Not Sure
+	4.	Notes (textarea):
+	•	What happened? Did your child mention anything? Did you get a report?
+	5.	Optional: Upload Attachment
+	•	Add school emails or screenshots as evidence
+	6.	(Optional for MVP) Rate the session (1–5 stars)
+
+⸻
+
+Step 3: Store in Supabase
+
+Store each entry in a new progress_notes table with fields:
+	•	user_id
+	•	service_type
+	•	date
+	•	status (yes/no/not sure)
+	•	notes
+	•	attachment_url (optional)
+
+⸻
+
+Step 4: Display Progress Logs
+
+Add a basic table under the form showing:
+	•	Date
+	•	Service Type
+	•	Status
+	•	Shortened Note Preview
+
+Add filter options by service type or status.
+
+⸻
+
+📤 GitHub Issue / Dev Prompt
+
+Here’s your developer-ready task to copy and send:
+
+⸻
+
+📝 GitHub Issue: Build Progress Note Logger Tool for Hero Plan
+
+Title: 📋 Add Progress Note Logger to Hero Dashboard
+
+⸻
+
+📌 Summary:
+
+The Progress Note Logger is a critical parent tool that allows families to track whether IEP services are being delivered as promised. It logs date-stamped notes per service and stores them in the user’s dashboard for review or use in dispute letters.
+
+⸻
+
+✅ Build the Following:
+
+1. Dashboard Card
+	•	Title: Progress Notes
+	•	Description: Log updates on services being received and compare them to your child’s IEP.
+	•	Button: Log Notes
+	•	Access: Hero Plan users only
+
+⸻
+
+2. Log Entry Form
+
+Create a form with the following fields:
+	•	Service Type: Dropdown with preset options + “Other”
+	•	Date: Default to current day
+	•	Was Service Provided?: Yes / No / Not Sure
+	•	Notes: Textarea
+	•	Attachment Upload: Optional file input
+
+⸻
+
+3. Supabase Table: progress_notes
+
+Fields:
+	•	id (UUID)
+	•	user_id
+	•	service_type
+	•	date
+	•	status (text or enum)
+	•	notes
+	•	attachment_url
+
+⸻
+
+4. Notes Display Table
+
+After submitting a note, show a table of recent logs:
+	•	Filterable by service type or status
+	•	Display service name, date, status, short note preview
+
+⸻
+
+✅ Goal:
+
+Help parents document and track services received vs. promised to identify gaps, support disputes, and feed the Progress Analyzer tool.
+
+⸻
+
+Let me know when this is live so we can begin tracking services across the platform.
+
+⸻
+
+Want to scope the final tool — the Parent Communication Tracker — next? That’ll round out your MVP stack.
