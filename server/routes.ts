@@ -422,6 +422,57 @@ Use professional, supportive language that empowers the parent while being legal
     }
   });
 
+  // Advocate Matches routes
+  app.get("/api/advocate-matches", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      let matches;
+      if (user.role === 'parent') {
+        matches = await storage.getAdvocateMatchesByParentId(user.id);
+      } else if (user.role === 'advocate') {
+        matches = await storage.getAdvocateMatchesByAdvocateId(user.id);
+      } else {
+        matches = [];
+      }
+      res.json(matches);
+    } catch (error: any) {
+      console.error('Error fetching advocate matches:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/advocate-matches", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      const matchData = req.body;
+      
+      // For MVP, auto-assign to first available advocate
+      // In production, this would use proper matching logic
+      const availableAdvocate = await storage.getUserByEmail('advocate@demo.com');
+      if (!availableAdvocate) {
+        return res.status(400).json({ message: 'No available advocates found' });
+      }
+
+      const match = await storage.createAdvocateMatch(user.id, availableAdvocate.id, matchData);
+      
+      // Send notification emails
+      const { sendAdvocateNotification, sendParentConfirmation } = await import('./emailTemplates');
+      
+      try {
+        await sendAdvocateNotification(match, availableAdvocate.email, availableAdvocate.username);
+        await sendParentConfirmation(match, user.email);
+      } catch (emailError) {
+        console.error('Email notification failed:', emailError);
+        // Don't fail the request if email fails
+      }
+
+      res.json(match);
+    } catch (error: any) {
+      console.error('Error creating advocate match:', error);
+      res.status(400).json({ message: error.message });
+    }
+  });
+
   app.get("/api/me", requireAuth, (req, res) => {
     const user = req.user as any;
     // Fix Hero Plan detection: parent@demo.com should always have Hero access
