@@ -1,187 +1,47 @@
 # Overview
-
-My IEP Hero is a comprehensive SaaS platform for Individualized Education Program (IEP) management, designed to empower parents and professionals with advanced collaboration tools and intuitive workflow management. The application provides complete IEP lifecycle management including goal tracking, document storage, progress monitoring, and subscription-based service plans.
-
-## Recent Changes (January 2025)
-- ✓ Full-stack application successfully migrated and integrated
-- ✓ Supabase authentication system implemented and working  
-- ✓ Dashboard with IEP goals, documents, and events tracking
-- ✓ Stripe payment integration for multiple subscription tiers
-- ✓ Build:dev script added for Lovable.dev compatibility
-- ✓ Application running successfully on port 5000
-- ✓ Memory Q&A component with advocate sharing functionality
-- ✓ Database schema extended with sharedMemories table and advocateEmail field
-- ✓ Resend email integration for advocate notifications
-- ✓ Test routes implemented for Memory Q&A functionality validation
-- ✓ AI output validation requiring "services", "goals", or "accommodations" keywords
-- ✓ Duplicate prevention system with 60-second window for identical questions
-- ✓ Comprehensive test suite validating all Memory Q&A features
-- ✓ Progressive Web App (PWA) implementation with mobile-first design
-- ✓ Mobile navigation, offline support, and native device integration
-- ✓ PWA install prompts, service worker caching, and mobile-optimized components
-- ✓ Voice input, haptic feedback, and native sharing capabilities
-- ✓ Comprehensive pricing page with Free vs Hero Plan ($495/year) comparison
-- ✓ Hero Plan modal with detailed feature breakdown and Stripe checkout integration
-- ✓ User registration and authentication system working correctly
-- ✓ Database storage fully operational with PostgreSQL backend
-- ✓ User registration persisting to database successfully
-- ✓ Authentication system integrated with persistent storage
-- ✓ Crystal clear signup flow with pricing transparency implemented
-- ✓ Users now see exactly what they're signing up for (Free vs $495 Hero Plan)
-- ✓ Email verification with welcome emails working perfectly
-- ✓ Registration page shows beautiful pricing comparison before signup
-- ✓ Clear messaging throughout: "You're creating a FREE account" vs "You're unlocking the $495 Hero Family Offer"
-- ✓ Seamless role-based signup flow with clear value propositions implemented
-- ✓ Three distinct user paths: Parent/Guardian, IEP Advocate, Education Professional
-- ✓ Role-specific value propositions and feature customization
-- ✓ Intuitive 3-step flow: Role Selection → Pricing Plans → Registration Form
-- ✓ Each role gets tailored benefits and pricing plan descriptions
-- ✓ Easy navigation between steps with back buttons and role/plan changing options
-- ✓ Comprehensive plan status tracking system implemented
-- ✓ Database stores planStatus field: "free", "heroOffer", "retainer"
-- ✓ Beautiful plan status badges and cards displaying user's subscription level
-- ✓ Dashboard shows clear plan status with upgrade options for free users
-- ✓ Plan-specific features and benefits clearly communicated throughout UI
-- ✓ Demo login credentials with proper plan assignments:
-  - parent@demo.com/demo123 → Hero Plan ($495/year) with full features
-  - advocate@demo.com/demo123 → Hero Plan with full tool access for professional use
-- ✓ Stunning dark theme with glass-morphism effects and animations implemented
-- ✓ Login and registration flows completely redesigned with premium UX
-- ✓ Authentication system working correctly with proper session management
-- ✓ Real AI-powered document analysis with OpenAI GPT-4o integration
-- ✓ Professional document analysis results modal with scoring and recommendations
-- ✓ Fixed subscription page error - now shows success message for MVP testing
-- ✓ AI document analyzer provides expert IEP analysis with compliance checking
-- ✓ Complete dashboard redesign with modern split-view SaaS interface
-- ✓ Role-based tools for parents and advocates with professional layout
-- ✓ Split-panel design: left for lists/CRM, right for previews/chat/notes
-- ✓ Integrated file upload, document management, and AI analysis workflow
-- ✓ Hero Plan dashboard with dark mode design and AI-powered IEP tools
-- ✓ Conditional tool access based on subscription tier (Hero vs Free)
-- ✓ Professional dark theme with accessible contrast and modern gradients
-- ✓ AI tools section with 8 comprehensive IEP management tools
-- ✓ Complete Hero dashboard functionality with dark theme implementation
-- ✓ Document Vault page with Hero theme and mock document display
-- ✓ Goals page with Hero theme and full CRUD functionality
-- ✓ Working navigation between Dashboard, Goals, and Documents pages
-- ✓ Professional AI tool modals with file upload integration
-- ✓ Consistent Hero Plan detection and UI throughout application
-- ✓ Created beautiful light-theme parent dashboard (dashboard-parent.tsx) with 4 parent-specific tools
-- ✓ Renamed dashboard-premium.tsx to dashboard-advocate.tsx for advocate/professional users
-- ✓ Implemented role-based routing: parents → /dashboard-parent, advocates → /dashboard-advocate
-- ✓ Removed duplicate navigation headers, now using single top navbar consistently
-- ✓ Parent dashboard features: IEP Goal Generator, Progress Analyzer, Meeting Prep, Ask AI About Docs
-- ✓ Created dedicated /tools/iep-goal-generator route with full-page component
-- ✓ AI-powered IEP goal generation using OpenAI GPT-4o with SMART criteria
-- ✓ Production deployment fixes applied for Cloud Run compatibility
-- ✓ Server configuration updated to bind to 0.0.0.0 on all environments 
-- ✓ Enhanced error handling for demo account setup to prevent deployment failures
-- ✓ Build process verified working correctly with static asset serving
-- ✓ TypeScript errors resolved in demo setup configuration
-- ✓ Comprehensive server startup logging added for production debugging
-- ✓ Professional goal display with next steps and educational tips
-- ✓ Smart Letter Generator updated with 10 comprehensive professional template prompts
-- ✓ All templates optimized for GPT processing with proper IDEA legal references
-- ✓ Hero Plan access controls working correctly for all demo accounts
-- ✓ Template categories: Evaluation Requests, Behavioral Support, Data & Records, Advocacy, Legal Response, Meeting Requests, Documentation, Monitoring, and Observation
-- ✓ Meeting Prep Wizard completed with 7-step guided questionnaire
-- ✓ AI-powered prep sheet generation using OpenAI GPT-4o integration
-- ✓ Professional prep sheet output with copy, download, and restart functionality
-- ✓ Wizard collects concerns, services, progress, changes, requests, attendees, and questions
-- ✓ Generated prep sheets include talking points, legal rights reminders, and advocacy tips
-- ✓ Parent Communication Tracker completed as final Hero Plan MVP tool
-- ✓ Communication logging with email, phone, in-person, and written note tracking
-- ✓ Response monitoring with automatic overdue flagging after 10 days
-- ✓ Timeline view with status badges and filtering by communication type and response status
-- ✓ Database schema with communication_logs table for persistent storage
-- ✓ Complete Hero Plan MVP suite now includes all 4 core tools: Smart Letter Generator, Meeting Prep Wizard, Progress Note Logger, and Parent Communication Tracker
-- ✓ Advocate Matcher MVP implemented with 3-step intake form and automated email notifications
-- ✓ Parent intake form collects child info, IEP needs, contact preferences, and scheduling availability
-- ✓ Automatic advocate matching and notification system with professional email templates
-- ✓ Email notifications sent to both advocates and parents using Resend API integration
-- ✓ Database schema with advocate_matches table for tracking parent-advocate connections
-- ✓ Complete workflow from parent request to advocate notification with confirmation emails
-- ✓ Enhanced Advocate Matcher with manual advocate assignment dropdown (4 professional advocates)
-- ✓ Auto-confirmation email system for parents with professional templates
-- ✓ Real-time Slack integration for team notifications on new advocate match requests
-- ✓ Enhanced success confirmation screen with detailed status updates and next steps
-- ✓ Production-ready Supabase integration with automatic fallback to local database
-- ✓ Comprehensive chat system implementation completed
-- ✓ ChatWidget component integrated into dashboards with real-time message updates
-- ✓ Full-featured chat page with conversation management and user directory
-- ✓ Message API endpoints with authentication and read status tracking
-- ✓ Both demo accounts (parent and advocate) now have Hero Plan access to all tools
-- ✓ **DEPLOYMENT FIXES APPLIED** - Server configuration optimized for production deployment
-- ✓ Server listens on 0.0.0.0 (all interfaces) for proper Cloud Run compatibility  
-- ✓ Static file serving configured correctly for production builds
-- ✓ Demo account setup wrapped with comprehensive error handling to prevent deployment failures
-- ✓ Added deployment preparation script (prepare-deploy.sh) for pre-deployment validation
-- ✓ Production build tested and verified working correctly
-- ✓ **DEPLOYMENT CONFIGURATION COMPLETED** - Fixed all deployment failure issues (August 5, 2025)
-- ✓ Static file serving path resolved - files copied from dist/public to server/public during build
-- ✓ Production server startup verified with proper host binding and error handling  
-- ✓ Deployment preparation script validates all production requirements before deployment
-- ✓ Cloud Run compatibility ensured with 0.0.0.0 host binding and PORT environment variable support
-- ✓ **FINAL DEPLOYMENT FIXES COMPLETED** - Resolved static file serving & server configuration
-- ✓ Production build process verified: dist/index.js (100K) + server/public/ (1MB) static assets
-- ✓ serveStatic function working correctly with copied files from dist/public to server/public
-- ✓ Server configuration confirmed: 0.0.0.0 host binding, PORT env variable, production mode detection
-- ✓ Deployment scripts enhanced with comprehensive validation and error checking
-- ✓ Ready for live deployment at https://my-iep-hero-myiephero.replit.app
+My IEP Hero is a comprehensive SaaS platform designed for Individualized Education Program (IEP) management. Its purpose is to empower parents and professionals with advanced collaboration tools and intuitive workflow management throughout the entire IEP lifecycle. Key capabilities include goal tracking, document storage, progress monitoring, and subscription-based service plans. The platform aims to provide a robust solution for navigating the complexities of IEPs, offering tools like AI-powered document analysis, smart letter generation, meeting preparation wizards, and communication tracking.
 
 # User Preferences
-
 Preferred communication style: Simple, everyday language.
 
 # System Architecture
+The application is a full-stack solution built with a modern, component-based approach.
 
 ## Frontend Architecture
-The frontend is built using **React 18** with TypeScript, utilizing a modern component-based architecture. The application uses **Vite** as the build tool and development server, providing fast hot module replacement and optimized builds.
-
-**UI Framework**: The application leverages **shadcn/ui** components built on top of **Radix UI** primitives, providing accessible and customizable UI components. The design system uses **Tailwind CSS** for styling with a custom color palette optimized for the IEP management domain.
-
-**State Management**: The application uses **TanStack Query (React Query)** for server state management, providing caching, synchronization, and background updates. Local component state is managed using React's built-in hooks.
-
-**Routing**: Client-side routing is implemented using **Wouter**, a lightweight routing library that provides declarative routing without the overhead of React Router.
-
-**Authentication**: The frontend implements a context-based authentication system that manages user sessions and provides route protection through higher-order components.
+The frontend is developed with **React 18** and TypeScript, using **Vite** for fast builds and development.
+- **UI Framework**: **shadcn/ui** components built on **Radix UI** primitives, styled with **Tailwind CSS** using a custom color palette.
+- **State Management**: **TanStack Query (React Query)** for server state, and React's built-in hooks for local component state.
+- **Routing**: **Wouter** for client-side routing.
+- **Authentication**: Context-based system with route protection.
+- **PWA Features**: Implemented with mobile-first design, including offline support, native device integration, voice input, haptic feedback, and native sharing.
+- **UI/UX Decisions**: Features a stunning dark theme with glass-morphism effects and animations, as well as a light-theme parent dashboard. It incorporates a split-view SaaS interface for role-based tools, consistent navigation, and professional AI tool modals. Supports distinct user paths (Parent/Guardian, IEP Advocate, Education Professional) with tailored UIs and feature access based on subscription tier.
 
 ## Backend Architecture
-The backend follows a **REST API** architecture built with **Express.js** and TypeScript. The server implements session-based authentication using **Passport.js** with local strategy for email/password authentication.
-
-**API Design**: RESTful endpoints are organized by resource type (users, goals, documents, events, messages) with proper HTTP methods and status codes. The API includes middleware for request logging, error handling, and authentication.
-
-**File Handling**: Document uploads are handled using **Multer** middleware with file type validation and size limits. Uploaded files are stored in a local uploads directory with unique identifiers.
-
-**Session Management**: User sessions are managed using **express-session** with configurable security settings. Session data persists user authentication state across requests.
+The backend is a **REST API** built with **Express.js** and TypeScript.
+- **API Design**: RESTful endpoints organized by resource type, with middleware for logging, error handling, and authentication.
+- **File Handling**: **Multer** for document uploads, storing files locally with unique identifiers.
+- **Session Management**: **express-session** for managing user sessions with configurable security settings.
+- **Authentication**: Session-based authentication using **Passport.js** with a local strategy and bcrypt password hashing. Supports multiple user roles (parent, advocate, professional) with role-based access control.
 
 ## Data Storage Solutions
-The application uses **PostgreSQL** as the primary database with **Drizzle ORM** for type-safe database operations and schema management.
+- **Primary Database**: **PostgreSQL** for persistent data storage.
+- **ORM**: **Drizzle ORM** for type-safe database operations and schema management.
+- **Schema Design**: Tables for users, IEP goals, documents, events, and messages, using UUID primary keys and foreign key relationships.
+- **Migration System**: Drizzle's migration system for managing database schema changes.
+- **Storage Interface**: An abstraction layer (IStorage interface) supports different storage backends, including PostgreSQL and an in-memory option for development.
 
-**Schema Design**: The database schema includes tables for users, IEP goals, documents, events, and messages. Each table uses UUID primary keys for scalability and includes proper foreign key relationships.
+## System Design Choices
+- **AI Integration**: Deep integration with **OpenAI GPT-4o** for features like AI-powered document analysis, IEP goal generation, smart letter generation, and meeting prep sheet generation. AI output validation requires specific keywords.
+- **Subscription Management**: Supports multiple subscription tiers (Free, Hero Plan) with conditional tool access and a clear signup flow showcasing pricing transparency. A plan status tracking system visually indicates user subscription levels.
+- **Communication & Notifications**: Integrates **Resend** for email notifications (e.g., welcome emails, advocate notifications). Features an Advocate Matcher MVP with automated email notifications and real-time Slack integration for team alerts.
+- **Chat System**: Includes a comprehensive chat system with real-time message updates, conversation management, and user directory.
 
-**Migration System**: Database schema changes are managed through Drizzle's migration system, allowing version control of database structure changes.
-
-**Storage Interface**: The application implements an abstraction layer (IStorage interface) that allows for different storage backends. Currently includes both production PostgreSQL implementation and in-memory storage for development/testing.
-
-## Authentication and Authorization
-**Authentication Strategy**: The system uses session-based authentication with bcrypt password hashing. Users authenticate with email/password credentials, and sessions are maintained server-side.
-
-**Role-Based Access**: The application supports multiple user roles (parent, advocate, professional) with role-specific features and permissions built into the UI and API endpoints.
-
-**Session Security**: Sessions include security configurations such as secure cookies in production, session expiration, and protection against common session-based attacks.
-
-## External Dependencies
-
-**Payment Processing**: Stripe integration for subscription management, including both client-side (Stripe.js, React Stripe.js) and server-side components. The application supports multiple subscription tiers (free, basic, professional, enterprise) with Stripe webhooks for payment processing.
-
-**Database Service**: Neon Database serverless PostgreSQL for cloud-hosted database with connection pooling and automatic scaling capabilities.
-
-**Development Tools**: The application includes Replit-specific development enhancements including error overlay, cartographer for debugging, and development banner integration.
-
-**UI Component Library**: Extensive use of Radix UI primitives for accessible component foundations, with shadcn/ui providing pre-built component implementations.
-
-**Date Handling**: date-fns library for consistent date formatting and manipulation across the application.
-
-**Form Management**: React Hook Form with Zod for form validation and hookform/resolvers for schema-based validation integration.
- 
+# External Dependencies
+- **Payment Processing**: **Stripe** (Stripe.js, React Stripe.js) for subscription management and payment processing, including webhook integration.
+- **Database Service**: **Neon Database** for serverless PostgreSQL hosting.
+- **AI Service**: **OpenAI GPT-4o** for advanced AI capabilities.
+- **Email Service**: **Resend** for sending transactional emails.
+- **Development Tools**: Replit-specific enhancements like error overlay and cartographer.
+- **UI Component Library**: **Radix UI** and **shadcn/ui**.
+- **Date Handling**: **date-fns** for date manipulation.
+- **Form Management**: **React Hook Form** with **Zod** for validation.
