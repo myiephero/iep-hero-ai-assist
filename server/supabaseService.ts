@@ -18,15 +18,16 @@ export interface SupabaseAdvocateMatch {
   document_urls?: string[];
 }
 
-export const submitAdvocateMatch = async (formData: any, userId: string) => {
+export const submitAdvocateMatch = async (formData: any, userId: string, selectedAdvocateId?: string) => {
   if (!supabaseAdmin) {
     console.log('Supabase not configured, using local database');
     return { success: false, error: 'Supabase not configured' };
   }
 
-  const { error } = await supabaseAdmin.from("advocate_matches").insert([
+  const { data, error } = await supabaseAdmin.from("advocate_matches").insert([
     {
       parent_id: userId,
+      advocate_id: selectedAdvocateId || null,
       meeting_date: formData.meetingDate,
       contact_method: formData.contactMethod,
       parent_availability: formData.availability,
@@ -37,12 +38,29 @@ export const submitAdvocateMatch = async (formData: any, userId: string) => {
       status: "pending",
       document_urls: formData.uploadedFiles || [],
     }
-  ]);
+  ]).select();
 
   if (error) {
     console.error("Error submitting match:", error);
     return { success: false, error };
   }
 
-  return { success: true };
+  // Send Slack notification if webhook is configured
+  const slackWebhook = process.env.SLACK_WEBHOOK_URL;
+  if (slackWebhook && slackWebhook !== 'YOUR/SLACK/WEBHOOK') {
+    try {
+      await fetch(slackWebhook, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text: `📢 New Advocate Match Request\nParent ID: ${userId}\nAdvocate ID: ${selectedAdvocateId || 'Auto-assigned'}\nGrade: ${formData.gradeLevel}\nDistrict: ${formData.schoolDistrict}\nConcern: ${formData.concerns.substring(0, 100)}...`
+        })
+      });
+      console.log('✅ Slack notification sent');
+    } catch (slackError) {
+      console.error('Failed to send Slack notification:', slackError);
+    }
+  }
+
+  return { success: true, data: data?.[0] };
 };

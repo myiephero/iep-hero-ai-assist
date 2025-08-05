@@ -49,6 +49,7 @@ const advocateMatchSchema = z.object({
   helpAreas: z.array(z.string()).min(1, "Please select at least one help area"),
   gradeLevel: z.string().min(1, "Child's grade level is required"),
   schoolDistrict: z.string().min(2, "School district is required"),
+  selectedAdvocate: z.string().optional(),
   uploadedFiles: z.array(z.string()).optional(),
 });
 
@@ -75,6 +76,7 @@ export default function AdvocateMatcher() {
       helpAreas: [],
       gradeLevel: "",
       schoolDistrict: "",
+      selectedAdvocate: "",
       uploadedFiles: [],
     },
   });
@@ -85,11 +87,14 @@ export default function AdvocateMatcher() {
       const response = await apiRequest('POST', '/api/advocate-matches', data);
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (result) => {
       setIsSubmitted(true);
+      const savedTo = result.savedTo === 'local' ? 'development database' : 'Supabase';
+      console.log(`✅ Data saved to: ${savedTo}`);
+      
       toast({
-        title: "Match Request Submitted",
-        description: "We're connecting you with an expert advocate. You'll hear from them within 24 hours.",
+        title: "Request Submitted Successfully!",
+        description: "✅ Your advocate match request has been submitted. You'll receive a confirmation email and hear from your advocate within 24 hours.",
       });
     },
     onError: (error: any) => {
@@ -427,6 +432,34 @@ export default function AdvocateMatcher() {
                               className="resize-none"
                             />
                           </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="selectedAdvocate"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Preferred Advocate (Optional)</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Auto-assign best match or choose specific advocate" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="">Auto-assign best match</SelectItem>
+                              <SelectItem value="advocate-demo-1">Sarah Mitchell - Special Education Law</SelectItem>
+                              <SelectItem value="advocate-demo-2">David Chen - IEP Compliance Expert</SelectItem>
+                              <SelectItem value="advocate-demo-3">Maria Rodriguez - Behavioral Support Specialist</SelectItem>
+                              <SelectItem value="advocate-demo-4">Jennifer Thompson - Transition Planning</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <p className="text-xs text-gray-500">
+                            Leave blank for automatic matching based on your needs
+                          </p>
                           <FormMessage />
                         </FormItem>
                       )}
