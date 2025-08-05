@@ -309,26 +309,39 @@ export default function MeetingPrepWizard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
-      <div className="max-w-2xl mx-auto">
-        <div className="mb-6">
+    <div className="min-h-screen bg-gray-50/50">
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* Clean Header */}
+        <div className="mb-8">
           <Link href="/dashboard-parent">
-            <Button variant="ghost" className="mb-4">
+            <Button variant="ghost" size="sm" className="mb-6 text-gray-600 hover:text-gray-900 hover:bg-white">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Dashboard
             </Button>
           </Link>
+          
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 bg-cyan-500 rounded-lg flex items-center justify-center">
+              <ClipboardList className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-semibold text-gray-900">Meeting Prep Assistant</h1>
+              <p className="text-gray-600">Generate talking points and meeting notes</p>
+            </div>
+          </div>
         </div>
 
-        <Card>
+        <div className="max-w-2xl mx-auto">
+
+        <Card className="bg-white border-0 shadow-sm rounded-xl">
           <CardHeader>
             <div className="flex items-center justify-between mb-4">
               <div>
                 <CardTitle className="text-xl">Meeting Prep Wizard</CardTitle>
                 <CardDescription>Step {currentStep} of {wizardSteps.length}</CardDescription>
               </div>
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center">
-                <ClipboardList className="w-8 h-8 text-purple-600" />
+              <div className="w-16 h-16 bg-cyan-100 rounded-full flex items-center justify-center">
+                <ClipboardList className="w-8 h-8 text-cyan-600" />
               </div>
             </div>
             <Progress value={progress} className="w-full" />

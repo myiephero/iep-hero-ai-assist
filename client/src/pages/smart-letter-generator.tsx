@@ -307,31 +307,31 @@ export default function SmartLetterGenerator() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="mb-6">
+    <div className="min-h-screen bg-gray-50/50">
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* Clean Header */}
+        <div className="mb-8">
           <Link href="/dashboard-parent">
-            <Button variant="ghost" className="mb-4">
+            <Button variant="ghost" size="sm" className="mb-6 text-gray-600 hover:text-gray-900 hover:bg-white">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Dashboard
             </Button>
           </Link>
           
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">Smart Letter Generator</h1>
-              <p className="text-gray-600">Create professional advocacy letters with AI assistance</p>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 bg-indigo-500 rounded-lg flex items-center justify-center">
+              <Wand2 className="w-5 h-5 text-white" />
             </div>
-            <Badge className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white">
-              Hero Plan
-            </Badge>
+            <div>
+              <h1 className="text-2xl font-semibold text-gray-900">Template Builder</h1>
+              <p className="text-gray-600">Design reusable IEP templates and forms</p>
+            </div>
           </div>
         </div>
 
         <div className="space-y-6">
           {/* Template Selection */}
-          <Card>
+          <Card className="bg-white border-0 shadow-sm rounded-xl">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <FileText className="w-5 h-5" />
@@ -343,7 +343,7 @@ export default function SmartLetterGenerator() {
             </CardHeader>
             <CardContent>
               <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
-                <SelectTrigger className="w-full">
+                <SelectTrigger className="w-full h-12 border-gray-200 focus:border-blue-400 focus:ring-blue-100">
                   <SelectValue placeholder="Select a letter template..." />
                 </SelectTrigger>
                 <SelectContent>
