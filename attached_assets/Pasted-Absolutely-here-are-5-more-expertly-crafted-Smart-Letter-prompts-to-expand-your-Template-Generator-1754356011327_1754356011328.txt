@@ -1,0 +1,59 @@
+Absolutely — here are 5 more expertly crafted Smart Letter prompts to expand your Template Generator to a powerful set of 10 total options for parents:
+
+⸻
+
+✉️ 6. Request for IEP Meeting
+
+Write a formal letter requesting an IEP meeting for my child [Student Name] at [School Name]. State that new concerns have emerged regarding [brief concern, e.g., declining academic performance, behavioral changes, lack of progress], and I am requesting a team meeting to discuss possible updates to the IEP. Reference IDEA timelines and request a meeting within 10 school days.
+
+
+⸻
+
+✉️ 7. Parent Concerns Letter (Attach to IEP)
+
+Draft a parent input statement to be attached to my child’s IEP. It should outline my concerns about [specific areas, e.g., reading comprehension, peer interactions, service consistency], my hopes for the IEP team, and specific requests or suggestions I believe should be considered. Tone should be collaborative, but clear.
+
+
+⸻
+
+✉️ 8. 504 Plan Request (Initial)
+
+Create a formal letter requesting a Section 504 Plan evaluation for my child [Student Name] at [School Name]. Explain that my child has a documented diagnosis of [diagnosis] which substantially limits major life activities. Request a meeting to begin the evaluation process and determine eligibility for accommodations.
+
+
+⸻
+
+✉️ 9. Service Implementation Check-In
+
+Write a follow-up letter asking for confirmation that all IEP services and supports for my child [Student Name] are being implemented as written. Ask for a service delivery log or confirmation from relevant staff. Reference the school’s obligation under IDEA to provide services with fidelity and transparency.
+
+
+⸻
+
+✉️ 10. Request to Observe Child in School Setting
+
+Draft a respectful letter requesting an in-person observation of my child [Student Name] in the classroom and/or during services at [School Name]. State that the observation will help inform my understanding of my child’s needs and participation in the current environment. Include dates of availability and request guidance on visitor policies if needed.
+
+
+⸻
+
+✅ You Now Have 10 Parent Letter Templates:
+
+#	Letter Type
+1	Request for IEP Evaluation
+2	Request for FBA
+3	Request for Progress Data
+4	Dispute or Complaint
+5	PWN Response
+6	Request for IEP Meeting
+7	Parent Concerns Statement
+8	504 Plan Request
+9	Service Implementation Check
+10	Request to Observe Child
+
+
+⸻
+
+All are ready to drop into the Replit UI as dropdowns with prompt fields (child name, school, concern, etc.).
+
+Let me know when you’re ready to move on to the Meeting Prep Wizard — we can create prompt logic and step flow next.
