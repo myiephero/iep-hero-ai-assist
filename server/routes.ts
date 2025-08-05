@@ -377,6 +377,41 @@ Use professional, supportive language that empowers the parent while being legal
     }
   });
 
+  // Generated Documents API - Save AI-generated content to document vault
+  app.post("/api/documents/generate", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      const { content, type, generatedBy, displayName, parentDocumentId } = req.body;
+
+      if (!content || !type || !generatedBy || !displayName) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+
+      const documentData = {
+        userId: user.id,
+        filename: `${displayName.replace(/[^a-zA-Z0-9]/g, '_')}.txt`,
+        originalName: `${displayName}.txt`,
+        displayName,
+        type,
+        content,
+        generatedBy,
+        parentDocumentId: parentDocumentId || null,
+        fileUrl: null, // Generated documents don't have file URLs
+      };
+
+      const document = await storage.createDocument(documentData);
+      
+      res.json({ 
+        success: true, 
+        document,
+        message: "Generated content saved to Document Vault"
+      });
+    } catch (error: any) {
+      console.error('Error saving generated document:', error);
+      res.status(500).json({ error: 'Failed to save generated content' });
+    }
+  });
+
   // Progress Notes routes
   app.get("/api/progress-notes", requireAuth, async (req, res) => {
     try {

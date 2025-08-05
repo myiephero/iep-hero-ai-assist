@@ -32,27 +32,45 @@ export default function DashboardAdvocate() {
   const isHeroPlan = displayUser.planStatus === 'heroOffer';
 
   const openToolModal = (tool: string) => {
-    // Navigate directly to specific tool pages for Hero Plan tools
-    if (tool === 'One-Click Advocacy Report') {
-      setLocation('/tools/advocacy-report-generator');
-      return;
+    // Navigate directly to specific tool pages for all Hero Plan tools
+    switch (tool) {
+      case 'One-Click Advocacy Report':
+        setLocation('/tools/advocacy-report-generator');
+        break;
+      case 'IEP Goal Generator':
+        setLocation('/tools/iep-goal-generator');
+        break;
+      case 'AI IEP Review':
+        setLocation('/tools/ai-iep-review');
+        break;
+      case 'Template Builder':
+        setLocation('/tools/smart-letter-generator');
+        break;
+      case 'Progress Analyzer':
+        setLocation('/tools/progress-analyzer');
+        break;
+      case 'Meeting Prep Assistant':
+        setLocation('/tools/meeting-prep-wizard');
+        break;
+      case 'Compliance Checker':
+        setLocation('/tools/ai-iep-review'); // Use AI IEP Review for compliance checking
+        break;
+      case 'Accommodation Builder':
+        setLocation('/tools/iep-goal-generator'); // Use Goal Generator for accommodations
+        break;
+      case 'Transition Planner':
+        setLocation('/tools/progress-analyzer'); // Use Progress Analyzer for transition planning
+        break;
+      default:
+        // Fallback for unimplemented tools
+        setSelectedTool(tool);
+        setModalOpen(true);
     }
-    if (tool === 'IEP Goal Generator') {
-      setLocation('/tools/iep-goal-generator');
-      return;
-    }
-    if (tool === 'AI IEP Review') {
-      setLocation('/tools/ai-iep-review');
-      return;
-    }
-    
-    // For other tools, show modal
-    setSelectedTool(tool);
-    setModalOpen(true);
   };
 
   const handleSubmit = () => {
-    alert(`Uploaded ${upload?.name || 'nothing'} to ${selectedTool}`);
+    // Tools should redirect to their actual implementation pages
+    // This is a fallback for unimplemented tools
     setModalOpen(false);
     setUpload(null);
   };
@@ -71,30 +89,38 @@ export default function DashboardAdvocate() {
           </p>
         </div>
 
-        {/* Stats Cards */}
+        {/* Quick Actions */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
-          <Card className="bg-[#3E4161]/70 border-slate-600">
-            <CardContent className="p-4">
-              <div className="text-slate-300 text-sm">Families Supported</div>
-              <div className="text-2xl font-bold text-white">4</div>
+          <Card className="bg-[#3E4161]/70 border-slate-600 hover:bg-[#4A4E76] cursor-pointer transition-colors"
+                onClick={() => setLocation('/documents')}>
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl mb-2">🗂️</div>
+              <div className="text-white font-semibold">Document Vault</div>
+              <div className="text-slate-300 text-sm">Manage Files</div>
             </CardContent>
           </Card>
-          <Card className="bg-[#3E4161]/70 border-slate-600">
-            <CardContent className="p-4">
-              <div className="text-slate-300 text-sm">Documents Reviewed</div>
-              <div className="text-2xl font-bold text-white">12</div>
+          <Card className="bg-[#3E4161]/70 border-slate-600 hover:bg-[#4A4E76] cursor-pointer transition-colors"
+                onClick={() => setLocation('/tools/iep-goal-generator')}>
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl mb-2">🎯</div>
+              <div className="text-white font-semibold">Goal Generator</div>
+              <div className="text-slate-300 text-sm">Create Goals</div>
             </CardContent>
           </Card>
-          <Card className="bg-[#3E4161]/70 border-slate-600">
-            <CardContent className="p-4">
-              <div className="text-slate-300 text-sm">Goals Generated</div>
-              <div className="text-2xl font-bold text-white">28</div>
+          <Card className="bg-[#3E4161]/70 border-slate-600 hover:bg-[#4A4E76] cursor-pointer transition-colors"
+                onClick={() => setLocation('/tools/ai-iep-review')}>
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl mb-2">🧠</div>
+              <div className="text-white font-semibold">AI Review</div>
+              <div className="text-slate-300 text-sm">Analyze IEPs</div>
             </CardContent>
           </Card>
-          <Card className="bg-[#3E4161]/70 border-slate-600">
-            <CardContent className="p-4">
-              <div className="text-slate-300 text-sm">Compliance Flags</div>
-              <div className="text-2xl font-bold text-white">1</div>
+          <Card className="bg-[#3E4161]/70 border-slate-600 hover:bg-[#4A4E76] cursor-pointer transition-colors"
+                onClick={() => setLocation('/tools/advocacy-report-generator')}>
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl mb-2">📋</div>
+              <div className="text-white font-semibold">Reports</div>
+              <div className="text-slate-300 text-sm">Generate Reports</div>
             </CardContent>
           </Card>
         </div>
