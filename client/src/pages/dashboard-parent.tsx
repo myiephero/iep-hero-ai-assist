@@ -53,6 +53,11 @@ const parentTools = [
     name: 'Ask AI About My Docs',
     description: 'Ask questions about your uploaded IEP documents',
     icon: '💬'
+  },
+  {
+    name: 'Get Expert Help',
+    description: 'Connect with an IEP advocate for personalized support',
+    icon: '🤝'
   }
 ];
 
@@ -105,6 +110,10 @@ export default function ParentDashboard() {
     }
     if (tool === "Document Vault") {
       setLocation("/documents");
+      return;
+    }
+    if (tool === "Get Expert Help") {
+      setLocation("/tools/advocate-matcher");
       return;
     }
     setSelectedTool(tool);

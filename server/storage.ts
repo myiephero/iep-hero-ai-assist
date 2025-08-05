@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type Goal, type InsertGoal, type Document, type InsertDocument, type Event, type InsertEvent, type Message, type InsertMessage, type SharedMemory, type InsertSharedMemory, type ProgressNote, type InsertProgressNote, type CommunicationLog, type InsertCommunicationLog, users, iepGoals, documents, events, messages, sharedMemories, progressNotes, communicationLogs } from "@shared/schema";
+import { type User, type InsertUser, type Goal, type InsertGoal, type Document, type InsertDocument, type Event, type InsertEvent, type Message, type InsertMessage, type SharedMemory, type InsertSharedMemory, type ProgressNote, type InsertProgressNote, type CommunicationLog, type InsertCommunicationLog, type AdvocateMatch, type InsertAdvocateMatch, users, iepGoals, documents, events, messages, sharedMemories, progressNotes, communicationLogs, advocateMatches } from "@shared/schema";
 import { randomUUID } from "crypto";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
@@ -46,6 +46,11 @@ export interface IStorage {
   // Communication Logs
   getCommunicationLogsByUserId(userId: string): Promise<CommunicationLog[]>;
   createCommunicationLog(userId: string, log: InsertCommunicationLog): Promise<CommunicationLog>;
+  
+  // Advocate Matches
+  getAdvocateMatchesByParentId(parentId: string): Promise<AdvocateMatch[]>;
+  getAdvocateMatchesByAdvocateId(advocateId: string): Promise<AdvocateMatch[]>;
+  createAdvocateMatch(parentId: string, advocateId: string, match: InsertAdvocateMatch): Promise<AdvocateMatch>;
 }
 
 export class MemStorage implements IStorage {
@@ -57,6 +62,7 @@ export class MemStorage implements IStorage {
   private sharedMemories: Map<string, SharedMemory>;
   private progressNotes: Map<string, ProgressNote>;
   private communicationLogs: Map<string, CommunicationLog>;
+  private advocateMatches: Map<string, AdvocateMatch>;
 
   constructor() {
     this.users = new Map();
@@ -67,6 +73,7 @@ export class MemStorage implements IStorage {
     this.sharedMemories = new Map();
     this.progressNotes = new Map();
     this.communicationLogs = new Map();
+    this.advocateMatches = new Map();
     
     // Add sample data for development
     this.initializeSampleData();
@@ -355,6 +362,27 @@ export class MemStorage implements IStorage {
     };
     this.communicationLogs.set(id, newLog);
     return newLog;
+  }
+
+  async getAdvocateMatchesByParentId(parentId: string): Promise<AdvocateMatch[]> {
+    return Array.from(this.advocateMatches.values()).filter(match => match.parentId === parentId);
+  }
+
+  async getAdvocateMatchesByAdvocateId(advocateId: string): Promise<AdvocateMatch[]> {
+    return Array.from(this.advocateMatches.values()).filter(match => match.advocateId === advocateId);
+  }
+
+  async createAdvocateMatch(parentId: string, advocateId: string, match: InsertAdvocateMatch): Promise<AdvocateMatch> {
+    const id = randomUUID();
+    const newMatch: AdvocateMatch = {
+      id,
+      parentId,
+      advocateId,
+      ...match,
+      createdAt: new Date(),
+    };
+    this.advocateMatches.set(id, newMatch);
+    return newMatch;
   }
 }
 
@@ -789,6 +817,29 @@ export const storage = new class LocalDbStorage implements IStorage {
     };
     
     const result = await this.db.insert(communicationLogs).values(newLog).returning();
+    return result[0];
+  }
+
+  // Advocate Matches
+  async getAdvocateMatchesByParentId(parentId: string): Promise<AdvocateMatch[]> {
+    return await this.db.select().from(advocateMatches).where(eq(advocateMatches.parentId, parentId));
+  }
+
+  async getAdvocateMatchesByAdvocateId(advocateId: string): Promise<AdvocateMatch[]> {
+    return await this.db.select().from(advocateMatches).where(eq(advocateMatches.advocateId, advocateId));
+  }
+
+  async createAdvocateMatch(parentId: string, advocateId: string, match: InsertAdvocateMatch): Promise<AdvocateMatch> {
+    const id = randomUUID();
+    const newMatch = {
+      ...match,
+      id,
+      parentId,
+      advocateId,
+      createdAt: new Date()
+    };
+    
+    const result = await this.db.insert(advocateMatches).values(newMatch).returning();
     return result[0];
   }
 

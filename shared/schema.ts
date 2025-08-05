@@ -95,6 +95,24 @@ export const communicationLogs = pgTable("communication_logs", {
   createdAt: timestamp("created_at").default(sql`now()`),
 });
 
+export const advocateMatches = pgTable("advocate_matches", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  parentId: varchar("parent_id").notNull().references(() => users.id),
+  advocateId: varchar("advocate_id").notNull().references(() => users.id),
+  parentName: text("parent_name").notNull(),
+  childGrade: text("child_grade").notNull(),
+  schoolDistrict: text("school_district").notNull(),
+  helpAreas: text("help_areas").array().notNull(),
+  biggestConcern: text("biggest_concern").notNull(),
+  nextMeetingDate: text("next_meeting_date"),
+  preferredContact: text("preferred_contact").notNull(), // phone, zoom, email
+  availability: text("availability").notNull(),
+  calendlyLink: text("calendly_link"),
+  documentUrls: text("document_urls").array(),
+  status: text("status").notNull().default("pending"), // pending, confirmed, completed
+  createdAt: timestamp("created_at").default(sql`now()`),
+});
+
 // Schemas
 export const insertUserSchema = createInsertSchema(users).pick({
   email: true,
@@ -151,6 +169,11 @@ export const insertCommunicationLogSchema = createInsertSchema(communicationLogs
   createdAt: true,
 });
 
+export const insertAdvocateMatchSchema = createInsertSchema(advocateMatches).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -168,3 +191,5 @@ export type InsertProgressNote = z.infer<typeof insertProgressNoteSchema>;
 export type ProgressNote = typeof progressNotes.$inferSelect;
 export type InsertCommunicationLog = z.infer<typeof insertCommunicationLogSchema>;
 export type CommunicationLog = typeof communicationLogs.$inferSelect;
+export type InsertAdvocateMatch = z.infer<typeof insertAdvocateMatchSchema>;
+export type AdvocateMatch = typeof advocateMatches.$inferSelect;

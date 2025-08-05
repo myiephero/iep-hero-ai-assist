@@ -23,6 +23,7 @@ import RightsExplainer from "@/pages/rights-explainer";
 import MeetingPrepWizard from "@/pages/meeting-prep-wizard";
 import ProgressNotesLogger from "@/pages/progress-notes-logger";
 import CommunicationTracker from "@/pages/communication-tracker";
+import AdvocateMatcher from "@/pages/advocate-matcher";
 import Subscribe from "@/pages/subscribe";
 import Pricing from "@/pages/pricing";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
@@ -169,6 +170,11 @@ function Router() {
       <Route path="/tools/communication-tracker">
         <AuthGuard>
           <CommunicationTracker />
+        </AuthGuard>
+      </Route>
+      <Route path="/tools/advocate-matcher">
+        <AuthGuard>
+          <AdvocateMatcher />
         </AuthGuard>
       </Route>
       <Route path="/">
