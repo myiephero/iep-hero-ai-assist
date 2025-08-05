@@ -24,6 +24,17 @@ const getOidcConfig = memoize(
 
 export function getSession() {
   const sessionTtl = 7 * 24 * 60 * 60 * 1000; // 1 week
+  
+  // SECURITY FIX: Require SESSION_SECRET to be set, fail startup if not configured
+  if (!process.env.SESSION_SECRET) {
+    throw new Error("CRITICAL SECURITY: SESSION_SECRET environment variable must be set. Server startup aborted.");
+  }
+  
+  if (process.env.SESSION_SECRET === "dev-secret-please-change-in-production") {
+    console.error("CRITICAL SECURITY WARNING: Using development session secret in production!");
+    console.error("Set SESSION_SECRET environment variable to a secure random value.");
+  }
+  
   const pgStore = connectPg(session);
   
   // Use a fallback session store if DATABASE_URL is not configured
@@ -35,16 +46,20 @@ export function getSession() {
         tableName: "sessions",
       })
     : null;
-    
+  
+  // SECURITY FIX: Conditional secure cookie configuration
+  const isProduction = process.env.NODE_ENV === "production";
+  
   return session({
-    secret: process.env.SESSION_SECRET || "dev-secret-please-change-in-production",
+    secret: process.env.SESSION_SECRET,
     store: sessionStore || undefined,
     resave: false,
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: false, // Allow non-HTTPS in development
+      secure: isProduction, // Only use secure cookies in production
       maxAge: sessionTtl,
+      sameSite: 'lax', // Additional security
     },
   });
 }

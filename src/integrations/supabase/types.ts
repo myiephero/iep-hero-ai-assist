@@ -113,6 +113,30 @@ export type Database = {
           },
         ]
       }
+      advocate_matches: {
+        Row: {
+          default_value: string | null
+          is_nullable: boolean | null
+          is_primary_key: boolean | null
+          name: string | null
+          type: string | null
+        }
+        Insert: {
+          default_value?: string | null
+          is_nullable?: boolean | null
+          is_primary_key?: boolean | null
+          name?: string | null
+          type?: string | null
+        }
+        Update: {
+          default_value?: string | null
+          is_nullable?: boolean | null
+          is_primary_key?: boolean | null
+          name?: string | null
+          type?: string | null
+        }
+        Relationships: []
+      }
       advocate_notes: {
         Row: {
           advocate_id: string
@@ -224,7 +248,22 @@ export type Database = {
           id?: string
           parent_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "assignments_advocate_id_fkey"
+            columns: ["advocate_id"]
+            isOneToOne: false
+            referencedRelation: "user_roles_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "assignments_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "user_roles_view"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       availabilities: {
         Row: {
@@ -310,13 +349,40 @@ export type Database = {
           parent_id?: string
           school_district?: string | null
         }
+        Relationships: []
+      }
+      documents: {
+        Row: {
+          file_url: string
+          id: string
+          name: string | null
+          type: string | null
+          uploaded_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          file_url: string
+          id?: string
+          name?: string | null
+          type?: string | null
+          uploaded_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          file_url?: string
+          id?: string
+          name?: string | null
+          type?: string | null
+          uploaded_at?: string | null
+          user_id?: string | null
+        }
         Relationships: [
           {
-            foreignKeyName: "children_parent_id_fkey"
-            columns: ["parent_id"]
+            foreignKeyName: "documents_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["user_id"]
+            referencedRelation: "user_roles_view"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -341,6 +407,39 @@ export type Database = {
           id?: string
           parent_id?: string | null
           timestamp?: string | null
+        }
+        Relationships: []
+      }
+      goals: {
+        Row: {
+          createdAt: string | null
+          id: string
+          notes: string | null
+          status: string
+          targetDate: string | null
+          title: string
+          updatedAt: string | null
+          userId: string
+        }
+        Insert: {
+          createdAt?: string | null
+          id?: string
+          notes?: string | null
+          status?: string
+          targetDate?: string | null
+          title: string
+          updatedAt?: string | null
+          userId: string
+        }
+        Update: {
+          createdAt?: string | null
+          id?: string
+          notes?: string | null
+          status?: string
+          targetDate?: string | null
+          title?: string
+          updatedAt?: string | null
+          userId?: string
         }
         Relationships: []
       }
@@ -502,54 +601,152 @@ export type Database = {
           },
         ]
       }
+      memory: {
+        Row: {
+          content: string | null
+          created_at: string | null
+          embedding: string | null
+          id: string
+          metadata: Json | null
+          namespace: string | null
+          user_id: string | null
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string | null
+          embedding?: string | null
+          id?: string
+          metadata?: Json | null
+          namespace?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          content?: string | null
+          created_at?: string | null
+          embedding?: string | null
+          id?: string
+          metadata?: Json | null
+          namespace?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
-          avatar_url: string | null
-          bio: string | null
-          certification: string | null
-          created_at: string
-          first_name: string
-          hourly_rate: number | null
+          created_at: string | null
+          email: string
+          first_name: string | null
           id: string
-          is_verified: boolean | null
-          last_name: string
-          phone: string | null
-          role: Database["public"]["Enums"]["user_role"]
-          specializations: string[] | null
-          updated_at: string
+          last_name: string | null
+          role: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          role?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          role?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      reminder_emails: {
+        Row: {
+          emailStatus: string | null
+          emailType: string
+          id: string
+          reminderId: string
+          sentAt: string | null
+          userId: string
+        }
+        Insert: {
+          emailStatus?: string | null
+          emailType: string
+          id?: string
+          reminderId: string
+          sentAt?: string | null
+          userId: string
+        }
+        Update: {
+          emailStatus?: string | null
+          emailType?: string
+          id?: string
+          reminderId?: string
+          sentAt?: string | null
+          userId?: string
+        }
+        Relationships: []
+      }
+      reminders: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          due_date: string
+          id: string
+          is_completed: boolean | null
+          title: string
+          updated_at: string | null
           user_id: string
         }
         Insert: {
-          avatar_url?: string | null
-          bio?: string | null
-          certification?: string | null
-          created_at?: string
-          first_name: string
-          hourly_rate?: number | null
+          created_at?: string | null
+          description?: string | null
+          due_date: string
           id?: string
-          is_verified?: boolean | null
-          last_name: string
-          phone?: string | null
-          role?: Database["public"]["Enums"]["user_role"]
-          specializations?: string[] | null
-          updated_at?: string
+          is_completed?: boolean | null
+          title: string
+          updated_at?: string | null
           user_id: string
         }
         Update: {
-          avatar_url?: string | null
-          bio?: string | null
-          certification?: string | null
-          created_at?: string
-          first_name?: string
-          hourly_rate?: number | null
+          created_at?: string | null
+          description?: string | null
+          due_date?: string
           id?: string
-          is_verified?: boolean | null
-          last_name?: string
-          phone?: string | null
-          role?: Database["public"]["Enums"]["user_role"]
-          specializations?: string[] | null
-          updated_at?: string
+          is_completed?: boolean | null
+          title?: string
+          updated_at?: string | null
           user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reminders_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shared_answers: {
+        Row: {
+          default_value: string | null
+          is_required: boolean | null
+          name: string | null
+          type: string | null
+        }
+        Insert: {
+          default_value?: string | null
+          is_required?: boolean | null
+          name?: string | null
+          type?: string | null
+        }
+        Update: {
+          default_value?: string | null
+          is_required?: boolean | null
+          name?: string | null
+          type?: string | null
         }
         Relationships: []
       }
@@ -579,6 +776,82 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      subscriptions: {
+        Row: {
+          created_at: string | null
+          end_date: string | null
+          id: string
+          is_active: boolean | null
+          plan_type: string
+          start_date: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          end_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          plan_type: string
+          start_date?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          end_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          plan_type?: string
+          start_date?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tool_logs: {
+        Row: {
+          created_at: string | null
+          id: string
+          input: string | null
+          output: string | null
+          tool: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          input?: string | null
+          output?: string | null
+          tool: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          input?: string | null
+          output?: string | null
+          tool?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tool_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_roles_view"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       usage_logs: {
         Row: {
@@ -624,6 +897,38 @@ export type Database = {
           },
         ]
       }
+      user_feedback: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          rating: number | null
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          rating?: number | null
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          rating?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_feedback_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_profiles: {
         Row: {
           auth_id: string | null
@@ -661,7 +966,15 @@ export type Database = {
           timezone?: string | null
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "user_profiles_auth_id_fkey"
+            columns: ["auth_id"]
+            isOneToOne: true
+            referencedRelation: "user_roles_view"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
@@ -674,11 +987,36 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles_view: {
+        Row: {
+          created_at: string | null
+          email: string | null
+          id: string | null
+          role: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email?: string | null
+          id?: string | null
+          role?: never
+        }
+        Update: {
+          created_at?: string | null
+          email?: string | null
+          id?: string | null
+          role?: never
+        }
+        Relationships: []
+      }
     }
     Functions: {
       auto_assign_advocate_to_review: {
         Args: { review_id: string }
         Returns: boolean
+      }
+      binary_quantize: {
+        Args: { "": string } | { "": unknown }
+        Returns: unknown
       }
       get_ai_review_with_advocate: {
         Args: { review_id: string }
@@ -713,6 +1051,109 @@ export type Database = {
           meetings: Json
           advocate_notes: Json
         }[]
+      }
+      get_pending_reminders: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          reminder_id: string
+          user_id: string
+          title: string
+          meeting_date: string
+          days_until: number
+          reminder_type: string
+        }[]
+      }
+      halfvec_avg: {
+        Args: { "": number[] }
+        Returns: unknown
+      }
+      halfvec_out: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      halfvec_send: {
+        Args: { "": unknown }
+        Returns: string
+      }
+      halfvec_typmod_in: {
+        Args: { "": unknown[] }
+        Returns: number
+      }
+      hnsw_bit_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      hnsw_halfvec_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      hnsw_sparsevec_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      hnswhandler: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      is_admin: {
+        Args: { user_email: string }
+        Returns: boolean
+      }
+      ivfflat_bit_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      ivfflat_halfvec_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      ivfflathandler: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      l2_norm: {
+        Args: { "": unknown } | { "": unknown }
+        Returns: number
+      }
+      l2_normalize: {
+        Args: { "": string } | { "": unknown } | { "": unknown }
+        Returns: unknown
+      }
+      sparsevec_out: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      sparsevec_send: {
+        Args: { "": unknown }
+        Returns: string
+      }
+      sparsevec_typmod_in: {
+        Args: { "": unknown[] }
+        Returns: number
+      }
+      vector_avg: {
+        Args: { "": number[] }
+        Returns: string
+      }
+      vector_dims: {
+        Args: { "": string } | { "": unknown }
+        Returns: number
+      }
+      vector_norm: {
+        Args: { "": string }
+        Returns: number
+      }
+      vector_out: {
+        Args: { "": string }
+        Returns: unknown
+      }
+      vector_send: {
+        Args: { "": string }
+        Returns: string
+      }
+      vector_typmod_in: {
+        Args: { "": unknown[] }
+        Returns: number
       }
     }
     Enums: {

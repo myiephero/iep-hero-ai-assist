@@ -8,6 +8,65 @@ import { db } from "./db";
 import { users } from "@shared/schema";
 import { eq } from "drizzle-orm";
 
+// SECURITY FIX: Simple rate limiting implementation
+const requestCounts = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT_WINDOW = 15 * 60 * 1000; // 15 minutes
+const RATE_LIMIT_MAX = 100; // requests per window
+
+function rateLimit(req: any, res: any, next: any) {
+  const ip = req.ip || req.connection.remoteAddress;
+  const now = Date.now();
+  const key = `${ip}-general`;
+  
+  const current = requestCounts.get(key);
+  if (!current || now > current.resetTime) {
+    requestCounts.set(key, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
+    return next();
+  }
+  
+  if (current.count >= RATE_LIMIT_MAX) {
+    return res.status(429).json({ message: 'Too many requests' });
+  }
+  
+  current.count++;
+  next();
+}
+
+// SECURITY FIX: Strict rate limiting for sensitive endpoints
+function strictRateLimit(req: any, res: any, next: any) {
+  const ip = req.ip || req.connection.remoteAddress;
+  const now = Date.now();
+  const key = `${ip}-sensitive`;
+  
+  const current = requestCounts.get(key);
+  if (!current || now > current.resetTime) {
+    requestCounts.set(key, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
+    return next();
+  }
+  
+  if (current.count >= 10) { // Much stricter limit for sensitive endpoints
+    return res.status(429).json({ message: 'Too many requests to sensitive endpoint' });
+  }
+  
+  current.count++;
+  next();
+}
+
+// SECURITY FIX: Input sanitization middleware
+function sanitizeInput(req: any, res: any, next: any) {
+  if (req.body && typeof req.body === 'object') {
+    for (const [key, value] of Object.entries(req.body)) {
+      if (typeof value === 'string') {
+        // Basic XSS prevention - remove script tags and javascript: protocols
+        req.body[key] = value
+          .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+          .replace(/javascript:/gi, '');
+      }
+    }
+  }
+  next();
+}
+
 if (!process.env.STRIPE_SECRET_KEY) {
   console.warn('Missing required Stripe secret: STRIPE_SECRET_KEY. Stripe operations will be disabled.');
 }
@@ -17,10 +76,23 @@ const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SEC
 }) : null;
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // SECURITY FIX: Apply security middleware
+  app.use(rateLimit);
+  app.use(sanitizeInput);
+  
   // Auth middleware
   await setupAuth(app);
 
   // Note: Removed unsafe external subscribe.html and success.html routes for security
+
+  // SECURITY FIX: Add security headers middleware
+  app.use((req, res, next) => {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    next();
+  });
 
   // Auth routes
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
@@ -34,8 +106,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // SECURITY FIX: Apply strict rate limiting to sensitive endpoints
   // Create subscription for a specific plan
-  app.post('/api/create-subscription', isAuthenticated, async (req: any, res) => {
+  app.post('/api/create-subscription', strictRateLimit, isAuthenticated, sanitizeInput, async (req: any, res) => {
     if (!stripe) {
       return res.status(500).json({ message: 'Payment processing not configured' });
     }
@@ -134,15 +207,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Stripe webhook to handle subscription updates
-  app.post('/api/stripe-webhook', async (req, res) => {
+  // SECURITY FIX: Stripe webhook with signature verification and input validation
+  app.post('/api/stripe-webhook', strictRateLimit, async (req, res) => {
+    if (!stripe) {
+      return res.status(500).json({ message: 'Payment processing not configured' });
+    }
+
     try {
-      const event = req.body;
+      const signature = req.headers['stripe-signature'];
+      const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+      // SECURITY FIX: Verify webhook signature if secret is configured
+      let event;
+      if (endpointSecret && signature) {
+        try {
+          event = stripe.webhooks.constructEvent(req.body, signature, endpointSecret);
+        } catch (err: any) {
+          console.error('Webhook signature verification failed:', err.message);
+          return res.status(400).json({ message: 'Webhook signature verification failed' });
+        }
+      } else {
+        // Fall back to raw event (not recommended for production)
+        console.warn('SECURITY WARNING: Webhook signature verification disabled - STRIPE_WEBHOOK_SECRET not configured');
+        event = req.body;
+      }
+
+      // SECURITY FIX: Input validation
+      if (!event?.type || !event?.data?.object) {
+        return res.status(400).json({ message: 'Invalid webhook payload' });
+      }
 
       switch (event.type) {
         case 'invoice.payment_succeeded':
           const subscriptionId = event.data.object.subscription;
           const customerId = event.data.object.customer;
+          
+          // Validate required fields
+          if (!customerId || typeof customerId !== 'string') {
+            console.error('Invalid customer ID in webhook:', customerId);
+            return res.status(400).json({ message: 'Invalid customer ID' });
+          }
           
           // Find user by customer ID and update subscription status
           const userList = await db.select().from(users).where(eq(users.stripeCustomerId, customerId));
@@ -155,17 +259,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const deletedSubscription = event.data.object;
           const deletedCustomerId = deletedSubscription.customer;
           
+          // Validate required fields
+          if (!deletedCustomerId || typeof deletedCustomerId !== 'string') {
+            console.error('Invalid customer ID in webhook:', deletedCustomerId);
+            return res.status(400).json({ message: 'Invalid customer ID' });
+          }
+          
           const deletedUserList = await db.select().from(users).where(eq(users.stripeCustomerId, deletedCustomerId));
           if (deletedUserList.length > 0) {
             await storage.updateUserSubscription(deletedUserList[0].id, deletedUserList[0].subscriptionPlan!, 'canceled');
           }
           break;
+
+        default:
+          console.log(`Unhandled webhook event type: ${event.type}`);
       }
 
       res.json({ received: true });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Webhook error:', error);
-      res.status(400).json({ message: 'Webhook error' });
+      res.status(400).json({ message: 'Webhook processing failed' });
     }
   });
 
