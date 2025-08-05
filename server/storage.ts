@@ -25,7 +25,7 @@ export interface IStorage {
   
   // Documents
   getDocumentsByUserId(userId: string): Promise<Document[]>;
-  createDocument(userId: string, document: InsertDocument): Promise<Document>;
+  createDocument(documentData: any): Promise<Document>;
   deleteDocument(documentId: string): Promise<void>;
   updateDocumentName(documentId: string, displayName: string): Promise<Document>;
   saveDocumentAnalysis(documentId: string, analysis: any): Promise<Document>;
@@ -272,13 +272,13 @@ export class MemStorage implements IStorage {
     return Array.from(this.documents.values()).filter(doc => doc.userId === userId);
   }
 
-  async createDocument(userId: string, insertDocument: InsertDocument): Promise<Document> {
+  async createDocument(documentData: any): Promise<Document> {
     const id = randomUUID();
     const document: Document = {
-      ...insertDocument,
+      ...documentData,
       id,
-      userId,
-      uploadedAt: new Date()
+      uploadedAt: documentData.uploadedAt || new Date(),
+      createdAt: documentData.createdAt || new Date()
     };
     this.documents.set(id, document);
     return document;

@@ -39,11 +39,15 @@ export const documents = pgTable("documents", {
   filename: text("filename").notNull(),
   originalName: text("original_name").notNull(),
   displayName: text("display_name"), // User-editable display name
-  type: text("type").notNull(), // iep, assessment, progress_report, meeting_notes, other
+  type: text("type").notNull(), // iep, assessment, progress_report, meeting_notes, goal_set, template, compliance_report, generated, other
   description: text("description"),
-  fileUrl: text("file_url").notNull(),
+  fileUrl: text("file_url"), // Optional for generated documents
+  content: text("content"), // For generated text documents
   analysisResult: jsonb("analysis_result"), // Store AI analysis results
+  generatedBy: text("generated_by"), // Which tool generated this content
+  parentDocumentId: varchar("parent_document_id").references(() => documents.id), // Link to source document if applicable
   uploadedAt: timestamp("uploaded_at").default(sql`now()`),
+  createdAt: timestamp("created_at").default(sql`now()`),
 });
 
 export const events = pgTable("events", {

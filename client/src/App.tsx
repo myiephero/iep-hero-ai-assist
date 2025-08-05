@@ -21,6 +21,9 @@ import ProgressNotes from "@/pages/progress-notes";
 import CommunicationPlan from "@/pages/communication-plan";
 import RightsExplainer from "@/pages/rights-explainer";
 import MeetingPrepWizard from "@/pages/meeting-prep-wizard";
+import SmartLetterGeneratorTool from "@/pages/tools/smart-letter-generator";
+import ProgressAnalyzerTool from "@/pages/tools/progress-analyzer";
+import MeetingPrepWizardTool from "@/pages/tools/meeting-prep-wizard";
 import ProgressNotesLogger from "@/pages/progress-notes-logger";
 import CommunicationTracker from "@/pages/communication-tracker";
 import AdvocateMatcher from "@/pages/advocate-matcher";
@@ -131,7 +134,7 @@ function Router() {
       </Route>
       <Route path="/tools/progress-analyzer">
         <AuthGuard>
-          <ProgressAnalyzer />
+          <ProgressAnalyzerTool />
         </AuthGuard>
       </Route>
       <Route path="/tools/meeting-prep">
@@ -141,7 +144,12 @@ function Router() {
       </Route>
       <Route path="/tools/smart-letter-generator">
         <AuthGuard>
-          <SmartLetterGenerator />
+          <SmartLetterGeneratorTool />
+        </AuthGuard>
+      </Route>
+      <Route path="/tools/meeting-prep-wizard">
+        <AuthGuard>
+          <MeetingPrepWizardTool />
         </AuthGuard>
       </Route>
       <Route path="/tools/progress-notes">
@@ -159,11 +167,7 @@ function Router() {
           <RightsExplainer />
         </AuthGuard>
       </Route>
-      <Route path="/tools/meeting-prep-wizard">
-        <AuthGuard>
-          <MeetingPrepWizard />
-        </AuthGuard>
-      </Route>
+
       <Route path="/tools/progress-notes-logger">
         <AuthGuard>
           <ProgressNotesLogger />

@@ -20,6 +20,7 @@ import {
   Settings,
   Zap
 } from "lucide-react";
+import { apiRequest } from "@/lib/queryClient";
 
 interface IEPToolsProps {
   isHeroPlan: boolean;
@@ -102,14 +103,12 @@ export function IEPTools({ isHeroPlan, userId }: IEPToolsProps) {
   const handleGenerateContent = async (toolId: string) => {
     setIsGenerating(true);
     try {
-      // For MVP testing, remove Hero Plan gating
       if (!isHeroPlan) {
-        // Temporarily allow all users to access Hero features for testing
         console.log("Hero Plan feature access enabled for testing");
       }
       
-      // Simulate AI generation
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Simulate AI generation with realistic timing
+      await new Promise(resolve => setTimeout(resolve, 3000));
       
       const templates = {
         "iep-review": `🤖 AI IEP DOCUMENT ANALYSIS COMPLETE
@@ -208,11 +207,45 @@ RECOMMENDED ACTIONS:
 NEXT REVIEW: 4 weeks`
       };
 
-      setGeneratedContent(templates[toolId as keyof typeof templates] || "Content generated successfully!");
+      const content = templates[toolId as keyof typeof templates] || "Content generated successfully!";
+      setGeneratedContent(content);
+      
+      // Auto-save to document vault
+      await saveToDocumentVault(content, toolId);
     } catch (error) {
       console.error("Generation failed:", error);
     } finally {
       setIsGenerating(false);
+    }
+  };
+
+  const saveToDocumentVault = async (content: string, toolId: string) => {
+    try {
+      const toolTitles = {
+        "iep-review": "AI IEP Analysis Report",
+        "goal-generator": "AI Generated IEP Goals",
+        "template-builder": "Custom IEP Template",
+        "progress-analyzer": "AI Progress Analysis Report",
+        "compliance-checker": "Compliance Check Report",
+        "meeting-prep": "Meeting Preparation Guide"
+      };
+
+      const displayName = toolTitles[toolId as keyof typeof toolTitles] || `Generated Content - ${new Date().toLocaleDateString()}`;
+      
+      const response = await apiRequest("POST", "/api/documents/generate", {
+        content,
+        type: "generated",
+        generatedBy: toolId,
+        displayName
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log("Content saved to document vault:", result);
+        // Could add a toast notification here
+      }
+    } catch (error) {
+      console.error("Failed to save to document vault:", error);
     }
   };
 
@@ -306,9 +339,31 @@ NEXT REVIEW: 4 weeks`
                   {generatedContent}
                 </pre>
                 <div className="flex gap-2 mt-4">
-                  <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
+                  <Button 
+                    size="sm" 
+                    className="bg-blue-600 hover:bg-blue-700"
+                    onClick={() => {
+                      const blob = new Blob([generatedContent], { type: 'text/plain' });
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = `${tools.find(t => t.id === activeTool)?.title.replace(/[^a-zA-Z0-9]/g, '_')}.txt`;
+                      document.body.appendChild(a);
+                      a.click();
+                      document.body.removeChild(a);
+                      URL.revokeObjectURL(url);
+                    }}
+                  >
                     <Download className="w-4 h-4 mr-2" />
                     Download
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    className="bg-green-600 hover:bg-green-700"
+                    onClick={() => saveToDocumentVault(generatedContent, activeTool!)}
+                  >
+                    <FileText className="w-4 h-4 mr-2" />
+                    Save to Vault
                   </Button>
                   <Button size="sm" variant="outline" className="text-white border-white/20">
                     <Share2 className="w-4 h-4 mr-2" />

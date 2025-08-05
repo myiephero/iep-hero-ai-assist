@@ -28,44 +28,8 @@ export default function Documents() {
     queryKey: ["/api/documents"],
   });
 
-  // Mock documents for demo
-  const mockDocuments: any[] = [
-    {
-      id: "1",
-      filename: "IEP_Report_March.pdf",
-      type: "iep",
-      userId: "demo",
-      originalName: "IEP_Report_March.pdf",
-      description: null,
-      fileUrl: "/uploads/demo1.pdf",
-      uploadedAt: new Date("2024-03-15"),
-      size: "2.4 MB",
-    },
-    {
-      id: "2", 
-      filename: "ReadingEval_Results.pdf",
-      type: "assessment",
-      userId: "demo",
-      originalName: "ReadingEval_Results.pdf", 
-      description: null,
-      fileUrl: "/uploads/demo2.pdf",
-      uploadedAt: new Date("2024-02-20"),
-      size: "1.8 MB",
-    },
-    {
-      id: "3",
-      filename: "Notes_AprilMeeting.pdf", 
-      type: "meeting_notes",
-      userId: "demo",
-      originalName: "Notes_AprilMeeting.pdf",
-      description: null,
-      fileUrl: "/uploads/demo3.pdf",
-      uploadedAt: new Date("2024-04-10"),
-      size: "1.2 MB",
-    },
-  ];
-
-  const displayDocuments = documents.length > 0 ? documents : mockDocuments;
+  // Use only real documents - no mock data
+  const displayDocuments = documents;
   const isHeroPlan = user?.planStatus === 'heroOffer';
 
   // Mutation for updating document name
@@ -325,6 +289,17 @@ export default function Documents() {
                         >
                           <Eye className="w-4 h-4 mr-1" />
                           View Analysis
+                        </Button>
+                      )}
+                      {doc.content && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setViewingAnalysis(doc.content)}
+                          className="border-blue-500 text-blue-300 hover:bg-blue-700"
+                        >
+                          <Eye className="w-4 h-4 mr-1" />
+                          View Content
                         </Button>
                       )}
                       <Button
