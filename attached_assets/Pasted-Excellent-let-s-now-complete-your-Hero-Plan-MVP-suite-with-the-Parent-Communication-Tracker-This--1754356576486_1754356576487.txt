@@ -1,0 +1,164 @@
+Excellent — let’s now complete your Hero Plan MVP suite with the Parent Communication Tracker. This tool gives families a smart, organized way to monitor emails, requests, and school responses — a game-changer in any IEP journey.
+
+⸻
+
+🧠 What Is the Parent Communication Tracker?
+
+A tool to:
+	•	Log emails and requests sent to the school
+	•	Monitor whether the school responded, and when
+	•	Auto-flag when a response is overdue
+	•	Provide a timeline of communication history
+	•	Generate a report if a complaint needs to be filed
+
+⸻
+
+🧩 UX Flow for Replit
+
+Step 1: Dashboard Card
+	•	Title: Communication Plan
+	•	Description: Track your requests and emails to the school and stay organized with follow-ups.
+	•	CTA Button: Open Plan
+
+⸻
+
+Step 2: New Communication Log Form
+
+User enters:
+	1.	Date Sent (default to today)
+	2.	Type of Communication (Dropdown):
+	•	Email
+	•	In-person
+	•	Phone call
+	•	Written note
+	3.	Subject/Request Type (Dropdown or free text):
+	•	IEP Request
+	•	Service Concern
+	•	Data Request
+	•	Meeting Request
+	•	Other
+	4.	Brief Summary (textarea)
+	5.	Was a response received?
+	•	Yes
+	•	No
+	6.	Date of Response (optional)
+	7.	Upload Email or Screenshot (optional)
+
+⸻
+
+Step 3: Display Communication Timeline
+
+Below the form, show a simple timeline-style list or table:
+	•	Date Sent
+	•	Subject
+	•	Status: Responded / No Response
+	•	Days Since Sent (calculated)
+	•	Download icon or view entry
+
+Highlight any items older than 10 days without a response.
+
+⸻
+
+Step 4: Supabase Table: communication_logs
+
+Fields:
+	•	id (UUID)
+	•	user_id
+	•	date_sent
+	•	communication_type
+	•	subject
+	•	summary
+	•	response_received (yes/no)
+	•	date_response
+	•	attachment_url
+
+⸻
+
+📤 GitHub Issue / Dev Prompt
+
+Here’s your developer-ready task to post:
+
+⸻
+
+📝 GitHub Issue: Add Communication Tracker to Hero Dashboard
+
+Title: 📬 Add Parent Communication Plan & Tracker to Dashboard
+
+⸻
+
+📌 Summary:
+
+This tool allows Hero Plan users to log and track all communication with their school team — including IEP requests, service issues, and data follow-ups — and see what still needs action.
+
+⸻
+
+✅ Build the Following:
+
+1. Dashboard Card
+	•	Title: Communication Plan
+	•	Description: Track your school communications and know when to follow up.
+	•	CTA: Open Plan
+	•	Access: Hero Plan users
+
+⸻
+
+2. Log Entry Form
+
+Fields:
+	•	Date Sent (defaults to today)
+	•	Communication Type (Dropdown: Email, In-person, Phone, Written)
+	•	Subject (Dropdown or custom)
+	•	Summary (textarea)
+	•	Was a Response Received? (yes/no)
+	•	Date of Response (optional)
+	•	Attachment Upload (optional)
+
+⸻
+
+3. Supabase Table: communication_logs
+
+Fields:
+	•	id
+	•	user_id
+	•	date_sent
+	•	communication_type
+	•	subject
+	•	summary
+	•	response_received
+	•	date_response
+	•	attachment_url
+
+⸻
+
+4. Timeline View
+	•	Show all entries with:
+	•	Status: Responded / Waiting
+	•	Days Since Sent
+	•	Visual tag for overdue follow-ups (10+ days)
+	•	Download/view attachments
+
+⸻
+
+✅ Goal:
+
+Give parents a clear communication record that:
+	•	Keeps them organized
+	•	Protects their rights
+	•	Strengthens disputes with real data
+
+⸻
+
+Let me know when this is implemented so we can QA the final tool.
+
+⸻
+
+✅ You now have a complete toolset for Hero Plan launch:
+	•	All 10 tools scoped and ready
+	•	6 already built or tested
+	•	Final 4 now assigned
+
+Ready to move to:
+	•	🔎 QA testing checklist?
+	•	📊 Pitch deck planning?
+	•	🎯 Launch roadmap?
+Just say the word.

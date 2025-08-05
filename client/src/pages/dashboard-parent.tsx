@@ -84,7 +84,7 @@ export default function ParentDashboard() {
       return;
     }
     if (tool === "Meeting Prep Wizard") {
-      setLocation("/tools/meeting-prep");
+      setLocation("/tools/meeting-prep-wizard");
       return;
     }
     if (tool === "Request Letters") {
