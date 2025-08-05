@@ -268,10 +268,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
         
         console.log('✅ Login successful for:', user.email);
-        // Fix Hero Plan detection: parent@demo.com should always have Hero access
+        // Fix Hero Plan detection: demo accounts should always have Hero access
         let planStatus = user.planStatus || user.subscriptionTier || 'free';
-        if (user.email === 'parent@demo.com' || user.email === 'demo_parent@demo.com') {
+        let subscriptionTier = user.subscriptionTier || 'free';
+        
+        if (user.email === 'parent@demo.com' || user.email === 'advocate@demo.com' || user.email === 'demo_parent@demo.com') {
           planStatus = 'heroOffer';
+          subscriptionTier = 'heroOffer';
         }
         
         res.json({ 
@@ -281,7 +284,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             username: user.username, 
             role: user.role,
             planStatus: planStatus,
-            subscriptionTier: planStatus
+            subscriptionTier: subscriptionTier
           } 
         });
       });
@@ -536,10 +539,13 @@ Use professional, supportive language that empowers the parent while being legal
 
   app.get("/api/me", requireAuth, (req, res) => {
     const user = req.user as any;
-    // Fix Hero Plan detection: parent@demo.com should always have Hero access
+    // Fix Hero Plan detection: demo accounts should always have Hero access
     let planStatus = user.planStatus || user.subscriptionTier || 'free';
-    if (user.email === 'parent@demo.com' || user.email === 'demo_parent@demo.com') {
+    let subscriptionTier = user.subscriptionTier || 'free';
+    
+    if (user.email === 'parent@demo.com' || user.email === 'advocate@demo.com' || user.email === 'demo_parent@demo.com') {
       planStatus = 'heroOffer';
+      subscriptionTier = 'heroOffer';
     }
     
     res.json({ 
@@ -548,7 +554,7 @@ Use professional, supportive language that empowers the parent while being legal
         email: user.email, 
         username: user.username, 
         role: user.role, 
-        subscriptionTier: planStatus,
+        subscriptionTier: subscriptionTier,
         planStatus: planStatus
       } 
     });
@@ -1101,6 +1107,114 @@ Please provide a helpful, accurate answer based on the document content. If the 
       res.status(500).json({ 
         message: 'Letter generation failed', 
         error: error.message 
+      });
+    }
+  });
+
+  // Advocacy Report Generator API endpoint
+  app.post("/api/generate-advocacy-report", requireAuth, async (req, res) => {
+    try {
+      const { studentName, gradeLevel, disability, currentServices, concerns, requestedAction, reportType, timeline, additionalInfo } = req.body;
+
+      if (!process.env.OPENAI_API_KEY) {
+        return res.status(503).json({ 
+          error: "AI service temporarily unavailable. Please ensure OPENAI_API_KEY is configured." 
+        });
+      }
+
+      const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+      const prompt = `
+Generate a comprehensive advocacy report for an IEP student with the following information:
+
+STUDENT INFORMATION:
+- Name: ${studentName}
+- Grade Level: ${gradeLevel}
+- Primary Disability: ${disability}
+- Current IEP Services: ${currentServices}
+
+ADVOCACY REQUEST:
+- Primary Concerns: ${concerns}
+- Requested Action: ${requestedAction}
+- Report Type: ${reportType}
+- Timeline Priority: ${timeline}
+- Additional Information: ${additionalInfo}
+
+Create a professional advocacy report that includes:
+
+1. EXECUTIVE SUMMARY
+   - Brief overview of student needs and requested actions
+   - Key concerns requiring immediate attention
+
+2. STUDENT PROFILE & CURRENT STATUS
+   - Educational background and current placement
+   - Disability impact on learning
+   - Current IEP services and effectiveness
+
+3. AREAS OF CONCERN
+   - Detailed analysis of identified issues
+   - Evidence and documentation references
+   - Impact on student's educational progress
+
+4. LEGAL FRAMEWORK & RIGHTS
+   - Relevant IDEA provisions
+   - Section 504 considerations
+   - State-specific regulations (if applicable)
+
+5. RECOMMENDED ACTIONS
+   - Specific, measurable requests
+   - Timeline for implementation
+   - Expected outcomes
+
+6. SUPPORTING DOCUMENTATION
+   - List of required documents
+   - Evaluation recommendations
+   - Data collection suggestions
+
+7. NEXT STEPS
+   - Meeting requests
+   - Follow-up timeline
+   - Escalation procedures if needed
+
+Format this as a professional document suitable for school district communication, legal proceedings, or IEP team meetings. Use clear, authoritative language while maintaining a collaborative tone. Include specific legal references where appropriate.
+
+The report should be comprehensive yet concise, approximately 2-3 pages when printed.
+`;
+
+      const completion = await openai.chat.completions.create({
+        model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+        messages: [
+          {
+            role: "system",
+            content: "You are an expert IEP advocate and special education attorney. Generate professional advocacy reports that are legally sound, evidence-based, and effective for protecting student rights."
+          },
+          {
+            role: "user",
+            content: prompt
+          }
+        ],
+        max_tokens: 2000,
+        temperature: 0.7
+      });
+
+      const report = completion.choices[0]?.message?.content || "Failed to generate report";
+
+      res.json({ 
+        success: true, 
+        report: report,
+        metadata: {
+          studentName,
+          reportType,
+          timeline,
+          generatedAt: new Date().toISOString()
+        }
+      });
+
+    } catch (error: any) {
+      console.error('Advocacy report generation error:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: error.message || "Failed to generate advocacy report" 
       });
     }
   });
