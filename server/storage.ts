@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type Goal, type InsertGoal, type Document, type InsertDocument, type Event, type InsertEvent, type Message, type InsertMessage, type SharedMemory, type InsertSharedMemory, type ProgressNote, type InsertProgressNote, type CommunicationLog, type InsertCommunicationLog, type AdvocateMatch, type InsertAdvocateMatch, users, iepGoals, documents, events, messages, sharedMemories, progressNotes, communicationLogs, advocateMatches } from "@shared/schema";
+import { type User, type InsertUser, type Goal, type InsertGoal, type Document, type InsertDocument, type Event, type InsertEvent, type Message, type InsertMessage, type SharedMemory, type InsertSharedMemory, type ProgressNote, type InsertProgressNote, type CommunicationLog, type InsertCommunicationLog, type AdvocateMatch, type InsertAdvocateMatch, type Student, type InsertStudent, type AdvocateClient, type InsertAdvocateClient, users, iepGoals, documents, events, messages, sharedMemories, progressNotes, communicationLogs, advocateMatches, students, advocateClients } from "@shared/schema";
 import { randomUUID } from "crypto";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
@@ -25,6 +25,7 @@ export interface IStorage {
   
   // Documents
   getDocumentsByUserId(userId: string): Promise<Document[]>;
+  getDocumentsByStudentId(studentId: string): Promise<Document[]>;
   createDocument(documentData: any): Promise<Document>;
   deleteDocument(documentId: string): Promise<void>;
   updateDocumentName(documentId: string, displayName: string): Promise<Document>;
@@ -54,6 +55,20 @@ export interface IStorage {
   getAdvocateMatchesByParentId(parentId: string): Promise<AdvocateMatch[]>;
   getAdvocateMatchesByAdvocateId(advocateId: string): Promise<AdvocateMatch[]>;
   createAdvocateMatch(parentId: string, advocateId: string, match: InsertAdvocateMatch): Promise<AdvocateMatch>;
+  
+  // Students
+  getStudentsByParentId(parentId: string): Promise<Student[]>;
+  getStudentsByAdvocateId(advocateId: string): Promise<Student[]>;
+  createStudent(student: InsertStudent): Promise<Student>;
+  updateStudent(studentId: string, updates: Partial<InsertStudent>): Promise<Student>;
+  deleteStudent(studentId: string): Promise<void>;
+  
+  // Advocate Clients
+  getAdvocateClientsByAdvocateId(advocateId: string): Promise<AdvocateClient[]>;
+  getAdvocateClientsByParentId(parentId: string): Promise<AdvocateClient[]>;
+  createAdvocateClient(client: InsertAdvocateClient): Promise<AdvocateClient>;
+  updateAdvocateClient(clientId: string, updates: Partial<InsertAdvocateClient>): Promise<AdvocateClient>;
+  deleteAdvocateClient(clientId: string): Promise<void>;
 }
 
 export class MemStorage implements IStorage {
@@ -66,6 +81,8 @@ export class MemStorage implements IStorage {
   private progressNotes: Map<string, ProgressNote>;
   private communicationLogs: Map<string, CommunicationLog>;
   private advocateMatches: Map<string, AdvocateMatch>;
+  private students: Map<string, Student>;
+  private advocateClients: Map<string, AdvocateClient>;
 
   constructor() {
     this.users = new Map();
@@ -77,6 +94,8 @@ export class MemStorage implements IStorage {
     this.progressNotes = new Map();
     this.communicationLogs = new Map();
     this.advocateMatches = new Map();
+    this.students = new Map();
+    this.advocateClients = new Map();
     
     // Add sample data for development
     this.initializeSampleData();
@@ -410,6 +429,92 @@ export class MemStorage implements IStorage {
     };
     this.advocateMatches.set(id, newMatch);
     return newMatch;
+  }
+
+  // Student methods
+  async getStudentsByParentId(parentId: string): Promise<Student[]> {
+    return Array.from(this.students.values()).filter(student => student.parentId === parentId);
+  }
+
+  async getStudentsByAdvocateId(advocateId: string): Promise<Student[]> {
+    return Array.from(this.students.values()).filter(student => student.advocateId === advocateId);
+  }
+
+  async createStudent(student: InsertStudent): Promise<Student> {
+    const id = randomUUID();
+    const newStudent: Student = {
+      ...student,
+      id,
+      disabilities: student.disabilities || [],
+      currentServices: student.currentServices || [],
+      iepStatus: student.iepStatus || "active",
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.students.set(id, newStudent);
+    return newStudent;
+  }
+
+  async updateStudent(studentId: string, updates: Partial<InsertStudent>): Promise<Student> {
+    const student = this.students.get(studentId);
+    if (!student) {
+      throw new Error(`Student not found: ${studentId}`);
+    }
+
+    const updatedStudent: Student = {
+      ...student,
+      ...updates,
+      updatedAt: new Date()
+    };
+    this.students.set(studentId, updatedStudent);
+    return updatedStudent;
+  }
+
+  async deleteStudent(studentId: string): Promise<void> {
+    this.students.delete(studentId);
+  }
+
+  async getDocumentsByStudentId(studentId: string): Promise<Document[]> {
+    return Array.from(this.documents.values()).filter(doc => doc.studentId === studentId);
+  }
+
+  // Advocate Client methods
+  async getAdvocateClientsByAdvocateId(advocateId: string): Promise<AdvocateClient[]> {
+    return Array.from(this.advocateClients.values()).filter(client => client.advocateId === advocateId);
+  }
+
+  async getAdvocateClientsByParentId(parentId: string): Promise<AdvocateClient[]> {
+    return Array.from(this.advocateClients.values()).filter(client => client.parentId === parentId);
+  }
+
+  async createAdvocateClient(client: InsertAdvocateClient): Promise<AdvocateClient> {
+    const id = randomUUID();
+    const newClient: AdvocateClient = {
+      ...client,
+      id,
+      assignedDate: new Date(),
+      createdAt: new Date()
+    };
+    this.advocateClients.set(id, newClient);
+    return newClient;
+  }
+
+  async updateAdvocateClient(clientId: string, updates: Partial<InsertAdvocateClient>): Promise<AdvocateClient> {
+    const client = this.advocateClients.get(clientId);
+    if (!client) {
+      throw new Error(`Advocate client not found: ${clientId}`);
+    }
+
+    const updatedClient: AdvocateClient = {
+      ...client,
+      ...updates
+    };
+    this.advocateClients.set(clientId, updatedClient);
+    return updatedClient;
+  }
+
+  async deleteAdvocateClient(clientId: string): Promise<void> {
+    this.advocateClients.delete(clientId);
   }
 }
 

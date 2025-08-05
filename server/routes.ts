@@ -4,6 +4,8 @@ import Stripe from "stripe";
 import { storage } from "./storage";
 import { registerShareMemoryRoutes } from "./routes/share-memory";
 import { registerTestMemoryRoutes } from "./routes/test-memory";
+import studentsRoutes from "./routes/students";
+import advocateClientsRoutes from "./routes/advocate-clients";
 import { insertUserSchema, insertGoalSchema, insertDocumentSchema, insertEventSchema, insertMessageSchema } from "@shared/schema";
 import bcrypt from "bcrypt";
 import session from "express-session";
@@ -1070,6 +1072,12 @@ Be supportive and parent-friendly in your language while maintaining accuracy.`;
   
   // Register test routes
   registerTestMemoryRoutes(app);
+
+  // Register student management routes
+  app.use("/api/students", requireAuth, studentsRoutes);
+  
+  // Register advocate client management routes
+  app.use("/api/advocate/clients", requireAuth, advocateClientsRoutes);
 
   // Serve uploaded files
   app.use('/uploads', requireAuth, (req, res, next) => {

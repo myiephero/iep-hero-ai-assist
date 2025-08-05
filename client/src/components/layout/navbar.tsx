@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Bell, GraduationCap, Menu, User, Sparkles, Target, FileText, CreditCard } from "lucide-react";
+import { Bell, GraduationCap, Menu, User, Sparkles, Target, FileText, CreditCard, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
@@ -19,6 +19,15 @@ const NavLinks = ({ mobile = false }: { mobile?: boolean }) => {
     { href: "/goals", label: "Goals", icon: Target },
     { href: "/documents", label: "Documents", icon: FileText }
   ];
+
+  // Add role-specific navigation
+  if (user?.role === 'parent') {
+    navItems.push({ href: "/my-students", label: "My Students", icon: Users });
+  }
+  
+  if (user?.role === 'advocate') {
+    navItems.push({ href: "/my-parents", label: "My Parents", icon: Users });
+  }
   
   // Only add Subscribe for free plan users
   if (user?.planStatus === 'free') {
