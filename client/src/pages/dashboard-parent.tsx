@@ -167,12 +167,12 @@ export default function ParentDashboard() {
 
         {/* Parent Tools Section */}
         <div className="mb-8">
-          <h2 className="text-xl font-semibold mb-6 text-slate-900">Helpful Tools Just for You</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-            {parentTools.map(tool => (
+          <h2 className="text-xl font-semibold mb-6 text-slate-900">Helpful Tools Just for You ({parentTools.length} tools)</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6 min-h-fit">
+            {parentTools.map((tool, index) => (
               <Card 
-                key={tool.name} 
-                className="bg-white hover:shadow-xl transition-all duration-200 cursor-pointer group border border-slate-200"
+                key={`${tool.name}-${index}`} 
+                className="bg-white hover:shadow-xl transition-all duration-200 cursor-pointer group border border-slate-200 w-full"
                 onClick={() => openToolModal(tool.name)}
               >
                 <CardContent className="p-6">
