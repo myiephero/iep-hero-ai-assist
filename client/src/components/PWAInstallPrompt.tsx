@@ -6,8 +6,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 
 export function PWAInstallPrompt() {
   const { isInstallable, installApp, isInstalled } = usePWA();
-  const [dismissed, setDismissed] = useState(false);
+  const [dismissed, setDismissed] = useState(() => {
+    // Check if user has dismissed the prompt before
+    return localStorage.getItem('pwa-install-dismissed') === 'true';
+  });
 
+  // Show install prompt if installable, not installed, and not permanently dismissed
   if (!isInstallable || isInstalled || dismissed) {
     return null;
   }
@@ -23,7 +27,10 @@ export function PWAInstallPrompt() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => setDismissed(true)}
+            onClick={() => {
+              setDismissed(true);
+              localStorage.setItem('pwa-install-dismissed', 'true');
+            }}
             className="h-6 w-6 p-0"
           >
             <X className="h-4 w-4" />
@@ -46,7 +53,11 @@ export function PWAInstallPrompt() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setDismissed(true)}
+            onClick={() => {
+              setDismissed(true);
+              // Don't permanently dismiss when user clicks "Later" - allow it to show again
+              localStorage.setItem('pwa-install-dismissed-temporarily', Date.now().toString());
+            }}
           >
             Later
           </Button>

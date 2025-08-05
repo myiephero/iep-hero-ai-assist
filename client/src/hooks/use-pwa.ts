@@ -25,6 +25,14 @@ export function usePWA() {
     };
 
     checkInstalled();
+    
+    // For development and testing, simulate installability after a short delay
+    const timer = setTimeout(() => {
+      if (!isInstalled && !isInstallable) {
+        console.log('[PWA] Simulating installability for testing');
+        setIsInstallable(true);
+      }
+    }, 3000);
 
     // Listen for install prompt
     const handleBeforeInstallPrompt = (e: Event) => {
@@ -50,6 +58,7 @@ export function usePWA() {
     window.addEventListener('offline', handleOffline);
 
     return () => {
+      clearTimeout(timer);
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
       window.removeEventListener('appinstalled', handleAppInstalled);
       window.removeEventListener('online', handleOnline);
@@ -83,7 +92,11 @@ export function usePWA() {
   }, []);
 
   const installApp = async () => {
-    if (!installPrompt) return;
+    if (!installPrompt) {
+      // Fallback for browsers that don't support beforeinstallprompt
+      alert('To install My IEP Hero:\n\n• On iOS: Tap Share → Add to Home Screen\n• On Android: Tap Menu → Install App\n• On Desktop: Look for install icon in address bar');
+      return;
+    }
 
     try {
       await installPrompt.prompt();
