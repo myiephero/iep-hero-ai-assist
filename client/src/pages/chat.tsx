@@ -212,13 +212,13 @@ export default function ChatPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-            <MessageCircle className="h-8 w-8 text-blue-600" />
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 py-4 sm:py-8">
+        <div className="mb-4 sm:mb-6">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center gap-3">
+            <MessageCircle className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600" />
             Messages
           </h1>
-          <p className="text-gray-600 mt-2">
+          <p className="text-gray-600 mt-2 text-sm sm:text-base">
             {user?.role === 'parent' 
               ? 'Connect with advocates and professionals for IEP support'
               : user?.role === 'advocate' 
@@ -228,9 +228,9 @@ export default function ChatPage() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[600px]">
+        <div className={`${selectedConversation ? 'hidden lg:grid' : 'grid'} grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-200px)] lg:h-[600px]`}>
           {/* Conversations List */}
-          <Card className="lg:col-span-1">
+          <Card className={`lg:col-span-1 ${selectedConversation ? 'hidden lg:block' : 'block'}`}>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Users className="h-5 w-5" />
@@ -238,7 +238,7 @@ export default function ChatPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
-              <div className="max-h-[500px] overflow-y-auto">
+              <div className="max-h-[calc(100vh-300px)] lg:max-h-[500px] overflow-y-auto">
                 {conversations.length === 0 ? (
                   <div className="p-6 text-center text-gray-500">
                     <MessageCircle className="h-12 w-12 mx-auto mb-4 text-gray-300" />
@@ -254,13 +254,13 @@ export default function ChatPage() {
                   conversations.map((conversation) => (
                     <div
                       key={conversation.userId}
-                      className={`p-4 border-b cursor-pointer hover:bg-gray-50 transition-colors ${
+                      className={`p-3 sm:p-4 border-b cursor-pointer hover:bg-gray-50 transition-colors ${
                         selectedConversation === conversation.userId ? 'bg-blue-50 border-r-4 border-r-blue-500' : ''
                       }`}
                       onClick={() => setSelectedConversation(conversation.userId)}
                     >
                       <div className="flex items-start gap-3">
-                        <Avatar className="h-10 w-10">
+                        <Avatar className="h-8 w-8 sm:h-10 sm:w-10">
                           <AvatarImage src="" />
                           <AvatarFallback>
                             {conversation.userName.charAt(0).toUpperCase()}
@@ -310,11 +310,21 @@ export default function ChatPage() {
           </Card>
 
           {/* Chat Area */}
-          <Card className="lg:col-span-2 flex flex-col">
+          <Card className={`lg:col-span-2 flex flex-col ${!selectedConversation ? 'hidden lg:flex' : 'flex'}`}>
             {selectedConversation ? (
               <>
                 <CardHeader className="border-b">
                   <CardTitle className="flex items-center gap-3">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="lg:hidden p-2"
+                      onClick={() => setSelectedConversation(null)}
+                    >
+                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                      </svg>
+                    </Button>
                     <Avatar className="h-8 w-8">
                       <AvatarImage src="" />
                       <AvatarFallback>
@@ -346,7 +356,7 @@ export default function ChatPage() {
                 </CardHeader>
                 <CardContent className="flex-1 flex flex-col p-0">
                   {/* Messages */}
-                  <div className="flex-1 overflow-y-auto p-4 space-y-4 max-h-[400px]">
+                  <div className="flex-1 overflow-y-auto p-4 space-y-4 max-h-[calc(100vh-400px)] lg:max-h-[400px]">
                     {conversationMessages.length === 0 ? (
                       <div className="text-center text-gray-500 py-8">
                         <MessageCircle className="h-12 w-12 mx-auto mb-4 text-gray-300" />
@@ -361,7 +371,7 @@ export default function ChatPage() {
                             message.senderId === user?.id ? 'justify-end' : 'justify-start'
                           } group`}
                         >
-                          <div className={`max-w-xs lg:max-w-md ${message.senderId === user?.id ? 'order-2' : 'order-1'}`}>
+                          <div className={`max-w-[280px] sm:max-w-xs lg:max-w-md ${message.senderId === user?.id ? 'order-2' : 'order-1'}`}>
                             {message.replyToId && (
                               <div className="text-xs text-gray-500 mb-1 italic">
                                 Replying to: {conversationMessages.find(m => m.id === message.replyToId)?.content.substring(0, 50)}...
@@ -415,21 +425,36 @@ export default function ChatPage() {
 
                   {/* Message Input */}
                   <div className="border-t p-4">
-                    <div className="flex gap-2">
-                      <Input
-                        placeholder="Type your message..."
-                        value={newMessage}
-                        onChange={(e) => setNewMessage(e.target.value)}
-                        onKeyPress={handleKeyPress}
-                        disabled={sendMessageMutation.isPending}
-                      />
-                      <Button
-                        onClick={sendMessage}
-                        disabled={!newMessage.trim() || sendMessageMutation.isPending}
-                        size="sm"
-                      >
-                        <Send className="h-4 w-4" />
-                      </Button>
+                    {replyToMessage && (
+                      <div className="mb-3 p-2 bg-gray-100 rounded-lg text-sm">
+                        <div className="flex items-center justify-between">
+                          <span className="text-gray-600">Replying to:</span>
+                          <Button variant="ghost" size="sm" onClick={cancelReply} className="h-6 w-6 p-0">
+                            ×
+                          </Button>
+                        </div>
+                        <p className="text-gray-800 truncate">{replyToMessage.content.substring(0, 60)}...</p>
+                      </div>
+                    )}
+                    <div className="space-y-2">
+                      <div className="flex gap-2">
+                        <Input
+                          placeholder="Type your message..."
+                          value={newMessage}
+                          onChange={(e) => setNewMessage(e.target.value)}
+                          onKeyPress={handleKeyPress}
+                          disabled={sendMessageMutation.isPending}
+                          className="flex-1"
+                        />
+                        <Button
+                          onClick={sendMessage}
+                          disabled={!newMessage.trim() || sendMessageMutation.isPending}
+                          size="sm"
+                          className="px-3"
+                        >
+                          <Send className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </CardContent>

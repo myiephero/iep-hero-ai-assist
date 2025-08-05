@@ -197,6 +197,13 @@ export const insertEventSchema = createInsertSchema(events).omit({
 export const insertMessageSchema = createInsertSchema(messages).omit({
   id: true,
   sentAt: true,
+}).extend({
+  messageType: z.string().optional(),
+  priority: z.string().optional(),
+  threadId: z.string().optional(),
+  replyToId: z.string().optional(),
+  attachmentUrl: z.string().optional(),
+  archived: z.boolean().optional(),
 });
 
 export const insertSharedMemorySchema = createInsertSchema(sharedMemories).omit({

@@ -354,6 +354,10 @@ export class MemStorage implements IStorage {
     const message: Message = {
       ...insertMessage,
       id,
+      messageType: insertMessage.messageType || 'text',
+      priority: insertMessage.priority || 'normal',
+      read: false,
+      archived: false,
       sentAt: new Date()
     };
     this.messages.set(id, message);
