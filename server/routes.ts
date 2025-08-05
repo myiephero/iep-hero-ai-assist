@@ -806,6 +806,41 @@ Please provide a helpful, accurate answer based on the document content. If the 
     }
   });
 
+  // Smart Letter Generator route
+  app.post("/api/generate-letter", requireAuth, async (req, res) => {
+    try {
+      const { templateId, templateTitle, formData } = req.body;
+      
+      if (!templateId || !templateTitle || !formData) {
+        return res.status(400).json({ 
+          message: 'Missing required fields: templateId, templateTitle, and formData' 
+        });
+      }
+
+      // Use OpenAI to generate the letter
+      const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+      
+      const letterPrompt = generateLetterPrompt(templateId, templateTitle, formData);
+      
+      const response = await openai.chat.completions.create({
+        model: 'gpt-4o', // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+        messages: [{ role: 'user', content: letterPrompt }],
+        temperature: 0.3, // Lower temperature for more consistent, formal output
+        max_tokens: 1500
+      });
+
+      const letter = response.choices[0].message.content;
+      res.json({ letter });
+      
+    } catch (error: any) {
+      console.error('Letter generation error:', error);
+      res.status(500).json({ 
+        message: 'Letter generation failed', 
+        error: error.message 
+      });
+    }
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;
@@ -884,6 +919,108 @@ async function analyzeIEPWithAI(content: string): Promise<any> {
     recommendations,
     nextSteps
   };
+}
+
+// Generate prompts for different letter types
+function generateLetterPrompt(templateId: string, templateTitle: string, formData: any): string {
+  const currentDate = new Date().toLocaleDateString();
+  
+  const basePrompt = `You are a professional advocate helping parents write formal, legally appropriate letters for IEP-related matters. 
+
+Generate a professional, formal letter with the following requirements:
+- Use proper business letter format with today's date (${currentDate})
+- Include appropriate legal language and references to IDEA (Individuals with Disabilities Education Act) when relevant
+- Be respectful but assertive in tone
+- Include specific requests and timelines where appropriate
+- End with professional closing and space for signature
+
+Letter Type: ${templateTitle}
+`;
+
+  switch (templateId) {
+    case 'iep-evaluation-request':
+      return `${basePrompt}
+
+Create a formal letter requesting an IEP evaluation with these details:
+- Child's Name: ${formData.childName}
+- School: ${formData.schoolName}
+- Grade: ${formData.grade}
+- Specific Concerns: ${formData.concerns}
+- Requested Meeting Date: ${formData.requestedDate || 'As soon as possible'}
+
+Include:
+- Reference to IDEA requirement for evaluation within 60 days
+- Request for Prior Written Notice if denied
+- Professional closing requesting written response within 10 business days`;
+
+    case 'fba-request':
+      return `${basePrompt}
+
+Create a formal letter requesting a Functional Behavioral Assessment with these details:
+- Child's Name: ${formData.childName}
+- School: ${formData.schoolName}
+- Grade: ${formData.grade}
+- Behavioral Concerns: ${formData.behaviors}
+- Previous Interventions: ${formData.interventions || 'None specified'}
+
+Include:
+- Reference to IDEA requirements for behavioral supports
+- Request for FBA to develop appropriate Behavior Intervention Plan (BIP)
+- Timeline for completion and team meeting`;
+
+    case 'progress-data-request':
+      return `${basePrompt}
+
+Create a formal letter requesting access to student progress data with these details:
+- Child's Name: ${formData.childName}
+- School: ${formData.schoolName}
+- Data Requested: ${formData.dataType}
+- Time Period: ${formData.timeframe || 'Current school year'}
+- Purpose: ${formData.purpose || 'To monitor IEP progress and effectiveness'}
+
+Include:
+- Reference to FERPA rights for educational records access
+- Specific timeline for data provision (typically 45 days)
+- Request for data in usable format`;
+
+    case 'dispute-complaint':
+      return `${basePrompt}
+
+Create a formal complaint letter addressing IEP issues with these details:
+- Child's Name: ${formData.childName}
+- School: ${formData.schoolName}
+- Issue Description: ${formData.issueDescription}
+- Previous Communications: ${formData.previousCommunication || 'Initial formal notice'}
+- Desired Resolution: ${formData.desiredResolution}
+
+Include:
+- Reference to procedural safeguards under IDEA
+- Timeline for response and resolution
+- Mention of potential for formal complaint or due process if not resolved`;
+
+    case 'pwn-response':
+      return `${basePrompt}
+
+Create a formal response to Prior Written Notice with these details:
+- Child's Name: ${formData.childName}
+- School: ${formData.schoolName}
+- PWN Date: ${formData.pwnDate}
+- PWN Subject: ${formData.pwnSubject}
+- Your Response: ${formData.responseType}
+- Additional Information: ${formData.additionalInfo || 'None'}
+
+Include:
+- Clear statement of agreement or disagreement with school's proposal
+- Request for IEP team meeting if disagreeing
+- Reference to procedural safeguards and parent rights`;
+
+    default:
+      return `${basePrompt}
+
+Create a professional letter using the provided information: ${JSON.stringify(formData, null, 2)}
+
+Ensure the letter is appropriate for educational advocacy and includes relevant legal protections under IDEA.`;
+  }
 }
 
 // Simple AI response generator for IEP queries

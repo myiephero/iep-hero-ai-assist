@@ -15,14 +15,19 @@ const parentTools = [
     icon: '🎯'
   },
   {
-    name: 'AI IEP Review',
-    description: 'Get comprehensive AI analysis of your child\'s IEP',
-    icon: '📋'
-  },
-  {
     name: 'Progress Analyzer',
     description: 'See how your child is progressing toward goals',
     icon: '📈'
+  },
+  {
+    name: 'Meeting Prep',
+    description: 'Get organized for IEP meetings with personalized prep packages',
+    icon: '📋'
+  },
+  {
+    name: 'Smart Letter Generator',
+    description: 'Create legal letters like requests for IEP, FBA, progress data, and more',
+    icon: '✉️'
   },
   {
     name: 'Ask AI About My Docs',
@@ -60,6 +65,10 @@ export default function ParentDashboard() {
     }
     if (tool === "Meeting Prep") {
       setLocation("/tools/meeting-prep");
+      return;
+    }
+    if (tool === "Smart Letter Generator") {
+      setLocation("/tools/smart-letter-generator");
       return;
     }
     setSelectedTool(tool);
