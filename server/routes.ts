@@ -444,9 +444,20 @@ Use professional, supportive language that empowers the parent while being legal
       const user = req.user as any;
       const formData = req.body;
       
-      // Transform data to match Supabase format
+      // Try Supabase first, fallback to local database
+      const { submitAdvocateMatch } = await import('./supabaseService');
+      const supabaseResult = await submitAdvocateMatch(formData, user.id);
+      
+      if (supabaseResult.success) {
+        console.log('✅ Data successfully saved to Supabase!');
+        res.json({ success: true, message: 'Advocate match submitted to Supabase successfully' });
+        return;
+      }
+      
+      // Fallback to local database
+      console.log('📍 Fallback: Saving to local database');
       const matchData = {
-        meetingDate: formData.meetingDate,
+        meetingDate: formData.meetingDate || null,
         contactMethod: formData.contactMethod,
         parentAvailability: formData.availability,
         concerns: formData.concerns,
@@ -475,7 +486,7 @@ Use professional, supportive language that empowers the parent while being legal
         // Don't fail the request if email fails
       }
 
-      res.json({ success: true, match });
+      res.json({ success: true, match, savedTo: 'local' });
     } catch (error: any) {
       console.error('Error creating advocate match:', error);
       res.status(400).json({ success: false, error: error.message });

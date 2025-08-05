@@ -170,6 +170,9 @@ export const insertCommunicationLogSchema = createInsertSchema(communicationLogs
 export const insertAdvocateMatchSchema = createInsertSchema(advocateMatches).omit({
   id: true,
   createdAt: true,
+}).extend({
+  meetingDate: z.string().optional().or(z.literal("")),
+  documentUrls: z.array(z.string()).optional(),
 });
 
 // Types

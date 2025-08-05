@@ -829,14 +829,16 @@ export const storage = new class LocalDbStorage implements IStorage {
     return await this.db.select().from(advocateMatches).where(eq(advocateMatches.advocateId, advocateId));
   }
 
-  async createAdvocateMatch(parentId: string, advocateId: string, match: InsertAdvocateMatch): Promise<AdvocateMatch> {
+  async createAdvocateMatch(parentId: string, advocateId: string, match: Omit<InsertAdvocateMatch, 'parentId'>): Promise<AdvocateMatch> {
     const id = randomUUID();
     const newMatch = {
       ...match,
       id,
       parentId,
       advocateId: advocateId || null,
-      createdAt: new Date()
+      createdAt: new Date(),
+      meetingDate: match.meetingDate || null,
+      documentUrls: match.documentUrls || null,
     };
     
     const result = await this.db.insert(advocateMatches).values(newMatch).returning();
