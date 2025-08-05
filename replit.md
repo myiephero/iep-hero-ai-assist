@@ -14,7 +14,7 @@ The frontend is developed with **React 18** and TypeScript, using **Vite** for f
 - **Routing**: **Wouter** for client-side routing.
 - **Authentication**: Context-based system with route protection.
 - **PWA Features**: Implemented with mobile-first design, including offline support, native device integration, voice input, haptic feedback, and native sharing.
-- **UI/UX Decisions**: Features a stunning dark theme with glass-morphism effects and animations, as well as a light-theme parent dashboard. It incorporates a split-view SaaS interface for role-based tools, consistent navigation, and professional AI tool modals. Supports distinct user paths (Parent/Guardian, IEP Advocate, Education Professional) with tailored UIs and feature access based on subscription tier.
+- **UI/UX Decisions**: Features a stunning dark theme with glass-morphism effects and animations for advocate dashboards, as well as a light-theme parent dashboard. It incorporates a split-view SaaS interface for role-based tools, consistent navigation, and professional AI tool modals. Supports distinct user paths (Parent/Guardian, IEP Advocate, Education Professional) with tailored UIs and feature access based on subscription tier. Enhanced with modern navigation bar, IEP status tracking, and comprehensive dashboard overviews.
 
 ## Backend Architecture
 The backend is a **REST API** built with **Express.js** and TypeScript.
@@ -26,9 +26,10 @@ The backend is a **REST API** built with **Express.js** and TypeScript.
 ## Data Storage Solutions
 - **Primary Database**: **PostgreSQL** for persistent data storage.
 - **ORM**: **Drizzle ORM** for type-safe database operations and schema management.
-- **Schema Design**: Tables for users, IEP goals, documents, events, and messages, using UUID primary keys and foreign key relationships.
+- **Schema Design**: Tables for users, IEP goals, documents, events, messages, students, progress notes, communication logs, and advocate clients, using UUID primary keys and foreign key relationships.
 - **Migration System**: Drizzle's migration system for managing database schema changes.
 - **Storage Interface**: An abstraction layer (IStorage interface) supports different storage backends, including PostgreSQL and an in-memory option for development.
+- **Recent Updates**: Enhanced database schema with student management, advocate-client relationships, and comprehensive IEP tracking capabilities.
 
 ## System Design Choices
 - **AI Integration**: Deep integration with **OpenAI GPT-4o** for features like AI-powered document analysis, IEP goal generation, smart letter generation, and meeting prep sheet generation. AI output validation requires specific keywords.
