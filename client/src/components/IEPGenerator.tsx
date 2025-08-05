@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { useAuth } from '@/hooks/useAuth'
 import { useToast } from '@/hooks/use-toast'
 import { supabase, IEPDraft } from '@/lib/supabase'
-import { Wand2, Save, LogOut, FileText, Calendar } from 'lucide-react'
+import { Wand2, Save, LogOut, FileText, Calendar, Mail } from 'lucide-react'
 
 export function IEPGenerator() {
   const { user, signOut } = useAuth()
@@ -123,6 +123,10 @@ export function IEPGenerator() {
       // Clear form
       setDiagnosis('')
       setSuggestions('')
+
+      // Send advocate match notification email (example implementation)
+      await sendAdvocateMatchEmail(user!.id)
+      
     } catch (error: any) {
       toast({
         title: "Save failed",
@@ -131,6 +135,42 @@ export function IEPGenerator() {
       })
     } finally {
       setSaving(false)
+    }
+  }
+
+  const sendAdvocateMatchEmail = async (parentId: string, advocateId?: string) => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        console.log('No session available for email notification');
+        return;
+      }
+
+      const response = await fetch('https://wktcfhegoxjearpzdxpz.supabase.co/functions/v1/send-advocate-match-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
+        },
+        body: JSON.stringify({
+          parent_id: parentId,
+          advocate_id: advocateId || "default-advocate-uuid" // Use actual advocate ID when available
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Advocate match email sent:', data);
+        
+        toast({
+          title: "Notification sent!",
+          description: "We've notified potential advocates about your IEP needs.",
+        })
+      }
+    } catch (error) {
+      console.error('Failed to send advocate match email:', error);
+      // Don't show error to user as this is a background process
     }
   }
 
@@ -235,23 +275,34 @@ export function IEPGenerator() {
                     className="min-h-[300px] font-mono text-sm"
                     placeholder="Generated IEP goals will appear here..."
                   />
-                  <Button 
-                    onClick={saveToSupabase}
-                    disabled={saving}
-                    className="w-full bg-green-500 hover:bg-green-600"
-                  >
-                    {saving ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                        Saving...
-                      </>
-                    ) : (
-                      <>
-                        <Save className="w-4 h-4 mr-2" />
-                        Save to Supabase
-                      </>
-                    )}
-                  </Button>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <Button 
+                      onClick={saveToSupabase}
+                      disabled={saving}
+                      className="bg-green-500 hover:bg-green-600"
+                    >
+                      {saving ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                          Saving...
+                        </>
+                      ) : (
+                        <>
+                          <Save className="w-4 h-4 mr-2" />
+                          Save to Supabase
+                        </>
+                      )}
+                    </Button>
+                    
+                    <Button 
+                      onClick={() => sendAdvocateMatchEmail(user!.id)}
+                      disabled={!suggestions.trim()}
+                      className="bg-purple-500 hover:bg-purple-600"
+                    >
+                      <Mail className="w-4 h-4 mr-2" />
+                      Find Advocate
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             )}
