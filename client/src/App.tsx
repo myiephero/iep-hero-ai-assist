@@ -1,7 +1,7 @@
 import { Route, Router } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
-import { useAuth } from "@/hooks/use-auth.tsx";
+import { useAuth, AuthProvider } from "@/hooks/use-auth";
 import MainLayout from "@/components/layout/main-layout";
 import { MobileNavigation } from "@/components/MobileNavigation";
 
@@ -38,7 +38,7 @@ const queryClient = new QueryClient({
   },
 });
 
-function App() {
+function AppContent() {
   const { user, isLoading } = useAuth();
 
   if (isLoading) {
@@ -51,45 +51,50 @@ function App() {
 
   if (!user) {
     return (
-      <QueryClientProvider client={queryClient}>
-        <Router>
-          <Route path="/register" component={Register} />
-          <Route component={Login} />
-        </Router>
-        <Toaster />
-      </QueryClientProvider>
+      <Router>
+        <Route path="/register" component={Register} />
+        <Route component={Login} />
+      </Router>
     );
   }
 
   return (
+    <MainLayout>
+      <Router>
+        <Route path="/" component={Dashboard} />
+        <Route path="/dashboard" component={Dashboard} />
+        <Route path="/dashboard-parent" component={DashboardParent} />
+        <Route path="/goals" component={Goals} />
+        <Route path="/documents" component={Documents} />
+        <Route path="/messages" component={Messages} />
+        <Route path="/meeting-prep" component={MeetingPrep} />
+        <Route path="/progress-notes" component={ProgressNotes} />
+        <Route path="/my-students" component={MyStudents} />
+        <Route path="/my-parents" component={MyParents} />
+        <Route path="/subscribe" component={Subscribe} />
+        <Route path="/pricing" component={Pricing} />
+        
+        {/* Tool Routes */}
+        <Route path="/tools/iep-goal-generator" component={IEPGoalGenerator} />
+        <Route path="/tools/ai-iep-review" component={AIIEPReview} />
+        <Route path="/tools/ask-ai-about-docs" component={AskAIAboutDocs} />
+        <Route path="/tools/advocate-matcher" component={AdvocateMatchers} />
+        <Route path="/tools/smart-letter-generator" component={SmartLetterGenerator} />
+        
+        <Route component={NotFound} />
+      </Router>
+      <MobileNavigation />
+    </MainLayout>
+  );
+}
+
+function App() {
+  return (
     <QueryClientProvider client={queryClient}>
-      <MainLayout>
-        <Router>
-          <Route path="/" component={Dashboard} />
-          <Route path="/dashboard" component={Dashboard} />
-          <Route path="/dashboard-parent" component={DashboardParent} />
-          <Route path="/goals" component={Goals} />
-          <Route path="/documents" component={Documents} />
-          <Route path="/messages" component={Messages} />
-          <Route path="/meeting-prep" component={MeetingPrep} />
-          <Route path="/progress-notes" component={ProgressNotes} />
-          <Route path="/my-students" component={MyStudents} />
-          <Route path="/my-parents" component={MyParents} />
-          <Route path="/subscribe" component={Subscribe} />
-          <Route path="/pricing" component={Pricing} />
-          
-          {/* Tool Routes */}
-          <Route path="/tools/iep-goal-generator" component={IEPGoalGenerator} />
-          <Route path="/tools/ai-iep-review" component={AIIEPReview} />
-          <Route path="/tools/ask-ai-about-docs" component={AskAIAboutDocs} />
-          <Route path="/tools/advocate-matcher" component={AdvocateMatchers} />
-          <Route path="/tools/smart-letter-generator" component={SmartLetterGenerator} />
-          
-          <Route component={NotFound} />
-        </Router>
-        <MobileNavigation />
-      </MainLayout>
-      <Toaster />
+      <AuthProvider>
+        <AppContent />
+        <Toaster />
+      </AuthProvider>
     </QueryClientProvider>
   );
 }
