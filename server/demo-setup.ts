@@ -2,6 +2,18 @@ import bcrypt from 'bcrypt';
 import { storage } from './storage';
 
 export async function setupDemoAccounts() {
+  // Skip demo setup in production environment if database is not available
+  if (process.env.NODE_ENV === 'production') {
+    try {
+      // Test database connectivity first
+      await storage.getAllUsers();
+      console.log('🔧 Database connectivity verified for production demo setup');
+    } catch (error) {
+      console.log('⚠️ Database not available in production, skipping demo setup');
+      return;
+    }
+  }
+  
   console.log('🔧 DATABASE SETUP EXPLANATION:');
   console.log('- Replit environment blocks external database connections');
   console.log('- Using local PostgreSQL database for development');
@@ -20,7 +32,7 @@ export async function setupDemoAccounts() {
       subscriptionTier: 'heroOffer',
       planStatus: 'heroOffer',
       emailVerified: true,
-      verificationToken: null
+      verificationToken: undefined
     },
     {
       id: 'demo-advocate-001', 
@@ -31,7 +43,7 @@ export async function setupDemoAccounts() {
       subscriptionTier: 'heroOffer',
       planStatus: 'heroOffer',
       emailVerified: true,
-      verificationToken: null
+      verificationToken: undefined
     }
   ];
 
@@ -57,6 +69,10 @@ export async function setupDemoAccounts() {
       
     } catch (error: any) {
       console.error(`❌ Failed to create ${account.email}:`, error.message);
+      // Don't throw error - continue with other accounts
+      if (process.env.NODE_ENV === 'production') {
+        console.log(`⚠️ Production deployment continuing despite demo account setup failure`);
+      }
     }
   }
   

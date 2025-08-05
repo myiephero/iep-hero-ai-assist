@@ -40,13 +40,17 @@ app.use((req, res, next) => {
 (async () => {
   const server = await registerRoutes(app);
   
-  // Setup demo accounts for production
+  // Setup demo accounts - wrapped with comprehensive error handling
   try {
     await setupDemoAccounts();
+    console.log("✅ Demo accounts setup completed successfully");
   } catch (error: any) {
-    console.error("Demo account setup failed:", error.message);
-    // Continue with server startup even if demo setup fails
-    // This ensures deployment doesn't fail due to demo setup issues
+    console.error("⚠️ Demo account setup failed, but continuing with server startup:", error.message);
+    // Log additional error details for debugging in production
+    if (error.stack) {
+      console.error("Stack trace:", error.stack);
+    }
+    // Continue with server startup - demo setup failure should not prevent deployment
   }
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
@@ -71,16 +75,24 @@ app.use((req, res, next) => {
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
   const port = parseInt(process.env.PORT || '5000', 10);
-  const host = process.env.NODE_ENV === 'production' ? '0.0.0.0' : '0.0.0.0';
+  const host = '0.0.0.0'; // Always bind to all interfaces for Cloud Run deployment
   
   server.listen({
     port,
     host,
     reusePort: true,
   }, () => {
-    log(`serving on port ${port}`);
-  }).on('error', (err) => {
-    console.error('Server failed to start:', err);
+    log(`🚀 Server ready and serving on ${host}:${port}`);
+    log(`🔧 Environment: ${process.env.NODE_ENV || 'development'}`);
+    log(`📁 Static files: ${app.get('env') === 'development' ? 'Vite dev server' : 'Production build'}`);
+  }).on('error', (err: any) => {
+    console.error('❌ Server failed to start:', err.message);
+    if (err.code === 'EADDRINUSE') {
+      console.error(`Port ${port} is already in use. Please try a different port.`);
+    } else if (err.code === 'EACCES') {
+      console.error(`Permission denied to bind to port ${port}. Try running with sudo or use a port > 1024.`);
+    }
+    console.error('Full error:', err);
     process.exit(1);
   });
 })();
