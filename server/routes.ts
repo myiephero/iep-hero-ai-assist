@@ -398,6 +398,30 @@ Use professional, supportive language that empowers the parent while being legal
     }
   });
 
+  // Communication Logs routes
+  app.get("/api/communication-logs", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      const logs = await storage.getCommunicationLogsByUserId(user.id);
+      res.json(logs);
+    } catch (error: any) {
+      console.error('Error fetching communication logs:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/communication-logs", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      const logData = req.body;
+      const log = await storage.createCommunicationLog(user.id, logData);
+      res.json(log);
+    } catch (error: any) {
+      console.error('Error creating communication log:', error);
+      res.status(400).json({ message: error.message });
+    }
+  });
+
   app.get("/api/me", requireAuth, (req, res) => {
     const user = req.user as any;
     // Fix Hero Plan detection: parent@demo.com should always have Hero access
