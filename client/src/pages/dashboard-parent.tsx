@@ -20,14 +20,34 @@ const parentTools = [
     icon: '📈'
   },
   {
-    name: 'Meeting Prep',
-    description: 'Get organized for IEP meetings with personalized prep packages',
+    name: 'Meeting Prep Wizard',
+    description: 'Answer guided questions to generate prep notes',
     icon: '📋'
   },
   {
-    name: 'Smart Letter Generator',
-    description: 'Create legal letters like requests for IEP, FBA, progress data, and more',
+    name: 'Request Letters',
+    description: 'Generate legally sound letters (e.g., Request for IEP, FBA, etc.)',
     icon: '✉️'
+  },
+  {
+    name: 'Progress Notes',
+    description: 'Track updates on services vs. promised supports',
+    icon: '📝'
+  },
+  {
+    name: 'Communication Plan',
+    description: 'Track emails, deadlines, and key requests',
+    icon: '📧'
+  },
+  {
+    name: 'Know Your Rights',
+    description: 'Get plain-language explanations of IDEA & Section 504',
+    icon: '⚖️'
+  },
+  {
+    name: 'Document Vault',
+    description: 'Upload FERPA/HIPAA-compliant IEPs, emails, notes',
+    icon: '🗂️'
   },
   {
     name: 'Ask AI About My Docs',
@@ -63,12 +83,28 @@ export default function ParentDashboard() {
       setLocation("/tools/progress-analyzer");
       return;
     }
-    if (tool === "Meeting Prep") {
+    if (tool === "Meeting Prep Wizard") {
       setLocation("/tools/meeting-prep");
       return;
     }
-    if (tool === "Smart Letter Generator") {
+    if (tool === "Request Letters") {
       setLocation("/tools/smart-letter-generator");
+      return;
+    }
+    if (tool === "Progress Notes") {
+      setLocation("/tools/progress-notes");
+      return;
+    }
+    if (tool === "Communication Plan") {
+      setLocation("/tools/communication-plan");
+      return;
+    }
+    if (tool === "Know Your Rights") {
+      setLocation("/tools/rights-explainer");
+      return;
+    }
+    if (tool === "Document Vault") {
+      setLocation("/documents");
       return;
     }
     setSelectedTool(tool);
