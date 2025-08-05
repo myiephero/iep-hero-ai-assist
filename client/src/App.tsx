@@ -17,6 +17,9 @@ import AskAiAboutDocs from "@/pages/ask-ai-about-docs";
 import ProgressAnalyzer from "@/pages/progress-analyzer";
 import MeetingPrep from "@/pages/meeting-prep";
 import SmartLetterGenerator from "@/pages/smart-letter-generator";
+import ProgressNotes from "@/pages/progress-notes";
+import CommunicationPlan from "@/pages/communication-plan";
+import RightsExplainer from "@/pages/rights-explainer";
 import Subscribe from "@/pages/subscribe";
 import Pricing from "@/pages/pricing";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
@@ -133,6 +136,21 @@ function Router() {
       <Route path="/tools/smart-letter-generator">
         <AuthGuard>
           <SmartLetterGenerator />
+        </AuthGuard>
+      </Route>
+      <Route path="/tools/progress-notes">
+        <AuthGuard>
+          <ProgressNotes />
+        </AuthGuard>
+      </Route>
+      <Route path="/tools/communication-plan">
+        <AuthGuard>
+          <CommunicationPlan />
+        </AuthGuard>
+      </Route>
+      <Route path="/tools/rights-explainer">
+        <AuthGuard>
+          <RightsExplainer />
         </AuthGuard>
       </Route>
       <Route path="/">
