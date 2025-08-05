@@ -13,6 +13,7 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   verifyUserEmail(userId: string): Promise<User>;
   updateUserStripeInfo(userId: string, customerId: string, subscriptionId: string): Promise<User>;
+  updateStripeCustomerId(userId: string, customerId: string): Promise<User>;
   updateSubscriptionTier(userId: string, tier: string): Promise<User>;
   
   // IEP Goals
@@ -70,7 +71,10 @@ export class MemStorage implements IStorage {
       stripeCustomerId: null,
       stripeSubscriptionId: null,
       subscriptionTier: "free",
+      planStatus: "free",
       advocateEmail: "advocate@iephere.com",
+      emailVerified: true,
+      verificationToken: null,
       createdAt: new Date()
     };
     this.users.set("sample-user-1", sampleUser);
@@ -140,12 +144,45 @@ export class MemStorage implements IStorage {
       id, 
       stripeCustomerId: null,
       stripeSubscriptionId: null,
-      subscriptionTier: "free",
+      subscriptionTier: insertUser.subscriptionTier || "free",
+      planStatus: insertUser.planStatus || insertUser.subscriptionTier || "free",
       advocateEmail: null,
-      createdAt: new Date()
+      emailVerified: insertUser.emailVerified || false,
+      verificationToken: insertUser.verificationToken || null,
+      createdAt: new Date(),
+      role: insertUser.role || 'parent'
     };
     this.users.set(id, user);
     return user;
+  }
+
+  async getUserByVerificationToken(token: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find(user => user.verificationToken === token);
+  }
+
+  async verifyUserEmail(userId: string): Promise<User> {
+    const user = this.users.get(userId);
+    if (!user) throw new Error("User not found");
+    
+    const updatedUser = { 
+      ...user, 
+      emailVerified: true,
+      verificationToken: null
+    };
+    this.users.set(userId, updatedUser);
+    return updatedUser;
+  }
+
+  async updateStripeCustomerId(userId: string, customerId: string): Promise<User> {
+    const user = this.users.get(userId);
+    if (!user) throw new Error("User not found");
+    
+    const updatedUser = { 
+      ...user, 
+      stripeCustomerId: customerId
+    };
+    this.users.set(userId, updatedUser);
+    return updatedUser;
   }
 
   async updateUserStripeInfo(userId: string, customerId: string, subscriptionId: string): Promise<User> {
@@ -166,7 +203,11 @@ export class MemStorage implements IStorage {
     const user = this.users.get(userId);
     if (!user) throw new Error("User not found");
     
-    const updatedUser = { ...user, subscriptionTier: tier };
+    const updatedUser = { 
+      ...user, 
+      subscriptionTier: tier,
+      planStatus: tier
+    };
     this.users.set(userId, updatedUser);
     return updatedUser;
   }

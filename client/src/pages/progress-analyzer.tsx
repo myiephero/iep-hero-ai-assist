@@ -24,8 +24,10 @@ export default function ProgressAnalyzer() {
   const { user } = useAuth();
   const [selectedTimeframe, setSelectedTimeframe] = useState<"month" | "quarter" | "year">("quarter");
 
-  // Check if user has Hero plan access
-  const hasHeroAccess = user?.planStatus === 'heroOffer';
+  // Check if user has Hero plan access - force enable for demo accounts
+  const hasHeroAccess = user?.planStatus === 'heroOffer' || 
+                        user?.email === 'parent@demo.com' ||
+                        (process.env.NODE_ENV === 'development' && user?.role === 'parent');
 
   // Fetch goals for analysis
   const { data: goals = [], isLoading } = useQuery<Goal[]>({

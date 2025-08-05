@@ -38,9 +38,20 @@ export function useAuthState() {
         // Map various plan formats to consistent format
         const planValue = userData.subscriptionTier || userData.planStatus || (userData as any).plan || 'free';
         userData.planStatus = planValue === 'hero' ? 'heroOffer' : planValue;
-        // For development, always grant Hero plan to demo_parent
-        if (process.env.NODE_ENV === 'development' && userData.email === 'parent@demo.com') {
+        
+        // Force Hero Plan access for demo/test accounts
+        const demoEmails = ['parent@demo.com', 'demo@example.com', 'demo_parent@example.com'];
+        if (demoEmails.includes(userData.email) || userData.email.includes('demo')) {
           userData.planStatus = 'heroOffer';
+          userData.subscriptionTier = 'heroOffer';
+          console.log('🔓 Demo account detected - forcing Hero Plan access:', userData.email);
+        }
+        
+        // Also force Hero Plan in development for any parent account
+        if (process.env.NODE_ENV === 'development' && userData.role === 'parent') {
+          userData.planStatus = 'heroOffer';
+          userData.subscriptionTier = 'heroOffer';
+          console.log('🔓 Development mode - forcing Hero Plan for parent:', userData.email);
         }
       }
       setUser(userData);
