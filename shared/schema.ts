@@ -71,6 +71,17 @@ export const sharedMemories = pgTable("shared_memories", {
   sharedAt: timestamp("shared_at").default(sql`now()`),
 });
 
+export const progressNotes = pgTable("progress_notes", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  serviceType: text("service_type").notNull(),
+  date: text("date").notNull(), // storing as text for simplicity with forms
+  status: text("status").notNull(), // 'yes', 'no', 'not_sure'
+  notes: text("notes").notNull(),
+  attachmentUrl: text("attachment_url"),
+  createdAt: timestamp("created_at").default(sql`now()`),
+});
+
 // Schemas
 export const insertUserSchema = createInsertSchema(users).pick({
   email: true,
@@ -115,6 +126,12 @@ export const insertSharedMemorySchema = createInsertSchema(sharedMemories).omit(
   sharedAt: true,
 });
 
+export const insertProgressNoteSchema = createInsertSchema(progressNotes).omit({
+  id: true,
+  userId: true,
+  createdAt: true,
+});
+
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -128,3 +145,5 @@ export type InsertMessage = z.infer<typeof insertMessageSchema>;
 export type Message = typeof messages.$inferSelect;
 export type InsertSharedMemory = z.infer<typeof insertSharedMemorySchema>;
 export type SharedMemory = typeof sharedMemories.$inferSelect;
+export type InsertProgressNote = z.infer<typeof insertProgressNoteSchema>;
+export type ProgressNote = typeof progressNotes.$inferSelect;

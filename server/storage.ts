@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type Goal, type InsertGoal, type Document, type InsertDocument, type Event, type InsertEvent, type Message, type InsertMessage, type SharedMemory, type InsertSharedMemory, users, iepGoals, documents, events, messages, sharedMemories } from "@shared/schema";
+import { type User, type InsertUser, type Goal, type InsertGoal, type Document, type InsertDocument, type Event, type InsertEvent, type Message, type InsertMessage, type SharedMemory, type InsertSharedMemory, type ProgressNote, type InsertProgressNote, users, iepGoals, documents, events, messages, sharedMemories, progressNotes } from "@shared/schema";
 import { randomUUID } from "crypto";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
@@ -38,6 +38,10 @@ export interface IStorage {
   
   // Shared Memories
   createSharedMemory(sharedMemory: InsertSharedMemory): Promise<SharedMemory>;
+  
+  // Progress Notes
+  getProgressNotesByUserId(userId: string): Promise<ProgressNote[]>;
+  createProgressNote(userId: string, note: InsertProgressNote): Promise<ProgressNote>;
 }
 
 export class MemStorage implements IStorage {
@@ -47,6 +51,7 @@ export class MemStorage implements IStorage {
   private events: Map<string, Event>;
   private messages: Map<string, Message>;
   private sharedMemories: Map<string, SharedMemory>;
+  private progressNotes: Map<string, ProgressNote>;
 
   constructor() {
     this.users = new Map();
@@ -55,6 +60,7 @@ export class MemStorage implements IStorage {
     this.events = new Map();
     this.messages = new Map();
     this.sharedMemories = new Map();
+    this.progressNotes = new Map();
     
     // Add sample data for development
     this.initializeSampleData();
@@ -311,6 +317,22 @@ export class MemStorage implements IStorage {
     };
     this.sharedMemories.set(newSharedMemory.id, newSharedMemory);
     return newSharedMemory;
+  }
+
+  async getProgressNotesByUserId(userId: string): Promise<ProgressNote[]> {
+    return Array.from(this.progressNotes.values()).filter(note => note.userId === userId);
+  }
+
+  async createProgressNote(userId: string, note: InsertProgressNote): Promise<ProgressNote> {
+    const id = randomUUID();
+    const newNote: ProgressNote = {
+      id,
+      userId,
+      ...note,
+      createdAt: new Date(),
+    };
+    this.progressNotes.set(id, newNote);
+    return newNote;
   }
 }
 
@@ -709,6 +731,33 @@ export const storage = new class LocalDbStorage implements IStorage {
     };
     
     const result = await this.db.insert(sharedMemories).values(newSharedMemory).returning();
+    return result[0];
+  }
+
+  // Progress Notes
+  async getProgressNotesByUserId(userId: string): Promise<ProgressNote[]> {
+    return await this.db.select().from(progressNotes).where(eq(progressNotes.userId, userId));
+  }
+
+  async createProgressNote(userId: string, note: InsertProgressNote): Promise<ProgressNote> {
+    const id = randomUUID();
+    const newNote = {
+      ...note,
+      id,
+      userId,
+      createdAt: new Date()
+    };
+    
+    const result = await this.db.insert(progressNotes).values(newNote).returning();
+    return result[0];
+  }
+
+  async updateStripeCustomerId(userId: string, customerId: string): Promise<User> {
+    const result = await this.db
+      .update(users)
+      .set({ stripeCustomerId: customerId })
+      .where(eq(users.id, userId))
+      .returning();
     return result[0];
   }
 
