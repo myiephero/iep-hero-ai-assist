@@ -3,19 +3,29 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Save, Plus } from 'lucide-react';
+import { ArrowLeft, Save, Plus, User } from 'lucide-react';
 import { Link } from 'wouter';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
+import { useAuth } from '@/hooks/use-auth';
 
 export default function IEPGoalGeneratorPage() {
   const [area, setArea] = useState('');
+  const [selectedStudentId, setSelectedStudentId] = useState('');
   const [goals, setGoals] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
+
+  // Fetch students for parent users
+  const { data: students = [] } = useQuery({
+    queryKey: ['/api/students'],
+    enabled: user?.role === 'parent',
+  });
 
   const generateGoals = async () => {
     if (!area.trim()) {
@@ -72,6 +82,15 @@ export default function IEPGoalGeneratorPage() {
       return;
     }
 
+    if (user?.role === 'parent' && !selectedStudentId) {
+      toast({
+        title: "Please select a student",
+        description: "Choose which student these goals are for.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setSaving(true);
     
     try {
@@ -80,9 +99,10 @@ export default function IEPGoalGeneratorPage() {
         const goalData = {
           title: `${area} Goal ${index + 1}`,
           description: goalText,
-          status: 'not-started',
+          status: 'Not Started',
           progress: 0,
           dueDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 1 year from now
+          studentId: user?.role === 'parent' ? selectedStudentId : undefined,
           category: area || 'General'
         };
         
@@ -116,13 +136,23 @@ export default function IEPGoalGeneratorPage() {
   };
 
   const saveIndividualGoal = async (goalText: string, index: number) => {
+    if (user?.role === 'parent' && !selectedStudentId) {
+      toast({
+        title: "Please select a student",
+        description: "Choose which student this goal is for.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const goalData = {
         title: `${area} Goal ${index + 1}`,
         description: goalText,
-        status: 'not-started',
+        status: 'Not Started',
         progress: 0,
         dueDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        studentId: user?.role === 'parent' ? selectedStudentId : undefined,
         category: area || 'General'
       };
       
@@ -166,6 +196,39 @@ export default function IEPGoalGeneratorPage() {
         <Card className="bg-white shadow-sm border border-slate-200 mb-8">
           <CardContent className="p-6">
             <div className="space-y-6">
+              {user?.role === 'parent' && (
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Select Student
+                  </label>
+                  {students.length === 0 ? (
+                    <div className="p-4 border-2 border-dashed border-gray-300 rounded-lg text-center">
+                      <User className="mx-auto h-8 w-8 text-gray-400 mb-2" />
+                      <p className="text-gray-600 mb-2">No students found</p>
+                      <Link href="/my-students">
+                        <Button variant="outline" size="sm">
+                          Create Student Profile
+                        </Button>
+                      </Link>
+                    </div>
+                  ) : (
+                    <Select value={selectedStudentId} onValueChange={setSelectedStudentId}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Choose a student..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {students.map((student: any) => (
+                          <SelectItem key={student.id} value={student.id}>
+                            {student.firstName} {student.lastName}
+                            {student.gradeLevel && ` (Grade ${student.gradeLevel})`}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                </div>
+              )}
+
               <div>
                 <label htmlFor="area" className="block text-sm font-medium text-slate-700 mb-2">
                   Area of Need
