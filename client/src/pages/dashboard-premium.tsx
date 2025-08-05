@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/use-auth";
 import { useLocation } from "wouter";
+import Navbar from "@/components/layout/navbar";
 
 const advocateTools = [
   { name: 'AI IEP Review', desc: 'Analyze existing IEPs for quality & improvement', icon: '🧠' },
@@ -76,7 +77,9 @@ export default function DashboardAdvocate() {
   };
 
   return (
-    <div className="bg-gradient-to-b from-[#1A1B2E] to-[#2C2F48] min-h-screen text-white">
+    <>
+      <Navbar />
+      <div className="bg-gradient-to-b from-[#1A1B2E] to-[#2C2F48] min-h-screen text-white">
 
       <div className="px-6 pb-10">
         {/* Welcome Section */}
@@ -87,6 +90,118 @@ export default function DashboardAdvocate() {
           <p className="text-slate-300 mb-6">
             Access your complete suite of AI-powered IEP management tools
           </p>
+        </div>
+
+        {/* Client Management Dashboard */}
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold mb-4 text-white">Your Client Portfolio</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <Card className="bg-[#3E4161]/70 border-slate-600">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-slate-300 text-sm">Active Families</div>
+                    <div className="text-2xl font-bold text-white">8</div>
+                  </div>
+                  <div className="text-blue-400">👨‍👩‍👧‍👦</div>
+                </div>
+                <div className="text-xs text-slate-400 mt-1">3 new this month</div>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-[#3E4161]/70 border-slate-600">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-slate-300 text-sm">Students Served</div>
+                    <div className="text-2xl font-bold text-white">12</div>
+                  </div>
+                  <div className="text-green-400">👦👧</div>
+                </div>
+                <div className="text-xs text-slate-400 mt-1">Across 8 districts</div>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-[#3E4161]/70 border-slate-600">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-slate-300 text-sm">IEPs in Review</div>
+                    <div className="text-2xl font-bold text-white">5</div>
+                  </div>
+                  <div className="text-yellow-400">📋</div>
+                </div>
+                <div className="text-xs text-slate-400 mt-1">2 due this week</div>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-[#3E4161]/70 border-slate-600">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-slate-300 text-sm">Success Rate</div>
+                    <div className="text-2xl font-bold text-white">94%</div>
+                  </div>
+                  <div className="text-green-400">📈</div>
+                </div>
+                <div className="text-xs text-slate-400 mt-1">Goal achievement</div>
+              </CardContent>
+            </Card>
+          </div>
+          
+          {/* Assigned Families List */}
+          <Card className="bg-[#3E4161]/70 border-slate-600 mb-6">
+            <CardContent className="p-6">
+              <h3 className="text-lg font-semibold text-white mb-4">Recent Client Activity</h3>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-3 bg-[#2C2F48] rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-blue-500/20 rounded-full flex items-center justify-center">
+                      <span className="text-blue-400 text-sm">👤</span>
+                    </div>
+                    <div>
+                      <div className="font-medium text-white">Johnson Family - Emma (Grade 3)</div>
+                      <div className="text-sm text-slate-300">New IEP draft submitted for review</div>
+                    </div>
+                  </div>
+                  <div className="text-sm text-slate-400">Today</div>
+                </div>
+                
+                <div className="flex items-center justify-between p-3 bg-[#2C2F48] rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center">
+                      <span className="text-green-400 text-sm">✓</span>
+                    </div>
+                    <div>
+                      <div className="font-medium text-white">Smith Family - Michael (Grade 4)</div>
+                      <div className="text-sm text-slate-300">Accommodation request approved by district</div>
+                    </div>
+                  </div>
+                  <div className="text-sm text-slate-400">2 days ago</div>
+                </div>
+                
+                <div className="flex items-center justify-between p-3 bg-[#2C2F48] rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-yellow-500/20 rounded-full flex items-center justify-center">
+                      <span className="text-yellow-400 text-sm">📅</span>
+                    </div>
+                    <div>
+                      <div className="font-medium text-white">Davis Family - Alex (Grade 5)</div>
+                      <div className="text-sm text-slate-300">Annual IEP meeting scheduled for next week</div>
+                    </div>
+                  </div>
+                  <div className="text-sm text-slate-400">3 days ago</div>
+                </div>
+              </div>
+              
+              <Button 
+                className="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white"
+                onClick={() => setLocation('/my-parents')}
+              >
+                View All Families
+              </Button>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Quick Actions */}
@@ -100,7 +215,7 @@ export default function DashboardAdvocate() {
             </CardContent>
           </Card>
           <Card className="bg-[#3E4161]/70 border-slate-600 hover:bg-[#4A4E76] cursor-pointer transition-colors"
-                onClick={() => setLocation('/tools/iep-goal-generator')}>
+                onClick={() => setLocation('/iep-goal-generator')}>
             <CardContent className="p-4 text-center">
               <div className="text-2xl mb-2">🎯</div>
               <div className="text-white font-semibold">Goal Generator</div>
@@ -108,7 +223,7 @@ export default function DashboardAdvocate() {
             </CardContent>
           </Card>
           <Card className="bg-[#3E4161]/70 border-slate-600 hover:bg-[#4A4E76] cursor-pointer transition-colors"
-                onClick={() => setLocation('/tools/ai-iep-review')}>
+                onClick={() => setLocation('/ai-iep-review')}>
             <CardContent className="p-4 text-center">
               <div className="text-2xl mb-2">🧠</div>
               <div className="text-white font-semibold">AI Review</div>
@@ -116,7 +231,7 @@ export default function DashboardAdvocate() {
             </CardContent>
           </Card>
           <Card className="bg-[#3E4161]/70 border-slate-600 hover:bg-[#4A4E76] cursor-pointer transition-colors"
-                onClick={() => setLocation('/tools/advocacy-report-generator')}>
+                onClick={() => setLocation('/advocacy-report-generator')}>
             <CardContent className="p-4 text-center">
               <div className="text-2xl mb-2">📋</div>
               <div className="text-white font-semibold">Reports</div>
@@ -205,5 +320,6 @@ export default function DashboardAdvocate() {
         </Dialog>
       </div>
     </div>
+    </>
   );
 }

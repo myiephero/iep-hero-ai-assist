@@ -7,6 +7,8 @@ import { Input } from '@/components/ui/input';
 import { useAuth } from '@/hooks/use-auth';
 import { useLocation } from 'wouter';
 import IEPGoalGenerator from '@/components/IEPGoalGenerator';
+import { IEPStatusViewer } from '@/components/IEPStatusViewer';
+import Navbar from '@/components/layout/navbar';
 
 const parentTools = [
   {
@@ -133,7 +135,9 @@ export default function ParentDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#f2f7fd] to-[#eaf0f8] px-6 py-10 text-slate-800">
+    <>
+      <Navbar />
+      <div className="min-h-screen bg-gradient-to-b from-[#f2f7fd] to-[#eaf0f8] px-6 py-10 text-slate-800">
       <div className="max-w-5xl mx-auto">
         <h1 className="text-3xl font-bold mb-2 text-slate-900">
           Welcome back, {displayUser.username}! (Updated: {new Date().toLocaleTimeString()})
@@ -142,32 +146,114 @@ export default function ParentDashboard() {
           You're doing amazing. Let's check on your child's progress and get prepared for what's next.
         </p>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <Card className="bg-white shadow-sm border border-slate-200">
-            <CardContent className="p-4">
-              <div className="text-slate-600 text-sm">Active Goals</div>
-              <div className="text-2xl font-bold text-slate-900">2</div>
+        {/* IEP Management Dashboard */}
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold mb-4 text-slate-900">Your Child's IEP Overview</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <Card className="bg-white shadow-sm border border-slate-200">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-slate-600 text-sm">Active Goals</div>
+                    <div className="text-2xl font-bold text-slate-900">3</div>
+                  </div>
+                  <div className="text-blue-500">🎯</div>
+                </div>
+                <div className="text-xs text-slate-500 mt-1">2 in progress, 1 completed</div>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-white shadow-sm border border-slate-200">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-slate-600 text-sm">Overall Progress</div>
+                    <div className="text-2xl font-bold text-slate-900">75%</div>
+                  </div>
+                  <div className="text-green-500">📈</div>
+                </div>
+                <div className="text-xs text-slate-500 mt-1">Above grade level</div>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-white shadow-sm border border-slate-200">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-slate-600 text-sm">Next IEP Review</div>
+                    <div className="text-2xl font-bold text-slate-900">Mar 15</div>
+                  </div>
+                  <div className="text-yellow-500">🗓️</div>
+                </div>
+                <div className="text-xs text-slate-500 mt-1">In 45 days</div>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-white shadow-sm border border-slate-200">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-slate-600 text-sm">Documents</div>
+                    <div className="text-2xl font-bold text-slate-900">8</div>
+                  </div>
+                  <div className="text-purple-500">📁</div>
+                </div>
+                <div className="text-xs text-slate-500 mt-1">IEPs, reports, assessments</div>
+              </CardContent>
+            </Card>
+          </div>
+          
+          {/* Recent IEP Activity */}
+          <Card className="bg-white shadow-sm border border-slate-200 mb-6">
+            <CardContent className="p-6">
+              <h3 className="text-lg font-semibold text-slate-900 mb-4">Recent IEP Activity</h3>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                      <span className="text-green-600 text-sm">✓</span>
+                    </div>
+                    <div>
+                      <div className="font-medium text-slate-900">Reading Goal Completed</div>
+                      <div className="text-sm text-slate-600">Emma achieved 80% accuracy in grade-level reading</div>
+                    </div>
+                  </div>
+                  <div className="text-sm text-slate-500">2 days ago</div>
+                </div>
+                
+                <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                      <span className="text-blue-600 text-sm">📝</span>
+                    </div>
+                    <div>
+                      <div className="font-medium text-slate-900">Progress Report Generated</div>
+                      <div className="text-sm text-slate-600">Q2 progress update for math and social skills</div>
+                    </div>
+                  </div>
+                  <div className="text-sm text-slate-500">1 week ago</div>
+                </div>
+                
+                <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
+                      <span className="text-yellow-600 text-sm">🤝</span>
+                    </div>
+                    <div>
+                      <div className="font-medium text-slate-900">Advocate Meeting Scheduled</div>
+                      <div className="text-sm text-slate-600">Annual review prep with Sarah Johnson</div>
+                    </div>
+                  </div>
+                  <div className="text-sm text-slate-500">2 weeks ago</div>
+                </div>
+              </div>
             </CardContent>
           </Card>
-          <Card className="bg-white shadow-sm border border-slate-200">
-            <CardContent className="p-4">
-              <div className="text-slate-600 text-sm">Progress Rate</div>
-              <div className="text-2xl font-bold text-slate-900">67%</div>
-            </CardContent>
-          </Card>
-          <Card className="bg-white shadow-sm border border-slate-200">
-            <CardContent className="p-4">
-              <div className="text-slate-600 text-sm">Upcoming Meeting</div>
-              <div className="text-2xl font-bold text-slate-900">Aug 15</div>
-            </CardContent>
-          </Card>
-          <Card className="bg-white shadow-sm border border-slate-200">
-            <CardContent className="p-4">
-              <div className="text-slate-600 text-sm">Documents</div>
-              <div className="text-2xl font-bold text-slate-900">5</div>
-            </CardContent>
-          </Card>
+        </div>
+
+        {/* IEP Status Section */}
+        <div className="mb-8">
+          <IEPStatusViewer />
         </div>
 
         {/* Parent Tools Section */}
@@ -244,5 +330,6 @@ export default function ParentDashboard() {
         </Dialog>
       </div>
     </div>
+    </>
   );
 }
