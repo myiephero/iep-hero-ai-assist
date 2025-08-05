@@ -21,10 +21,10 @@ export default function IEPGoalGeneratorPage() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
 
-  // Fetch students for parent users
+  // Fetch students based on user role
   const { data: students = [] } = useQuery({
-    queryKey: ['/api/students'],
-    enabled: user?.role === 'parent',
+    queryKey: user?.role === 'advocate' ? ['/api/advocate/students'] : ['/api/students'],
+    enabled: !!user && (user.role === 'parent' || user.role === 'advocate'),
   });
 
   const generateGoals = async () => {
@@ -82,7 +82,7 @@ export default function IEPGoalGeneratorPage() {
       return;
     }
 
-    if (user?.role === 'parent' && !selectedStudentId) {
+    if ((user?.role === 'parent' || user?.role === 'advocate') && !selectedStudentId) {
       toast({
         title: "Please select a student",
         description: "Choose which student these goals are for.",
@@ -102,7 +102,7 @@ export default function IEPGoalGeneratorPage() {
           status: 'Not Started',
           progress: 0,
           dueDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 1 year from now
-          studentId: user?.role === 'parent' ? selectedStudentId : undefined,
+          studentId: selectedStudentId || undefined,
           category: area || 'General'
         };
         
@@ -136,7 +136,7 @@ export default function IEPGoalGeneratorPage() {
   };
 
   const saveIndividualGoal = async (goalText: string, index: number) => {
-    if (user?.role === 'parent' && !selectedStudentId) {
+    if ((user?.role === 'parent' || user?.role === 'advocate') && !selectedStudentId) {
       toast({
         title: "Please select a student",
         description: "Choose which student this goal is for.",
@@ -152,7 +152,7 @@ export default function IEPGoalGeneratorPage() {
         status: 'Not Started',
         progress: 0,
         dueDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        studentId: user?.role === 'parent' ? selectedStudentId : undefined,
+        studentId: selectedStudentId || undefined,
         category: area || 'General'
       };
       
@@ -179,7 +179,7 @@ export default function IEPGoalGeneratorPage() {
       <div className="max-w-4xl mx-auto px-6">
         {/* Header with Back Button */}
         <div className="mb-8">
-          <Link href="/dashboard-parent">
+          <Link href={user?.role === 'advocate' ? '/dashboard-advocate' : '/dashboard-parent'}>
             <Button variant="ghost" className="mb-4 text-slate-600 hover:text-slate-900">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Dashboard
@@ -188,7 +188,9 @@ export default function IEPGoalGeneratorPage() {
           
           <h1 className="text-3xl font-bold mb-3 text-slate-900">IEP Goal Generator</h1>
           <p className="text-lg text-slate-600">
-            Describe the area your child needs support in and we'll generate SMART IEP goals for you.
+            {user?.role === 'advocate' 
+              ? "Describe the area your student needs support in and we'll generate SMART IEP goals."
+              : "Describe the area your child needs support in and we'll generate SMART IEP goals for you."}
           </p>
         </div>
 
@@ -196,7 +198,7 @@ export default function IEPGoalGeneratorPage() {
         <Card className="bg-white shadow-sm border border-slate-200 mb-8">
           <CardContent className="p-6">
             <div className="space-y-6">
-              {user?.role === 'parent' && (
+              {(user?.role === 'parent' || user?.role === 'advocate') && (
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
                     Select Student
@@ -204,12 +206,18 @@ export default function IEPGoalGeneratorPage() {
                   {students.length === 0 ? (
                     <div className="p-4 border-2 border-dashed border-gray-300 rounded-lg text-center">
                       <User className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-                      <p className="text-gray-600 mb-2">No students found</p>
-                      <Link href="/my-students">
-                        <Button variant="outline" size="sm">
-                          Create Student Profile
-                        </Button>
-                      </Link>
+                      <p className="text-gray-600 mb-2">
+                        {user?.role === 'advocate' 
+                          ? "No students assigned to you yet." 
+                          : "No students found"}
+                      </p>
+                      {user?.role === 'parent' && (
+                        <Link href="/my-students">
+                          <Button variant="outline" size="sm">
+                            Create Student Profile
+                          </Button>
+                        </Link>
+                      )}
                     </div>
                   ) : (
                     <Select value={selectedStudentId} onValueChange={setSelectedStudentId}>

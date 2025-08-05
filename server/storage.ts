@@ -164,6 +164,73 @@ export class MemStorage implements IStorage {
     ];
     
     sampleGoals.forEach(goal => this.goals.set(goal.id, goal as Goal));
+    
+    // Add sample students for demo parent
+    const parentStudents = [
+      {
+        id: "student-001",
+        parentId: "sample-user-1",
+        firstName: "Emma",
+        lastName: "Johnson",
+        dateOfBirth: "2015-06-15",
+        gradeLevel: "3",
+        schoolName: "Roosevelt Elementary",
+        schoolDistrict: "Springfield District",
+        disabilities: ["ADHD", "Learning Disability"],
+        currentServices: ["Speech Therapy", "Special Education"],
+        iepStatus: "active",
+        lastIepDate: "2024-09-01",
+        nextIepDate: "2025-09-01",
+        caseNotes: "Student shows good progress in reading but needs support with math concepts.",
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        id: "student-002", 
+        parentId: "sample-user-1",
+        firstName: "Alex",
+        lastName: "Johnson",
+        dateOfBirth: "2013-03-22",
+        gradeLevel: "5",
+        schoolName: "Roosevelt Elementary",
+        schoolDistrict: "Springfield District",
+        disabilities: ["Autism Spectrum Disorder"],
+        currentServices: ["Occupational Therapy", "Behavioral Support"],
+        iepStatus: "active",
+        lastIepDate: "2024-08-15",
+        nextIepDate: "2025-08-15",
+        caseNotes: "Excellent progress in social skills, working on executive functioning.",
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    ];
+    
+    parentStudents.forEach(student => this.students.set(student.id, student as Student));
+    
+    // Add sample advocate students (assigned to advocate@demo.com)
+    const advocateStudents = [
+      {
+        id: "advocate-student-001",
+        parentId: "parent-demo-1", // Different parent
+        advocateId: "advocate-demo-1", // Will be set to actual advocate ID during setup
+        firstName: "Michael",
+        lastName: "Smith",
+        dateOfBirth: "2014-11-08",
+        gradeLevel: "4",
+        schoolName: "Lincoln Elementary",
+        schoolDistrict: "Central District",
+        disabilities: ["Dyslexia"],
+        currentServices: ["Reading Support", "Extended Time"],
+        iepStatus: "active",
+        lastIepDate: "2024-10-01",
+        nextIepDate: "2025-10-01",
+        caseNotes: "Strong advocate support needed for reading accommodations.",
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    ];
+    
+    advocateStudents.forEach(student => this.students.set(student.id, student as Student));
   }
 
   async getUser(id: string): Promise<User | undefined> {
