@@ -131,7 +131,7 @@ export default function ParentDashboard() {
     <div className="min-h-screen bg-gradient-to-b from-[#f2f7fd] to-[#eaf0f8] px-6 py-10 text-slate-800">
       <div className="max-w-5xl mx-auto">
         <h1 className="text-3xl font-bold mb-2 text-slate-900">
-          Welcome back, {displayUser.username}!
+          Welcome back, {displayUser.username}! (Updated: {new Date().toLocaleTimeString()})
         </h1>
         <p className="text-slate-600 mb-8">
           You're doing amazing. Let's check on your child's progress and get prepared for what's next.
