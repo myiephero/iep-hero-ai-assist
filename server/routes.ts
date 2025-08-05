@@ -938,88 +938,60 @@ Letter Type: ${templateTitle}
 `;
 
   switch (templateId) {
-    case 'iep-evaluation-request':
+    case 'iep-evaluation':
       return `${basePrompt}
 
-Create a formal letter requesting an IEP evaluation with these details:
-- Child's Name: ${formData.childName}
-- School: ${formData.schoolName}
-- Grade: ${formData.grade}
-- Specific Concerns: ${formData.concerns}
-- Requested Meeting Date: ${formData.requestedDate || 'As soon as possible'}
-
-Include:
-- Reference to IDEA requirement for evaluation within 60 days
-- Request for Prior Written Notice if denied
-- Professional closing requesting written response within 10 business days`;
+Generate a formal letter requesting a comprehensive special education evaluation for my child ${formData.childName} at ${formData.schoolName}. Include references to IDEA, the parent's right to request an evaluation, and the need to address concerns about ${formData.concerns}. Use a professional but assertive tone.`;
 
     case 'fba-request':
       return `${basePrompt}
 
-Create a formal letter requesting a Functional Behavioral Assessment with these details:
-- Child's Name: ${formData.childName}
-- School: ${formData.schoolName}
-- Grade: ${formData.grade}
-- Behavioral Concerns: ${formData.behaviors}
-- Previous Interventions: ${formData.interventions || 'None specified'}
+Create a letter requesting a Functional Behavior Assessment (FBA) for my child ${formData.childName} at ${formData.schoolName}. State that the child is exhibiting ${formData.behaviors} and that a formal behavior assessment is necessary to create a Behavior Intervention Plan. Cite IDEA provisions and request a written response within 10 school days.`;
 
-Include:
-- Reference to IDEA requirements for behavioral supports
-- Request for FBA to develop appropriate Behavior Intervention Plan (BIP)
-- Timeline for completion and team meeting`;
-
-    case 'progress-data-request':
+    case 'progress-data':
       return `${basePrompt}
 
-Create a formal letter requesting access to student progress data with these details:
-- Child's Name: ${formData.childName}
-- School: ${formData.schoolName}
-- Data Requested: ${formData.dataType}
-- Time Period: ${formData.timeframe || 'Current school year'}
-- Purpose: ${formData.purpose || 'To monitor IEP progress and effectiveness'}
-
-Include:
-- Reference to FERPA rights for educational records access
-- Specific timeline for data provision (typically 45 days)
-- Request for data in usable format`;
+Write a professional letter requesting all available progress monitoring data and service records for my child ${formData.childName} related to their IEP goals. Ask for updates including frequency, method of data collection, and a timeline of services provided. Reference that this information is part of the parent's rights under IDEA.`;
 
     case 'dispute-complaint':
       return `${basePrompt}
 
-Create a formal complaint letter addressing IEP issues with these details:
-- Child's Name: ${formData.childName}
-- School: ${formData.schoolName}
-- Issue Description: ${formData.issueDescription}
-- Previous Communications: ${formData.previousCommunication || 'Initial formal notice'}
-- Desired Resolution: ${formData.desiredResolution}
-
-Include:
-- Reference to procedural safeguards under IDEA
-- Timeline for response and resolution
-- Mention of potential for formal complaint or due process if not resolved`;
+Create a formal letter expressing concern about the school's failure to ${formData.issue} for my child ${formData.childName} at ${formData.schoolName}. State that this is a potential violation of the IEP and request a resolution meeting to address the issue. Use clear, factual language and request a written response.`;
 
     case 'pwn-response':
       return `${basePrompt}
 
-Create a formal response to Prior Written Notice with these details:
-- Child's Name: ${formData.childName}
-- School: ${formData.schoolName}
-- PWN Date: ${formData.pwnDate}
-- PWN Subject: ${formData.pwnSubject}
-- Your Response: ${formData.responseType}
-- Additional Information: ${formData.additionalInfo || 'None'}
+Generate a parent response to a Prior Written Notice from ${formData.schoolName}. Acknowledge receipt, and clearly state that I disagree with the proposed action to ${formData.proposedAction} for my child ${formData.childName}. Request a meeting to discuss alternatives and formally note that I do not consent to this change at this time.`;
 
-Include:
-- Clear statement of agreement or disagreement with school's proposal
-- Request for IEP team meeting if disagreeing
-- Reference to procedural safeguards and parent rights`;
+    case 'iep-meeting':
+      return `${basePrompt}
+
+Write a formal letter requesting an IEP meeting for my child ${formData.childName} at ${formData.schoolName}. State that new concerns have emerged regarding ${formData.concerns}, and I am requesting a team meeting to discuss possible updates to the IEP. Reference IDEA timelines and request a meeting within 10 school days.`;
+
+    case 'parent-concerns':
+      return `${basePrompt}
+
+Draft a parent input statement to be attached to my child's IEP for ${formData.childName} at ${formData.schoolName}. It should outline my concerns about ${formData.specificAreas}, my hopes for the IEP team, and specific requests or suggestions I believe should be considered. Tone should be collaborative, but clear.`;
+
+    case '504-request':
+      return `${basePrompt}
+
+Create a formal letter requesting a Section 504 Plan evaluation for my child ${formData.childName} at ${formData.schoolName}. Explain that my child has a documented diagnosis of ${formData.diagnosis} which substantially limits major life activities. Request a meeting to begin the evaluation process and determine eligibility for accommodations.`;
+
+    case 'service-check':
+      return `${basePrompt}
+
+Write a follow-up letter asking for confirmation that all IEP services and supports for my child ${formData.childName} at ${formData.schoolName} are being implemented as written. Ask for a service delivery log or confirmation from relevant staff. Reference the school's obligation under IDEA to provide services with fidelity and transparency.`;
+
+    case 'observation-request':
+      return `${basePrompt}
+
+Draft a respectful letter requesting an in-person observation of my child ${formData.childName} in the classroom and/or during services at ${formData.schoolName}. State that the observation will help inform my understanding of my child's needs and participation in the current environment. ${formData.availability ? `Include dates of availability: ${formData.availability}.` : ''} Request guidance on visitor policies if needed.`;
 
     default:
       return `${basePrompt}
 
-Create a professional letter using the provided information: ${JSON.stringify(formData, null, 2)}
-
-Ensure the letter is appropriate for educational advocacy and includes relevant legal protections under IDEA.`;
+Create a professional advocacy letter using the provided information and appropriate legal references for IEP-related matters.`;
   }
 }
 

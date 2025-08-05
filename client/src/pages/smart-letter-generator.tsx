@@ -28,69 +28,111 @@ interface LetterTemplate {
 
 const letterTemplates: LetterTemplate[] = [
   {
-    id: 'iep-evaluation-request',
+    id: 'iep-evaluation',
     title: 'Request for IEP Evaluation',
-    description: 'Formal request for initial IEP evaluation or re-evaluation',
+    description: 'Request a comprehensive special education evaluation',
     category: 'Evaluation Requests',
     fields: [
       { name: 'childName', label: 'Child\'s Name', type: 'text', required: true },
       { name: 'schoolName', label: 'School Name', type: 'text', required: true },
-      { name: 'grade', label: 'Grade Level', type: 'text', required: true },
-      { name: 'concerns', label: 'Specific Concerns', type: 'textarea', required: true, placeholder: 'Describe the areas of concern that prompt this evaluation request...' },
-      { name: 'requestedDate', label: 'Requested Meeting Date', type: 'date', required: false }
+      { name: 'concerns', label: 'Specific Concerns', type: 'textarea', required: true, placeholder: 'e.g., reading delays, behavior issues, attention difficulties...' }
     ]
   },
   {
     id: 'fba-request',
-    title: 'Request for Functional Behavioral Assessment (FBA)',
-    description: 'Request for behavioral assessment and intervention plan',
+    title: 'Request for Functional Behavior Assessment (FBA)',
+    description: 'Request a formal behavior assessment',
     category: 'Behavioral Support',
     fields: [
       { name: 'childName', label: 'Child\'s Name', type: 'text', required: true },
       { name: 'schoolName', label: 'School Name', type: 'text', required: true },
-      { name: 'grade', label: 'Grade Level', type: 'text', required: true },
-      { name: 'behaviors', label: 'Behavioral Concerns', type: 'textarea', required: true, placeholder: 'Describe specific behaviors that are interfering with learning...' },
-      { name: 'interventions', label: 'Previous Interventions Tried', type: 'textarea', required: false, placeholder: 'List any strategies or interventions already attempted...' }
+      { name: 'behaviors', label: 'Behavioral Concerns', type: 'textarea', required: true, placeholder: 'e.g., aggressive outbursts, refusal to complete work, disrupting class...' }
     ]
   },
   {
-    id: 'progress-data-request',
-    title: 'Request for Progress Data',
-    description: 'Request access to your child\'s progress data and records',
+    id: 'progress-data',
+    title: 'Request for Progress Reports or Data',
+    description: 'Request all progress monitoring data and service records',
     category: 'Data & Records',
     fields: [
       { name: 'childName', label: 'Child\'s Name', type: 'text', required: true },
-      { name: 'schoolName', label: 'School Name', type: 'text', required: true },
-      { name: 'dataType', label: 'Type of Data Requested', type: 'textarea', required: true, placeholder: 'Specify what data you need (progress reports, assessment scores, work samples, etc.)...' },
-      { name: 'timeframe', label: 'Time Period', type: 'text', required: false, placeholder: 'e.g., Current school year, last 6 months' },
-      { name: 'purpose', label: 'Purpose for Request', type: 'textarea', required: false, placeholder: 'Explain why you need this data...' }
+      { name: 'schoolName', label: 'School Name', type: 'text', required: true }
     ]
   },
   {
     id: 'dispute-complaint',
-    title: 'Dispute/Complaint Letter',
-    description: 'Formal complaint about IEP services or violations',
+    title: 'Dispute or Complaint Letter',
+    description: 'Express concern about IEP implementation failures',
     category: 'Advocacy',
     fields: [
       { name: 'childName', label: 'Child\'s Name', type: 'text', required: true },
       { name: 'schoolName', label: 'School Name', type: 'text', required: true },
-      { name: 'issueDescription', label: 'Description of Issue', type: 'textarea', required: true, placeholder: 'Describe the specific problem or violation...' },
-      { name: 'previousCommunication', label: 'Previous Communications', type: 'textarea', required: false, placeholder: 'Summarize any previous attempts to resolve this issue...' },
-      { name: 'desiredResolution', label: 'Desired Resolution', type: 'textarea', required: true, placeholder: 'What outcome are you seeking?' }
+      { name: 'issue', label: 'Issue Description', type: 'textarea', required: true, placeholder: 'e.g., provide speech services as outlined in the IEP, implement behavior plan...' }
     ]
   },
   {
     id: 'pwn-response',
     title: 'Prior Written Notice (PWN) Response',
-    description: 'Response to a Prior Written Notice from the school',
+    description: 'Respond to a Prior Written Notice from the school',
     category: 'Legal Response',
     fields: [
       { name: 'childName', label: 'Child\'s Name', type: 'text', required: true },
       { name: 'schoolName', label: 'School Name', type: 'text', required: true },
-      { name: 'pwnDate', label: 'PWN Date', type: 'date', required: true },
-      { name: 'pwnSubject', label: 'PWN Subject/Action', type: 'text', required: true, placeholder: 'What was the school\'s proposed action?' },
-      { name: 'responseType', label: 'Your Response', type: 'textarea', required: true, placeholder: 'Do you agree or disagree? Explain your position...' },
-      { name: 'additionalInfo', label: 'Additional Information', type: 'textarea', required: false, placeholder: 'Any supporting information or requests...' }
+      { name: 'proposedAction', label: 'Proposed Action', type: 'textarea', required: true, placeholder: 'e.g., deny requested service, change placement, reduce services...' }
+    ]
+  },
+  {
+    id: 'iep-meeting',
+    title: 'Request for IEP Meeting',
+    description: 'Request an IEP team meeting for new concerns',
+    category: 'Meeting Requests',
+    fields: [
+      { name: 'childName', label: 'Child\'s Name', type: 'text', required: true },
+      { name: 'schoolName', label: 'School Name', type: 'text', required: true },
+      { name: 'concerns', label: 'New Concerns', type: 'textarea', required: true, placeholder: 'e.g., declining academic performance, behavioral changes, lack of progress...' }
+    ]
+  },
+  {
+    id: 'parent-concerns',
+    title: 'Parent Concerns Letter (Attach to IEP)',
+    description: 'Parent input statement for IEP attachment',
+    category: 'Documentation',
+    fields: [
+      { name: 'childName', label: 'Child\'s Name', type: 'text', required: true },
+      { name: 'schoolName', label: 'School Name', type: 'text', required: true },
+      { name: 'specificAreas', label: 'Specific Areas of Concern', type: 'textarea', required: true, placeholder: 'e.g., reading comprehension, peer interactions, service consistency...' }
+    ]
+  },
+  {
+    id: '504-request',
+    title: '504 Plan Request (Initial)',
+    description: 'Request a Section 504 Plan evaluation',
+    category: 'Evaluation Requests',
+    fields: [
+      { name: 'childName', label: 'Child\'s Name', type: 'text', required: true },
+      { name: 'schoolName', label: 'School Name', type: 'text', required: true },
+      { name: 'diagnosis', label: 'Documented Diagnosis', type: 'text', required: true, placeholder: 'e.g., ADHD, anxiety, dyslexia...' }
+    ]
+  },
+  {
+    id: 'service-check',
+    title: 'Service Implementation Check-In',
+    description: 'Verify IEP services are being implemented',
+    category: 'Monitoring',
+    fields: [
+      { name: 'childName', label: 'Child\'s Name', type: 'text', required: true },
+      { name: 'schoolName', label: 'School Name', type: 'text', required: true }
+    ]
+  },
+  {
+    id: 'observation-request',
+    title: 'Request to Observe Child in School Setting',
+    description: 'Request permission to observe child in classroom',
+    category: 'Observation',
+    fields: [
+      { name: 'childName', label: 'Child\'s Name', type: 'text', required: true },
+      { name: 'schoolName', label: 'School Name', type: 'text', required: true },
+      { name: 'availability', label: 'Available Dates/Times', type: 'text', required: false, placeholder: 'When are you available to observe?' }
     ]
   }
 ];
