@@ -1,4 +1,4 @@
-import { useState, useEffect, createContext, useContext } from "react";
+import { useState, useEffect, createContext, useContext, ReactNode } from "react";
 import { authApi, type AuthUser } from "@/lib/auth";
 
 interface AuthContextType {
@@ -115,6 +115,16 @@ export function useAuthState() {
     logout,
     isLoading,
   };
+}
+
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const authState = useAuthState();
+  
+  return (
+    <AuthContext.Provider value={authState}>
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
 export { AuthContext };
