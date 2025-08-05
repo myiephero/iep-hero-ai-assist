@@ -46,7 +46,7 @@ export const documents = pgTable("documents", {
   content: text("content"), // For generated text documents
   analysisResult: jsonb("analysis_result"), // Store AI analysis results
   generatedBy: text("generated_by"), // Which tool generated this content
-  parentDocumentId: varchar("parent_document_id").references(() => documents.id), // Link to source document if applicable
+  parentDocumentId: varchar("parent_document_id"), // Link to source document if applicable
   uploadedAt: timestamp("uploaded_at").default(sql`now()`),
   createdAt: timestamp("created_at").default(sql`now()`),
 });
@@ -66,7 +66,13 @@ export const messages = pgTable("messages", {
   senderId: varchar("sender_id").notNull().references(() => users.id),
   receiverId: varchar("receiver_id").notNull().references(() => users.id),
   content: text("content").notNull(),
+  messageType: text("message_type").default("text"), // text, file, urgent, system
+  priority: text("priority").default("normal"), // low, normal, high, urgent
+  threadId: varchar("thread_id"), // For message threading
+  replyToId: varchar("reply_to_id"), // For direct replies
+  attachmentUrl: text("attachment_url"), // For file attachments
   read: boolean("read").default(false),
+  archived: boolean("archived").default(false),
   sentAt: timestamp("sent_at").default(sql`now()`),
 });
 

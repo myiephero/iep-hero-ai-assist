@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Send, MessageCircle, Users } from 'lucide-react';
+import { Send, MessageCircle, Users, AlertTriangle, Paperclip, Reply, Archive } from 'lucide-react';
 import { format } from 'date-fns';
 import Navbar from '@/components/layout/navbar';
 
@@ -16,7 +16,13 @@ interface Message {
   senderId: string;
   receiverId: string;
   content: string;
+  messageType?: string;
+  priority?: string;
+  threadId?: string;
+  replyToId?: string;
+  attachmentUrl?: string;
   read: boolean;
+  archived?: boolean;
   sentAt: string;
   senderName?: string;
   senderRole?: string;
@@ -34,6 +40,9 @@ export default function ChatPage() {
   const { user } = useAuth();
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
   const [newMessage, setNewMessage] = useState('');
+  const [messagePriority, setMessagePriority] = useState('normal');
+  const [replyToMessage, setReplyToMessage] = useState<Message | null>(null);
+  const [showArchived, setShowArchived] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Fetch all messages for the user
@@ -49,16 +58,26 @@ export default function ChatPage() {
 
   // Send message mutation
   const sendMessageMutation = useMutation({
-    mutationFn: async (messageData: { receiverId: string; content: string }) => {
+    mutationFn: async (messageData: { 
+      receiverId: string; 
+      content: string; 
+      priority?: string;
+      replyToId?: string;
+    }) => {
       return apiRequest('POST', '/api/messages', {
         senderId: user?.id,
         receiverId: messageData.receiverId,
         content: messageData.content,
+        priority: messageData.priority || 'normal',
+        replyToId: messageData.replyToId,
+        messageType: 'text'
       });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/messages'] });
       setNewMessage('');
+      setReplyToMessage(null);
+      setMessagePriority('normal');
     },
   });
 
@@ -72,9 +91,27 @@ export default function ChatPage() {
     },
   });
 
-  // Process messages into conversations
-  const conversations: Conversation[] = users
+  // Filter users based on role for better agent-advocate messaging
+  const filteredUsers = users
     .filter((u: any) => u.id !== user?.id)
+    .filter((u: any) => {
+      // Parents can message advocates and professionals
+      if (user?.role === 'parent') {
+        return u.role === 'advocate' || u.role === 'professional';
+      }
+      // Advocates can message parents and other advocates
+      if (user?.role === 'advocate') {
+        return u.role === 'parent' || u.role === 'advocate' || u.role === 'professional';
+      }
+      // Professionals can message everyone
+      if (user?.role === 'professional') {
+        return true;
+      }
+      return true;
+    });
+
+  // Process messages into conversations
+  const conversations: Conversation[] = filteredUsers
     .map((u: any) => {
       const userMessages = messages.filter(
         (msg) => msg.senderId === u.id || msg.receiverId === u.id
@@ -106,8 +143,9 @@ export default function ChatPage() {
     ? messages
         .filter(
           (msg) =>
-            (msg.senderId === selectedConversation && msg.receiverId === user?.id) ||
-            (msg.senderId === user?.id && msg.receiverId === selectedConversation)
+            ((msg.senderId === selectedConversation && msg.receiverId === user?.id) ||
+            (msg.senderId === user?.id && msg.receiverId === selectedConversation)) &&
+            (!msg.archived || showArchived)
         )
         .sort((a, b) => new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime())
     : [];
@@ -135,7 +173,18 @@ export default function ChatPage() {
     sendMessageMutation.mutate({
       receiverId: selectedConversation,
       content: newMessage.trim(),
+      priority: messagePriority,
+      replyToId: replyToMessage?.id,
     });
+  };
+
+  const handleReply = (message: Message) => {
+    setReplyToMessage(message);
+    setNewMessage('');
+  };
+
+  const cancelReply = () => {
+    setReplyToMessage(null);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -170,7 +219,12 @@ export default function ChatPage() {
             Messages
           </h1>
           <p className="text-gray-600 mt-2">
-            Connect with your IEP team members and get the support you need
+            {user?.role === 'parent' 
+              ? 'Connect with advocates and professionals for IEP support'
+              : user?.role === 'advocate' 
+              ? 'Communicate with parents and collaborate with other team members'
+              : 'Connect with all IEP team members and provide professional guidance'
+            }
           </p>
         </div>
 
@@ -188,8 +242,13 @@ export default function ChatPage() {
                 {conversations.length === 0 ? (
                   <div className="p-6 text-center text-gray-500">
                     <MessageCircle className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                    <p>No conversations yet</p>
-                    <p className="text-sm">Start by sending a message to a team member</p>
+                    <p>No team members available</p>
+                    <p className="text-sm">
+                      {user?.role === 'parent' 
+                        ? 'No advocates or professionals are available for messaging'
+                        : 'No team members are available for messaging right now'
+                      }
+                    </p>
                   </div>
                 ) : (
                   conversations.map((conversation) => (
@@ -219,7 +278,15 @@ export default function ChatPage() {
                             )}
                           </div>
                           <div className="flex items-center gap-2 mt-1">
-                            <Badge variant="outline" className="text-xs">
+                            <Badge 
+                              variant="outline" 
+                              className={`text-xs ${
+                                conversation.userRole === 'advocate' ? 'border-blue-500 text-blue-700' :
+                                conversation.userRole === 'parent' ? 'border-green-500 text-green-700' :
+                                conversation.userRole === 'professional' ? 'border-purple-500 text-purple-700' :
+                                'border-gray-500 text-gray-700'
+                              }`}
+                            >
                               {conversation.userRole}
                             </Badge>
                             {conversation.lastMessage && (
@@ -256,9 +323,24 @@ export default function ChatPage() {
                     </Avatar>
                     <div>
                       <h3 className="font-medium">{selectedUser?.username}</h3>
-                      <Badge variant="outline" className="text-xs">
-                        {selectedUser?.role}
-                      </Badge>
+                      <div className="flex items-center gap-2">
+                        <Badge 
+                          variant="outline" 
+                          className={`text-xs ${
+                            selectedUser?.role === 'advocate' ? 'border-blue-500 text-blue-700' :
+                            selectedUser?.role === 'parent' ? 'border-green-500 text-green-700' :
+                            selectedUser?.role === 'professional' ? 'border-purple-500 text-purple-700' :
+                            'border-gray-500 text-gray-700'
+                          }`}
+                        >
+                          {selectedUser?.role}
+                        </Badge>
+                        {selectedUser?.planStatus === 'heroOffer' && (
+                          <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs">
+                            HERO
+                          </Badge>
+                        )}
+                      </div>
                     </div>
                   </CardTitle>
                 </CardHeader>
@@ -277,23 +359,53 @@ export default function ChatPage() {
                           key={message.id}
                           className={`flex ${
                             message.senderId === user?.id ? 'justify-end' : 'justify-start'
-                          }`}
+                          } group`}
                         >
-                          <div
-                            className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                              message.senderId === user?.id
-                                ? 'bg-blue-500 text-white'
-                                : 'bg-gray-200 text-gray-900'
-                            }`}
-                          >
-                            <p className="text-sm">{message.content}</p>
-                            <p
-                              className={`text-xs mt-1 ${
-                                message.senderId === user?.id ? 'text-blue-100' : 'text-gray-500'
+                          <div className={`max-w-xs lg:max-w-md ${message.senderId === user?.id ? 'order-2' : 'order-1'}`}>
+                            {message.replyToId && (
+                              <div className="text-xs text-gray-500 mb-1 italic">
+                                Replying to: {conversationMessages.find(m => m.id === message.replyToId)?.content.substring(0, 50)}...
+                              </div>
+                            )}
+                            <div
+                              className={`px-4 py-2 rounded-lg relative ${
+                                message.senderId === user?.id
+                                  ? 'bg-blue-500 text-white'
+                                  : 'bg-gray-200 text-gray-900'
+                              } ${
+                                message.priority === 'urgent' ? 'border-2 border-red-500' :
+                                message.priority === 'high' ? 'border-l-4 border-orange-400' : ''
                               }`}
                             >
-                              {format(new Date(message.sentAt), 'MMM d, h:mm a')}
-                            </p>
+                              {message.priority === 'urgent' && (
+                                <div className="flex items-center gap-1 text-xs mb-1">
+                                  <AlertTriangle className="h-3 w-3" />
+                                  <span>Urgent</span>
+                                </div>
+                              )}
+                              <p className="text-sm">{message.content}</p>
+                              <div className="flex items-center justify-between mt-1">
+                                <p
+                                  className={`text-xs ${
+                                    message.senderId === user?.id ? 'text-blue-100' : 'text-gray-500'
+                                  }`}
+                                >
+                                  {format(new Date(message.sentAt), 'MMM d, h:mm a')}
+                                </p>
+                                {message.senderId !== user?.id && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className={`opacity-0 group-hover:opacity-100 transition-opacity p-1 h-auto ${
+                                      message.senderId === user?.id ? 'text-blue-100 hover:text-white' : 'text-gray-500 hover:text-gray-700'
+                                    }`}
+                                    onClick={() => handleReply(message)}
+                                  >
+                                    <Reply className="h-3 w-3" />
+                                  </Button>
+                                )}
+                              </div>
+                            </div>
                           </div>
                         </div>
                       ))
