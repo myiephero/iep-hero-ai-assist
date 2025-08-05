@@ -1,6 +1,7 @@
 import { Link, useLocation } from "wouter";
-import { Bell, GraduationCap, Menu, User, Sparkles, Target, FileText, CreditCard, Users } from "lucide-react";
+import { Bell, GraduationCap, Menu, User, Sparkles, Target, FileText, CreditCard, Users, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { usePWA } from "@/hooks/use-pwa";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -98,6 +99,25 @@ const UserMenu = () => {
   );
 };
 
+const PWAInstallButton = () => {
+  const { isInstallable, installApp, isInstalled } = usePWA();
+
+  if (isInstalled || !isInstallable) return null;
+
+  return (
+    <Button 
+      variant="ghost" 
+      size="sm" 
+      onClick={installApp}
+      className="text-white/80 hover:text-white hover:bg-white/10 rounded-lg hidden sm:flex items-center gap-2"
+      title="Install IEP Hero App"
+    >
+      <Download className="h-4 w-4" />
+      <span className="hidden lg:inline">Install</span>
+    </Button>
+  );
+};
+
 export default function Navbar() {
   const { user } = useAuth();
   
@@ -127,6 +147,8 @@ export default function Navbar() {
           </div>
 
           <div className="flex items-center space-x-3">
+            <PWAInstallButton />
+            
             <Button variant="ghost" size="sm" className="text-white/80 hover:text-white hover:bg-white/10 rounded-lg">
               <Bell className="h-5 w-5" />
             </Button>

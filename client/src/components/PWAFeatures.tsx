@@ -1,169 +1,142 @@
 import { useState, useEffect } from 'react';
-import { Smartphone, Download, Wifi, WifiOff, Bell, Share, Camera } from 'lucide-react';
+import { Download, Smartphone, Wifi, WifiOff, RefreshCw } from 'lucide-react';
+import { usePWA } from '@/hooks/use-pwa';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { usePWA } from '@/hooks/use-pwa';
-import { useMobile } from '@/hooks/use-mobile';
 
 export function PWAFeatures() {
-  const { isInstallable, isInstalled, isOnline, installApp } = usePWA();
-  const { isMobile, canShare, canVibrate, deviceType, screenSize } = useMobile();
-  const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default');
-
-  useEffect(() => {
-    if ('Notification' in window) {
-      setNotificationPermission(Notification.permission);
-    }
-  }, []);
-
-  const requestNotificationPermission = async () => {
-    if ('Notification' in window) {
-      const permission = await Notification.requestPermission();
-      setNotificationPermission(permission);
-      if (permission === 'granted') {
-        new Notification('IEP Hero', {
-          body: 'You will now receive notifications for important updates!',
-          icon: '/pwa-192x192.svg'
-        });
-      }
-    }
-  };
-
-  const testShare = async () => {
-    if (canShare) {
-      try {
-        await navigator.share({
-          title: 'My IEP Hero',
-          text: 'Check out this amazing IEP management platform!',
-          url: window.location.href
-        });
-      } catch (error) {
-        console.log('Share canceled or failed');
-      }
-    }
-  };
-
-  const testVibration = () => {
-    if (canVibrate) {
-      navigator.vibrate([100, 50, 100, 50, 100]);
-    }
-  };
-
-  const features = [
-    {
-      name: 'App Installation',
-      description: isInstalled ? 'App is installed' : isInstallable ? 'Ready to install' : 'Not available',
-      icon: Download,
-      available: isInstallable || isInstalled,
-      status: isInstalled ? 'active' : isInstallable ? 'ready' : 'unavailable',
-      action: isInstallable ? installApp : undefined
-    },
-    {
-      name: 'Offline Support',
-      description: isOnline ? 'Currently online' : 'Working offline',
-      icon: isOnline ? Wifi : WifiOff,
-      available: true,
-      status: isOnline ? 'active' : 'offline'
-    },
-    {
-      name: 'Push Notifications',
-      description: notificationPermission === 'granted' ? 'Enabled' : notificationPermission === 'denied' ? 'Blocked' : 'Available',
-      icon: Bell,
-      available: 'Notification' in window,
-      status: notificationPermission === 'granted' ? 'active' : notificationPermission === 'denied' ? 'blocked' : 'available',
-      action: notificationPermission === 'default' ? requestNotificationPermission : undefined
-    },
-    {
-      name: 'Native Sharing',
-      description: canShare ? 'Available' : 'Not supported',
-      icon: Share,
-      available: canShare,
-      status: canShare ? 'active' : 'unavailable',
-      action: canShare ? testShare : undefined
-    },
-    {
-      name: 'Haptic Feedback',
-      description: canVibrate ? 'Available' : 'Not supported',
-      icon: Smartphone,
-      available: canVibrate,
-      status: canVibrate ? 'active' : 'unavailable',
-      action: canVibrate ? testVibration : undefined
-    },
-    {
-      name: 'Camera Access',
-      description: 'mediaDevices' in navigator ? 'Available' : 'Not supported',
-      icon: Camera,
-      available: 'mediaDevices' in navigator,
-      status: 'mediaDevices' in navigator ? 'active' : 'unavailable'
-    }
-  ];
+  const { isInstallable, installApp, isInstalled, isOnline, updateAvailable, updateApp } = usePWA();
+  const [showFeatures, setShowFeatures] = useState(false);
 
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Smartphone className="h-5 w-5" />
-          Mobile Features
-        </CardTitle>
-        <CardDescription>
-          Device: {deviceType} • Screen: {screenSize.width}×{screenSize.height}
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {features.map((feature) => (
-            <div
-              key={feature.name}
-              className="flex items-center justify-between p-3 border rounded-lg"
-            >
-              <div className="flex items-center gap-3">
-                <feature.icon className="h-4 w-4 text-muted-foreground" />
-                <div>
-                  <div className="font-medium text-sm">{feature.name}</div>
-                  <div className="text-xs text-muted-foreground">
-                    {feature.description}
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <Badge
-                  variant={
-                    feature.status === 'active'
-                      ? 'default'
-                      : feature.status === 'ready'
-                      ? 'secondary'
-                      : feature.status === 'blocked'
-                      ? 'destructive'
-                      : 'outline'
-                  }
-                  className="text-xs"
-                >
-                  {feature.status}
-                </Badge>
-                {feature.action && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={feature.action}
-                    className="h-6 px-2 text-xs"
-                  >
-                    Test
-                  </Button>
-                )}
-              </div>
+    <div className="space-y-4">
+      {/* PWA Status Card */}
+      <Card className="border-primary/20">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Smartphone className="h-5 w-5" />
+            App Installation
+            {isInstalled && (
+              <Badge variant="secondary" className="bg-green-100 text-green-800">
+                Installed
+              </Badge>
+            )}
+          </CardTitle>
+          <CardDescription>
+            Install My IEP Hero as a native app for the best experience
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {!isInstalled && isInstallable && (
+            <div className="flex items-center gap-2">
+              <Button onClick={installApp} className="flex-1">
+                <Download className="mr-2 h-4 w-4" />
+                Install App
+              </Button>
             </div>
-          ))}
-        </div>
-        
-        {isMobile && (
-          <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-            <p className="text-sm text-blue-700 dark:text-blue-300">
-              🎉 Mobile experience optimized! Add to home screen for the best experience.
-            </p>
+          )}
+          
+          {isInstalled && (
+            <div className="flex items-center gap-2 text-sm text-green-600">
+              <Smartphone className="h-4 w-4" />
+              App is installed and ready to use
+            </div>
+          )}
+          
+          {!isInstallable && !isInstalled && (
+            <div className="text-sm text-gray-600">
+              <p>To install My IEP Hero:</p>
+              <ul className="list-disc list-inside mt-2 space-y-1">
+                <li><strong>iOS:</strong> Tap Share → Add to Home Screen</li>
+                <li><strong>Android:</strong> Tap Menu → Install App</li>
+                <li><strong>Desktop:</strong> Look for install icon in address bar</li>
+              </ul>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Connection Status */}
+      <Card className="border-primary/20">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            {isOnline ? (
+              <Wifi className="h-5 w-5 text-green-500" />
+            ) : (
+              <WifiOff className="h-5 w-5 text-red-500" />
+            )}
+            Connection Status
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center gap-2">
+            <Badge variant={isOnline ? "default" : "destructive"}>
+              {isOnline ? "Online" : "Offline"}
+            </Badge>
+            {!isOnline && (
+              <span className="text-sm text-gray-600">
+                Limited functionality available
+              </span>
+            )}
           </div>
-        )}
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+
+      {/* App Updates */}
+      {updateAvailable && (
+        <Card className="border-blue-200 bg-blue-50">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-blue-800">
+              <RefreshCw className="h-5 w-5" />
+              Update Available
+            </CardTitle>
+            <CardDescription className="text-blue-600">
+              A new version of My IEP Hero is available
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button onClick={updateApp} variant="outline" className="border-blue-300 text-blue-700">
+              <RefreshCw className="mr-2 h-4 w-4" />
+              Update Now
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* App Features */}
+      <Card className="border-primary/20">
+        <CardHeader>
+          <CardTitle>App Benefits</CardTitle>
+          <CardDescription>
+            Why install the My IEP Hero app?
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ul className="space-y-2 text-sm">
+            <li className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+              Faster loading and better performance
+            </li>
+            <li className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+              Works offline for basic features
+            </li>
+            <li className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+              Native app experience on your device
+            </li>
+            <li className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+              Quick access from home screen
+            </li>
+            <li className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+              Push notifications for important updates
+            </li>
+          </ul>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
