@@ -2,8 +2,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MessageCircle } from "lucide-react";
-import type { Message } from "@shared/schema";
 import { formatDistanceToNow } from "date-fns";
+import { Link } from "wouter";
+
+interface Message {
+  id: string;
+  senderId: string;
+  content: string;
+  sentAt: string;
+}
 
 interface RecentMessagesProps {
   messages: Message[];
@@ -15,9 +22,11 @@ export default function RecentMessages({ messages }: RecentMessagesProps) {
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg">Recent Messages</CardTitle>
-          <Button variant="ghost" size="sm" className="text-primary">
-            View All
-          </Button>
+          <Link href="/messages">
+            <Button variant="ghost" size="sm" className="text-primary">
+              View All
+            </Button>
+          </Link>
         </div>
       </CardHeader>
       <CardContent>
