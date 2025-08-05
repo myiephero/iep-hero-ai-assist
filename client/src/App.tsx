@@ -26,6 +26,7 @@ import CommunicationTracker from "@/pages/communication-tracker";
 import AdvocateMatcher from "@/pages/advocate-matcher";
 import Subscribe from "@/pages/subscribe";
 import Pricing from "@/pages/pricing";
+import Chat from "@/pages/chat";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 import { MobileNavigation } from "@/components/MobileNavigation";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
@@ -175,6 +176,11 @@ function Router() {
       <Route path="/tools/advocate-matcher">
         <AuthGuard>
           <AdvocateMatcher />
+        </AuthGuard>
+      </Route>
+      <Route path="/chat">
+        <AuthGuard>
+          <Chat />
         </AuthGuard>
       </Route>
       <Route path="/">

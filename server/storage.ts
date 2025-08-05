@@ -10,6 +10,7 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   getUserByVerificationToken(token: string): Promise<User | undefined>;
+  getAllUsers(): Promise<User[]>;
   createUser(user: InsertUser): Promise<User>;
   verifyUserEmail(userId: string): Promise<User>;
   updateUserStripeInfo(userId: string, customerId: string, subscriptionId: string): Promise<User>;
@@ -154,6 +155,10 @@ export class MemStorage implements IStorage {
 
   async getUserByUsername(username: string): Promise<User | undefined> {
     return Array.from(this.users.values()).find(user => user.username === username);
+  }
+
+  async getAllUsers(): Promise<User[]> {
+    return Array.from(this.users.values());
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
@@ -419,6 +424,10 @@ export class DbStorage implements IStorage {
     return result[0];
   }
 
+  async getAllUsers(): Promise<User[]> {
+    return await this.db.select().from(users);
+  }
+
   async createUser(user: InsertUser): Promise<User> {
     const id = randomUUID();
     const newUser = {
@@ -634,6 +643,10 @@ export const storage = new class LocalDbStorage implements IStorage {
   async getUserByUsername(username: string): Promise<User | undefined> {
     const result = await this.db.select().from(users).where(eq(users.username, username)).limit(1);
     return result[0];
+  }
+
+  async getAllUsers(): Promise<User[]> {
+    return await this.db.select().from(users);
   }
 
   async createUser(user: InsertUser): Promise<User> {

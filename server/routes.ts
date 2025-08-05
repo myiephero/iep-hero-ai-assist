@@ -802,6 +802,33 @@ Use professional, supportive language that empowers the parent while being legal
     }
   });
 
+  app.put("/api/messages/:id/read", requireAuth, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.markMessageAsRead(id);
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Get all users for chat (filtered to remove sensitive data)
+  app.get("/api/users", requireAuth, async (req, res) => {
+    try {
+      const users = await storage.getAllUsers();
+      // Only return safe user data for chat
+      const safeUsers = users.map(user => ({
+        id: user.id,
+        username: user.username,
+        role: user.role,
+        planStatus: user.planStatus
+      }));
+      res.json(safeUsers);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   // Memory Query route for AI-powered IEP questions
   app.post("/api/memory-query", requireAuth, async (req, res) => {
     try {
