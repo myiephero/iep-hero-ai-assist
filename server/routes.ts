@@ -1401,6 +1401,14 @@ Diagnosis: ${diagnosis}`;
     }
   });
 
+  // Register messaging routes
+  try {
+    const { registerMessagingRoutes } = await import('./routes/messaging');
+    registerMessagingRoutes(app);
+  } catch (error) {
+    console.log('ℹ️ Messaging routes not loaded (development mode)');
+  }
+
   const httpServer = createServer(app);
 
   return httpServer;
