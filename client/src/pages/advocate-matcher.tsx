@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { ArrowLeft, Users, Calendar, Phone, Video, Mail, Upload, CheckCircle, FileText, GraduationCap, Building, HelpCircle } from "lucide-react";
+import { ArrowLeft, Users, Calendar, Phone, Video, Mail, CheckCircle, GraduationCap, Building } from "lucide-react";
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
@@ -40,17 +40,16 @@ const CONTACT_METHODS = [
   { value: "email", label: "Email Exchange", icon: Mail }
 ];
 
+// Match your exact Supabase function format
 const advocateMatchSchema = z.object({
-  parentName: z.string().min(2, "Parent name is required"),
-  childGrade: z.string().min(1, "Child's grade level is required"),
-  schoolDistrict: z.string().min(2, "School district is required"),
-  helpAreas: z.array(z.string()).min(1, "Please select at least one help area"),
-  biggestConcern: z.string().min(20, "Please describe your biggest concern (at least 20 characters)"),
-  nextMeetingDate: z.string().optional(),
-  preferredContact: z.string().min(1, "Please select a preferred contact method"),
+  meetingDate: z.string().optional(),
+  contactMethod: z.string().min(1, "Please select a preferred contact method"),
   availability: z.string().min(10, "Please describe your availability"),
-  calendlyLink: z.string().url().optional().or(z.literal("")),
-  documentUrls: z.array(z.string()).optional(),
+  concerns: z.string().min(20, "Please describe your biggest concern (at least 20 characters)"),
+  helpAreas: z.array(z.string()).min(1, "Please select at least one help area"),
+  gradeLevel: z.string().min(1, "Child's grade level is required"),
+  schoolDistrict: z.string().min(2, "School district is required"),
+  uploadedFiles: z.array(z.string()).optional(),
 });
 
 type AdvocateMatchForm = z.infer<typeof advocateMatchSchema>;
@@ -69,16 +68,14 @@ export default function AdvocateMatcher() {
   const form = useForm<AdvocateMatchForm>({
     resolver: zodResolver(advocateMatchSchema),
     defaultValues: {
-      parentName: user?.username || "",
-      childGrade: "",
-      schoolDistrict: "",
-      helpAreas: [],
-      biggestConcern: "",
-      nextMeetingDate: "",
-      preferredContact: "",
+      meetingDate: "",
+      contactMethod: "",
       availability: "",
-      calendlyLink: "",
-      documentUrls: [],
+      concerns: "",
+      helpAreas: [],
+      gradeLevel: "",
+      schoolDistrict: "",
+      uploadedFiles: [],
     },
   });
 
@@ -262,21 +259,7 @@ export default function AdvocateMatcher() {
                   <div className="space-y-6">
                     <FormField
                       control={form.control}
-                      name="parentName"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Your Full Name</FormLabel>
-                          <FormControl>
-                            <Input {...field} placeholder="Enter your full name" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="childGrade"
+                      name="gradeLevel"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Child's Current Grade Level</FormLabel>
@@ -363,7 +346,7 @@ export default function AdvocateMatcher() {
 
                     <FormField
                       control={form.control}
-                      name="biggestConcern"
+                      name="concerns"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>What's your biggest concern or challenge right now?</FormLabel>
@@ -382,7 +365,7 @@ export default function AdvocateMatcher() {
 
                     <FormField
                       control={form.control}
-                      name="nextMeetingDate"
+                      name="meetingDate"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Next IEP Meeting Date (if scheduled)</FormLabel>
@@ -404,7 +387,7 @@ export default function AdvocateMatcher() {
                   <div className="space-y-6">
                     <FormField
                       control={form.control}
-                      name="preferredContact"
+                      name="contactMethod"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>How would you prefer to meet with your advocate?</FormLabel>
@@ -444,23 +427,6 @@ export default function AdvocateMatcher() {
                               className="resize-none"
                             />
                           </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="calendlyLink"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Calendly Link (Optional)</FormLabel>
-                          <FormControl>
-                            <Input {...field} placeholder="https://calendly.com/yourname" />
-                          </FormControl>
-                          <p className="text-xs text-gray-500">
-                            If you have a Calendly account, paste your link here for easy scheduling
-                          </p>
                           <FormMessage />
                         </FormItem>
                       )}

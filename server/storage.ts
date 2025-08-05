@@ -835,7 +835,7 @@ export const storage = new class LocalDbStorage implements IStorage {
       ...match,
       id,
       parentId,
-      advocateId,
+      advocateId: advocateId || null,
       createdAt: new Date()
     };
     
