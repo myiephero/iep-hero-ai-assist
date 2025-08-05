@@ -20,6 +20,7 @@ From your Supabase project dashboard:
 Run this SQL in your Supabase SQL Editor:
 
 ```sql
+-- Create advocate_matches table for production data capture
 CREATE TABLE advocate_matches (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -41,7 +42,29 @@ ALTER TABLE advocate_matches ENABLE ROW LEVEL SECURITY;
 
 -- Create policy to allow service role full access
 CREATE POLICY "Service role can do everything" ON advocate_matches
-  USING (auth.role() = 'service_role');
+  FOR ALL USING (auth.role() = 'service_role');
+
+-- Create policy for authenticated users to read their own matches
+CREATE POLICY "Users can view own matches" ON advocate_matches
+  FOR SELECT USING (auth.uid()::text = parent_id);
+
+-- Insert sample data for testing (optional)
+INSERT INTO advocate_matches (
+  parent_id, advocate_id, meeting_date, contact_method, 
+  parent_availability, concerns, help_areas, grade_level, 
+  school_district, status
+) VALUES (
+  'demo-parent-id',
+  'advocate-demo-1', 
+  '2025-01-20',
+  'phone',
+  'Monday-Friday after 4pm, weekends flexible',
+  'School district denied my request for additional speech therapy sessions despite clear IEP recommendations',
+  ARRAY['Service Denial', 'IEP Evaluation'],
+  '5th Grade',
+  'Metro Public Schools',
+  'pending'
+);
 ```
 
 ### 4. Set Environment Variables
