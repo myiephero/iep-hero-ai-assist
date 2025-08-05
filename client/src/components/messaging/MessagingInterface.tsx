@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { useAuth } from '@/hooks/useAuth'
 import { useMessaging } from '@/hooks/useMessaging'
+import { QuickMessageForm } from './QuickMessageForm'
 import { Send, MessageCircle, User } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import { formatDistanceToNow } from 'date-fns'
@@ -22,7 +23,8 @@ export function MessagingInterface() {
     sending,
     activeConversationId,
     setActiveConversationId,
-    sendMessage
+    sendMessage,
+    loadConversations
   } = useMessaging()
 
   // Auto scroll to bottom when new messages arrive
@@ -74,6 +76,9 @@ export function MessagingInterface() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-6">
+        {/* Quick Message Form */}
+        <QuickMessageForm onMessageSent={loadConversations} />
+        
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[600px]">
           {/* Conversations Sidebar */}
           <Card className="bg-white border-0 shadow-sm rounded-xl">
