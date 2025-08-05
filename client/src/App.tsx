@@ -1,24 +1,15 @@
-import { Route, Router } from "wouter";
+import { Auth } from "@/components/Auth";
+import { IEPGenerator } from "@/components/IEPGenerator";
+import { MessagingInterface } from "@/components/messaging/MessagingInterface";
 import { useAuth } from "@/hooks/useAuth";
 import { Toaster } from "@/components/ui/toaster";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-
-// Import pages
-import Login from "@/pages/login";
-import Dashboard from "@/pages/dashboard";
-import DashboardParent from "@/pages/dashboard-parent";
-import Goals from "@/pages/goals";
-import Messages from "@/pages/messages";
-import Documents from "@/pages/documents";
-import MeetingPrep from "@/pages/meeting-prep";
-import ProgressNotes from "@/pages/progress-notes";
-import NotFound from "@/pages/not-found";
-
-// Create query client
-const queryClient = new QueryClient();
+import { Button } from "@/components/ui/button";
+import { MessageCircle, FileText, ArrowLeft } from "lucide-react";
+import { useState } from "react";
 
 function App() {
   const { user, loading } = useAuth();
+  const [currentView, setCurrentView] = useState<'iep' | 'messages'>('iep');
 
   if (loading) {
     return (
@@ -30,28 +21,48 @@ function App() {
 
   if (!user) {
     return (
-      <QueryClientProvider client={queryClient}>
-        <Login />
+      <div>
+        <Auth />
         <Toaster />
-      </QueryClientProvider>
+      </div>
     );
   }
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <Router>
-        <Route path="/" component={Dashboard} />
-        <Route path="/dashboard" component={Dashboard} />
-        <Route path="/dashboard-parent" component={DashboardParent} />
-        <Route path="/goals" component={Goals} />
-        <Route path="/messages" component={Messages} />
-        <Route path="/documents" component={Documents} />
-        <Route path="/meeting-prep" component={MeetingPrep} />
-        <Route path="/progress-notes" component={ProgressNotes} />
-        <Route component={NotFound} />
-      </Router>
+    <div>
+      {/* Navigation */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 py-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <h1 className="text-xl font-semibold text-gray-900">My IEP Hero</h1>
+              <div className="flex gap-2">
+                <Button
+                  variant={currentView === 'iep' ? 'default' : 'outline'}
+                  onClick={() => setCurrentView('iep')}
+                  size="sm"
+                >
+                  <FileText className="w-4 h-4 mr-2" />
+                  IEP Goals
+                </Button>
+                <Button
+                  variant={currentView === 'messages' ? 'default' : 'outline'}
+                  onClick={() => setCurrentView('messages')}
+                  size="sm"
+                >
+                  <MessageCircle className="w-4 h-4 mr-2" />
+                  Messages
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      {currentView === 'iep' ? <IEPGenerator /> : <MessagingInterface />}
       <Toaster />
-    </QueryClientProvider>
+    </div>
   );
 }
 
