@@ -24,6 +24,7 @@ import MeetingPrepWizard from "@/pages/meeting-prep-wizard";
 import ProgressNotesLogger from "@/pages/progress-notes-logger";
 import CommunicationTracker from "@/pages/communication-tracker";
 import AdvocateMatcher from "@/pages/advocate-matcher";
+import AdvocacyReportGenerator from "@/pages/advocacy-report-generator";
 import Subscribe from "@/pages/subscribe";
 import Pricing from "@/pages/pricing";
 import Chat from "@/pages/chat";
@@ -176,6 +177,11 @@ function Router() {
       <Route path="/tools/advocate-matcher">
         <AuthGuard>
           <AdvocateMatcher />
+        </AuthGuard>
+      </Route>
+      <Route path="/tools/advocacy-report-generator">
+        <AuthGuard>
+          <AdvocacyReportGenerator />
         </AuthGuard>
       </Route>
       <Route path="/chat">

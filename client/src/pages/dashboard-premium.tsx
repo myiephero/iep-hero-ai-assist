@@ -7,10 +7,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/use-auth";
+import { useLocation } from "wouter";
 
 const advocateTools = [
   { name: 'AI IEP Review', desc: 'Analyze existing IEPs for quality & improvement', icon: '🧠' },
   { name: 'IEP Goal Generator', desc: 'Craft measurable objectives quickly', icon: '🎯' },
+  { name: 'One-Click Advocacy Report', desc: 'Generate comprehensive advocacy reports with legal framework', icon: '📋' },
   { name: 'Template Builder', desc: 'Design reusable IEP templates and forms', icon: '📄' },
   { name: 'Progress Analyzer', desc: 'Data-driven recommendations for IEP goals', icon: '📊' },
   { name: 'Meeting Prep Assistant', desc: 'Generate talking points and meeting notes', icon: '🗣️' },
@@ -23,12 +25,28 @@ export default function DashboardAdvocate() {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedTool, setSelectedTool] = useState<string | null>(null);
   const [upload, setUpload] = useState<File | null>(null);
+  const [, setLocation] = useLocation();
   const { user } = useAuth();
 
   const displayUser = user || { email: "advocate@demo.com", planStatus: "heroOffer", username: "demo_advocate", role: "advocate" };
   const isHeroPlan = displayUser.planStatus === 'heroOffer';
 
   const openToolModal = (tool: string) => {
+    // Navigate directly to specific tool pages for Hero Plan tools
+    if (tool === 'One-Click Advocacy Report') {
+      setLocation('/tools/advocacy-report-generator');
+      return;
+    }
+    if (tool === 'IEP Goal Generator') {
+      setLocation('/tools/iep-goal-generator');
+      return;
+    }
+    if (tool === 'AI IEP Review') {
+      setLocation('/tools/ai-iep-review');
+      return;
+    }
+    
+    // For other tools, show modal
     setSelectedTool(tool);
     setModalOpen(true);
   };

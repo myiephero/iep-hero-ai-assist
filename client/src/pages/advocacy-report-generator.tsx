@@ -1,398 +1,460 @@
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { FileText, Download, Copy, RefreshCw, AlertCircle, CheckCircle } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { useMutation } from '@tanstack/react-query';
-import { apiRequest } from '@/lib/queryClient';
-import Navbar from '@/components/layout/navbar';
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
+import { ArrowLeft, Download, Copy, FileText, Clock, AlertCircle } from "lucide-react";
+import { Link } from "wouter";
 
-interface ReportData {
-  studentName: string;
-  gradeLevel: string;
-  disability: string;
-  currentServices: string;
-  concerns: string;
-  requestedAction: string;
-  reportType: string;
-  timeline: string;
-  additionalInfo: string;
-}
+const formSchema = z.object({
+  studentName: z.string().min(2, "Student name must be at least 2 characters"),
+  gradeLevel: z.string().min(1, "Grade level is required"),
+  disability: z.string().min(2, "Primary disability is required"),
+  currentServices: z.string().min(10, "Current services description is required"),
+  concerns: z.string().min(20, "Please provide detailed concerns"),
+  requestedAction: z.string().min(10, "Requested action is required"),
+  reportType: z.string().min(1, "Report type is required"),
+  timeline: z.string().min(1, "Timeline is required"),
+  additionalInfo: z.string().optional()
+});
+
+type FormData = z.infer<typeof formSchema>;
 
 export default function AdvocacyReportGenerator() {
-  const [formData, setFormData] = useState<ReportData>({
-    studentName: '',
-    gradeLevel: '',
-    disability: '',
-    currentServices: '',
-    concerns: '',
-    requestedAction: '',
-    reportType: 'comprehensive',
-    timeline: 'urgent',
-    additionalInfo: ''
-  });
-  
-  const [generatedReport, setGeneratedReport] = useState<string>('');
-  const [showReport, setShowReport] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generatedReport, setGeneratedReport] = useState<string>("");
+  const [reportMetadata, setReportMetadata] = useState<any>(null);
   const { toast } = useToast();
 
-  const generateReportMutation = useMutation({
-    mutationFn: async (data: ReportData) => {
-      const response = await apiRequest('POST', '/api/generate-advocacy-report', data);
-      return response.json();
-    },
-    onSuccess: (data) => {
-      setGeneratedReport(data.report);
-      setShowReport(true);
-      toast({
-        title: "Report Generated Successfully",
-        description: "Your advocacy report is ready for review and download."
-      });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Generation Failed",
-        description: error.message || "Failed to generate advocacy report. Please try again.",
-        variant: "destructive"
-      });
+  const form = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      studentName: "",
+      gradeLevel: "",
+      disability: "",
+      currentServices: "",
+      concerns: "",
+      requestedAction: "",
+      reportType: "",
+      timeline: "",
+      additionalInfo: ""
     }
   });
 
-  const handleInputChange = (field: keyof ReportData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
-
-  const handleGenerate = () => {
-    if (!formData.studentName || !formData.concerns || !formData.requestedAction) {
-      toast({
-        title: "Missing Information",
-        description: "Please fill in student name, concerns, and requested action.",
-        variant: "destructive"
-      });
-      return;
-    }
-    generateReportMutation.mutate(formData);
-  };
-
-  const handleCopy = async () => {
+  const onSubmit = async (data: FormData) => {
+    setIsGenerating(true);
     try {
-      await navigator.clipboard.writeText(generatedReport);
+      const response = await apiRequest("POST", "/api/generate-advocacy-report", data);
+      const result = await response.json();
+      
+      if (result.success) {
+        setGeneratedReport(result.report);
+        setReportMetadata(result.metadata);
+        toast({
+          title: "Report Generated Successfully",
+          description: "Your professional advocacy report has been created."
+        });
+      } else {
+        throw new Error(result.error || "Failed to generate report");
+      }
+    } catch (error: any) {
       toast({
-        title: "Copied to Clipboard",
-        description: "The advocacy report has been copied to your clipboard."
-      });
-    } catch (error) {
-      toast({
-        title: "Copy Failed",
-        description: "Failed to copy to clipboard. Please select and copy manually.",
+        title: "Generation Failed",
+        description: error.message || "Unable to generate advocacy report. Please try again.",
         variant: "destructive"
       });
+    } finally {
+      setIsGenerating(false);
     }
   };
 
-  const handleDownload = () => {
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(generatedReport);
+    toast({
+      title: "Copied to Clipboard",
+      description: "The advocacy report has been copied to your clipboard."
+    });
+  };
+
+  const downloadReport = () => {
     const blob = new Blob([generatedReport], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `advocacy-report-${formData.studentName.replace(/\s+/g, '-').toLowerCase()}-${new Date().toISOString().split('T')[0]}.txt`;
+    a.download = `advocacy-report-${reportMetadata?.studentName?.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.txt`;
+    document.body.appendChild(a);
     a.click();
+    document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    
     toast({
       title: "Download Started",
       description: "Your advocacy report is being downloaded."
     });
   };
 
-  const handleReset = () => {
-    setFormData({
-      studentName: '',
-      gradeLevel: '',
-      disability: '',
-      currentServices: '',
-      concerns: '',
-      requestedAction: '',
-      reportType: 'comprehensive',
-      timeline: 'urgent',
-      additionalInfo: ''
-    });
-    setGeneratedReport('');
-    setShowReport(false);
+  const resetForm = () => {
+    form.reset();
+    setGeneratedReport("");
+    setReportMetadata(null);
   };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      <Navbar />
-      
-      <div className="container mx-auto px-4 py-8">
+  if (generatedReport) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-6">
         <div className="max-w-4xl mx-auto">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <div className="p-3 bg-blue-600 rounded-xl">
-                <FileText className="h-8 w-8 text-white" />
-              </div>
-              <h1 className="text-3xl font-bold text-gray-900">
-                One-Click Advocacy Report Generator
-              </h1>
+          <div className="flex items-center gap-4 mb-6">
+            <Link href="/dashboard-advocate">
+              <Button variant="ghost" size="sm" className="gap-2">
+                <ArrowLeft className="h-4 w-4" />
+                Back to Dashboard
+              </Button>
+            </Link>
+            <div>
+              <h1 className="text-2xl font-bold text-slate-900">Generated Advocacy Report</h1>
+              <p className="text-slate-600">
+                Report for {reportMetadata?.studentName} • {reportMetadata?.reportType} • Generated {new Date(reportMetadata?.generatedAt).toLocaleDateString()}
+              </p>
             </div>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Generate comprehensive advocacy reports for IEP meetings, legal documentation, 
-              and school district communications in minutes, not hours.
-            </p>
-            <Badge className="mt-3 bg-blue-100 text-blue-800 border-blue-200">
-              AI-Powered • Professional Quality • Legally Compliant
-            </Badge>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Input Form */}
-            <Card className="shadow-lg border-0">
-              <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-700 text-white">
-                <CardTitle className="flex items-center gap-2">
-                  <AlertCircle className="h-5 w-5" />
-                  Student Information & Concerns
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-6 space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="studentName" className="text-sm font-medium text-gray-700">
-                      Student Name *
-                    </Label>
-                    <Input
-                      id="studentName"
-                      value={formData.studentName}
-                      onChange={(e) => handleInputChange('studentName', e.target.value)}
-                      placeholder="Enter student's full name"
-                      className="mt-1"
+          <Card className="mb-6">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+              <div>
+                <CardTitle className="text-lg">Professional Advocacy Report</CardTitle>
+                <CardDescription>
+                  Ready for school district communication, legal proceedings, or IEP team meetings
+                </CardDescription>
+              </div>
+              <div className="flex gap-2">
+                <Button onClick={copyToClipboard} variant="outline" size="sm" className="gap-2">
+                  <Copy className="h-4 w-4" />
+                  Copy
+                </Button>
+                <Button onClick={downloadReport} variant="outline" size="sm" className="gap-2">
+                  <Download className="h-4 w-4" />
+                  Download
+                </Button>
+                <Button onClick={resetForm} variant="default" size="sm">
+                  Generate New Report
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="bg-white p-6 rounded-lg border shadow-sm">
+                <pre className="whitespace-pre-wrap font-serif text-sm leading-relaxed text-slate-800">
+                  {generatedReport}
+                </pre>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-6">
+      <div className="max-w-2xl mx-auto">
+        <div className="flex items-center gap-4 mb-6">
+          <Link href="/dashboard-advocate">
+            <Button variant="ghost" size="sm" className="gap-2">
+              <ArrowLeft className="h-4 w-4" />
+              Back to Dashboard
+            </Button>
+          </Link>
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900">Advocacy Report Generator</h1>
+            <p className="text-slate-600">Create professional advocacy reports for IEP students</p>
+          </div>
+        </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5 text-blue-600" />
+              Student & Advocacy Information
+            </CardTitle>
+            <CardDescription>
+              Provide detailed information to generate a comprehensive advocacy report that includes legal framework, recommended actions, and next steps.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                {/* Student Information Section */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-slate-900">Student Information</h3>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="studentName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Student Name</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Enter student's full name" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="gradeLevel"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Grade Level</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select grade level" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="Pre-K">Pre-K</SelectItem>
+                              <SelectItem value="Kindergarten">Kindergarten</SelectItem>
+                              <SelectItem value="1st Grade">1st Grade</SelectItem>
+                              <SelectItem value="2nd Grade">2nd Grade</SelectItem>
+                              <SelectItem value="3rd Grade">3rd Grade</SelectItem>
+                              <SelectItem value="4th Grade">4th Grade</SelectItem>
+                              <SelectItem value="5th Grade">5th Grade</SelectItem>
+                              <SelectItem value="6th Grade">6th Grade</SelectItem>
+                              <SelectItem value="7th Grade">7th Grade</SelectItem>
+                              <SelectItem value="8th Grade">8th Grade</SelectItem>
+                              <SelectItem value="9th Grade">9th Grade</SelectItem>
+                              <SelectItem value="10th Grade">10th Grade</SelectItem>
+                              <SelectItem value="11th Grade">11th Grade</SelectItem>
+                              <SelectItem value="12th Grade">12th Grade</SelectItem>
+                              <SelectItem value="Transition (18-21)">Transition (18-21)</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
                   </div>
-                  <div>
-                    <Label htmlFor="gradeLevel" className="text-sm font-medium text-gray-700">
-                      Grade Level
-                    </Label>
-                    <Select value={formData.gradeLevel} onValueChange={(value) => handleInputChange('gradeLevel', value)}>
-                      <SelectTrigger className="mt-1">
-                        <SelectValue placeholder="Select grade" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="pre-k">Pre-K</SelectItem>
-                        <SelectItem value="k">Kindergarten</SelectItem>
-                        <SelectItem value="1">1st Grade</SelectItem>
-                        <SelectItem value="2">2nd Grade</SelectItem>
-                        <SelectItem value="3">3rd Grade</SelectItem>
-                        <SelectItem value="4">4th Grade</SelectItem>
-                        <SelectItem value="5">5th Grade</SelectItem>
-                        <SelectItem value="6">6th Grade</SelectItem>
-                        <SelectItem value="7">7th Grade</SelectItem>
-                        <SelectItem value="8">8th Grade</SelectItem>
-                        <SelectItem value="9">9th Grade</SelectItem>
-                        <SelectItem value="10">10th Grade</SelectItem>
-                        <SelectItem value="11">11th Grade</SelectItem>
-                        <SelectItem value="12">12th Grade</SelectItem>
-                      </SelectContent>
-                    </Select>
+
+                  <FormField
+                    control={form.control}
+                    name="disability"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Primary Disability Category</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select primary disability" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="Autism Spectrum Disorder">Autism Spectrum Disorder</SelectItem>
+                            <SelectItem value="Specific Learning Disability">Specific Learning Disability</SelectItem>
+                            <SelectItem value="ADHD">ADHD</SelectItem>
+                            <SelectItem value="Intellectual Disability">Intellectual Disability</SelectItem>
+                            <SelectItem value="Emotional Behavioral Disorder">Emotional/Behavioral Disorder</SelectItem>
+                            <SelectItem value="Speech Language Impairment">Speech/Language Impairment</SelectItem>
+                            <SelectItem value="Other Health Impairment">Other Health Impairment</SelectItem>
+                            <SelectItem value="Multiple Disabilities">Multiple Disabilities</SelectItem>
+                            <SelectItem value="Hearing Impairment">Hearing Impairment</SelectItem>
+                            <SelectItem value="Visual Impairment">Visual Impairment</SelectItem>
+                            <SelectItem value="Orthopedic Impairment">Orthopedic Impairment</SelectItem>
+                            <SelectItem value="Traumatic Brain Injury">Traumatic Brain Injury</SelectItem>
+                            <SelectItem value="Developmental Delay">Developmental Delay</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="currentServices"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Current IEP Services</FormLabel>
+                        <FormControl>
+                          <Textarea 
+                            placeholder="Describe current special education services, related services, accommodations, and modifications..."
+                            className="min-h-[100px]"
+                            {...field} 
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* Advocacy Request Section */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-slate-900">Advocacy Request</h3>
+                  
+                  <FormField
+                    control={form.control}
+                    name="concerns"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Primary Concerns</FormLabel>
+                        <FormControl>
+                          <Textarea 
+                            placeholder="Detail your specific concerns about the student's education, services, or treatment..."
+                            className="min-h-[120px]"
+                            {...field} 
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          Be specific about what is not working and how it impacts the student's education
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="requestedAction"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Requested Action</FormLabel>
+                        <FormControl>
+                          <Textarea 
+                            placeholder="What specific changes or actions are you requesting from the school district?"
+                            className="min-h-[100px]"
+                            {...field} 
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="reportType"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Report Type</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select report type" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="IEP Meeting Preparation">IEP Meeting Preparation</SelectItem>
+                              <SelectItem value="Service Request">Service Request</SelectItem>
+                              <SelectItem value="Complaint Documentation">Complaint Documentation</SelectItem>
+                              <SelectItem value="Due Process Preparation">Due Process Preparation</SelectItem>
+                              <SelectItem value="Placement Appeal">Placement Appeal</SelectItem>
+                              <SelectItem value="Evaluation Request">Evaluation Request</SelectItem>
+                              <SelectItem value="Progress Monitoring">Progress Monitoring</SelectItem>
+                              <SelectItem value="Transition Planning">Transition Planning</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="timeline"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Timeline Priority</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select timeline" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="Immediate (1-2 weeks)">
+                                <div className="flex items-center gap-2">
+                                  <AlertCircle className="h-4 w-4 text-red-500" />
+                                  Immediate (1-2 weeks)
+                                </div>
+                              </SelectItem>
+                              <SelectItem value="Urgent (3-4 weeks)">
+                                <div className="flex items-center gap-2">
+                                  <Clock className="h-4 w-4 text-orange-500" />
+                                  Urgent (3-4 weeks)
+                                </div>
+                              </SelectItem>
+                              <SelectItem value="Standard (1-2 months)">
+                                <div className="flex items-center gap-2">
+                                  <Clock className="h-4 w-4 text-blue-500" />
+                                  Standard (1-2 months)
+                                </div>
+                              </SelectItem>
+                              <SelectItem value="Long-term (3+ months)">
+                                <div className="flex items-center gap-2">
+                                  <Clock className="h-4 w-4 text-green-500" />
+                                  Long-term (3+ months)
+                                </div>
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   </div>
-                </div>
 
-                <div>
-                  <Label htmlFor="disability" className="text-sm font-medium text-gray-700">
-                    Primary Disability/Diagnosis
-                  </Label>
-                  <Input
-                    id="disability"
-                    value={formData.disability}
-                    onChange={(e) => handleInputChange('disability', e.target.value)}
-                    placeholder="e.g., Autism, ADHD, Learning Disability"
-                    className="mt-1"
+                  <FormField
+                    control={form.control}
+                    name="additionalInfo"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Additional Information (Optional)</FormLabel>
+                        <FormControl>
+                          <Textarea 
+                            placeholder="Any additional context, previous communications, or relevant information..."
+                            className="min-h-[80px]"
+                            {...field} 
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
                 </div>
 
-                <div>
-                  <Label htmlFor="currentServices" className="text-sm font-medium text-gray-700">
-                    Current IEP Services
-                  </Label>
-                  <Textarea
-                    id="currentServices"
-                    value={formData.currentServices}
-                    onChange={(e) => handleInputChange('currentServices', e.target.value)}
-                    placeholder="List current accommodations, modifications, and services..."
-                    className="mt-1"
-                    rows={3}
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="concerns" className="text-sm font-medium text-gray-700">
-                    Primary Concerns *
-                  </Label>
-                  <Textarea
-                    id="concerns"
-                    value={formData.concerns}
-                    onChange={(e) => handleInputChange('concerns', e.target.value)}
-                    placeholder="Describe specific concerns about the current IEP, services, or educational progress..."
-                    className="mt-1"
-                    rows={4}
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="requestedAction" className="text-sm font-medium text-gray-700">
-                    Requested Action *
-                  </Label>
-                  <Textarea
-                    id="requestedAction"
-                    value={formData.requestedAction}
-                    onChange={(e) => handleInputChange('requestedAction', e.target.value)}
-                    placeholder="What specific actions or changes are you requesting from the school district?"
-                    className="mt-1"
-                    rows={3}
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="reportType" className="text-sm font-medium text-gray-700">
-                      Report Type
-                    </Label>
-                    <Select value={formData.reportType} onValueChange={(value) => handleInputChange('reportType', value)}>
-                      <SelectTrigger className="mt-1">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="comprehensive">Comprehensive Report</SelectItem>
-                        <SelectItem value="meeting-prep">Meeting Preparation</SelectItem>
-                        <SelectItem value="legal-documentation">Legal Documentation</SelectItem>
-                        <SelectItem value="complaint-filing">Complaint Filing</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label htmlFor="timeline" className="text-sm font-medium text-gray-700">
-                      Timeline Priority
-                    </Label>
-                    <Select value={formData.timeline} onValueChange={(value) => handleInputChange('timeline', value)}>
-                      <SelectTrigger className="mt-1">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="urgent">Urgent (Immediate)</SelectItem>
-                        <SelectItem value="normal">Normal (30 days)</SelectItem>
-                        <SelectItem value="routine">Routine (60+ days)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <div>
-                  <Label htmlFor="additionalInfo" className="text-sm font-medium text-gray-700">
-                    Additional Information
-                  </Label>
-                  <Textarea
-                    id="additionalInfo"
-                    value={formData.additionalInfo}
-                    onChange={(e) => handleInputChange('additionalInfo', e.target.value)}
-                    placeholder="Any additional context, documentation references, or special circumstances..."
-                    className="mt-1"
-                    rows={3}
-                  />
-                </div>
-
-                <div className="flex gap-3">
+                {/* Submit Button */}
+                <div className="flex justify-end pt-4">
                   <Button 
-                    onClick={handleGenerate}
-                    disabled={generateReportMutation.isPending}
-                    className="flex-1 bg-blue-600 hover:bg-blue-700"
+                    type="submit" 
+                    disabled={isGenerating}
+                    className="min-w-[200px]"
                   >
-                    {generateReportMutation.isPending ? (
+                    {isGenerating ? (
                       <>
-                        <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                        Generating...
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        Generating Report...
                       </>
                     ) : (
                       <>
                         <FileText className="h-4 w-4 mr-2" />
-                        Generate Report
+                        Generate Advocacy Report
                       </>
                     )}
                   </Button>
-                  <Button 
-                    variant="outline" 
-                    onClick={handleReset}
-                    className="px-6"
-                  >
-                    Reset
-                  </Button>
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* Generated Report */}
-            <Card className="shadow-lg border-0">
-              <CardHeader className="bg-gradient-to-r from-green-600 to-green-700 text-white">
-                <CardTitle className="flex items-center gap-2">
-                  <CheckCircle className="h-5 w-5" />
-                  Generated Advocacy Report
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-6">
-                {!showReport ? (
-                  <div className="flex flex-col items-center justify-center py-12 text-center">
-                    <div className="p-4 bg-gray-100 rounded-full mb-4">
-                      <FileText className="h-12 w-12 text-gray-400" />
-                    </div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">
-                      Ready to Generate
-                    </h3>
-                    <p className="text-gray-600 max-w-sm">
-                      Fill out the form and click "Generate Report" to create your 
-                      professional advocacy document.
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    <div className="flex gap-2 mb-4">
-                      <Button
-                        onClick={handleCopy}
-                        variant="outline"
-                        size="sm"
-                        className="flex-1"
-                      >
-                        <Copy className="h-4 w-4 mr-2" />
-                        Copy
-                      </Button>
-                      <Button
-                        onClick={handleDownload}
-                        variant="outline"
-                        size="sm"
-                        className="flex-1"
-                      >
-                        <Download className="h-4 w-4 mr-2" />
-                        Download
-                      </Button>
-                    </div>
-                    
-                    <Separator />
-                    
-                    <div className="bg-gray-50 rounded-lg p-4 max-h-96 overflow-y-auto">
-                      <pre className="whitespace-pre-wrap text-sm text-gray-800 leading-relaxed">
-                        {generatedReport}
-                      </pre>
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-        </div>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
