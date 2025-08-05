@@ -17,6 +17,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useMutation } from "@tanstack/react-query";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { AdvocateMatchConfirmation } from "@/components/AdvocateMatchConfirmation";
 
 const HELP_AREAS = [
   "IEP Evaluation Request",
@@ -60,6 +61,8 @@ export default function AdvocateMatcher() {
   const { toast } = useToast();
   const [step, setStep] = useState(1);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [matchData, setMatchData] = useState<any>(null);
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
   // Check if user has Hero plan access
   const hasHeroAccess = user?.planStatus === 'heroOffer' || 
@@ -88,14 +91,12 @@ export default function AdvocateMatcher() {
       return response.json();
     },
     onSuccess: (result) => {
-      setIsSubmitted(true);
       const savedTo = result.savedTo === 'local' ? 'development database' : 'Supabase';
       console.log(`✅ Data saved to: ${savedTo}`);
       
-      toast({
-        title: "Request Submitted Successfully!",
-        description: "✅ Your advocate match request has been submitted. You'll receive a confirmation email and hear from your advocate within 24 hours.",
-      });
+      // Store match data and show animated confirmation
+      setMatchData(result.match);
+      setShowConfirmation(true);
     },
     onError: (error: any) => {
       console.error('Error creating match:', error);
@@ -141,6 +142,21 @@ export default function AdvocateMatcher() {
     );
   }
 
+  // Show animated confirmation sequence
+  if (showConfirmation && matchData) {
+    return (
+      <>
+        <AdvocateMatchConfirmation 
+          matchData={matchData}
+          onComplete={() => {
+            setShowConfirmation(false);
+            setIsSubmitted(true);
+          }}
+        />
+      </>
+    );
+  }
+
   if (isSubmitted) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
@@ -159,42 +175,17 @@ export default function AdvocateMatcher() {
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <CheckCircle className="w-8 h-8 text-green-600" />
               </div>
-              <CardTitle className="text-2xl text-green-600">Request Submitted Successfully!</CardTitle>
+              <CardTitle className="text-2xl text-green-600">Welcome Back!</CardTitle>
               <CardDescription>
-                Your advocate match request has been submitted and our team has been notified.
+                Your advocate match has been successfully processed.
               </CardDescription>
             </CardHeader>
             <CardContent className="text-center space-y-4">
-              <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-                <h3 className="font-semibold mb-2 text-green-800">Confirmation Details</h3>
-                <ul className="text-sm text-green-700 space-y-2 text-left">
-                  <li className="flex items-center">
-                    <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
-                    Request submitted to our advocate matching system
-                  </li>
-                  <li className="flex items-center">
-                    <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
-                    Confirmation email sent to your inbox
-                  </li>
-                  <li className="flex items-center">
-                    <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
-                    Our team has been notified via Slack
-                  </li>
-                  <li className="flex items-center">
-                    <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
-                    Expert advocate will be assigned within 24 hours
-                  </li>
-                </ul>
-              </div>
-              
               <div className="bg-blue-50 p-4 rounded-lg">
-                <h3 className="font-semibold mb-2">What happens next?</h3>
-                <ul className="text-sm text-gray-600 space-y-2">
-                  <li>📧 Check your email for detailed confirmation</li>
-                  <li>📞 Your advocate will contact you within 24 hours</li>
-                  <li>📋 Together you'll create an action plan for your child's IEP</li>
-                  <li>🤝 Get ongoing support throughout the entire process</li>
-                </ul>
+                <h3 className="font-semibold mb-2">Ready for Another Match?</h3>
+                <p className="text-sm text-gray-600 mb-4">
+                  You can submit additional requests or return to your dashboard to access all Hero Plan tools.
+                </p>
               </div>
               
               <div className="flex gap-3 justify-center">
