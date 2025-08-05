@@ -374,6 +374,30 @@ Use professional, supportive language that empowers the parent while being legal
     }
   });
 
+  // Progress Notes routes
+  app.get("/api/progress-notes", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      const notes = await storage.getProgressNotesByUserId(user.id);
+      res.json(notes);
+    } catch (error: any) {
+      console.error('Error fetching progress notes:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/progress-notes", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      const noteData = req.body;
+      const note = await storage.createProgressNote(user.id, noteData);
+      res.json(note);
+    } catch (error: any) {
+      console.error('Error creating progress note:', error);
+      res.status(400).json({ message: error.message });
+    }
+  });
+
   app.get("/api/me", requireAuth, (req, res) => {
     const user = req.user as any;
     // Fix Hero Plan detection: parent@demo.com should always have Hero access

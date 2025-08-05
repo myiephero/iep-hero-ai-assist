@@ -92,7 +92,7 @@ export default function ParentDashboard() {
       return;
     }
     if (tool === "Progress Notes") {
-      setLocation("/tools/progress-notes");
+      setLocation("/tools/progress-notes-logger");
       return;
     }
     if (tool === "Communication Plan") {

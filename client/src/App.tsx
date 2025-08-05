@@ -21,6 +21,7 @@ import ProgressNotes from "@/pages/progress-notes";
 import CommunicationPlan from "@/pages/communication-plan";
 import RightsExplainer from "@/pages/rights-explainer";
 import MeetingPrepWizard from "@/pages/meeting-prep-wizard";
+import ProgressNotesLogger from "@/pages/progress-notes-logger";
 import Subscribe from "@/pages/subscribe";
 import Pricing from "@/pages/pricing";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
@@ -157,6 +158,11 @@ function Router() {
       <Route path="/tools/meeting-prep-wizard">
         <AuthGuard>
           <MeetingPrepWizard />
+        </AuthGuard>
+      </Route>
+      <Route path="/tools/progress-notes-logger">
+        <AuthGuard>
+          <ProgressNotesLogger />
         </AuthGuard>
       </Route>
       <Route path="/">
