@@ -426,13 +426,11 @@ Use professional, supportive language that empowers the parent while being legal
   app.get("/api/advocate-matches", requireAuth, async (req, res) => {
     try {
       const user = req.user as any;
-      let matches;
+      let matches: any[] = [];
       if (user.role === 'parent') {
         matches = await storage.getAdvocateMatchesByParentId(user.id);
       } else if (user.role === 'advocate') {
         matches = await storage.getAdvocateMatchesByAdvocateId(user.id);
-      } else {
-        matches = [];
       }
       res.json(matches);
     } catch (error: any) {
@@ -444,10 +442,21 @@ Use professional, supportive language that empowers the parent while being legal
   app.post("/api/advocate-matches", requireAuth, async (req, res) => {
     try {
       const user = req.user as any;
-      const matchData = req.body;
+      const formData = req.body;
+      
+      // Transform data to match Supabase format
+      const matchData = {
+        meetingDate: formData.meetingDate,
+        contactMethod: formData.contactMethod,
+        parentAvailability: formData.availability,
+        concerns: formData.concerns,
+        helpAreas: formData.helpAreas,
+        gradeLevel: formData.gradeLevel,
+        schoolDistrict: formData.schoolDistrict,
+        documentUrls: formData.uploadedFiles || [],
+      };
       
       // For MVP, auto-assign to first available advocate
-      // In production, this would use proper matching logic
       const availableAdvocate = await storage.getUserByEmail('advocate@demo.com');
       if (!availableAdvocate) {
         return res.status(400).json({ message: 'No available advocates found' });
@@ -466,10 +475,10 @@ Use professional, supportive language that empowers the parent while being legal
         // Don't fail the request if email fails
       }
 
-      res.json(match);
+      res.json({ success: true, match });
     } catch (error: any) {
       console.error('Error creating advocate match:', error);
-      res.status(400).json({ message: error.message });
+      res.status(400).json({ success: false, error: error.message });
     }
   });
 

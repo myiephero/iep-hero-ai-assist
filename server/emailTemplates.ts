@@ -10,10 +10,6 @@ export async function sendAdvocateNotification(match: AdvocateMatch, advocateEma
     ? `📎 Documents:\n${match.documentUrls.map((url, i) => `\t• Attachment ${i + 1}: ${url}`).join('\n')}`
     : '📎 Documents:\n\t• No documents uploaded';
 
-  const calendlySection = match.calendlyLink 
-    ? `🔗 Book a Call:\n${match.calendlyLink} — this is their preferred time to meet.`
-    : `🔗 Book a Call:\nNo Calendly link provided. Please coordinate scheduling directly with the parent.`;
-
   const emailBody = `Hi ${advocateName},
 
 You've been matched with a new Hero Plan parent who is seeking support with their child's IEP process. Below are the intake details:
@@ -21,8 +17,7 @@ You've been matched with a new Hero Plan parent who is seeking support with thei
 ⸻
 
 👨‍👩‍👧 Parent Information:
-\t• Name: ${match.parentName}
-\t• Child Grade Level: ${match.childGrade}
+\t• Child Grade Level: ${match.gradeLevel}
 \t• School District: ${match.schoolDistrict}
 
 ⸻
@@ -31,10 +26,10 @@ You've been matched with a new Hero Plan parent who is seeking support with thei
 \t• Help Areas Selected:
 ${helpAreasFormatted}
 \t• Biggest Concern:
-"${match.biggestConcern}"
-\t• Next IEP Meeting: ${match.nextMeetingDate || 'Not scheduled'}
-\t• Preferred Contact Method: ${match.preferredContact}
-\t• Availability: ${match.availability}
+"${match.concerns}"
+\t• Next IEP Meeting: ${match.meetingDate || 'Not scheduled'}
+\t• Preferred Contact Method: ${match.contactMethod}
+\t• Availability: ${match.parentAvailability}
 
 ⸻
 
@@ -42,7 +37,8 @@ ${documentsSection}
 
 ⸻
 
-${calendlySection}
+🔗 Book a Call:
+Please coordinate scheduling directly with the parent based on their availability.
 
 ⸻
 
@@ -55,7 +51,7 @@ Thanks for being a Hero!
     const result = await resend.emails.send({
       from: 'IEP Hero <noreply@iephero.com>',
       to: [advocateEmail],
-      subject: `🆕 New Parent Match Assigned – ${match.parentName.split(' ')[0]} Needs Help`,
+      subject: `🆕 New Parent Match Assigned – Parent Needs Help`,
       text: emailBody,
     });
 
@@ -68,7 +64,7 @@ Thanks for being a Hero!
 }
 
 export async function sendParentConfirmation(match: AdvocateMatch, parentEmail: string) {
-  const emailBody = `Hi ${match.parentName},
+  const emailBody = `Hi there,
 
 Great news! We've successfully matched you with an expert IEP advocate who specializes in helping families like yours.
 
@@ -85,10 +81,10 @@ Great news! We've successfully matched you with an expert IEP advocate who speci
 
 📋 Your Submitted Information:
 
-\t• Child's Grade: ${match.childGrade}
+\t• Child's Grade: ${match.gradeLevel}
 \t• School District: ${match.schoolDistrict}
 \t• Help Areas: ${match.helpAreas.join(', ')}
-\t• Preferred Contact: ${match.preferredContact}
+\t• Preferred Contact: ${match.contactMethod}
 
 ⸻
 

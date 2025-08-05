@@ -98,18 +98,16 @@ export const communicationLogs = pgTable("communication_logs", {
 export const advocateMatches = pgTable("advocate_matches", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   parentId: varchar("parent_id").notNull().references(() => users.id),
-  advocateId: varchar("advocate_id").notNull().references(() => users.id),
-  parentName: text("parent_name").notNull(),
-  childGrade: text("child_grade").notNull(),
-  schoolDistrict: text("school_district").notNull(),
+  advocateId: varchar("advocate_id").references(() => users.id),
+  meetingDate: text("meeting_date"),
+  contactMethod: text("contact_method").notNull(), // phone, zoom, email
+  parentAvailability: text("parent_availability").notNull(),
+  concerns: text("concerns").notNull(),
   helpAreas: text("help_areas").array().notNull(),
-  biggestConcern: text("biggest_concern").notNull(),
-  nextMeetingDate: text("next_meeting_date"),
-  preferredContact: text("preferred_contact").notNull(), // phone, zoom, email
-  availability: text("availability").notNull(),
-  calendlyLink: text("calendly_link"),
-  documentUrls: text("document_urls").array(),
+  gradeLevel: text("grade_level").notNull(),
+  schoolDistrict: text("school_district").notNull(),
   status: text("status").notNull().default("pending"), // pending, confirmed, completed
+  documentUrls: text("document_urls").array(),
   createdAt: timestamp("created_at").default(sql`now()`),
 });
 
