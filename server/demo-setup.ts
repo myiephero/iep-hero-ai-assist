@@ -28,8 +28,8 @@ export async function setupDemoAccounts() {
       email: 'advocate@demo.com',
       password: await bcrypt.hash('demo123', 10),
       role: 'advocate',
-      subscriptionTier: 'free',
-      planStatus: 'free',
+      subscriptionTier: 'heroOffer',
+      planStatus: 'heroOffer',
       emailVerified: true,
       verificationToken: null
     }
@@ -43,8 +43,8 @@ export async function setupDemoAccounts() {
       if (existingUser) {
         console.log(`✅ Demo account ${account.email} already exists`);
         
-        // Force update existing demo parent to Hero Plan if needed
-        if (account.email === 'parent@demo.com' && existingUser.planStatus !== 'heroOffer') {
+        // Force update existing demo accounts to Hero Plan if needed
+        if ((account.email === 'parent@demo.com' || account.email === 'advocate@demo.com') && existingUser.planStatus !== 'heroOffer') {
           await storage.updateSubscriptionTier(existingUser.id, 'heroOffer');
           console.log(`🔓 Updated ${account.email} to Hero Plan`);
         }

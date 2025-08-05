@@ -25,8 +25,8 @@ async function setupDemoAccounts() {
       email: 'advocate@demo.com',
       password: await bcrypt.hash('demo123', 10),
       role: 'advocate',
-      subscriptionTier: 'free',
-      planStatus: 'free',
+      subscriptionTier: 'heroOffer',
+      planStatus: 'heroOffer',
       isVerified: true
     }
   ];
@@ -53,7 +53,7 @@ async function setupDemoAccounts() {
   console.log('🎉 Demo account setup complete!');
   console.log('📝 Demo Credentials:');
   console.log('   Parent: parent@demo.com / demo123 (Hero Plan)');
-  console.log('   Advocate: advocate@demo.com / demo123 (Free Plan)');
+  console.log('   Advocate: advocate@demo.com / demo123 (Hero Plan)');
 }
 
 if (require.main === module) {
