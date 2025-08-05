@@ -446,11 +446,26 @@ Use professional, supportive language that empowers the parent while being legal
       
       // Try Supabase first, fallback to local database
       const { submitAdvocateMatch } = await import('./supabaseService');
-      const supabaseResult = await submitAdvocateMatch(formData, user.id);
+      const supabaseResult = await submitAdvocateMatch(formData, user.id, formData.selectedAdvocate);
       
       if (supabaseResult.success) {
         console.log('✅ Data successfully saved to Supabase!');
-        res.json({ success: true, message: 'Advocate match submitted to Supabase successfully' });
+        
+        // Send auto-confirmation to parent
+        try {
+          const { sendParentConfirmation } = await import('./emailTemplates');
+          const mockMatch = {
+            gradeLevel: formData.gradeLevel,
+            schoolDistrict: formData.schoolDistrict,
+            helpAreas: formData.helpAreas,
+            contactMethod: formData.contactMethod,
+          };
+          await sendParentConfirmation(mockMatch as any, user.email);
+        } catch (emailError) {
+          console.error('Failed to send confirmation email:', emailError);
+        }
+        
+        res.json({ success: true, message: 'Advocate match submitted to Supabase successfully', savedTo: 'supabase' });
         return;
       }
       
@@ -467,23 +482,49 @@ Use professional, supportive language that empowers the parent while being legal
         documentUrls: formData.uploadedFiles || [],
       };
       
-      // For MVP, auto-assign to first available advocate
-      const availableAdvocate = await storage.getUserByEmail('advocate@demo.com');
-      if (!availableAdvocate) {
-        return res.status(400).json({ message: 'No available advocates found' });
+      // Use selected advocate or auto-assign to demo advocate
+      let advocateId = 'advocate-demo-1'; // Default to first demo advocate
+      if (formData.selectedAdvocate) {
+        advocateId = formData.selectedAdvocate;
+      } else {
+        // Auto-assign logic based on help areas
+        const availableAdvocate = await storage.getUserByEmail('advocate@demo.com');
+        if (availableAdvocate) {
+          advocateId = availableAdvocate.id;
+        }
       }
 
-      const match = await storage.createAdvocateMatch(user.id, availableAdvocate.id, matchData);
+      const match = await storage.createAdvocateMatch(user.id, advocateId, matchData);
       
       // Send notification emails
       const { sendAdvocateNotification, sendParentConfirmation } = await import('./emailTemplates');
       
       try {
-        await sendAdvocateNotification(match, availableAdvocate.email, availableAdvocate.username);
+        const availableAdvocate = await storage.getUserByEmail('advocate@demo.com');
+        if (availableAdvocate) {
+          await sendAdvocateNotification(match, availableAdvocate.email, availableAdvocate.username);
+        }
         await sendParentConfirmation(match, user.email);
       } catch (emailError) {
         console.error('Email notification failed:', emailError);
         // Don't fail the request if email fails
+      }
+
+      // Send Slack notification for local database too
+      const slackWebhook = process.env.SLACK_WEBHOOK_URL;
+      if (slackWebhook && slackWebhook !== 'YOUR/SLACK/WEBHOOK') {
+        try {
+          await fetch(slackWebhook, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              text: `📢 New Advocate Match Request (Local DB)\nParent: ${user.email}\nAdvocate ID: ${advocateId}\nGrade: ${formData.gradeLevel}\nDistrict: ${formData.schoolDistrict}\nConcern: ${formData.concerns.substring(0, 100)}...`
+            })
+          });
+          console.log('✅ Slack notification sent');
+        } catch (slackError) {
+          console.error('Failed to send Slack notification:', slackError);
+        }
       }
 
       res.json({ success: true, match, savedTo: 'local' });
