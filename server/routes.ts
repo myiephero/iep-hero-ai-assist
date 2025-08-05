@@ -1078,6 +1078,22 @@ Be supportive and parent-friendly in your language while maintaining accuracy.`;
   
   // Register advocate client management routes
   app.use("/api/advocate/clients", requireAuth, advocateClientsRoutes);
+  
+  // Advocate students endpoint - get students assigned to this advocate
+  app.get("/api/advocate/students", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      if (user.role !== 'advocate') {
+        return res.status(403).json({ message: 'Access denied: Advocates only' });
+      }
+      
+      const students = await storage.getStudentsByAdvocateId(user.id);
+      res.json(students);
+    } catch (error: any) {
+      console.error('Error fetching advocate students:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
 
   // Serve uploaded files
   app.use('/uploads', requireAuth, (req, res, next) => {
