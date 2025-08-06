@@ -473,23 +473,37 @@ PRIORITY LEVEL: ${analysisResult.priority || 'Low'}
                 </CardContent>
               </Card>
             ))}
+            
+            {/* Empty State */}
+            {displayDocuments.length === 0 && (
+              <div className="flex items-center justify-center h-64">
+                <div className="text-center">
+                  <FileText className="h-16 w-16 text-slate-400 mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold mb-2">
+                    {searchTerm ? 'No documents found' : 'No documents yet'}
+                  </h3>
+                  <p className="text-slate-400 mb-6">
+                    {searchTerm 
+                      ? `No documents match "${searchTerm}". Try a different search term.`
+                      : 'Upload your first IEP document to get started with AI analysis and secure storage'
+                    }
+                  </p>
+                  {!searchTerm && (
+                    <Button 
+                      onClick={() => setShowFileUpload(true)}
+                      className="bg-blue-600 hover:bg-blue-700"
+                    >
+                      <Upload className="h-4 w-4 mr-2" />
+                      Upload Document
+                    </Button>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
-        {displayDocuments.length === 0 && !isLoading && (
-          <div className="text-center py-12">
-            <FileText className="w-16 h-16 text-slate-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-white mb-2">No documents yet</h3>
-            <p className="text-slate-400 mb-6">Upload your first IEP document to get started</p>
-            <Button 
-              onClick={() => setShowFileUpload(true)}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
-            >
-              <Upload className="w-4 h-4 mr-2" />
-              Upload Document
-            </Button>
-          </div>
-        )}
+
       </div>
 
       <FileUploadModal 
