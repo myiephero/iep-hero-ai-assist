@@ -272,8 +272,7 @@ Report Date: ${new Date().toLocaleDateString()}
             <CardContent className="pt-6">
               <Button 
                 onClick={generateReport}
-                variant="outline"
-                className="w-full"
+                className="w-full bg-green-600 hover:bg-green-700 text-white"
               >
                 <Download className="w-4 h-4 mr-2" />
                 Download Full Analysis Report
