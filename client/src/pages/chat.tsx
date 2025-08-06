@@ -9,7 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Send, MessageCircle, Users, AlertTriangle, Paperclip, Reply, Archive } from 'lucide-react';
 import { format } from 'date-fns';
-import Navbar from '@/components/layout/navbar';
+
 
 interface Message {
   id: string;
@@ -199,7 +199,7 @@ export default function ChatPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Navbar />
+
         <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="flex items-center justify-center h-96">
             <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
@@ -211,7 +211,7 @@ export default function ChatPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
+
       <div className="max-w-7xl mx-auto px-2 sm:px-4 py-4 sm:py-8">
         <div className="mb-4 sm:mb-6">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center gap-3">

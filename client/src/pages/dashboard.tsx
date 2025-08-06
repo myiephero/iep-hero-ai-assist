@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import Navbar from "@/components/layout/navbar";
+
 import StatsCards from "@/components/dashboard/stats-cards";
 import GoalsSection from "@/components/dashboard/goals-section";
 import UpcomingEvents from "@/components/dashboard/upcoming-events";
@@ -69,7 +69,7 @@ export default function Dashboard() {
   if (goalsLoading || eventsLoading || messagesLoading || documentsLoading) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Navbar />
+
         <div className="flex items-center justify-center h-96">
           <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
         </div>
@@ -79,7 +79,7 @@ export default function Dashboard() {
 
   return (
     <MobileLayout className="min-h-screen bg-gray-50">
-      <Navbar />
+
       
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         {/* Welcome Section */}

@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Users, User, Calendar, MessageCircle, FolderOpen, Phone, Mail, Star, Clock } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/use-auth";
-import Navbar from "@/components/layout/navbar";
+
 
 interface AdvocateClient {
   id: string;
@@ -116,7 +116,7 @@ export default function MyParents() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
-        <Navbar />
+
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin w-8 h-8 border-4 border-blue-400 border-t-transparent rounded-full" />
         </div>
@@ -126,7 +126,7 @@ export default function MyParents() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
-      <Navbar />
+
       <div className="container mx-auto px-6 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">

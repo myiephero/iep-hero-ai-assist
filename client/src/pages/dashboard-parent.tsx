@@ -8,7 +8,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { useLocation } from 'wouter';
 import IEPGoalGenerator from '@/components/IEPGoalGenerator';
 import { IEPStatusViewer } from '@/components/IEPStatusViewer';
-import Navbar from '@/components/layout/navbar';
+
 
 const parentTools = [
   {
@@ -136,7 +136,7 @@ export default function ParentDashboard() {
 
   return (
     <>
-      <Navbar />
+
       <div className="min-h-screen bg-gradient-to-b from-[#f2f7fd] to-[#eaf0f8] px-6 py-10 text-slate-800">
       <div className="max-w-5xl mx-auto">
         <h1 className="text-3xl font-bold mb-2 text-slate-900">
