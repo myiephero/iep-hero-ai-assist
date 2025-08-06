@@ -176,6 +176,12 @@ function Router() {
           <MeetingPrep />
         </AuthGuard>
       </Route>
+      <Route path="/smart-letter-generator">
+        <AuthGuard>
+          <Navbar />
+          <SmartLetterGenerator />
+        </AuthGuard>
+      </Route>
       <Route path="/tools/smart-letter-generator">
         <AuthGuard>
           <SmartLetterGeneratorTool />

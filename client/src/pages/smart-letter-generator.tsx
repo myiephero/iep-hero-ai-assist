@@ -12,6 +12,7 @@ import { Link } from "wouter";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { supabase } from "@/utils/supabaseClient";
 
 interface LetterTemplate {
   id: string;
@@ -288,6 +289,11 @@ export default function SmartLetterGenerator() {
 
     setIsSaving(true);
     try {
+      // Check if user is authenticated
+      if (!user) {
+        throw new Error('Please log in to save documents');
+      }
+
       // Find matching student ID based on child name from form
       let studentId = null;
       const childName = formData.childName?.trim();
@@ -310,27 +316,75 @@ export default function SmartLetterGenerator() {
         }
       }
 
-      // Use the documents/generate endpoint for AI-generated content
-      const documentData = {
-        content: generatedLetter,
-        type: 'letter',
-        generatedBy: 'Smart Letter Generator',
-        displayName: `${currentTemplate.title} - ${childName || 'Student'} - ${new Date().toLocaleDateString()}`,
-        parentDocumentId: null,
-        studentId: studentId // Preserve student assignment
-      };
+      // Create document title from template and child name
+      const documentTitle = `${currentTemplate.title} - ${childName || 'Student'}`;
+      
+      // Try Supabase first, fallback to API endpoint if not available
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-      await apiRequest('POST', '/api/documents/generate', documentData);
+      if (supabaseUrl && supabaseAnonKey && supabaseUrl.startsWith('https://')) {
+        // Use direct Supabase insertion
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError || !session?.user) {
+          throw new Error('Supabase authentication required');
+        }
+
+        // Generate safe filename
+        const timestamp = new Date().getTime();
+        const filename = `${documentTitle.replace(/[^a-zA-Z0-9\-_\s]/g, '').replace(/\s+/g, '_')}_${timestamp}.txt`;
+
+        // Insert document directly into Supabase
+        const { data: document, error: insertError } = await supabase
+          .from('documents')
+          .insert({
+            user_id: session.user.id,
+            student_id: studentId,
+            title: documentTitle,
+            content: generatedLetter,
+            type: 'letter',
+            filename: filename,
+            original_name: `${documentTitle}.txt`,
+            display_name: documentTitle,
+            generated_by: 'Smart Letter Generator',
+            created_at: new Date().toISOString(),
+            uploaded_at: new Date().toISOString()
+          })
+          .select()
+          .single();
+
+        if (insertError) {
+          throw insertError;
+        }
+      } else {
+        // Fallback to API endpoint for local development
+        const documentData = {
+          content: generatedLetter,
+          type: 'letter',
+          generatedBy: 'Smart Letter Generator',
+          displayName: documentTitle,
+          parentDocumentId: null,
+          studentId: studentId
+        };
+
+        const response = await apiRequest('POST', '/api/documents/generate', documentData);
+        
+        if (!response.ok) {
+          throw new Error('Failed to save document');
+        }
+      }
 
       toast({
-        title: "Saved to Vault!",
-        description: `Letter saved${childName ? ` for ${childName}` : ''} to your document vault`,
+        title: "Letter saved to your Document Vault!",
+        description: `${documentTitle} has been saved successfully`,
       });
-    } catch (error) {
+
+    } catch (error: any) {
       console.error('Error saving to vault:', error);
       toast({
         title: "Save Failed",
-        description: "Unable to save to document vault",
+        description: error.message || "Unable to save to document vault",
         variant: "destructive",
       });
     } finally {
