@@ -8,7 +8,7 @@ import { ArrowLeft, TrendingUp, Calendar, Target, AlertCircle, CheckCircle2, Bar
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { Link } from "wouter";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Goal {
   id: string;
