@@ -873,6 +873,15 @@ Use professional, supportive language that empowers the parent while being legal
 
       console.log(`📋 Analyzing IEP document: ${req.file.originalname}`);
       
+      // Check if OpenAI API key is available
+      if (!process.env.OPENAI_API_KEY) {
+        console.error("OPENAI_API_KEY not found in environment");
+        return res.status(503).json({ 
+          message: "AI service temporarily unavailable. Please ensure OPENAI_API_KEY is configured.", 
+          error: "OpenAI API key not configured" 
+        });
+      }
+      
       // Construct full file path
       const filePath = `uploads/${req.file.filename}`;
       
