@@ -504,7 +504,7 @@ Use professional, supportive language that empowers the parent while being legal
   app.post("/api/documents/generate", requireAuth, async (req, res) => {
     try {
       const user = req.user as any;
-      const { content, type, generatedBy, displayName, parentDocumentId } = req.body;
+      const { content, type, generatedBy, displayName, parentDocumentId, studentId } = req.body;
 
       if (!content || !type || !generatedBy || !displayName) {
         return res.status(400).json({ error: "Missing required fields" });
@@ -518,6 +518,7 @@ Use professional, supportive language that empowers the parent while being legal
 
       const documentData = {
         userId: user.id,
+        studentId: studentId || null, // Include student assignment
         filename: filename,
         originalName: originalName,
         displayName: safeDisplayName,
@@ -532,7 +533,8 @@ Use professional, supportive language that empowers the parent while being legal
         filename: documentData.filename,
         originalName: documentData.originalName,
         displayName: documentData.displayName,
-        type: documentData.type
+        type: documentData.type,
+        studentId: documentData.studentId
       });
 
       const document = await storage.createDocument(documentData);
