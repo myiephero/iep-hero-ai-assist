@@ -321,6 +321,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
+  // Current user endpoint
+  app.get("/api/current-user", (req, res) => {
+    if (req.isAuthenticated()) {
+      const user = req.user as any;
+      // Fix Hero Plan detection: demo accounts should always have Hero access
+      let planStatus = user.planStatus || user.subscriptionTier || 'free';
+      let subscriptionTier = user.subscriptionTier || 'free';
+      
+      if (user.email === 'parent@demo.com' || user.email === 'advocate@demo.com' || user.email === 'demo_parent@demo.com') {
+        planStatus = 'heroOffer';
+        subscriptionTier = 'heroOffer';
+      }
+      
+      res.json({ 
+        user: { 
+          id: user.id, 
+          email: user.email, 
+          username: user.username, 
+          role: user.role,
+          planStatus: planStatus,
+          subscriptionTier: subscriptionTier
+        } 
+      });
+    } else {
+      res.status(401).json({ message: 'Not authenticated' });
+    }
+  });
+
   // Generate Meeting Prep Sheet route
   app.post("/api/generate-meeting-prep", requireAuth, async (req, res) => {
     try {
