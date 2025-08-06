@@ -68,11 +68,19 @@ export default function Goals() {
     queryKey: ["/api/goals"],
   });
 
-  // Fetch students for the dropdown
-  const { data: students = [] } = useQuery<Array<{id: string, firstName: string, lastName: string}>>({
+  // Fetch students for the dropdown - different endpoints for parent vs advocate
+  const { data: parentStudents = [] } = useQuery<Array<{id: string, firstName: string, lastName: string}>>({
     queryKey: ["/api/parent/students"],
     enabled: !!user && user.role === 'parent',
   });
+
+  const { data: advocateStudents = [] } = useQuery<Array<{id: string, firstName: string, lastName: string}>>({
+    queryKey: ["/api/advocate/students"],
+    enabled: !!user && user.role === 'advocate',
+  });
+
+  // Use appropriate students list based on user role
+  const students = user?.role === 'advocate' ? advocateStudents : parentStudents;
 
   const displayGoals = goals;
   const isHeroPlan = user?.planStatus === 'heroOffer';
@@ -217,8 +225,8 @@ export default function Goals() {
                     )}
                   />
                   
-                  {/* Student Selector - always show for parents */}
-                  {user?.role === 'parent' && (
+                  {/* Student Selector - show for both parents and advocates */}
+                  {(user?.role === 'parent' || user?.role === 'advocate') && (
                     <FormField
                       control={form.control}
                       name="studentId"
