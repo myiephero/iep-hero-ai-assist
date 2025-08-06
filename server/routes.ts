@@ -423,7 +423,7 @@ Use professional, supportive language that empowers the parent while being legal
         content,
         generatedBy,
         parentDocumentId: parentDocumentId || null,
-        fileUrl: null, // Generated documents don't have file URLs
+        fileUrl: "", // Empty string instead of null since field is required
       };
 
       const document = await storage.createDocument(documentData);
