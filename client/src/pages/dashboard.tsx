@@ -14,7 +14,7 @@ import { MobileLayout } from "@/components/MobileLayout";
 import { PlanStatusBadge, PlanStatusCard } from "@/components/PlanStatusBadge";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/contexts/AuthContext";
 import { useMobile } from "@/hooks/use-mobile";
 
 export default function Dashboard() {

@@ -9,7 +9,7 @@ import { ArrowLeft, Save, Plus, User, Upload } from 'lucide-react';
 import { Link } from 'wouter';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth } from '@/contexts/AuthContext';
 import FileUploadModal from '@/components/modals/file-upload-modal';
 
 export default function IEPGoalGeneratorPage() {
