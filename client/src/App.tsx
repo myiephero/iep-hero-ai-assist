@@ -229,16 +229,19 @@ function Router() {
       </Route>
       <Route path="/my-students">
         <AuthGuard>
+          <Navbar />
           <MyStudents />
         </AuthGuard>
       </Route>
       <Route path="/my-parents">
         <AuthGuard>
+          <Navbar />
           <MyParents />
         </AuthGuard>
       </Route>
       <Route path="/advocate-students">
         <AuthGuard>
+          <Navbar />
           <AdvocateStudents />
         </AuthGuard>
       </Route>
