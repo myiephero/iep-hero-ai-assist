@@ -1150,14 +1150,16 @@ export const storage = new class LocalDbStorage implements IStorage {
     return await this.db.select().from(documents).where(eq(documents.userId, userId));
   }
 
-  async createDocument(userId: string, document: InsertDocument): Promise<Document> {
+  async createDocument(documentData: any): Promise<Document> {
     const id = randomUUID();
     const newDocument = {
-      ...document,
+      ...documentData,
       id,
-      userId,
-      uploadedAt: new Date()
+      uploadedAt: documentData.uploadedAt || new Date(),
+      createdAt: documentData.createdAt || new Date()
     };
+    
+    console.log('💾 LocalDbStorage - Inserting document with filename:', newDocument.filename);
     
     const result = await this.db.insert(documents).values(newDocument).returning();
     return result[0];
