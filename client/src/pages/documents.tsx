@@ -445,22 +445,22 @@ PRIORITY LEVEL: ${analysisResult.priority || 'Low'}
                             setViewingAnalysis(contentToShow);
                             setCurrentAnalysisDocument(doc);
                           }}
-                          className="bg-blue-700 border-blue-500 text-white hover:bg-blue-600 hover:border-blue-400"
+                          className="bg-emerald-700 border-emerald-500 text-white hover:bg-emerald-600 hover:border-emerald-400"
                         >
                           <Eye className="w-4 h-4 mr-1" />
-                          View Content
+                          View Analysis
                         </Button>
                       )}
-                      {/* Only show AI Analyze for uploaded documents, not generated ones */}
-                      {!doc.generatedBy && (
+                      {/* Show AI Analyze/Re-analyze for all documents with Hero Plan */}
+                      {isHeroPlan && (
                         <Button
                           onClick={() => analyzeDocument(doc.id)}
-                          disabled={analyzingDocument === doc.id || !isHeroPlan}
+                          disabled={analyzingDocument === doc.id}
                           className="bg-blue-600 hover:bg-blue-700 text-white disabled:bg-slate-600"
                           size="sm"
                         >
                           <Brain className="w-4 h-4 mr-1" />
-                          {analyzingDocument === doc.id ? "Analyzing..." : doc.analysisResult ? "Re-analyze" : "AI Analyze"}
+                          {analyzingDocument === doc.id ? "Analyzing..." : (doc.analysisResult || doc.content) ? "Re-analyze" : "AI Analyze"}
                         </Button>
                       )}
                       {!isHeroPlan && (
