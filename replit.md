@@ -38,8 +38,8 @@ The backend is a **REST API** built with **Express.js** and TypeScript.
 
 # External Dependencies
 - **Payment Processing**: **Stripe** (Stripe.js, React Stripe.js) for subscription management and payment processing, including webhook integration.
-- **Database Service**: **Neon Database** for serverless PostgreSQL hosting.
-- **AI Service**: **OpenAI GPT-4o** for advanced AI capabilities.
+- **Database Service**: **Supabase** for PostgreSQL hosting and authentication services. Fully integrated with environment variables for seamless connection.
+- **AI Service**: **OpenAI GPT-4o** for advanced AI capabilities including IEP goal generation and document analysis.
 - **Email Service**: **Resend** for sending transactional emails.
 - **Development Tools**: Replit-specific enhancements like error overlay and cartographer.
 - **UI Component Library**: **Radix UI** and **shadcn/ui**.
