@@ -28,6 +28,7 @@ const NavLinks = ({ mobile = false }: { mobile?: boolean }) => {
   
   if (user?.role === 'advocate') {
     navItems.push({ href: "/my-parents", label: "My Parents", icon: Users });
+    navItems.push({ href: "/advocate-students", label: "Students", icon: GraduationCap });
   }
   
   // Only add Subscribe for free plan users

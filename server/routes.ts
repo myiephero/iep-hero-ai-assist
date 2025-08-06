@@ -451,6 +451,87 @@ Use professional, supportive language that empowers the parent while being legal
     }
   });
 
+  // Advocate clients endpoint
+  app.get("/api/advocate/clients", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      if (user.role !== 'advocate') {
+        return res.status(403).json({ message: 'Access denied. Advocate role required.' });
+      }
+      
+      // For now, return sample data since we don't have client relationships in database yet
+      const sampleClients = [
+        {
+          id: "client-001",
+          parentName: "Sarah Martinez",
+          email: "sarah.martinez@email.com",
+          phone: "(555) 123-4567",
+          studentsCount: 1,
+          activeGoals: 3,
+          documentsCount: 5,
+          lastContact: "2025-08-05",
+          caseStatus: "active",
+          nextMeeting: "2025-08-15",
+          students: [
+            {
+              name: "Miguel Martinez",
+              grade: "3rd",
+              school: "Lincoln Elementary"
+            }
+          ]
+        },
+        {
+          id: "client-002", 
+          parentName: "Jennifer Chen",
+          email: "jennifer.chen@email.com",
+          phone: "(555) 987-6543",
+          studentsCount: 2,
+          activeGoals: 5,
+          documentsCount: 8,
+          lastContact: "2025-08-03",
+          caseStatus: "active",
+          nextMeeting: "2025-08-12",
+          students: [
+            {
+              name: "Kevin Chen",
+              grade: "5th",
+              school: "Roosevelt Elementary"
+            },
+            {
+              name: "Lisa Chen", 
+              grade: "2nd",
+              school: "Roosevelt Elementary"
+            }
+          ]
+        }
+      ];
+      
+      res.json(sampleClients);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Create new student for advocate's client
+  app.post("/api/advocate/students", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      if (user.role !== 'advocate') {
+        return res.status(403).json({ message: 'Access denied. Advocate role required.' });
+      }
+      
+      const studentData = insertStudentSchema.parse({
+        ...req.body,
+        advocateId: user.id
+      });
+      
+      const student = await storage.createStudent(studentData);
+      res.json(student);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  });
+
   app.post("/api/students", requireAuth, async (req, res) => {
     try {
       const user = req.user as any;
