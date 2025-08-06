@@ -5,12 +5,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { GraduationCap, Eye, EyeOff, Mail, Lock, ArrowRight, CheckCircle, Sparkles } from "lucide-react";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Login() {
   const [, setLocation] = useLocation();
-  const { login } = useAuth();
+  const { signIn } = useAuth();
   const { toast } = useToast();
   
   const [loginData, setLoginData] = useState({
@@ -28,8 +28,8 @@ export default function Login() {
     console.log('🔄 Starting login process for:', loginData.email);
 
     try {
-      const result = await login(loginData.email, loginData.password);
-      console.log('✅ Login successful, result:', result);
+      await signIn(loginData.email, loginData.password);
+      console.log('✅ Login successful');
       
       // Success animation
       toast({

@@ -3,7 +3,7 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { AuthContext, useAuth, useAuthState } from "@/hooks/use-auth";
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import NotFound from "@/pages/not-found";
 import Login from "@/pages/login";
 import Register from "@/pages/register";
@@ -39,12 +39,9 @@ import { OfflineIndicator } from "@/components/OfflineIndicator";
 import Navbar from "@/components/layout/navbar";
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
-  const { user, isLoading } = useAuth();
+  const { user, loading } = useAuth();
 
-  console.log('🔍 AuthGuard check:', { user: user?.email, isLoading });
-
-  if (isLoading) {
-    console.log('⏳ AuthGuard: Still loading...');
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
         <div className="animate-spin w-8 h-8 border-4 border-blue-400 border-t-transparent rounded-full" />
@@ -53,23 +50,24 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
   }
 
   if (!user) {
-    console.log('❌ AuthGuard: No user, redirecting to login');
     return <Redirect to="/login" />;
   }
 
-  console.log('✅ AuthGuard: User authenticated, showing content');
   return <>{children}</>;
 }
 
 function DashboardRouter() {
   const { user } = useAuth();
   
-  console.log('🔄 Dashboard Router - User role:', user?.role);
+  // For Supabase users, check user metadata for role
+  const userRole = user?.user_metadata?.role || user?.app_metadata?.role || 'parent';
   
-  if (user?.role === 'parent') {
+  console.log('🔄 Dashboard Router - User role:', userRole);
+  
+  if (userRole === 'parent') {
     console.log('👨‍👩‍👧‍👦 Routing parent to parent dashboard');
     return <Redirect to="/dashboard-parent" />;
-  } else if (user?.role === 'advocate' || user?.role === 'professional') {
+  } else if (userRole === 'advocate' || userRole === 'professional') {
     console.log('👩‍💼 Routing advocate/professional to advocate dashboard');
     return <Redirect to="/dashboard-advocate" />;
   } else {
@@ -214,11 +212,9 @@ function Router() {
 }
 
 function App() {
-  const authState = useAuthState();
-
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthContext.Provider value={authState}>
+      <AuthProvider>
         <TooltipProvider>
           <OfflineIndicator />
           <PWAInstallPrompt />
@@ -226,7 +222,7 @@ function App() {
           <MobileNavigation />
           <Toaster />
         </TooltipProvider>
-      </AuthContext.Provider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }
