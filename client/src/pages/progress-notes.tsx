@@ -10,6 +10,8 @@ import { ArrowLeft, Plus, Edit, Trash2, FileText, AlertTriangle, CheckCircle } f
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 
 interface ProgressNote {
   id: string;
@@ -25,18 +27,34 @@ interface ProgressNote {
 export default function ProgressNotes() {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [notes, setNotes] = useState<ProgressNote[]>([
-    {
-      id: '1',
-      date: '2024-01-15',
-      serviceType: 'Speech Therapy',
-      promisedSupport: '2x weekly 30-minute sessions for articulation',
-      actualProgress: 'Child showing improvement in /r/ sound production',
-      concerns: 'Sessions sometimes cancelled due to therapist absence',
-      status: 'behind',
-      nextSteps: 'Request makeup sessions for missed appointments'
+  const queryClient = useQueryClient();
+
+  // Fetch progress notes from API
+  const { data: notes = [], isLoading } = useQuery<ProgressNote[]>({
+    queryKey: ['/api/progress-notes'],
+    enabled: !!user
+  });
+
+  // Mutation for creating/updating progress notes
+  const createNoteMutation = useMutation({
+    mutationFn: (data: any) => apiRequest('POST', '/api/progress-notes', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/progress-notes'] });
+      toast({
+        title: "Note Saved",
+        description: "Progress note has been saved successfully.",
+      });
+      resetForm();
+    },
+    onError: (error: any) => {
+      console.error('Failed to save progress note:', error);
+      toast({
+        title: "Save Failed",
+        description: "Unable to save progress note. Please try again.",
+        variant: "destructive",
+      });
     }
-  ]);
+  });
   const [isEditing, setIsEditing] = useState(false);
   const [editingNote, setEditingNote] = useState<ProgressNote | null>(null);
   const [formData, setFormData] = useState({
@@ -44,7 +62,7 @@ export default function ProgressNotes() {
     promisedSupport: '',
     actualProgress: '',
     concerns: '',
-    status: 'on-track' as const,
+    status: 'on-track' as 'on-track' | 'behind' | 'exceeding',
     nextSteps: ''
   });
 
@@ -52,6 +70,18 @@ export default function ProgressNotes() {
   const hasHeroAccess = user?.planStatus === 'heroOffer' || 
                         user?.email === 'parent@demo.com' ||
                         (process.env.NODE_ENV === 'development' && user?.role === 'parent');
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex items-center justify-center h-64">
+            <div className="animate-spin w-8 h-8 border-4 border-blue-400 border-t-transparent rounded-full" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!hasHeroAccess) {
     return (
@@ -101,27 +131,15 @@ export default function ProgressNotes() {
       return;
     }
 
-    const newNote: ProgressNote = {
-      id: editingNote?.id || Date.now().toString(),
-      date: new Date().toISOString().split('T')[0],
-      ...formData
-    };
-
-    if (editingNote) {
-      setNotes(prev => prev.map(note => note.id === editingNote.id ? newNote : note));
-      toast({
-        title: "Note Updated",
-        description: "Progress note has been updated successfully.",
-      });
-    } else {
-      setNotes(prev => [newNote, ...prev]);
-      toast({
-        title: "Note Added",
-        description: "New progress note has been created.",
-      });
-    }
-
-    resetForm();
+    // Use the mutation to save to backend
+    createNoteMutation.mutate({
+      serviceType: formData.serviceType,
+      promisedSupport: formData.promisedSupport,
+      actualProgress: formData.actualProgress,
+      concerns: formData.concerns,
+      status: formData.status,
+      nextSteps: formData.nextSteps
+    });
   };
 
   const resetForm = () => {
@@ -130,7 +148,7 @@ export default function ProgressNotes() {
       promisedSupport: '',
       actualProgress: '',
       concerns: '',
-      status: 'on-track',
+      status: 'on-track' as 'on-track' | 'behind' | 'exceeding',
       nextSteps: ''
     });
     setIsEditing(false);
@@ -150,12 +168,28 @@ export default function ProgressNotes() {
     setIsEditing(true);
   };
 
+  // Mutation for deleting progress notes
+  const deleteNoteMutation = useMutation({
+    mutationFn: (id: string) => apiRequest('DELETE', `/api/progress-notes/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/progress-notes'] });
+      toast({
+        title: "Note Deleted",
+        description: "Progress note has been removed.",
+      });
+    },
+    onError: (error: any) => {
+      console.error('Failed to delete progress note:', error);
+      toast({
+        title: "Delete Failed",
+        description: "Unable to delete progress note. Please try again.",
+        variant: "destructive",
+      });
+    }
+  });
+
   const deleteNote = (id: string) => {
-    setNotes(prev => prev.filter(note => note.id !== id));
-    toast({
-      title: "Note Deleted",
-      description: "Progress note has been removed.",
-    });
+    deleteNoteMutation.mutate(id);
   };
 
   const getStatusIcon = (status: string) => {
@@ -282,8 +316,12 @@ export default function ProgressNotes() {
               </div>
 
               <div className="flex gap-4">
-                <Button onClick={handleSubmit} className="bg-blue-600 hover:bg-blue-700">
-                  {isEditing ? 'Update Note' : 'Add Note'}
+                <Button 
+                  onClick={handleSubmit} 
+                  className="bg-blue-600 hover:bg-blue-700"
+                  disabled={createNoteMutation.isPending}
+                >
+                  {createNoteMutation.isPending ? 'Saving...' : (isEditing ? 'Update Note' : 'Add Note')}
                 </Button>
                 {isEditing && (
                   <Button onClick={resetForm} variant="outline">
