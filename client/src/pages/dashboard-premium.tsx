@@ -96,52 +96,7 @@ export default function DashboardAdvocate() {
           <DashboardMetrics className="mb-8" />
         </div>
 
-        {/* Quick Access Tools */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <Card 
-            className="bg-[#3E4161]/70 border-slate-600 cursor-pointer hover:bg-[#3E4161]/90 transition-all duration-200"
-            onClick={() => setLocation("/documents")}
-          >
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl mb-2">📁</div>
-              <div className="font-semibold text-white">Document Vault</div>
-              <div className="text-xs text-slate-400">Manage Files</div>
-            </CardContent>
-          </Card>
-          
-          <Card 
-            className="bg-[#3E4161]/70 border-slate-600 cursor-pointer hover:bg-[#3E4161]/90 transition-all duration-200"
-            onClick={() => setLocation("/tools/iep-goal-generator")}
-          >
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl mb-2">🎯</div>
-              <div className="font-semibold text-white">Goal Generator</div>
-              <div className="text-xs text-slate-400">Create Goals</div>
-            </CardContent>
-          </Card>
-          
-          <Card 
-            className="bg-[#3E4161]/70 border-slate-600 cursor-pointer hover:bg-[#3E4161]/90 transition-all duration-200"
-            onClick={() => setLocation("/tools/ai-iep-review")}
-          >
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl mb-2">🧠</div>
-              <div className="font-semibold text-white">AI Review</div>
-              <div className="text-xs text-slate-400">Analyze IEPs</div>
-            </CardContent>
-          </Card>
-          
-          <Card 
-            className="bg-[#3E4161]/70 border-slate-600 cursor-pointer hover:bg-[#3E4161]/90 transition-all duration-200"
-            onClick={() => setLocation("/messages")}
-          >
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl mb-2">📄</div>
-              <div className="font-semibold text-white">Reports</div>
-              <div className="text-xs text-slate-400">Generate Reports</div>
-            </CardContent>
-          </Card>
-        </div>
+
 
         {/* Client Management Dashboard */}
         <div className="mb-8">
@@ -255,59 +210,7 @@ export default function DashboardAdvocate() {
           </Card>
         </div>
 
-        {/* Quick Actions */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
-          <Card className="bg-[#3E4161]/70 border-slate-600 hover:bg-[#4A4E76] cursor-pointer transition-colors"
-                onClick={() => setLocation('/documents')}>
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl mb-2">🗂️</div>
-              <div className="text-white font-semibold">Document Vault</div>
-              <div className="text-slate-300 text-sm">Manage Files</div>
-            </CardContent>
-          </Card>
-          <Card className="bg-[#3E4161]/70 border-slate-600 hover:bg-[#4A4E76] cursor-pointer transition-colors"
-                onClick={() => setLocation('/tools/iep-goal-generator')}>
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl mb-2">🎯</div>
-              <div className="text-white font-semibold">Goal Generator</div>
-              <div className="text-slate-300 text-sm">Create Goals</div>
-            </CardContent>
-          </Card>
-          <Card className="bg-[#3E4161]/70 border-slate-600 hover:bg-[#4A4E76] cursor-pointer transition-colors"
-                onClick={() => setLocation('/my-students')}>
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl mb-2">🧑‍🎓</div>
-              <div className="text-white font-semibold">My Students</div>
-              <div className="text-slate-300 text-sm">Manage Cases</div>
-            </CardContent>
-          </Card>
-          <Card className="bg-[#3E4161]/70 border-slate-600 hover:bg-[#4A4E76] cursor-pointer transition-colors"
-                onClick={() => setLocation('/tools/smart-letter-generator')}>
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl mb-2">📝</div>
-              <div className="text-white font-semibold">Smart Letters</div>
-              <div className="text-slate-300 text-sm">Generate Letters</div>
-            </CardContent>
-          </Card>
-          <Card className="bg-[#3E4161]/70 border-slate-600 hover:bg-[#4A4E76] cursor-pointer transition-colors"
-                onClick={() => setLocation('/ai-iep-review')}>
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl mb-2">🧠</div>
-              <div className="text-white font-semibold">AI Review</div>
-              <div className="text-slate-300 text-sm">Analyze IEPs</div>
-            </CardContent>
-          </Card>
-          <Card className="bg-[#3E4161]/70 border-slate-600 hover:bg-[#4A4E76] cursor-pointer transition-colors"
-                onClick={() => setLocation('/advocacy-report-generator')}>
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl mb-2">📋</div>
-              <div className="text-white font-semibold">Reports</div>
-              <div className="text-slate-300 text-sm">Generate Reports</div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* AI Tools Section */}
+        {/* AI Tools - Compact Layout */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-xl font-semibold text-white">AI-Powered IEP Professional Tools</h3>
@@ -318,32 +221,75 @@ export default function DashboardAdvocate() {
             )}
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {advocateTools.map((tool) => (
-              <Card 
-                key={tool.name} 
-                className="bg-[#3E4161]/70 border-slate-600 hover:bg-[#3E4161]/90 transition-all duration-200 cursor-pointer"
-                onClick={() => openToolModal(tool.name)}
-              >
-                <CardContent className="p-4">
-                  <div className="flex flex-col items-center text-center space-y-3">
-                    <div className="text-3xl">
-                      {tool.icon}
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-white mb-1">
-                        {tool.name}
-                      </h3>
-                      <p className="text-slate-400 text-sm leading-relaxed">
-                        {tool.desc}
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+            <Card className="bg-[#3E4161]/70 border-slate-600 hover:bg-[#4A4E76] cursor-pointer transition-colors"
+                  onClick={() => setLocation('/documents')}>
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl mb-2">📁</div>
+                <div className="text-white font-semibold">Document Vault</div>
+                <div className="text-slate-300 text-sm">Manage Files</div>
+              </CardContent>
+            </Card>
+            <Card className="bg-[#3E4161]/70 border-slate-600 hover:bg-[#4A4E76] cursor-pointer transition-colors"
+                  onClick={() => setLocation('/tools/iep-goal-generator')}>
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl mb-2">🎯</div>
+                <div className="text-white font-semibold">Goal Generator</div>
+                <div className="text-slate-300 text-sm">Create Goals</div>
+              </CardContent>
+            </Card>
+            <Card className="bg-[#3E4161]/70 border-slate-600 hover:bg-[#4A4E76] cursor-pointer transition-colors"
+                  onClick={() => setLocation('/my-students')}>
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl mb-2">🧑‍🎓</div>
+                <div className="text-white font-semibold">My Students</div>
+                <div className="text-slate-300 text-sm">Manage Cases</div>
+              </CardContent>
+            </Card>
+            <Card className="bg-[#3E4161]/70 border-slate-600 hover:bg-[#4A4E76] cursor-pointer transition-colors"
+                  onClick={() => setLocation('/tools/smart-letter-generator')}>
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl mb-2">📝</div>
+                <div className="text-white font-semibold">Smart Letters</div>
+                <div className="text-slate-300 text-sm">Generate Letters</div>
+              </CardContent>
+            </Card>
+            <Card className="bg-[#3E4161]/70 border-slate-600 hover:bg-[#4A4E76] cursor-pointer transition-colors"
+                  onClick={() => setLocation('/tools/ai-iep-review')}>
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl mb-2">🧠</div>
+                <div className="text-white font-semibold">AI Review</div>
+                <div className="text-slate-300 text-sm">Analyze IEPs</div>
+              </CardContent>
+            </Card>
+            <Card className="bg-[#3E4161]/70 border-slate-600 hover:bg-[#4A4E76] cursor-pointer transition-colors"
+                  onClick={() => setLocation('/tools/advocacy-report-generator')}>
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl mb-2">📋</div>
+                <div className="text-white font-semibold">Reports</div>
+                <div className="text-slate-300 text-sm">Generate Reports</div>
+              </CardContent>
+            </Card>
+            <Card className="bg-[#3E4161]/70 border-slate-600 hover:bg-[#4A4E76] cursor-pointer transition-colors"
+                  onClick={() => setLocation('/tools/meeting-prep-wizard')}>
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl mb-2">🗣️</div>
+                <div className="text-white font-semibold">Meeting Prep Assistant</div>
+                <div className="text-slate-300 text-sm">Generate talking points</div>
+              </CardContent>
+            </Card>
+            <Card className="bg-[#3E4161]/70 border-slate-600 hover:bg-[#4A4E76] cursor-pointer transition-colors"
+                  onClick={() => setLocation('/tools/progress-analyzer')}>
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl mb-2">📊</div>
+                <div className="text-white font-semibold">Progress Analyzer</div>
+                <div className="text-slate-300 text-sm">Data-driven recommendations</div>
+              </CardContent>
+            </Card>
           </div>
         </div>
+
+
 
         {/* AI Tool Modal */}
         <Dialog open={modalOpen} onOpenChange={setModalOpen}>
