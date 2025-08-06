@@ -41,14 +41,14 @@ export default function MyParentsPage() {
 
   // Query for advocate clients
   const { data: clients = [], isLoading, refetch } = useQuery({
-    queryKey: ["/api/advocate-clients"],
+    queryKey: ["/api/advocate/clients"],
     enabled: !!user,
   });
 
   // Mutation to add new client
   const addClientMutation = useMutation({
     mutationFn: async (data: AddClientFormData) => {
-      const response = await apiRequest("POST", "/api/advocate-clients", data);
+      const response = await apiRequest("POST", "/api/advocate/clients", data);
       if (!response.ok) {
         const error = await response.json();
         throw new Error(error.message || "Failed to add client");
@@ -62,7 +62,7 @@ export default function MyParentsPage() {
       });
       setShowAddClient(false);
       form.reset();
-      queryClient.invalidateQueries({ queryKey: ["/api/advocate-clients"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/advocate/clients"] });
     },
     onError: (error: any) => {
       toast({

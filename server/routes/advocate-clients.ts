@@ -8,8 +8,9 @@ const router = Router();
 // Get all clients for the authenticated advocate
 router.get("/", async (req, res) => {
   try {
-    const userId = req.user?.id;
-    if (!userId || req.user?.role !== 'advocate') {
+    const user = req.user as any;
+    const userId = user?.id;
+    if (!userId || user?.role !== 'advocate') {
       return res.status(401).json({ error: "Advocate authentication required" });
     }
 
@@ -43,7 +44,8 @@ router.get("/", async (req, res) => {
 // Get client relationships for a parent
 router.get("/parent", async (req, res) => {
   try {
-    const userId = req.user?.id;
+    const user = req.user as any;
+    const userId = user?.id;
     if (!userId) {
       return res.status(401).json({ error: "Authentication required" });
     }
@@ -76,28 +78,80 @@ router.get("/parent", async (req, res) => {
 // Create new advocate-client relationship
 router.post("/", async (req, res) => {
   try {
-    const userId = req.user?.id;
+    const user = req.user as any;
+    const userId = user?.id;
     if (!userId) {
       return res.status(401).json({ error: "Authentication required" });
     }
 
     // Only advocates or system admins can create relationships
-    if (req.user?.role !== 'advocate' && req.user?.role !== 'admin') {
+    if (user?.role !== 'advocate' && user?.role !== 'admin') {
       return res.status(403).json({ error: "Permission denied" });
     }
 
-    // Validate the request body
-    const validatedData = insertAdvocateClientSchema.parse({
-      ...req.body,
-      advocateId: userId
-    });
+    const { parentEmail, clientName, phone, notes } = req.body;
 
-    const client = await storage.createAdvocateClient(validatedData);
-    return res.status(201).json(client);
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return res.status(400).json({ error: "Invalid client data", details: error.errors });
+    if (!parentEmail || !clientName) {
+      return res.status(400).json({ error: "Parent email and client name are required" });
     }
+
+    // Find or create the parent user
+    let parent = await storage.getUserByEmail(parentEmail);
+    
+    if (!parent) {
+      // Create new parent account with temporary password
+      const tempPassword = Math.random().toString(36).slice(-8);
+      const newParentData = {
+        email: parentEmail,
+        username: clientName.toLowerCase().replace(/\s+/g, '_'),
+        password: tempPassword,
+        role: 'parent' as const
+      };
+      
+      try {
+        parent = await storage.createUser(newParentData);
+      } catch (error: any) {
+        if (error.message?.includes('duplicate')) {
+          return res.status(400).json({ error: "A user with this email already exists" });
+        }
+        throw error;
+      }
+    }
+
+    // Check if relationship already exists
+    const existingClients = await storage.getAdvocateClientsByAdvocateId(userId);
+    const existingClient = existingClients.find(client => client.parentId === parent!.id);
+    
+    if (existingClient) {
+      return res.status(400).json({ error: "Client relationship already exists" });
+    }
+
+    // Create the advocate-client relationship
+    const clientData = {
+      advocateId: userId,
+      parentId: parent.id,
+      studentId: null, // No specific student initially
+      relationshipStatus: 'active',
+      startDate: new Date(),
+      endDate: null,
+      notes: notes || null
+    };
+
+    const client = await storage.createAdvocateClient(clientData);
+    
+    // Return enhanced client data
+    const enhancedClient = {
+      ...client,
+      parent: {
+        id: parent.id,
+        email: parent.email,
+        username: parent.username
+      },
+      students: []
+    };
+
+    return res.status(201).json(enhancedClient);
+  } catch (error) {
     console.error("Error creating advocate client:", error);
     return res.status(500).json({ error: "Failed to create client relationship" });
   }
@@ -106,10 +160,11 @@ router.post("/", async (req, res) => {
 // Update advocate-client relationship
 router.put("/:id", async (req, res) => {
   try {
-    const userId = req.user?.id;
+    const user = req.user as any;
+    const userId = user?.id;
     const clientId = req.params.id;
     
-    if (!userId || req.user?.role !== 'advocate') {
+    if (!userId || user?.role !== 'advocate') {
       return res.status(401).json({ error: "Advocate authentication required" });
     }
 
@@ -132,10 +187,11 @@ router.put("/:id", async (req, res) => {
 // Delete advocate-client relationship
 router.delete("/:id", async (req, res) => {
   try {
-    const userId = req.user?.id;
+    const user = req.user as any;
+    const userId = user?.id;
     const clientId = req.params.id;
     
-    if (!userId || req.user?.role !== 'advocate') {
+    if (!userId || user?.role !== 'advocate') {
       return res.status(401).json({ error: "Advocate authentication required" });
     }
 
