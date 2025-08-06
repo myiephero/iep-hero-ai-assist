@@ -438,6 +438,18 @@ Use professional, supportive language that empowers the parent while being legal
     }
   });
 
+  app.delete("/api/progress-notes/:id", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      const noteId = req.params.id;
+      await storage.deleteProgressNote(noteId);
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error('Error deleting progress note:', error);
+      res.status(400).json({ message: error.message });
+    }
+  });
+
   // Communication Logs routes
   app.get("/api/communication-logs", requireAuth, async (req, res) => {
     try {

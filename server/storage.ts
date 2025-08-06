@@ -46,6 +46,7 @@ export interface IStorage {
   // Progress Notes
   getProgressNotesByUserId(userId: string): Promise<ProgressNote[]>;
   createProgressNote(userId: string, note: InsertProgressNote): Promise<ProgressNote>;
+  deleteProgressNote(noteId: string): Promise<void>;
   
   // Communication Logs
   getCommunicationLogsByUserId(userId: string): Promise<CommunicationLog[]>;
@@ -463,6 +464,14 @@ export class MemStorage implements IStorage {
     };
     this.progressNotes.set(id, newNote);
     return newNote;
+  }
+
+  async deleteProgressNote(noteId: string): Promise<void> {
+    this.progressNotes.delete(noteId);
+  }
+
+  async deleteProgressNote(noteId: string): Promise<void> {
+    this.progressNotes.delete(noteId);
   }
 
   async getCommunicationLogsByUserId(userId: string): Promise<CommunicationLog[]> {
@@ -1024,6 +1033,10 @@ export const storage = new class LocalDbStorage implements IStorage {
     
     const result = await this.db.insert(progressNotes).values(newNote).returning();
     return result[0];
+  }
+
+  async deleteProgressNote(noteId: string): Promise<void> {
+    await this.db.delete(progressNotes).where(eq(progressNotes.id, noteId));
   }
 
   // Communication Logs
