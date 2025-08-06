@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/use-auth";
 import { useLocation } from "wouter";
-import Navbar from "@/components/layout/navbar";
+
 
 const advocateTools = [
   { name: 'AI IEP Review', desc: 'Analyze existing IEPs for quality & improvement', icon: '🧠' },
@@ -78,7 +78,7 @@ export default function DashboardAdvocate() {
 
   return (
     <>
-      <Navbar />
+
       <div className="bg-gradient-to-b from-[#1A1B2E] to-[#2C2F48] min-h-screen text-white">
 
       <div className="px-6 pb-10">
