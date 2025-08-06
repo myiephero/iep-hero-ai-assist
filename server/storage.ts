@@ -2,7 +2,7 @@ import { type User, type InsertUser, type Goal, type InsertGoal, type Document, 
 import { randomUUID } from "crypto";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
-import { eq, and } from "drizzle-orm";
+import { eq, and, inArray } from "drizzle-orm";
 import fs from "fs";
 
 export interface IStorage {
@@ -29,6 +29,7 @@ export interface IStorage {
   getDocumentsByStudentId(studentId: string): Promise<Document[]>;
   createDocument(documentData: any): Promise<Document>;
   deleteDocument(documentId: string): Promise<void>;
+  deleteDocuments(documentIds: string[], userId: string): Promise<number>;
   updateDocumentName(documentId: string, displayName: string): Promise<Document>;
   saveDocumentAnalysis(documentId: string, analysis: any): Promise<Document>;
   
@@ -1252,6 +1253,71 @@ export const storage = new class LocalDbStorage implements IStorage {
 
   async deleteDocument(documentId: string): Promise<void> {
     await this.db.delete(documents).where(eq(documents.id, documentId));
+  }
+
+  async deleteDocuments(documentIds: string[], userId: string): Promise<number> {
+    // First get the documents to verify ownership and get filenames for cleanup
+    const docsToDelete = await this.db
+      .select()
+      .from(documents)
+      .where(and(
+        eq(documents.userId, userId),
+        inArray(documents.id, documentIds)
+      ));
+
+    // Delete physical files
+    for (const doc of docsToDelete) {
+      if (doc.filename) {
+        const filePath = `uploads/${doc.filename}`;
+        if (fs.existsSync(filePath)) {
+          try {
+            fs.unlinkSync(filePath);
+          } catch (error) {
+            console.error(`Failed to delete file ${filePath}:`, error);
+          }
+        }
+      }
+    }
+
+    // Delete from database
+    const result = await this.db
+      .delete(documents)
+      .where(and(
+        eq(documents.userId, userId),
+        inArray(documents.id, documentIds)
+      ));
+
+    return docsToDelete.length;
+  }
+
+  async updateDocumentName(documentId: string, displayName: string): Promise<Document> {
+    const result = await this.db
+      .update(documents)
+      .set({ displayName })
+      .where(eq(documents.id, documentId))
+      .returning();
+    
+    if (result.length === 0) {
+      throw new Error("Document not found");
+    }
+    return result[0];
+  }
+
+  async saveDocumentAnalysis(documentId: string, analysis: any): Promise<Document> {
+    const result = await this.db
+      .update(documents)
+      .set({ analysisResult: analysis })
+      .where(eq(documents.id, documentId))
+      .returning();
+    
+    if (result.length === 0) {
+      throw new Error("Document not found");
+    }
+    return result[0];
+  }
+
+  async getDocumentsByStudentId(studentId: string): Promise<Document[]> {
+    return await this.db.select().from(documents).where(eq(documents.studentId, studentId));
   }
 
   // Events
