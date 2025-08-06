@@ -18,7 +18,6 @@ export default function IEPGoalGeneratorPage() {
   const [goals, setGoals] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [savingToVault, setSavingToVault] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -177,59 +176,6 @@ export default function IEPGoalGeneratorPage() {
     }
   };
 
-  // Save to vault mutation
-  const saveToVaultMutation = useMutation({
-    mutationFn: async () => {
-      if (goals.length === 0) {
-        throw new Error("No goals to save");
-      }
-
-      const goalsContent = `SMART IEP GOALS GENERATED
-Generated: ${new Date().toLocaleString()}
-Goal Area: ${area}
-Student: ${students.find(s => s.id === selectedStudentId)?.name || 'Selected Student'}
-
-GENERATED IEP GOALS:
-
-${goals.map((goal, index) => `GOAL ${index + 1}:
-${goal}
-
-`).join('')}
-
----
-These SMART IEP goals were generated using AI assistance based on the specified goal area and should be reviewed and customized by the IEP team before implementation.`;
-
-      const response = await apiRequest("POST", "/api/documents/generate", {
-        content: goalsContent,
-        type: "iep_goals",
-        generatedBy: "IEP Goal Generator",
-        displayName: `IEP Goals - ${area} - ${new Date().toLocaleDateString()}`,
-        parentDocumentId: null
-      });
-      
-      if (!response.ok) {
-        throw new Error("Failed to save to vault");
-      }
-      
-      return response.json();
-    },
-    onSuccess: () => {
-      toast({
-        title: "Saved to Vault!",
-        description: "Generated IEP goals have been saved to your Document Vault"
-      });
-      setSavingToVault(false);
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Save Failed",
-        description: error.message || "Failed to save to Document Vault",
-        variant: "destructive"
-      });
-      setSavingToVault(false);
-    }
-  });
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#f2f7fd] to-[#eaf0f8] py-8">
       <div className="max-w-4xl mx-auto px-6">
@@ -344,18 +290,6 @@ These SMART IEP goals were generated using AI assistance based on the specified 
               <h2 className="text-2xl font-semibold text-slate-900">Generated IEP Goals</h2>
               <div className="flex items-center gap-4">
                 <span className="text-sm text-slate-500">{goals.length} goals generated</span>
-                <Button 
-                  onClick={() => {
-                    setSavingToVault(true);
-                    saveToVaultMutation.mutate();
-                  }}
-                  disabled={savingToVault}
-                  className="bg-blue-600 hover:bg-blue-700 text-white disabled:bg-slate-600"
-                  size="sm"
-                >
-                  <FileText className="w-4 h-4 mr-2" />
-                  {savingToVault ? "Saving..." : "Save to Vault"}
-                </Button>
                 <Button 
                   onClick={saveGoalsToDatabase} 
                   disabled={saving}
