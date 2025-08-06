@@ -24,7 +24,7 @@ export default function IEPGoalGeneratorPage() {
   const { user } = useAuth();
 
   // Fetch students based on user role
-  const { data: students = [] } = useQuery({
+  const { data: students = [] } = useQuery<any[]>({
     queryKey: user?.role === 'advocate' ? ['/api/advocate/students'] : ['/api/students'],
     enabled: !!user && (user.role === 'parent' || user.role === 'advocate'),
   });

@@ -595,7 +595,7 @@ export class DbStorage implements IStorage {
 
   constructor() {
     // Use Supabase database connection
-    const supabaseUrl = 'postgresql://postgres:[MyIEPHero2025$]@db.wktcfhegoxjearpzdxpz.supabase.co:5432/postgres';
+    const supabaseUrl = process.env.DATABASE_URL || 'postgresql://postgres:[MyIEPHero2025$]@db.wktcfhegoxjearpzdxpz.supabase.co:5432/postgres';
     
     const sql = postgres(supabaseUrl, { 
       ssl: { rejectUnauthorized: false },
