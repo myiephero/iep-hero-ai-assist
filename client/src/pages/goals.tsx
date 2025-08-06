@@ -26,7 +26,7 @@ import type { Goal } from "@shared/schema";
 const goalFormSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().min(1, "Description is required"),
-  studentId: z.string().optional(),
+  studentId: z.string().min(1, "Student is required"),
   status: z.enum(["Not Started", "In Progress", "Completed"]),
   progress: z.number().min(0).max(100),
   dueDate: z.date(),
@@ -217,8 +217,8 @@ export default function Goals() {
                     )}
                   />
                   
-                  {/* Student Selector - show for parents when they have students */}
-                  {user?.role === 'parent' && students.length > 0 && (
+                  {/* Student Selector - always show for parents */}
+                  {user?.role === 'parent' && (
                     <FormField
                       control={form.control}
                       name="studentId"
@@ -232,15 +232,19 @@ export default function Goals() {
                           <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
                               <SelectTrigger className="bg-[#3E4161] border-slate-500 text-white">
-                                <SelectValue placeholder="Select a student" />
+                                <SelectValue placeholder={students.length === 0 ? "Loading students..." : "Select a student"} />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent className="bg-[#3E4161] border-slate-500">
-                              {students.map((student: any) => (
-                                <SelectItem key={student.id} value={student.id}>
-                                  {student.firstName} {student.lastName}
-                                </SelectItem>
-                              ))}
+                              {students.length === 0 ? (
+                                <SelectItem value="_loading" disabled>Loading students...</SelectItem>
+                              ) : (
+                                students.map((student: any) => (
+                                  <SelectItem key={student.id} value={student.id}>
+                                    {student.firstName} {student.lastName}
+                                  </SelectItem>
+                                ))
+                              )}
                             </SelectContent>
                           </Select>
                           <FormMessage />
