@@ -1292,6 +1292,48 @@ Be supportive and parent-friendly in your language while maintaining accuracy.`;
     }
   });
 
+  // Dashboard Metrics API - Real data from database
+  app.get("/api/dashboard/metrics", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      
+      // Active Goals count
+      const goals = await storage.getGoalsByUserId(user.id);
+      const activeGoalsCount = goals.length;
+      
+      // Progress Rate calculation (average completion percentage)
+      const progressRate = goals.length > 0 
+        ? Math.round(goals.reduce((sum: number, goal: any) => sum + (goal.progress || 0), 0) / goals.length)
+        : 0;
+      
+      // Documents count
+      const documents = await storage.getDocumentsByUserId(user.id);
+      const documentsCount = documents.length;
+      
+      // Upcoming Meeting (next event from events table)
+      const events = await storage.getEventsByUserId(user.id);
+      const upcomingMeeting = events
+        .filter((event: any) => new Date(event.date) > new Date())
+        .sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime())[0];
+      
+      const metrics = {
+        activeGoals: activeGoalsCount,
+        progressRate: progressRate,
+        upcomingMeeting: upcomingMeeting ? {
+          title: upcomingMeeting.title,
+          date: upcomingMeeting.date,
+          type: upcomingMeeting.type
+        } : null,
+        documents: documentsCount
+      };
+      
+      res.json(metrics);
+    } catch (error: any) {
+      console.error('Error fetching dashboard metrics:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   // Serve uploaded files
   app.use('/uploads', requireAuth, (req, res, next) => {
     // Add file access control here if needed

@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLocation } from "wouter";
+import { DashboardMetrics } from "@/components/DashboardMetrics";
 
 
 const advocateTools = [
@@ -90,6 +91,9 @@ export default function DashboardAdvocate() {
           <p className="text-slate-300 mb-6">
             Access your complete suite of AI-powered IEP management tools
           </p>
+          
+          {/* Dashboard Metrics - Real Data */}
+          <DashboardMetrics className="mb-8" />
         </div>
 
         {/* Quick Access Tools */}
