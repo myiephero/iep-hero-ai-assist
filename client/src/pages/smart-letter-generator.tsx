@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -146,6 +147,20 @@ export default function SmartLetterGenerator() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
+  // Fetch students for mapping child names to student IDs
+  const { data: parentStudents = [] } = useQuery<Array<{id: string, firstName: string, lastName: string}>>({
+    queryKey: ["/api/parent/students"],
+    enabled: !!user && user.role === 'parent',
+  });
+
+  const { data: advocateStudents = [] } = useQuery<Array<{id: string, firstName: string, lastName: string}>>({
+    queryKey: ["/api/advocate/students"],
+    enabled: !!user && user.role === 'advocate',
+  });
+
+  // Use appropriate students list based on user role
+  const students = user?.role === 'advocate' ? advocateStudents : parentStudents;
+
   // Check if user has Hero plan access
   const hasHeroAccess = user?.planStatus === 'heroOffer' || 
                         user?.email === 'parent@demo.com';
@@ -273,20 +288,43 @@ export default function SmartLetterGenerator() {
 
     setIsSaving(true);
     try {
+      // Find matching student ID based on child name from form
+      let studentId = null;
+      const childName = formData.childName?.trim();
+      
+      if (childName && students.length > 0) {
+        // Try to match by full name first
+        const matchingStudent = students.find(student => {
+          const fullName = `${student.firstName} ${student.lastName}`.trim().toLowerCase();
+          return fullName === childName.toLowerCase();
+        });
+        
+        // If no full name match, try first name only
+        if (!matchingStudent) {
+          const firstNameMatch = students.find(student => 
+            student.firstName.toLowerCase() === childName.toLowerCase()
+          );
+          studentId = firstNameMatch?.id || null;
+        } else {
+          studentId = matchingStudent.id;
+        }
+      }
+
       // Use the documents/generate endpoint for AI-generated content
       const documentData = {
         content: generatedLetter,
         type: 'letter',
         generatedBy: 'Smart Letter Generator',
-        displayName: `${currentTemplate.title} - ${new Date().toLocaleDateString()}`,
-        parentDocumentId: null
+        displayName: `${currentTemplate.title} - ${childName || 'Student'} - ${new Date().toLocaleDateString()}`,
+        parentDocumentId: null,
+        studentId: studentId // Preserve student assignment
       };
 
       await apiRequest('POST', '/api/documents/generate', documentData);
 
       toast({
         title: "Saved to Vault!",
-        description: "Letter has been saved to your document vault",
+        description: `Letter saved${childName ? ` for ${childName}` : ''} to your document vault`,
       });
     } catch (error) {
       console.error('Error saving to vault:', error);
@@ -442,13 +480,13 @@ export default function SmartLetterGenerator() {
                     </Button>
                     <Button 
                       onClick={saveToVault} 
-                      variant="outline" 
                       size="sm"
                       disabled={isSaving}
+                      className="bg-green-600 hover:bg-green-700 text-white disabled:bg-slate-500"
                     >
                       {isSaving ? (
                         <>
-                          <div className="animate-spin w-3 h-3 border-2 border-gray-600 border-t-transparent rounded-full mr-1" />
+                          <div className="animate-spin w-3 h-3 border-2 border-green-200 border-t-transparent rounded-full mr-1" />
                           Saving...
                         </>
                       ) : (
