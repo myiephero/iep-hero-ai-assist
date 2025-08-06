@@ -14,7 +14,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon, Plus, Edit, Trash2, Target, TrendingUp, BarChart3 } from "lucide-react";
+import { CalendarIcon, Plus, Edit, Trash2, Target, TrendingUp, BarChart3, Search, User } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { format } from "date-fns";
 import { useForm } from "react-hook-form";
@@ -43,6 +43,7 @@ const statusColors = {
 export default function Goals() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -82,7 +83,24 @@ export default function Goals() {
   // Use appropriate students list based on user role
   const students = user?.role === 'advocate' ? advocateStudents : parentStudents;
 
-  const displayGoals = goals;
+  // Create a map of student names for quick lookup
+  const studentMap = students.reduce((acc, student) => {
+    acc[student.id] = `${student.firstName} ${student.lastName}`;
+    return acc;
+  }, {} as Record<string, string>);
+
+  // Filter goals based on search term (searches goal title, description, and student name)
+  const displayGoals = goals.filter(goal => {
+    const studentName = studentMap[goal.studentId || ''] || 'Unknown Student';
+    const searchLower = searchTerm.toLowerCase();
+    
+    return (
+      goal.title.toLowerCase().includes(searchLower) ||
+      goal.description.toLowerCase().includes(searchLower) ||
+      studentName.toLowerCase().includes(searchLower)
+    );
+  });
+  
   const isHeroPlan = user?.planStatus === 'heroOffer';
 
   const createGoalMutation = useMutation({
@@ -175,21 +193,31 @@ export default function Goals() {
 
 
       <div className="p-6">
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex justify-between items-start mb-6">
           <div>
             <h2 className="text-2xl font-bold text-white mb-2">IEP Goals</h2>
             <p className="text-slate-300">Track progress toward educational objectives</p>
           </div>
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button 
-                onClick={openNewDialog}
-                className="bg-blue-600 hover:bg-blue-700 text-white"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Add Goal
-              </Button>
-            </DialogTrigger>
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
+              <Input
+                placeholder="Search by student name or goal..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 bg-[#3E4161] border-slate-500 text-white placeholder-slate-400 w-72"
+              />
+            </div>
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button 
+                  onClick={openNewDialog}
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Goal
+                </Button>
+              </DialogTrigger>
             <DialogContent className="bg-[#2C2F48] border-slate-600 text-white">
               <DialogHeader>
                 <DialogTitle className="text-xl">
@@ -352,7 +380,8 @@ export default function Goals() {
                 </form>
               </Form>
             </DialogContent>
-          </Dialog>
+            </Dialog>
+          </div>
         </div>
 
         {isLoading ? (
@@ -365,7 +394,13 @@ export default function Goals() {
               <Card key={goal.id} className="bg-[#3E4161] border-slate-600">
                 <CardHeader className="pb-3">
                   <div className="flex justify-between items-start">
-                    <div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <User className="w-4 h-4 text-blue-400" />
+                        <span className="text-blue-300 text-sm font-medium">
+                          {studentMap[goal.studentId || ''] || 'Unknown Student'}
+                        </span>
+                      </div>
                       <CardTitle className="text-white">{goal.title}</CardTitle>
                       <p className="text-slate-300 mt-2">{goal.description}</p>
                     </div>
