@@ -1,100 +1,232 @@
-import { Route, Router } from "wouter";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Switch, Route, Redirect } from "wouter";
+import { queryClient } from "./lib/queryClient";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
-import { useAuth, AuthProvider } from "@/hooks/use-auth";
-import MainLayout from "@/components/layout/main-layout";
-import { MobileNavigation } from "@/components/MobileNavigation";
-
-// Import pages
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { AuthContext, useAuth, useAuthState } from "@/hooks/use-auth";
+import NotFound from "@/pages/not-found";
 import Login from "@/pages/login";
 import Register from "@/pages/register";
-import Dashboard from "@/pages/dashboard";
+import DashboardAdvocate from "@/pages/dashboard-premium";
 import DashboardParent from "@/pages/dashboard-parent";
-import Goals from "@/pages/goals";
 import Documents from "@/pages/documents";
-import Messages from "@/pages/messages";
+import Goals from "@/pages/goals";
+import IEPGoalGeneratorPage from "@/pages/iep-goal-generator";
+import AIIEPReviewPage from "@/pages/ai-iep-review";
+import AskAiAboutDocs from "@/pages/ask-ai-about-docs";
+import ProgressAnalyzer from "@/pages/progress-analyzer";
 import MeetingPrep from "@/pages/meeting-prep";
+import SmartLetterGenerator from "@/pages/smart-letter-generator";
 import ProgressNotes from "@/pages/progress-notes";
-import MyStudents from "@/pages/my-students";
-import MyParents from "@/pages/my-parents";
+import CommunicationPlan from "@/pages/communication-plan";
+import RightsExplainer from "@/pages/rights-explainer";
+import MeetingPrepWizard from "@/pages/meeting-prep-wizard";
+import SmartLetterGeneratorTool from "@/pages/tools/smart-letter-generator";
+import ProgressAnalyzerTool from "@/pages/tools/progress-analyzer";
+import MeetingPrepWizardTool from "@/pages/tools/meeting-prep-wizard";
+import ProgressNotesLogger from "@/pages/progress-notes-logger";
+import CommunicationTracker from "@/pages/communication-tracker";
+import AdvocateMatcher from "@/pages/advocate-matcher";
+import AdvocacyReportGenerator from "@/pages/advocacy-report-generator";
 import Subscribe from "@/pages/subscribe";
 import Pricing from "@/pages/pricing";
-import NotFound from "@/pages/not-found";
+import Chat from "@/pages/chat";
+import MyStudents from "@/pages/my-students";
+import MyParents from "@/pages/my-parents";
+import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
+import { MobileNavigation } from "@/components/MobileNavigation";
+import { OfflineIndicator } from "@/components/OfflineIndicator";
+import Navbar from "@/components/layout/navbar";
 
-// Import available tool pages (simplified for now)
-import IEPGoalGenerator from "@/pages/iep-goal-generator";
-import AIIEPReview from "@/pages/ai-iep-review";
-import AskAIAboutDocs from "@/pages/ask-ai-about-docs";
-import AdvocateMatchers from "@/pages/advocate-matcher";
-import SmartLetterGenerator from "@/pages/smart-letter-generator";
-
-// Create a single query client instance
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 60 * 1000, // 1 minute
-      refetchOnWindowFocus: false,
-    },
-  },
-});
-
-function AppContent() {
+function AuthGuard({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
 
+  console.log('🔍 AuthGuard check:', { user: user?.email, isLoading });
+
   if (isLoading) {
+    console.log('⏳ AuthGuard: Still loading...');
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white/50" />
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
+        <div className="animate-spin w-8 h-8 border-4 border-blue-400 border-t-transparent rounded-full" />
       </div>
     );
   }
 
   if (!user) {
-    return (
-      <Router>
-        <Route path="/register" component={Register} />
-        <Route component={Login} />
-      </Router>
-    );
+    console.log('❌ AuthGuard: No user, redirecting to login');
+    return <Redirect to="/login" />;
   }
 
+  console.log('✅ AuthGuard: User authenticated, showing content');
+  return <>{children}</>;
+}
+
+function DashboardRouter() {
+  const { user } = useAuth();
+  
+  console.log('🔄 Dashboard Router - User role:', user?.role);
+  
+  if (user?.role === 'parent') {
+    console.log('👨‍👩‍👧‍👦 Routing parent to parent dashboard');
+    return <Redirect to="/dashboard-parent" />;
+  } else if (user?.role === 'advocate' || user?.role === 'professional') {
+    console.log('👩‍💼 Routing advocate/professional to advocate dashboard');
+    return <Redirect to="/dashboard-advocate" />;
+  } else {
+    console.log('❓ Unknown role, defaulting to advocate dashboard');
+    return <Redirect to="/dashboard-advocate" />;
+  }
+}
+
+function Router() {
   return (
-    <MainLayout>
-      <Router>
-        <Route path="/" component={Dashboard} />
-        <Route path="/dashboard" component={Dashboard} />
-        <Route path="/dashboard-parent" component={DashboardParent} />
-        <Route path="/goals" component={Goals} />
-        <Route path="/documents" component={Documents} />
-        <Route path="/messages" component={Messages} />
-        <Route path="/meeting-prep" component={MeetingPrep} />
-        <Route path="/progress-notes" component={ProgressNotes} />
-        <Route path="/my-students" component={MyStudents} />
-        <Route path="/my-parents" component={MyParents} />
-        <Route path="/subscribe" component={Subscribe} />
-        <Route path="/pricing" component={Pricing} />
-        
-        {/* Tool Routes */}
-        <Route path="/tools/iep-goal-generator" component={IEPGoalGenerator} />
-        <Route path="/tools/ai-iep-review" component={AIIEPReview} />
-        <Route path="/tools/ask-ai-about-docs" component={AskAIAboutDocs} />
-        <Route path="/tools/advocate-matcher" component={AdvocateMatchers} />
-        <Route path="/tools/smart-letter-generator" component={SmartLetterGenerator} />
-        
-        <Route component={NotFound} />
-      </Router>
-      <MobileNavigation />
-    </MainLayout>
+    <Switch>
+      <Route path="/login" component={Login} />
+      <Route path="/register" component={Register} />
+      <Route path="/subscribe">
+        <AuthGuard>
+          <Navbar />
+          <Subscribe />
+        </AuthGuard>
+      </Route>
+      <Route path="/pricing" component={Pricing} />
+      <Route path="/dashboard">
+        <AuthGuard>
+          <DashboardRouter />
+        </AuthGuard>
+      </Route>
+      <Route path="/dashboard-parent">
+        <AuthGuard>
+          <Navbar />
+          <DashboardParent />
+        </AuthGuard>
+      </Route>
+      <Route path="/dashboard-advocate">
+        <AuthGuard>
+          <Navbar />
+          <DashboardAdvocate />
+        </AuthGuard>
+      </Route>
+      <Route path="/documents">
+        <AuthGuard>
+          <Navbar />
+          <Documents />
+        </AuthGuard>
+      </Route>
+      <Route path="/goals">
+        <AuthGuard>
+          <Navbar />
+          <Goals />
+        </AuthGuard>
+      </Route>
+      <Route path="/tools/iep-goal-generator">
+        <AuthGuard>
+          <IEPGoalGeneratorPage />
+        </AuthGuard>
+      </Route>
+      <Route path="/tools/ai-iep-review">
+        <AuthGuard>
+          <AIIEPReviewPage />
+        </AuthGuard>
+      </Route>
+      <Route path="/tools/ask-ai-docs">
+        <AuthGuard>
+          <AskAiAboutDocs />
+        </AuthGuard>
+      </Route>
+      <Route path="/tools/progress-analyzer">
+        <AuthGuard>
+          <ProgressAnalyzerTool />
+        </AuthGuard>
+      </Route>
+      <Route path="/tools/meeting-prep">
+        <AuthGuard>
+          <MeetingPrep />
+        </AuthGuard>
+      </Route>
+      <Route path="/tools/smart-letter-generator">
+        <AuthGuard>
+          <SmartLetterGeneratorTool />
+        </AuthGuard>
+      </Route>
+      <Route path="/tools/meeting-prep-wizard">
+        <AuthGuard>
+          <MeetingPrepWizardTool />
+        </AuthGuard>
+      </Route>
+      <Route path="/tools/progress-notes">
+        <AuthGuard>
+          <ProgressNotes />
+        </AuthGuard>
+      </Route>
+      <Route path="/tools/communication-plan">
+        <AuthGuard>
+          <CommunicationPlan />
+        </AuthGuard>
+      </Route>
+      <Route path="/tools/rights-explainer">
+        <AuthGuard>
+          <RightsExplainer />
+        </AuthGuard>
+      </Route>
+
+      <Route path="/tools/progress-notes-logger">
+        <AuthGuard>
+          <ProgressNotesLogger />
+        </AuthGuard>
+      </Route>
+      <Route path="/tools/communication-tracker">
+        <AuthGuard>
+          <CommunicationTracker />
+        </AuthGuard>
+      </Route>
+      <Route path="/tools/advocate-matcher">
+        <AuthGuard>
+          <AdvocateMatcher />
+        </AuthGuard>
+      </Route>
+      <Route path="/tools/advocacy-report-generator">
+        <AuthGuard>
+          <AdvocacyReportGenerator />
+        </AuthGuard>
+      </Route>
+      <Route path="/chat">
+        <AuthGuard>
+          <Chat />
+        </AuthGuard>
+      </Route>
+      <Route path="/my-students">
+        <AuthGuard>
+          <MyStudents />
+        </AuthGuard>
+      </Route>
+      <Route path="/my-parents">
+        <AuthGuard>
+          <MyParents />
+        </AuthGuard>
+      </Route>
+      <Route path="/">
+        <Redirect to="/dashboard" />
+      </Route>
+      <Route component={NotFound} />
+    </Switch>
   );
 }
 
 function App() {
+  const authState = useAuthState();
+
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <AppContent />
-        <Toaster />
-      </AuthProvider>
+      <AuthContext.Provider value={authState}>
+        <TooltipProvider>
+          <OfflineIndicator />
+          <PWAInstallPrompt />
+          <Router />
+          <MobileNavigation />
+          <Toaster />
+        </TooltipProvider>
+      </AuthContext.Provider>
     </QueryClientProvider>
   );
 }
