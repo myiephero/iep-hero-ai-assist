@@ -41,6 +41,9 @@ export const documents = pgTable("documents", {
   originalName: text("original_name").notNull(),
   displayName: text("display_name"), // User-editable display name
   type: text("type").notNull(), // iep, assessment, progress_report, meeting_notes, goal_set, template, compliance_report, generated, other
+  category: text("category"), // AI-generated category: academic, behavioral, medical, legal, administrative, communication
+  tags: jsonb("tags").default([]), // AI-generated and user-editable tags array
+  confidence: integer("confidence"), // AI confidence score for auto-categorization (0-100)
   description: text("description"),
   fileUrl: text("file_url"), // Optional for generated documents
   content: text("content"), // For generated text documents
