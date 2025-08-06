@@ -222,6 +222,7 @@ export default function DashboardAdvocate() {
           </div>
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+            {/* Row 1: Document Vault, Goal Generator, My Students, Smart Letters */}
             <Card className="bg-[#3E4161]/70 border-slate-600 hover:bg-[#4A4E76] cursor-pointer transition-colors"
                   onClick={() => setLocation('/documents')}>
               <CardContent className="p-4 text-center">
@@ -254,6 +255,8 @@ export default function DashboardAdvocate() {
                 <div className="text-slate-300 text-sm">Generate Letters</div>
               </CardContent>
             </Card>
+            
+            {/* Row 2: AI Review, Reports, Meeting Prep Assistant */}
             <Card className="bg-[#3E4161]/70 border-slate-600 hover:bg-[#4A4E76] cursor-pointer transition-colors"
                   onClick={() => setLocation('/tools/ai-iep-review')}>
               <CardContent className="p-4 text-center">
@@ -276,14 +279,6 @@ export default function DashboardAdvocate() {
                 <div className="text-2xl mb-2">🗣️</div>
                 <div className="text-white font-semibold">Meeting Prep Assistant</div>
                 <div className="text-slate-300 text-sm">Generate talking points</div>
-              </CardContent>
-            </Card>
-            <Card className="bg-[#3E4161]/70 border-slate-600 hover:bg-[#4A4E76] cursor-pointer transition-colors"
-                  onClick={() => setLocation('/tools/progress-analyzer')}>
-              <CardContent className="p-4 text-center">
-                <div className="text-2xl mb-2">📊</div>
-                <div className="text-white font-semibold">Progress Analyzer</div>
-                <div className="text-slate-300 text-sm">Data-driven recommendations</div>
               </CardContent>
             </Card>
           </div>
