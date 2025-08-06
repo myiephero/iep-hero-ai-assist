@@ -312,7 +312,7 @@ export default function SmartLetterGenerator() {
         {/* Header */}
         <div className="mb-6">
           <Link href="/dashboard-parent">
-            <Button variant="ghost" className="mb-4">
+            <Button className="mb-4 bg-slate-600 hover:bg-slate-700 text-white">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Dashboard
             </Button>
@@ -414,7 +414,7 @@ export default function SmartLetterGenerator() {
                       </>
                     )}
                   </Button>
-                  <Button onClick={resetForm} variant="outline">
+                  <Button onClick={resetForm} className="bg-slate-600 hover:bg-slate-700 text-white">
                     Reset Form
                   </Button>
                 </div>

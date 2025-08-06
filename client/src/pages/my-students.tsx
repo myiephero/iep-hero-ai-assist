@@ -317,15 +317,14 @@ export default function MyStudentsPage() {
                   <div className="flex gap-2">
                     <Button 
                       size="sm" 
-                      variant="outline" 
-                      className="flex-1 border-slate-500 text-white hover:bg-slate-700"
+                      className="flex-1 bg-slate-700 hover:bg-slate-600 text-white border border-slate-600"
                       onClick={() => setLocation(`/documents?studentId=${student.id}`)}
                     >
                       Documents
                     </Button>
                     <Button 
                       size="sm" 
-                      className="flex-1 bg-blue-600 hover:bg-blue-700"
+                      className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
                       onClick={() => setLocation(`/tools/iep-goal-generator?studentId=${student.id}`)}
                     >
                       IEP Goals
@@ -557,16 +556,15 @@ export default function MyStudentsPage() {
               <div className="flex gap-3 pt-4">
                 <Button
                   type="button"
-                  variant="outline"
+                  className="flex-1 bg-slate-700 hover:bg-slate-600 text-white border border-slate-600"
                   onClick={() => setShowAddStudent(false)}
-                  className="flex-1 border-slate-500 bg-transparent text-white hover:bg-slate-700 hover:text-white"
                   disabled={addStudentMutation.isPending}
                 >
                   Cancel
                 </Button>
                 <Button
                   type="submit"
-                  className="flex-1 bg-blue-600 hover:bg-blue-700"
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
                   disabled={addStudentMutation.isPending}
                 >
                   {addStudentMutation.isPending ? "Adding..." : "Add Student"}

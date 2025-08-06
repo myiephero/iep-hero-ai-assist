@@ -130,8 +130,7 @@ export default function Pricing() {
             </CardContent>
             <CardFooter>
               <Button 
-                className="w-full" 
-                variant="outline"
+                className="w-full bg-slate-600 hover:bg-slate-700 text-white" 
                 disabled={user !== null}
               >
                 {user ? "Current Plan" : "Get Started Free"}
