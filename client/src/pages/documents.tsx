@@ -7,8 +7,10 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import FileUploadModal from "@/components/modals/file-upload-modal";
-import { FileText, Upload, Download, Brain, Edit2, Check, X, Eye, Save, ArrowLeft, Search, User } from "lucide-react";
+import { FileText, Upload, Download, Brain, Edit2, Check, X, Eye, Save, ArrowLeft, Search, User, Trash2, Archive, MoreHorizontal } from "lucide-react";
 import { Link } from "wouter";
 import { format } from "date-fns";
 import type { Document } from "@shared/schema";
@@ -27,6 +29,8 @@ export default function Documents() {
   const [searchTerm, setSearchTerm] = useState("");
   const [assigningStudent, setAssigningStudent] = useState<string | null>(null);
   const [selectedStudentId, setSelectedStudentId] = useState<string>("");
+  const [selectedDocuments, setSelectedDocuments] = useState<Set<string>>(new Set());
+  const [bulkActionMode, setBulkActionMode] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -180,7 +184,57 @@ PRIORITY LEVEL: ${analysisResult.priority || 'Low'}
     }
   });
 
+  // Bulk delete mutation
+  const bulkDeleteMutation = useMutation({
+    mutationFn: async (documentIds: string[]) => {
+      const response = await apiRequest("DELETE", "/api/documents/bulk", { documentIds });
+      if (!response.ok) {
+        throw new Error("Failed to delete documents");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/documents"] });
+      setSelectedDocuments(new Set());
+      setBulkActionMode(false);
+      toast({
+        title: "Success",
+        description: "Documents deleted successfully"
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete documents",
+        variant: "destructive"
+      });
+    }
+  });
+
   // Functions
+  const toggleDocumentSelection = (documentId: string) => {
+    const newSelected = new Set(selectedDocuments);
+    if (newSelected.has(documentId)) {
+      newSelected.delete(documentId);
+    } else {
+      newSelected.add(documentId);
+    }
+    setSelectedDocuments(newSelected);
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedDocuments.size === displayDocuments.length && displayDocuments.length > 0) {
+      setSelectedDocuments(new Set());
+    } else {
+      setSelectedDocuments(new Set(displayDocuments.map(doc => doc.id)));
+    }
+  };
+
+  const handleBulkDelete = () => {
+    if (selectedDocuments.size > 0) {
+      bulkDeleteMutation.mutate(Array.from(selectedDocuments));
+    }
+  };
   const startEditingName = (doc: any) => {
     setEditingDocument(doc.id);
     setEditingName(doc.displayName || doc.originalName);
@@ -342,15 +396,58 @@ PRIORITY LEVEL: ${analysisResult.priority || 'Low'}
                 {studentId ? `View and manage documents for ${student?.firstName || 'this student'}` : 'Securely store and analyze your IEP documents'}
               </p>
             </div>
-            <Button 
-              onClick={() => setShowFileUpload(true)}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
-            >
-              <Upload className="w-4 h-4 mr-2" />
-              Upload Document
-            </Button>
+            <div className="flex gap-3">
+              <Button 
+                onClick={() => setShowFileUpload(true)}
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                <Upload className="w-4 h-4 mr-2" />
+                Upload Document
+              </Button>
+              <Button
+                onClick={() => setBulkActionMode(!bulkActionMode)}
+                variant="outline"
+                className="border-slate-600 text-white hover:bg-slate-700"
+              >
+                {bulkActionMode ? "Cancel Selection" : "Select Documents"}
+              </Button>
+            </div>
           </div>
         </div>
+
+        {/* Bulk Action Bar */}
+        {bulkActionMode && (
+          <div className="mb-4 p-4 bg-slate-700 rounded-lg border border-slate-600">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <Checkbox
+                  checked={selectedDocuments.size === displayDocuments.length && displayDocuments.length > 0}
+                  onCheckedChange={toggleSelectAll}
+                  className="border-slate-400"
+                />
+                <span className="text-white">
+                  {selectedDocuments.size === 0 
+                    ? "Select documents" 
+                    : `${selectedDocuments.size} document${selectedDocuments.size === 1 ? '' : 's'} selected`
+                  }
+                </span>
+              </div>
+              {selectedDocuments.size > 0 && (
+                <div className="flex items-center gap-2">
+                  <Button
+                    onClick={handleBulkDelete}
+                    disabled={bulkDeleteMutation.isPending}
+                    variant="destructive"
+                    size="sm"
+                  >
+                    <Trash2 className="w-4 h-4 mr-1" />
+                    {bulkDeleteMutation.isPending ? "Deleting..." : "Delete Selected"}
+                  </Button>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Search Bar */}
         <div className="mb-6">
@@ -376,6 +473,13 @@ PRIORITY LEVEL: ${analysisResult.priority || 'Low'}
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
+                      {bulkActionMode && (
+                        <Checkbox
+                          checked={selectedDocuments.has(doc.id)}
+                          onCheckedChange={() => toggleDocumentSelection(doc.id)}
+                          className="border-slate-400"
+                        />
+                      )}
                       <div className="p-3 bg-slate-700 rounded-lg">
                         <FileText className="w-8 h-8 text-blue-400" />
                       </div>
