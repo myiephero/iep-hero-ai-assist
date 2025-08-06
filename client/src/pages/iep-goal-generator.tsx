@@ -26,7 +26,7 @@ export default function IEPGoalGeneratorPage() {
 
   // Fetch students based on user role
   const { data: students = [] } = useQuery<any[]>({
-    queryKey: user?.role === 'advocate' ? ['/api/advocate/students'] : ['/api/students'],
+    queryKey: user?.role === 'advocate' ? ['/api/advocate/students'] : ['/api/parent/students'],
     enabled: !!user && (user.role === 'parent' || user.role === 'advocate'),
   });
 
@@ -271,6 +271,13 @@ These SMART IEP goals were generated using AI assistance based on the specified 
                         <Link href="/my-students">
                           <Button variant="outline" size="sm">
                             Create Student Profile
+                          </Button>
+                        </Link>
+                      )}
+                      {user?.role === 'advocate' && (
+                        <Link href="/advocate-students">
+                          <Button variant="outline" size="sm">
+                            Add Students
                           </Button>
                         </Link>
                       )}
