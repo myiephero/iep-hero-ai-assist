@@ -70,11 +70,11 @@ function DashboardRouter() {
     console.log('👨‍👩‍👧‍👦 Routing parent to parent dashboard');
     return <Redirect to="/dashboard-parent" />;
   } else if (userRole === 'advocate' || userRole === 'professional') {
-    console.log('👩‍💼 Routing advocate/professional to advocate dashboard');
-    return <Redirect to="/dashboard-advocate" />;
+    console.log('👩‍💼 Routing advocate/professional to premium dashboard');
+    return <Redirect to="/dashboard-premium" />;
   } else {
-    console.log('❓ Unknown role, defaulting to advocate dashboard');
-    return <Redirect to="/dashboard-advocate" />;
+    console.log('❓ Unknown role, defaulting to premium dashboard');
+    return <Redirect to="/dashboard-premium" />;
   }
 }
 
@@ -102,6 +102,12 @@ function Router() {
         </AuthGuard>
       </Route>
       <Route path="/dashboard-advocate">
+        <AuthGuard>
+          <Navbar />
+          <DashboardAdvocate />
+        </AuthGuard>
+      </Route>
+      <Route path="/dashboard-premium">
         <AuthGuard>
           <Navbar />
           <DashboardAdvocate />
