@@ -53,7 +53,7 @@ export default function MyStudents() {
     caseNotes: ""
   });
 
-  const { data: students = [], isLoading } = useQuery({
+  const { data: students = [], isLoading } = useQuery<Student[]>({
     queryKey: ['/api/students'],
     enabled: !!user
   });
@@ -197,7 +197,7 @@ export default function MyStudents() {
         </div>
 
         {/* Students Grid */}
-        {students.length === 0 ? (
+        {(students as Student[]).length === 0 ? (
           <Card className="bg-white/10 backdrop-blur-lg border-white/20">
             <CardContent className="text-center py-12">
               <User className="w-16 h-16 text-white/40 mx-auto mb-4" />
@@ -214,7 +214,7 @@ export default function MyStudents() {
           </Card>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {students.map((student: Student) => (
+            {(students as Student[]).map((student: Student) => (
               <Card key={student.id} className="bg-white/10 backdrop-blur-lg border-white/20 hover:bg-white/15 transition-all">
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
