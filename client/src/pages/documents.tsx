@@ -5,8 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 import FileUploadModal from "@/components/modals/file-upload-modal";
-import { FileText, Upload, Download, Brain, Edit2, Check, X, Eye, Save, ArrowLeft, Search } from "lucide-react";
+import { FileText, Upload, Download, Brain, Edit2, Check, X, Eye, Save, ArrowLeft, Search, User } from "lucide-react";
 import { Link } from "wouter";
 import { format } from "date-fns";
 import type { Document } from "@shared/schema";
@@ -23,6 +25,8 @@ export default function Documents() {
   const [currentAnalysisDocument, setCurrentAnalysisDocument] = useState<any>(null);
   const [savingToVault, setSavingToVault] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [assigningStudent, setAssigningStudent] = useState<string | null>(null);
+  const [selectedStudentId, setSelectedStudentId] = useState<string>("");
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -39,6 +43,11 @@ export default function Documents() {
   const { data: student } = useQuery({
     queryKey: ["/api/students", studentId],
     enabled: !!studentId,
+  });
+
+  // Query all students for assignment functionality
+  const { data: allStudents = [] } = useQuery({
+    queryKey: ["/api/students"],
   });
 
   // Filter documents by student if specified and add search functionality
@@ -141,6 +150,33 @@ PRIORITY LEVEL: ${analysisResult.priority || 'Low'}
         variant: "destructive"
       });
       setSavingToVault(false);
+    }
+  });
+
+  // Mutation for assigning document to student
+  const assignToStudentMutation = useMutation({
+    mutationFn: async ({ documentId, studentId }: { documentId: string; studentId: string }) => {
+      const response = await apiRequest("PATCH", `/api/documents/${documentId}/assign`, { studentId });
+      if (!response.ok) {
+        throw new Error("Failed to assign document to student");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/documents"] });
+      setAssigningStudent(null);
+      setSelectedStudentId("");
+      toast({
+        title: "Success",
+        description: "Document assigned to student successfully"
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error", 
+        description: error.message || "Failed to assign document to student",
+        variant: "destructive"
+      });
     }
   });
 
@@ -402,12 +438,72 @@ PRIORITY LEVEL: ${analysisResult.priority || 'Low'}
                             </Badge>
                           )}
                         </div>
-                        <p className="text-sm text-slate-400">
-                          Uploaded {doc.uploadedAt ? format(new Date(doc.uploadedAt), "MMM d, yyyy") : "Unknown"}
-                        </p>
+                        <div className="flex items-center gap-2 text-sm text-slate-400">
+                          <span>Uploaded {doc.uploadedAt ? format(new Date(doc.uploadedAt), "MMM d, yyyy") : "Unknown"}</span>
+                          {doc.studentId && (
+                            <Badge className="bg-purple-600 text-white">
+                              <User className="w-3 h-3 mr-1" />
+                              Student Assigned
+                            </Badge>
+                          )}
+                        </div>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
+                      {/* Student Assignment */}
+                      {assigningStudent === doc.id ? (
+                        <div className="flex items-center gap-2">
+                          <Select value={selectedStudentId} onValueChange={setSelectedStudentId}>
+                            <SelectTrigger className="w-40 bg-slate-700 border-slate-500 text-white">
+                              <SelectValue placeholder="Select student" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {allStudents.map((student: any) => (
+                                <SelectItem key={student.id} value={student.id}>
+                                  {student.firstName} {student.lastName}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <Button
+                            size="sm"
+                            onClick={() => {
+                              if (selectedStudentId) {
+                                assignToStudentMutation.mutate({ 
+                                  documentId: doc.id, 
+                                  studentId: selectedStudentId 
+                                });
+                              }
+                            }}
+                            disabled={!selectedStudentId || assignToStudentMutation.isPending}
+                            className="bg-purple-600 hover:bg-purple-700"
+                          >
+                            <Check className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              setAssigningStudent(null);
+                              setSelectedStudentId("");
+                            }}
+                            className="border-slate-500"
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      ) : (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setAssigningStudent(doc.id)}
+                          className="bg-purple-700 border-purple-500 text-white hover:bg-purple-600 hover:border-purple-400"
+                        >
+                          <User className="w-4 h-4 mr-1" />
+                          {doc.studentId ? "Reassign" : "Assign to Student"}
+                        </Button>
+                      )}
+                      
                       <Button
                         variant="outline"
                         size="sm"
@@ -584,6 +680,26 @@ PRIORITY LEVEL: ${viewingAnalysis.priority || 'Low'}
                   <Download className="w-4 h-4 mr-1" />
                   Download
                 </Button>
+                {/* Save Analysis to Vault button for structured analysis */}
+                {!viewingAnalysis.isTextContent && (
+                  <Button
+                    onClick={() => {
+                      setSavingToVault(true);
+                      saveAnalysisToVaultMutation.mutate({
+                        analysisResult: viewingAnalysis,
+                        documentName: currentAnalysisDocument.displayName || currentAnalysisDocument.originalName,
+                        parentDocumentId: currentAnalysisDocument.id
+                      });
+                    }}
+                    disabled={savingToVault}
+                    variant="outline" 
+                    className="border-blue-500 text-blue-400 hover:bg-blue-700"
+                    size="sm"
+                  >
+                    <Save className="w-4 h-4 mr-1" />
+                    {savingToVault ? "Saving..." : "Save to Vault"}
+                  </Button>
+                )}
               </div>
             )}
           </DialogHeader>
