@@ -17,7 +17,7 @@ const tools = [
     title: "Advocate Matcher",
     description: "Get matched with a special ed advocate",
     icon: "🤝",
-    route: "/advocate-matcher"
+    route: "/matcher"
   },
   {
     title: "Messages",

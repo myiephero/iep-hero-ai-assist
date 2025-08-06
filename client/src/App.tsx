@@ -138,6 +138,11 @@ function Router() {
           <SimpleAdvocateMatcherForm />
         </AuthGuard>
       </Route>
+      <Route path="/matcher">
+        <AuthGuard>
+          <SimpleAdvocateMatcherForm />
+        </AuthGuard>
+      </Route>
       <Route path="/tools/ai-iep-review">
         <AuthGuard>
           <AIIEPReviewPage />
