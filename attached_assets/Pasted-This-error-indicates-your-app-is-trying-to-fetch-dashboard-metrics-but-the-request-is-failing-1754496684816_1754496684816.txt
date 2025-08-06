@@ -1,0 +1,63 @@
+This error indicates your app is trying to **fetch dashboard metrics**, but the request is **failing**, likely due to one of the following:
+
+---
+
+### 🔎 Likely Causes
+
+1. **No real user data in Supabase yet**
+
+   * If the metrics function relies on data like goals, documents, meetings, etc., and those tables are still empty or use demo placeholders — this will fail.
+
+2. **Backend/API endpoint is broken or unconnected**
+
+   * The `/api/dashboard-metrics` or equivalent endpoint might be throwing an error, missing required headers/auth, or querying non-existent Supabase rows.
+
+3. **Incorrect Supabase connection or query permissions**
+
+   * The Supabase client may not be connected or authorized properly, or RLS (Row Level Security) might be blocking access to needed tables.
+
+4. **Code is referencing mock/demo data that has been disabled**
+
+   * During cleanup, any fallback mock data may have been removed — exposing the broken metrics query now.
+
+---
+
+### ✅ Prompt to Send to Replit Agent
+
+You can send this straight to your Replit agent:
+
+---
+
+📉 **Prompt: Fix "Failed to load dashboard metrics" for Parent & Advocate Dashboards**
+
+Both the Parent and Advocate dashboards are throwing this error:
+
+> "Failed to load dashboard metrics"
+
+Please investigate and fix the following:
+
+---
+
+### 📊 Metrics Failure – Root Causes to Check
+
+1. **Ensure `/api/dashboard-metrics` (or similar endpoint) is properly connected** to Supabase and querying:
+
+   * `iep_drafts` or `iep_documents`
+   * `goals` or `iep_goals`
+   * `meetings`
+   * `documents`
+
+2. **Fix any Supabase query issues or empty data errors.**
+
+   * Add safe defaults (e.g., return 0 goals if none exist).
+   * Prevent app from crashing when no records are returned.
+
+3. **If using Supabase RLS, ensure the logged-in user (parent/advocate) has proper access** to those rows.
+
+4. **Return realistic mock data only if no live records are found** — or flag empty dashboards gracefully.
+
+---
+
+Once this is fixed, metrics like “Active Goals”, “Progress Rate”, and “Next Meeting” should show live or fallback data correctly for both roles.
+
+Let me know once it’s been submitted and I’ll help you validate the fix or move on to next UI items.
