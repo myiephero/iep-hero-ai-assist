@@ -6,9 +6,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, MessageCircle, FileText, Brain, ArrowLeft } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { Loader2, MessageCircle, FileText, Brain, ArrowLeft, Save, Download } from "lucide-react";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -20,11 +21,13 @@ interface Document {
 
 export default function AskAiAboutDocs() {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [question, setQuestion] = useState("");
   const [mode, setMode] = useState<"single" | "all">("all");
   const [selectedDocId, setSelectedDocId] = useState<string>("");
   const [answer, setAnswer] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [savingToVault, setSavingToVault] = useState(false);
 
   // Check if user has Hero plan access
   const hasHeroAccess = user?.planStatus === 'heroOffer' || 
@@ -59,6 +62,55 @@ export default function AskAiAboutDocs() {
       setIsAnalyzing(false);
     }
   };
+
+  // Save to vault mutation
+  const saveToVaultMutation = useMutation({
+    mutationFn: async () => {
+      const qaContent = `AI DOCUMENT Q&A RESPONSE
+
+Question: ${question}
+Analysis Mode: ${mode === "all" ? "All Documents" : `Single Document (${documents.find(d => d.id === selectedDocId)?.filename || "Unknown"})`}
+Generated: ${new Date().toLocaleString()}
+
+QUESTION:
+${question}
+
+AI RESPONSE:
+${answer}
+
+---
+This Q&A was generated using AI-powered document analysis to provide insights from your IEP documents.`;
+
+      const response = await apiRequest("POST", "/api/documents/generate", {
+        content: qaContent,
+        type: "qa_response",
+        generatedBy: "Ask AI About Docs",
+        displayName: `AI Q&A - ${question.slice(0, 50)}... - ${new Date().toLocaleDateString()}`,
+        parentDocumentId: null
+      });
+      
+      if (!response.ok) {
+        throw new Error("Failed to save to vault");
+      }
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Saved to Vault!",
+        description: "Q&A response has been saved to your Document Vault"
+      });
+      setSavingToVault(false);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Save Failed",
+        description: error.message || "Failed to save to Document Vault",
+        variant: "destructive"
+      });
+      setSavingToVault(false);
+    }
+  });
 
   if (!hasHeroAccess) {
     return (
@@ -225,12 +277,65 @@ export default function AskAiAboutDocs() {
                   </div>
                 </div>
               ) : answer ? (
-                <div className="prose prose-sm max-w-none">
-                  <div className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg p-4 mb-4">
+                <div className="space-y-4">
+                  <div className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg p-4">
                     <h4 className="text-purple-900 font-semibold mb-2">AI Response:</h4>
                     <div className="text-gray-700 whitespace-pre-wrap">
                       {answer}
                     </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={() => {
+                        setSavingToVault(true);
+                        saveToVaultMutation.mutate();
+                      }}
+                      disabled={savingToVault}
+                      className="bg-green-600 hover:bg-green-700 text-white disabled:bg-slate-600"
+                      size="sm"
+                    >
+                      <Save className="w-4 h-4 mr-1" />
+                      {savingToVault ? "Saving..." : "Save to Vault"}
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        const qaText = `AI DOCUMENT Q&A RESPONSE
+
+Question: ${question}
+Analysis Mode: ${mode === "all" ? "All Documents" : `Single Document (${documents.find(d => d.id === selectedDocId)?.filename || "Unknown"})`}
+Generated: ${new Date().toLocaleString()}
+
+QUESTION:
+${question}
+
+AI RESPONSE:
+${answer}
+
+---
+This Q&A was generated using AI-powered document analysis to provide insights from your IEP documents.`;
+                        
+                        const blob = new Blob([qaText], { type: 'text/plain' });
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `AI_QA_${question.slice(0, 30).replace(/[^a-zA-Z0-9]/g, '_')}.txt`;
+                        document.body.appendChild(a);
+                        a.click();
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(a);
+                        
+                        toast({
+                          title: "Downloaded",
+                          description: "Q&A response downloaded successfully"
+                        });
+                      }}
+                      variant="outline"
+                      className="border-slate-300 hover:bg-slate-50"
+                      size="sm"
+                    >
+                      <Download className="w-4 h-4 mr-1" />
+                      Download
+                    </Button>
                   </div>
                 </div>
               ) : (
