@@ -559,7 +559,7 @@ export default function MyStudentsPage() {
                   type="button"
                   variant="outline"
                   onClick={() => setShowAddStudent(false)}
-                  className="flex-1 border-slate-500"
+                  className="flex-1 border-slate-500 bg-transparent text-white hover:bg-slate-700 hover:text-white"
                   disabled={addStudentMutation.isPending}
                 >
                   Cancel
