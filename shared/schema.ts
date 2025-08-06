@@ -188,6 +188,7 @@ export const insertGoalSchema = createInsertSchema(iepGoals).omit({
 }).extend({
   status: z.enum(["Not Started", "In Progress", "Completed"]).default("Not Started"),
   progress: z.number().min(0).max(100).default(0),
+  dueDate: z.string().or(z.date()).transform((val) => new Date(val)),
 });
 
 export const insertDocumentSchema = createInsertSchema(documents).omit({
