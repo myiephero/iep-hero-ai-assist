@@ -92,6 +92,53 @@ export default function DashboardAdvocate() {
           </p>
         </div>
 
+        {/* Quick Access Tools */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <Card 
+            className="bg-[#3E4161]/70 border-slate-600 cursor-pointer hover:bg-[#3E4161]/90 transition-all duration-200"
+            onClick={() => setLocation("/documents")}
+          >
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl mb-2">📁</div>
+              <div className="font-semibold text-white">Document Vault</div>
+              <div className="text-xs text-slate-400">Manage Files</div>
+            </CardContent>
+          </Card>
+          
+          <Card 
+            className="bg-[#3E4161]/70 border-slate-600 cursor-pointer hover:bg-[#3E4161]/90 transition-all duration-200"
+            onClick={() => setLocation("/tools/iep-goal-generator")}
+          >
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl mb-2">🎯</div>
+              <div className="font-semibold text-white">Goal Generator</div>
+              <div className="text-xs text-slate-400">Create Goals</div>
+            </CardContent>
+          </Card>
+          
+          <Card 
+            className="bg-[#3E4161]/70 border-slate-600 cursor-pointer hover:bg-[#3E4161]/90 transition-all duration-200"
+            onClick={() => setLocation("/tools/ai-iep-review")}
+          >
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl mb-2">🧠</div>
+              <div className="font-semibold text-white">AI Review</div>
+              <div className="text-xs text-slate-400">Analyze IEPs</div>
+            </CardContent>
+          </Card>
+          
+          <Card 
+            className="bg-[#3E4161]/70 border-slate-600 cursor-pointer hover:bg-[#3E4161]/90 transition-all duration-200"
+            onClick={() => setLocation("/messages")}
+          >
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl mb-2">📄</div>
+              <div className="font-semibold text-white">Reports</div>
+              <div className="text-xs text-slate-400">Generate Reports</div>
+            </CardContent>
+          </Card>
+        </div>
+
         {/* Client Management Dashboard */}
         <div className="mb-8">
           <h2 className="text-xl font-semibold mb-4 text-white">Your Client Portfolio</h2>
@@ -251,29 +298,27 @@ export default function DashboardAdvocate() {
             )}
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {advocateTools.map((tool) => (
               <Card 
                 key={tool.name} 
-                className="bg-[#3E4161] hover:bg-[#4A4E76] border-slate-500 transition-all duration-200 cursor-pointer group"
+                className="bg-[#3E4161]/70 border-slate-600 hover:bg-[#3E4161]/90 transition-all duration-200 cursor-pointer"
                 onClick={() => openToolModal(tool.name)}
               >
                 <CardContent className="p-4">
-                  <div className="text-3xl mb-3 group-hover:scale-110 transition-transform">
-                    {tool.icon}
+                  <div className="flex flex-col items-center text-center space-y-3">
+                    <div className="text-3xl">
+                      {tool.icon}
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-white mb-1">
+                        {tool.name}
+                      </h3>
+                      <p className="text-slate-400 text-sm leading-relaxed">
+                        {tool.desc}
+                      </p>
+                    </div>
                   </div>
-                  <div className="font-semibold text-white mb-2">
-                    {tool.name}
-                  </div>
-                  <div className="text-sm text-slate-300 mb-4 line-clamp-2">
-                    {tool.desc}
-                  </div>
-                  <Button 
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                    disabled={!isHeroPlan && tool.name !== "AI IEP Review"}
-                  >
-                    {isHeroPlan || tool.name === "AI IEP Review" ? "Use Tool" : "Upgrade Required"}
-                  </Button>
                 </CardContent>
               </Card>
             ))}
