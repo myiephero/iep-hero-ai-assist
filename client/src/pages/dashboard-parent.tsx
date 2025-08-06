@@ -76,7 +76,14 @@ export default function ParentDashboard() {
   const [selectedTool, setSelectedTool] = useState<string | null>(null);
   const [upload, setUpload] = useState<File | null>(null);
 
-  const displayUser = user || { username: "demo_parent", planStatus: "heroOffer" };
+  // Use demo authentication if no user is logged in
+  const displayUser = user || { 
+    id: "demo_parent_id",
+    email: "parent@demo.com", 
+    username: "Demo Parent", 
+    role: "parent",
+    planStatus: "heroOffer" 
+  };
   const isHeroPlan = (displayUser as any).planStatus === 'heroOffer';
 
   const openToolModal = (tool: string) => {
@@ -140,7 +147,7 @@ export default function ParentDashboard() {
       <div className="min-h-screen bg-gradient-to-b from-[#1A1B2E] to-[#2C2F48] px-6 py-10 text-white">
       <div className="max-w-5xl mx-auto">
         <h1 className="text-3xl font-bold mb-2 text-white">
-          Welcome back, {(displayUser as any).username}!
+          Welcome back, {displayUser.username}!
         </h1>
         {isHeroPlan && (
           <div className="flex items-center gap-2 mb-4">
@@ -155,6 +162,21 @@ export default function ParentDashboard() {
 
         {/* Dashboard Metrics - Real Data */}
         <DashboardMetrics className="mb-8" />
+
+        {/* Quick Access to Students */}
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold mb-4 text-white">My Students</h2>
+          <Card 
+            className="bg-[#3E4161]/70 border-slate-600 cursor-pointer hover:bg-[#3E4161]/90 transition-all duration-200"
+            onClick={() => setLocation("/my-students")}
+          >
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl mb-2">👥</div>
+              <div className="font-semibold text-white">Manage Students</div>
+              <div className="text-xs text-slate-400">View and manage your children's IEP information</div>
+            </CardContent>
+          </Card>
+        </div>
 
         {/* Essential Tools - Clean Top Row */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -203,46 +225,42 @@ export default function ParentDashboard() {
           </Card>
         </div>
 
-        {/* Your Child's IEP Overview - Consolidated */}
-        <details className="mb-8">
-          <summary className="text-xl font-semibold mb-4 text-white cursor-pointer hover:text-blue-400 transition-colors">
-            Your Child's IEP Overview
-          </summary>
-          <div className="mt-4 space-y-4">
-            {/* Remove hardcoded demo data - will be replaced with real data */}
-            <Card className="bg-[#3E4161]/70 border-slate-600">
-              <CardContent className="p-4">
-                <div className="text-center text-slate-400">
-                  <div className="text-sm">IEP data will appear here when you have active goals and documents</div>
-                </div>
+        {/* Communication Section */}
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold mb-4 text-white">Communication & Support</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Card 
+              className="bg-[#3E4161]/70 border-slate-600 cursor-pointer hover:bg-[#3E4161]/90 transition-all duration-200"
+              onClick={() => setLocation("/messages")}
+            >
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl mb-2">💬</div>
+                <div className="font-semibold text-white">Messages</div>
+                <div className="text-xs text-slate-400">Chat with your advocate</div>
+              </CardContent>
+            </Card>
+            
+            <Card 
+              className="bg-[#3E4161]/70 border-slate-600 cursor-pointer hover:bg-[#3E4161]/90 transition-all duration-200"
+              onClick={() => setLocation("/tools/advocate-matcher")}
+            >
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl mb-2">🤝</div>
+                <div className="font-semibold text-white">Get Expert Help</div>
+                <div className="text-xs text-slate-400">Connect with advocates</div>
               </CardContent>
             </Card>
           </div>
-        </details>
-
-        {/* Messages Section */}
-        <div className="mb-8">
-          <Card 
-            className="bg-[#3E4161]/70 border-slate-600 cursor-pointer hover:bg-[#3E4161]/90 transition-all duration-200"
-            onClick={() => setLocation("/messages")}
-          >
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl mb-2">💬</div>
-              <div className="font-semibold text-white">Messages</div>
-              <div className="text-xs text-slate-400">Chat with your advocate</div>
-            </CardContent>
-          </Card>
         </div>
 
-        {/* Additional Tools - Matching Top Row Style */}
+        {/* Planning & Documentation Tools */}
         <div className="mb-8">
-          <h2 className="text-xl font-semibold mb-4 text-white">Additional Tools</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <h2 className="text-xl font-semibold mb-4 text-white">Planning & Documentation</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
               { name: 'Meeting Prep', desc: 'Prepare for IEP meetings', icon: '🗣️', route: '/tools/meeting-prep-wizard' },
               { name: 'Letter Generator', desc: 'Request letters & communication', icon: '📄', route: '/tools/smart-letter-generator' },
-              { name: 'Progress Logger', desc: 'Track service delivery', icon: '📝', route: '/tools/progress-notes-logger' },
-              { name: 'Get Expert Help', desc: 'Connect with advocates', icon: '🤝', route: '/matcher' }
+              { name: 'Progress Logger', desc: 'Track service delivery', icon: '📝', route: '/tools/progress-notes-logger' }
             ].map((tool, index) => (
               <Card
                 key={index}
@@ -259,54 +277,7 @@ export default function ParentDashboard() {
           </div>
         </div>
 
-        {/* Tool Modal */}
-        <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-          <DialogContent className="bg-[#2C2F48] border border-slate-600 max-w-4xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle className="text-xl font-semibold text-white">{selectedTool}</DialogTitle>
-            </DialogHeader>
-            
-            {selectedTool === "IEP Goal Generator" ? (
-              <IEPGoalGenerator />
-            ) : (
-              <div className="space-y-4">
-                <p className="text-sm text-slate-300">
-                  {selectedTool === "Ask AI About My Docs" 
-                    ? "Upload a document to ask questions about it" 
-                    : "This tool will help you with your child's IEP management."}
-                </p>
-                {selectedTool === "Ask AI About My Docs" && (
-                  <div>
-                    <Input 
-                      type="file" 
-                      accept=".pdf,.doc,.docx"
-                      onChange={(e) => setUpload(e.target.files?.[0] || null)}
-                      className="bg-[#3E4161] border-slate-500 text-white"
-                    />
-                    <p className="text-xs text-slate-400 mt-1">
-                      Upload PDF, DOC, or DOCX files (max 10MB)
-                    </p>
-                  </div>
-                )}
-                <div className="flex gap-2">
-                  <Button 
-                    onClick={handleSubmit}
-                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
-                  >
-                    {selectedTool === "Ask AI About My Docs" ? "Upload & Ask" : "Start Tool"}
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    onClick={() => setModalOpen(false)}
-                    className="border-slate-500 text-slate-300 hover:bg-slate-700"
-                  >
-                    Cancel
-                  </Button>
-                </div>
-              </div>
-            )}
-          </DialogContent>
-        </Dialog>
+
       </div>
     </div>
     </>
