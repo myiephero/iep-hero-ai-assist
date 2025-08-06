@@ -408,11 +408,17 @@ Use professional, supportive language that empowers the parent while being legal
         return res.status(400).json({ error: "Missing required fields" });
       }
 
+      // Generate a safe filename from displayName
+      const safeDisplayName = displayName?.trim() || 'Generated_Document';
+      const timestamp = new Date().getTime();
+      const filename = `${safeDisplayName.replace(/[^a-zA-Z0-9\-_\s]/g, '').replace(/\s+/g, '_')}_${timestamp}.txt`;
+      const originalName = `${safeDisplayName}.txt`;
+
       const documentData = {
         userId: user.id,
-        filename: `${displayName.replace(/[^a-zA-Z0-9]/g, '_')}.txt`,
-        originalName: `${displayName}.txt`,
-        displayName,
+        filename: filename,
+        originalName: originalName,
+        displayName: safeDisplayName,
         type,
         content,
         generatedBy,
