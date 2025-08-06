@@ -98,7 +98,7 @@ export default function AdvocacyReportGenerator() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `advocacy-report-${reportMetadata?.studentName?.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.txt`;
+    a.download = `advocacy-report-${reportMetadata?.studentName?.replace(/\s+/g, '-') || 'student'}-${new Date().toISOString().split('T')[0]}.txt`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -116,7 +116,7 @@ export default function AdvocacyReportGenerator() {
         content: generatedReport,
         type: "advocacy_report",
         generatedBy: "Advocacy Report Generator",
-        displayName: `Advocacy Report - ${reportMetadata?.studentName} - ${new Date().toLocaleDateString()}`,
+        displayName: `Advocacy Report - ${reportMetadata?.studentName || 'Student'} - ${new Date().toLocaleDateString()}`,
         parentDocumentId: null
       });
       
@@ -528,6 +528,79 @@ export default function AdvocacyReportGenerator() {
             </Form>
           </CardContent>
         </Card>
+
+        {/* Generated Report Display */}
+        {generatedReport && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <span className="flex items-center gap-2">
+                  <FileText className="h-5 w-5 text-green-600" />
+                  Generated Advocacy Report
+                </span>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={copyToClipboard}
+                    className="gap-2"
+                  >
+                    <Copy className="h-4 w-4" />
+                    Copy
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={downloadReport}
+                    className="gap-2"
+                  >
+                    <Download className="h-4 w-4" />
+                    Download
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setSavingToVault(true);
+                      saveToVaultMutation.mutate();
+                    }}
+                    disabled={savingToVault}
+                    className="gap-2"
+                  >
+                    {savingToVault ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
+                        Saving...
+                      </>
+                    ) : (
+                      <>
+                        <Save className="h-4 w-4" />
+                        Save to Vault
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="bg-slate-50 border rounded-lg p-4 max-h-96 overflow-y-auto">
+                <pre className="whitespace-pre-wrap text-sm text-slate-800 font-mono">
+                  {generatedReport}
+                </pre>
+              </div>
+              <div className="mt-4 flex justify-end">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={resetForm}
+                  className="gap-2"
+                >
+                  Generate Another Report
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );

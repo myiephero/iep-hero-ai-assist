@@ -222,6 +222,12 @@ function Router() {
           <AdvocacyReportGenerator />
         </AuthGuard>
       </Route>
+      
+      <Route path="/advocacy-report-generator">
+        <AuthGuard>
+          <AdvocacyReportGenerator />
+        </AuthGuard>
+      </Route>
       <Route path="/chat">
         <AuthGuard>
           <Chat />
