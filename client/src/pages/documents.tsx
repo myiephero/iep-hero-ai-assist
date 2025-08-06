@@ -374,12 +374,18 @@ PRIORITY LEVEL: ${analysisResult.priority || 'Low'}
                           View Analysis
                         </Button>
                       )}
-                      {doc.content && (
+                      {doc.content && !doc.analysisResult && (
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() => {
-                            setViewingAnalysis(doc.content);
+                            // For text content documents, display content as formatted text
+                            const contentToShow = {
+                              summary: doc.content,
+                              isTextContent: true,
+                              documentType: doc.generatedBy || 'Generated Content'
+                            };
+                            setViewingAnalysis(contentToShow);
                             setCurrentAnalysisDocument(doc);
                           }}
                           className="bg-blue-700 border-blue-500 text-white hover:bg-blue-600 hover:border-blue-400"
@@ -512,67 +518,82 @@ PRIORITY LEVEL: ${viewingAnalysis.priority || 'Low'}
           </DialogHeader>
           {viewingAnalysis && (
             <div className="space-y-6">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="text-center p-4 bg-slate-700 rounded-lg">
-                  <div className="text-3xl font-bold text-blue-400">{viewingAnalysis.overallScore}/5</div>
-                  <div className="text-sm text-slate-300">Overall Score</div>
+              {viewingAnalysis.isTextContent ? (
+                // Display text content for generated documents
+                <div>
+                  <div className="mb-4 p-3 bg-blue-700 rounded-lg">
+                    <h3 className="text-white font-semibold">Document Type: {viewingAnalysis.documentType}</h3>
+                  </div>
+                  <div className="text-slate-300 bg-slate-700 p-6 rounded-lg leading-relaxed whitespace-pre-line">
+                    {viewingAnalysis.summary}
+                  </div>
                 </div>
-                <div className="text-center p-4 bg-slate-700 rounded-lg">
-                  <div className="text-3xl font-bold text-emerald-400">{viewingAnalysis.complianceCheck?.ideaCompliance || 'N/A'}%</div>
-                  <div className="text-sm text-slate-300">IDEA Compliance</div>
+              ) : (
+                // Display structured analysis for analyzed documents
+                <div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="text-center p-4 bg-slate-700 rounded-lg">
+                      <div className="text-3xl font-bold text-blue-400">{viewingAnalysis.overallScore}/5</div>
+                      <div className="text-sm text-slate-300">Overall Score</div>
+                    </div>
+                    <div className="text-center p-4 bg-slate-700 rounded-lg">
+                      <div className="text-3xl font-bold text-emerald-400">{viewingAnalysis.complianceCheck?.ideaCompliance || 'N/A'}%</div>
+                      <div className="text-sm text-slate-300">IDEA Compliance</div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-semibold text-white mb-3">Summary</h3>
+                    <p className="text-slate-300 bg-slate-700 p-4 rounded-lg">{viewingAnalysis.summary}</p>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-semibold text-white mb-3">Strengths</h3>
+                    <ul className="space-y-2">
+                      {viewingAnalysis.strengths?.map((strength: string, index: number) => (
+                        <li key={index} className="flex items-start gap-2 text-slate-300">
+                          <span className="text-emerald-400 mt-1">✓</span>
+                          {strength}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-semibold text-white mb-3">Areas for Improvement</h3>
+                    <ul className="space-y-2">
+                      {viewingAnalysis.improvements?.map((improvement: string, index: number) => (
+                        <li key={index} className="flex items-start gap-2 text-slate-300">
+                          <span className="text-yellow-400 mt-1">!</span>
+                          {improvement}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-semibold text-white mb-3">Next Steps</h3>
+                    <ul className="space-y-2">
+                      {viewingAnalysis.nextSteps?.map((step: string, index: number) => (
+                        <li key={index} className="flex items-start gap-2 text-slate-300">
+                          <span className="text-blue-400 mt-1">→</span>
+                          {step}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div className="flex items-center justify-between p-4 bg-slate-700 rounded-lg">
+                    <span className="text-slate-300">Priority Level:</span>
+                    <Badge className={
+                      viewingAnalysis.priority === 'High' ? 'bg-red-600' :
+                      viewingAnalysis.priority === 'Medium' ? 'bg-yellow-600' : 'bg-green-600'
+                    }>
+                      {viewingAnalysis.priority || 'Low'}
+                    </Badge>
+                  </div>
                 </div>
-              </div>
-
-              <div>
-                <h3 className="text-lg font-semibold text-white mb-3">Summary</h3>
-                <p className="text-slate-300 bg-slate-700 p-4 rounded-lg">{viewingAnalysis.summary}</p>
-              </div>
-
-              <div>
-                <h3 className="text-lg font-semibold text-white mb-3">Strengths</h3>
-                <ul className="space-y-2">
-                  {viewingAnalysis.strengths?.map((strength: string, index: number) => (
-                    <li key={index} className="flex items-start gap-2 text-slate-300">
-                      <span className="text-emerald-400 mt-1">✓</span>
-                      {strength}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div>
-                <h3 className="text-lg font-semibold text-white mb-3">Areas for Improvement</h3>
-                <ul className="space-y-2">
-                  {viewingAnalysis.improvements?.map((improvement: string, index: number) => (
-                    <li key={index} className="flex items-start gap-2 text-slate-300">
-                      <span className="text-yellow-400 mt-1">!</span>
-                      {improvement}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div>
-                <h3 className="text-lg font-semibold text-white mb-3">Next Steps</h3>
-                <ul className="space-y-2">
-                  {viewingAnalysis.nextSteps?.map((step: string, index: number) => (
-                    <li key={index} className="flex items-start gap-2 text-slate-300">
-                      <span className="text-blue-400 mt-1">→</span>
-                      {step}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="flex items-center justify-between p-4 bg-slate-700 rounded-lg">
-                <span className="text-slate-300">Priority Level:</span>
-                <Badge className={
-                  viewingAnalysis.priority === 'High' ? 'bg-red-600' :
-                  viewingAnalysis.priority === 'Medium' ? 'bg-yellow-600' : 'bg-green-600'
-                }>
-                  {viewingAnalysis.priority || 'Low'}
-                </Badge>
-              </div>
+              )}
             </div>
           )}
         </DialogContent>
