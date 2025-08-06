@@ -1753,7 +1753,20 @@ Please provide a helpful, accurate answer based on the document content. If the 
   // Advocacy Report Generator API endpoint
   app.post("/api/generate-advocacy-report", requireAuth, async (req, res) => {
     try {
-      const { studentName, gradeLevel, disability, currentServices, concerns, requestedAction, reportType, timeline, additionalInfo } = req.body;
+      const { studentId, gradeLevel, disability, currentServices, concerns, requestedAction, reportType, timeline, additionalInfo } = req.body;
+      
+      // Get student information if studentId is provided
+      let studentName = '[Student Name]';
+      if (studentId) {
+        try {
+          const student = await storage.getStudentById(studentId);
+          if (student) {
+            studentName = `${student.firstName} ${student.lastName}`;
+          }
+        } catch (error) {
+          console.error('Error fetching student:', error);
+        }
+      }
 
       if (!process.env.OPENAI_API_KEY) {
         return res.status(503).json({ 
@@ -1842,9 +1855,9 @@ The report should be comprehensive yet concise, approximately 2-3 pages when pri
         success: true, 
         report: report,
         metadata: {
-          studentName,
-          reportType,
-          timeline,
+          studentName: studentName,
+          reportType: reportType,
+          timeline: timeline,
           generatedAt: new Date().toISOString()
         }
       });
