@@ -69,7 +69,7 @@ export default function Goals() {
   });
 
   // Fetch students for the dropdown
-  const { data: students = [] } = useQuery({
+  const { data: students = [] } = useQuery<Array<{id: string, firstName: string, lastName: string}>>({
     queryKey: ["/api/parent/students"],
     enabled: !!user && user.role === 'parent',
   });
@@ -155,7 +155,7 @@ export default function Goals() {
   useEffect(() => {
     if (preSelectedStudentId && students.length > 0) {
       // Check if the student exists
-      const studentExists = students.some((s: any) => s.id === preSelectedStudentId);
+      const studentExists = students.some((s) => s.id === preSelectedStudentId);
       if (studentExists && !isDialogOpen) {
         openNewDialog();
       }
@@ -239,7 +239,7 @@ export default function Goals() {
                               {students.length === 0 ? (
                                 <SelectItem value="_loading" disabled>Loading students...</SelectItem>
                               ) : (
-                                students.map((student: any) => (
+                                students.map((student) => (
                                   <SelectItem key={student.id} value={student.id}>
                                     {student.firstName} {student.lastName}
                                   </SelectItem>
