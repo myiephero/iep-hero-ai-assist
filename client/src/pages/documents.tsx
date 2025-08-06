@@ -355,7 +355,7 @@ PRIORITY LEVEL: ${analysisResult.priority || 'Low'}
                         variant="outline"
                         size="sm"
                         onClick={() => downloadDocument(doc.id, doc.originalName)}
-                        className="border-slate-400 text-slate-200 hover:bg-slate-600 hover:text-white"
+                        className="bg-slate-700 border-slate-500 text-white hover:bg-slate-600 hover:border-slate-400"
                       >
                         <Download className="w-4 h-4 mr-1" />
                         Download
@@ -368,7 +368,7 @@ PRIORITY LEVEL: ${analysisResult.priority || 'Low'}
                             setViewingAnalysis(doc.analysisResult);
                             setCurrentAnalysisDocument(doc);
                           }}
-                          className="border-emerald-400 text-emerald-200 hover:bg-emerald-600 hover:text-white"
+                          className="bg-emerald-700 border-emerald-500 text-white hover:bg-emerald-600 hover:border-emerald-400"
                         >
                           <Eye className="w-4 h-4 mr-1" />
                           View Analysis
@@ -382,7 +382,7 @@ PRIORITY LEVEL: ${analysisResult.priority || 'Low'}
                             setViewingAnalysis(doc.content);
                             setCurrentAnalysisDocument(doc);
                           }}
-                          className="border-blue-400 text-blue-200 hover:bg-blue-600 hover:text-white"
+                          className="bg-blue-700 border-blue-500 text-white hover:bg-blue-600 hover:border-blue-400"
                         >
                           <Eye className="w-4 h-4 mr-1" />
                           View Content

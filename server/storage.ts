@@ -749,6 +749,24 @@ export class DbStorage implements IStorage {
     await this.db.delete(documents).where(eq(documents.id, documentId));
   }
 
+  async updateDocumentName(documentId: string, displayName: string): Promise<Document> {
+    const result = await this.db
+      .update(documents)
+      .set({ displayName })
+      .where(eq(documents.id, documentId))
+      .returning();
+    return result[0];
+  }
+
+  async saveDocumentAnalysis(documentId: string, analysis: any): Promise<Document> {
+    const result = await this.db
+      .update(documents)
+      .set({ analysisResult: analysis })
+      .where(eq(documents.id, documentId))
+      .returning();
+    return result[0];
+  }
+
   // Events
   async getEventsByUserId(userId: string): Promise<Event[]> {
     return await this.db.select().from(events).where(eq(events.userId, userId));
