@@ -1,0 +1,62 @@
+import { useState } from 'react';
+import { supabase } from '@/supabaseClient';
+import { useAuth } from '@/contexts/AuthContext';
+
+export default function AdvocateMatcherForm() {
+  const { user } = useAuth();
+  const [form, setForm] = useState({
+    meeting_date: '',
+    contact_method: 'Zoom',
+    parent_availability: '',
+    concerns: '',
+    help_areas: [],
+    grade_level: '',
+    school_district: '',
+    document_urls: '',
+    assigned_advocate_id: ''
+  });
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleMultiChange = (e) => {
+    const options = [...e.target.options].filter((o) => o.selected).map((o) => o.value);
+    setForm((prev) => ({ ...prev, help_areas: options }));
+  };
+
+  const handleSubmit = async () => {
+    const { error } = await supabase.from('advocate_matches').insert({
+      parent_id: user.id,
+      ...form
+    });
+    if (!error) {
+      setSubmitted(true);
+    }
+  };
+
+  if (submitted) {
+    return <div className="p-6">✅ Submitted successfully. You'll hear from us shortly!</div>;
+  }
+
+  return (
+    <div className="p-6 grid gap-4 max-w-xl mx-auto">
+      <input type="date" name="meeting_date" onChange={handleChange} className="border p-2 rounded" />
+      <input type="text" name="parent_availability" placeholder="Parent availability" onChange={handleChange} className="border p-2 rounded" />
+      <input type="text" name="concerns" placeholder="Main concern" onChange={handleChange} className="border p-2 rounded" />
+      <select name="help_areas" multiple onChange={handleMultiChange} className="border p-2 rounded">
+        <option>Meeting Prep</option>
+        <option>Service Denial</option>
+        <option>Behavior Support</option>
+        <option>Accommodations</option>
+      </select>
+      <input type="text" name="grade_level" placeholder="Grade level" onChange={handleChange} className="border p-2 rounded" />
+      <input type="text" name="school_district" placeholder="School district" onChange={handleChange} className="border p-2 rounded" />
+      <input type="url" name="document_urls" placeholder="Paste IEP or files link" onChange={handleChange} className="border p-2 rounded" />
+
+      <button onClick={handleSubmit} className="bg-blue-600 text-white px-4 py-2 rounded">Submit</button>
+    </div>
+  );
+}
