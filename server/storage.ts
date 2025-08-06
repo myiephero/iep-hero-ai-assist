@@ -31,6 +31,7 @@ export interface IStorage {
   deleteDocument(documentId: string): Promise<void>;
   deleteDocuments(documentIds: string[], userId: string): Promise<number>;
   updateDocumentName(documentId: string, displayName: string): Promise<Document>;
+  updateDocument(documentId: string, updates: Partial<Document>): Promise<Document>;
   saveDocumentAnalysis(documentId: string, analysis: any): Promise<Document>;
   
   // Events
@@ -816,6 +817,15 @@ export class DbStorage implements IStorage {
     const result = await this.db
       .update(documents)
       .set({ displayName })
+      .where(eq(documents.id, documentId))
+      .returning();
+    return result[0];
+  }
+
+  async updateDocument(documentId: string, updates: Partial<Document>): Promise<Document> {
+    const result = await this.db
+      .update(documents)
+      .set(updates)
       .where(eq(documents.id, documentId))
       .returning();
     return result[0];
