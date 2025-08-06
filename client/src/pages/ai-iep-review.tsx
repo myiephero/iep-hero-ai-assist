@@ -47,11 +47,13 @@ export default function AIIEPReviewPage() {
 
       const response = await fetch('/api/review-iep', {
         method: 'POST',
-        body: formData
+        body: formData,
+        credentials: 'include' // Include session cookies for authentication
       });
 
       if (!response.ok) {
-        throw new Error('Failed to analyze IEP document');
+        const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+        throw new Error(errorData.message || 'Failed to analyze IEP document');
       }
 
       const data = await response.json();
