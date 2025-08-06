@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth } from '@/contexts/AuthContext';
 import { useLocation } from 'wouter';
 import IEPGoalGenerator from '@/components/IEPGoalGenerator';
 import { IEPStatusViewer } from '@/components/IEPStatusViewer';
@@ -71,9 +71,12 @@ const parentTools = [
 export default function ParentDashboard() {
   const { user } = useAuth();
   const [, setLocation] = useLocation();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedTool, setSelectedTool] = useState<string | null>(null);
+  const [upload, setUpload] = useState<File | null>(null);
 
   const displayUser = user || { username: "demo_parent", planStatus: "heroOffer" };
-  const isHeroPlan = displayUser.planStatus === 'heroOffer';
+  const isHeroPlan = (displayUser as any).planStatus === 'heroOffer';
 
   const openToolModal = (tool: string) => {
     if (tool === "IEP Goal Generator") {
@@ -136,7 +139,7 @@ export default function ParentDashboard() {
       <div className="min-h-screen bg-gradient-to-b from-[#1A1B2E] to-[#2C2F48] px-6 py-10 text-white">
       <div className="max-w-5xl mx-auto">
         <h1 className="text-3xl font-bold mb-2 text-white">
-          Welcome back, {displayUser.username}!
+          Welcome back, {(displayUser as any).username}!
         </h1>
         {isHeroPlan && (
           <div className="flex items-center gap-2 mb-4">

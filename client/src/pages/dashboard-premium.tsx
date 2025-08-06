@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/contexts/AuthContext";
 import { useLocation } from "wouter";
 
 
@@ -30,7 +30,7 @@ export default function DashboardAdvocate() {
   const { user } = useAuth();
 
   const displayUser = user || { email: "advocate@demo.com", planStatus: "heroOffer", username: "demo_advocate", role: "advocate" };
-  const isHeroPlan = displayUser.planStatus === 'heroOffer';
+  const isHeroPlan = (displayUser as any).planStatus === 'heroOffer';
 
   const openToolModal = (tool: string) => {
     // Navigate directly to specific tool pages for all Hero Plan tools
@@ -85,7 +85,7 @@ export default function DashboardAdvocate() {
         {/* Welcome Section */}
         <div className="pt-8 pb-6">
           <h1 className="text-2xl font-bold mb-2 text-white">
-            Welcome, {displayUser.username || 'Professional'}!
+            Welcome, {(displayUser as any).username || 'Professional'}!
           </h1>
           <p className="text-slate-300 mb-6">
             Access your complete suite of AI-powered IEP management tools
