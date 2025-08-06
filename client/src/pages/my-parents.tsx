@@ -50,8 +50,16 @@ export default function MyParentsPage() {
     mutationFn: async (data: AddClientFormData) => {
       const response = await apiRequest("POST", "/api/advocate/clients", data);
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Failed to add client");
+        try {
+          const error = await response.json();
+          throw new Error(error.message || error.error || "Failed to add client");
+        } catch (jsonError) {
+          // If JSON parsing fails, it's likely an authentication redirect
+          if (response.status === 401) {
+            throw new Error("Please log in as an advocate to add clients");
+          }
+          throw new Error(`Server error: ${response.status} ${response.statusText}`);
+        }
       }
       return response.json();
     },
