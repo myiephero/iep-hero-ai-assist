@@ -127,6 +127,11 @@ function Router() {
           <GoalGenerator />
         </AuthGuard>
       </Route>
+      <Route path="/tools/goals">
+        <AuthGuard>
+          <GoalGenerator />
+        </AuthGuard>
+      </Route>
       <Route path="/tools/ai-iep-review">
         <AuthGuard>
           <AIIEPReviewPage />
