@@ -8,6 +8,7 @@ interface AuthContextType {
   signUp: (email: string, password: string, userData?: any) => Promise<void>;
   signOut: () => Promise<void>;
   loading: boolean;
+  getUserRole: () => string;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -95,12 +96,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const getUserRole = () => {
+    if (!user) return 'guest';
+    return user.user_metadata?.role || user.app_metadata?.role || 'parent';
+  };
+
   const value = {
     user,
     signIn,
     signUp,
     signOut,
     loading,
+    getUserRole,
   };
 
   return (

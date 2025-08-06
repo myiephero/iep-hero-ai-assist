@@ -38,6 +38,7 @@ import { MobileNavigation } from "@/components/MobileNavigation";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
 import Navbar from "@/components/layout/navbar";
 
+// Simplified AuthGuard - kept for backward compatibility
 function AuthGuard({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
 
@@ -57,10 +58,8 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 }
 
 function DashboardRouter() {
-  const { user } = useAuth();
-  
-  // For Supabase users, check user metadata for role
-  const userRole = user?.user_metadata?.role || user?.app_metadata?.role || 'parent';
+  const { getUserRole } = useAuth();
+  const userRole = getUserRole();
   
   console.log('🔄 Dashboard Router - User role:', userRole);
   

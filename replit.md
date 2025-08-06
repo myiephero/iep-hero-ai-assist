@@ -32,6 +32,7 @@ The backend is a **REST API** built with **Express.js** and TypeScript.
 
 ## System Design Choices
 - **AI Integration**: Deep integration with **OpenAI GPT-4o** for features like AI-powered document analysis, IEP goal generation, smart letter generation, and meeting prep sheet generation. AI output validation requires specific keywords.
+- **Authentication System**: **Supabase Auth** with graceful fallback to demo authentication for development. Supports role-based access control (Parent, Advocate, Professional) with protected routes and user metadata management.
 - **Subscription Management**: Supports multiple subscription tiers (Free, Hero Plan) with conditional tool access and a clear signup flow showcasing pricing transparency. A plan status tracking system visually indicates user subscription levels.
 - **Communication & Notifications**: Integrates **Resend** for email notifications (e.g., welcome emails, advocate notifications). Features an Advocate Matcher MVP with automated email notifications and real-time Slack integration for team alerts.
 - **Chat System**: Includes a comprehensive chat system with real-time message updates, conversation management, and user directory.
