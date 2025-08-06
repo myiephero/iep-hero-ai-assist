@@ -274,15 +274,16 @@ export default function SmartLetterGenerator() {
 
     setIsSaving(true);
     try {
-      // Create a document in the vault
+      // Use the documents/generate endpoint for AI-generated content
       const documentData = {
-        filename: `${currentTemplate.title.replace(/\s+/g, '_')}_${Date.now()}.txt`,
-        originalName: `${currentTemplate.title} - ${new Date().toLocaleDateString()}.txt`,
+        content: generatedLetter,
         type: 'letter',
-        content: generatedLetter
+        generatedBy: 'Smart Letter Generator',
+        displayName: `${currentTemplate.title} - ${new Date().toLocaleDateString()}`,
+        parentDocumentId: null
       };
 
-      await apiRequest('POST', '/api/documents', documentData);
+      await apiRequest('POST', '/api/documents/generate', documentData);
 
       toast({
         title: "Saved to Vault!",
