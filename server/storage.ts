@@ -387,6 +387,18 @@ export class MemStorage implements IStorage {
     this.documents.delete(documentId);
   }
 
+  async deleteDocuments(documentIds: string[], userId: string): Promise<number> {
+    let deletedCount = 0;
+    for (const documentId of documentIds) {
+      const document = this.documents.get(documentId);
+      if (document && document.userId === userId) {
+        this.documents.delete(documentId);
+        deletedCount++;
+      }
+    }
+    return deletedCount;
+  }
+
   async updateDocumentName(documentId: string, displayName: string): Promise<Document> {
     const document = this.documents.get(documentId);
     if (!document) {
@@ -403,6 +415,16 @@ export class MemStorage implements IStorage {
       throw new Error("Document not found");
     }
     const updatedDocument = { ...document, analysisResult: analysis };
+    this.documents.set(documentId, updatedDocument);
+    return updatedDocument;
+  }
+
+  async updateDocument(documentId: string, updates: Partial<Document>): Promise<Document> {
+    const document = this.documents.get(documentId);
+    if (!document) {
+      throw new Error("Document not found");
+    }
+    const updatedDocument = { ...document, ...updates };
     this.documents.set(documentId, updatedDocument);
     return updatedDocument;
   }
