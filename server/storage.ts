@@ -56,6 +56,10 @@ export interface IStorage {
   getIEPDraftsByUserId(userId: string): Promise<IEPDraft[]>;
   createIEPDraft(userId: string, draft: InsertIEPDraft): Promise<IEPDraft>;
   
+  // Enhanced Messages
+  getConversationsByUserId(userId: string): Promise<any[]>;
+  getMessagesBetweenUsers(userId1: string, userId2: string): Promise<Message[]>;
+  
   // Advocate Matches
   getAdvocateMatchesByParentId(parentId: string): Promise<AdvocateMatch[]>;
   getAdvocateMatchesByAdvocateId(advocateId: string): Promise<AdvocateMatch[]>;
@@ -950,6 +954,53 @@ export class DbStorage implements IStorage {
 
   async deleteAdvocateClient(clientId: string): Promise<void> {
     await this.db.delete(advocateClients).where(eq(advocateClients.id, clientId));
+  }
+
+  // Enhanced Messages
+  async getConversationsByUserId(userId: string): Promise<any[]> {
+    // Get all users who have exchanged messages with current user
+    const conversations = await this.db
+      .select({
+        id: users.id,
+        username: users.username,
+        email: users.email,
+        role: users.role,
+        lastMessageTime: messages.sentAt,
+        lastMessage: messages.content
+      })
+      .from(messages)
+      .innerJoin(users, eq(
+        sql`CASE 
+          WHEN ${messages.senderId} = ${userId} THEN ${messages.receiverId}
+          ELSE ${messages.senderId}
+        END`,
+        users.id
+      ))
+      .where(
+        sql`${messages.senderId} = ${userId} OR ${messages.receiverId} = ${userId}`
+      )
+      .orderBy(sql`${messages.sentAt} DESC`);
+
+    // Remove duplicates and keep most recent message per conversation
+    const uniqueConversations = new Map();
+    conversations.forEach(conv => {
+      if (!uniqueConversations.has(conv.id)) {
+        uniqueConversations.set(conv.id, conv);
+      }
+    });
+
+    return Array.from(uniqueConversations.values());
+  }
+
+  async getMessagesBetweenUsers(userId1: string, userId2: string): Promise<Message[]> {
+    return await this.db
+      .select()
+      .from(messages)
+      .where(
+        sql`(${messages.senderId} = ${userId1} AND ${messages.receiverId} = ${userId2}) OR 
+            (${messages.senderId} = ${userId2} AND ${messages.receiverId} = ${userId1})`
+      )
+      .orderBy(messages.sentAt);
   }
 }
 
