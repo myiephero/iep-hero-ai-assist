@@ -266,11 +266,27 @@ export default function DashboardAdvocate() {
             </CardContent>
           </Card>
           <Card className="bg-[#3E4161]/70 border-slate-600 hover:bg-[#4A4E76] cursor-pointer transition-colors"
-                onClick={() => setLocation('/iep-goal-generator')}>
+                onClick={() => setLocation('/tools/iep-goal-generator')}>
             <CardContent className="p-4 text-center">
               <div className="text-2xl mb-2">🎯</div>
               <div className="text-white font-semibold">Goal Generator</div>
               <div className="text-slate-300 text-sm">Create Goals</div>
+            </CardContent>
+          </Card>
+          <Card className="bg-[#3E4161]/70 border-slate-600 hover:bg-[#4A4E76] cursor-pointer transition-colors"
+                onClick={() => setLocation('/my-students')}>
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl mb-2">🧑‍🎓</div>
+              <div className="text-white font-semibold">My Students</div>
+              <div className="text-slate-300 text-sm">Manage Cases</div>
+            </CardContent>
+          </Card>
+          <Card className="bg-[#3E4161]/70 border-slate-600 hover:bg-[#4A4E76] cursor-pointer transition-colors"
+                onClick={() => setLocation('/tools/smart-letter-generator')}>
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl mb-2">📝</div>
+              <div className="text-white font-semibold">Smart Letters</div>
+              <div className="text-slate-300 text-sm">Generate Letters</div>
             </CardContent>
           </Card>
           <Card className="bg-[#3E4161]/70 border-slate-600 hover:bg-[#4A4E76] cursor-pointer transition-colors"
