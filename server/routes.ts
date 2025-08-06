@@ -19,6 +19,7 @@ import fs from "fs";
 import { Resend } from "resend";
 import { randomUUID } from "crypto";
 import { analyzeIEPDocument, generateIEPGoals, generateIEPGoalsFromArea } from "./ai-document-analyzer";
+import { analyzeDocumentForTagging } from "./document-tagger";
 import OpenAI from "openai";
 
 if (!process.env.STRIPE_SECRET_KEY) {
