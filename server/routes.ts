@@ -6,7 +6,7 @@ import { registerShareMemoryRoutes } from "./routes/share-memory";
 import { registerTestMemoryRoutes } from "./routes/test-memory";
 import studentsRoutes from "./routes/students";
 import advocateClientsRoutes from "./routes/advocate-clients";
-import { insertUserSchema, insertGoalSchema, insertDocumentSchema, insertEventSchema, insertMessageSchema } from "@shared/schema";
+import { insertUserSchema, insertGoalSchema, insertDocumentSchema, insertEventSchema, insertMessageSchema, insertStudentSchema } from "@shared/schema";
 import bcrypt from "bcrypt";
 import session from "express-session";
 import pgSession from "connect-pg-simple";
@@ -1004,7 +1004,8 @@ Focus on functional skills that will help the student succeed in their education
 
       const { type, description } = req.body;
       
-      const document = await storage.createDocument(user.id, {
+      const document = await storage.createDocument({
+        userId: user.id,
         filename: req.file.filename,
         originalName: req.file.originalname,
         type: type || 'other',
@@ -1067,7 +1068,7 @@ Focus on functional skills that will help the student succeed in their education
       
       console.log(`✅ Analysis completed for ${document.originalName}:`, { 
         overallScore: analysis.overallScore, 
-        complianceScore: analysis.complianceScore,
+        complianceCheck: analysis.complianceCheck,
         priority: analysis.priority 
       });
       

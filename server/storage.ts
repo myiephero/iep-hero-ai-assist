@@ -609,6 +609,39 @@ export class MemStorage implements IStorage {
   async deleteAdvocateClient(clientId: string): Promise<void> {
     this.advocateClients.delete(clientId);
   }
+
+  // Missing methods for LocalDbStorage compatibility
+  async saveDocumentAnalysis(documentId: string, analysis: any): Promise<Document> {
+    // For local storage, we'll update the document in memory
+    const doc = this.documents.get(documentId);
+    if (doc) {
+      doc.analysisResult = analysis;
+      this.documents.set(documentId, doc);
+      return doc;
+    }
+    throw new Error(`Document ${documentId} not found`);
+  }
+
+  async getIEPDraftsByUserId(userId: string): Promise<any[]> {
+    // Return empty array for local storage
+    return [];
+  }
+
+  async createIEPDraft(userId: string, draft: any): Promise<any> {
+    const id = randomUUID();
+    const newDraft = { ...draft, id, userId, createdAt: new Date() };
+    return newDraft;
+  }
+
+  async getConversationsByUserId(userId: string): Promise<any[]> {
+    // Return empty array for local storage
+    return [];
+  }
+
+  async getMessagesBetweenUsers(userId1: string, userId2: string): Promise<any[]> {
+    // Return empty array for local storage
+    return [];
+  }
 }
 
 // Database Storage Implementation using Drizzle ORM
