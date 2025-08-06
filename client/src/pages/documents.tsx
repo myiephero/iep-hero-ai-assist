@@ -49,9 +49,10 @@ export default function Documents() {
     enabled: !!studentId,
   });
 
-  // Query all students for assignment functionality
+  // Query all students for assignment functionality - use advocate/students for advocates
   const { data: allStudents = [] } = useQuery({
-    queryKey: ["/api/students"],
+    queryKey: user?.role === 'advocate' ? ["/api/advocate/students"] : ["/api/students"],
+    enabled: !!user,
   });
 
   // Filter documents by student if specified and add search functionality
@@ -558,15 +559,23 @@ PRIORITY LEVEL: ${analysisResult.priority || 'Low'}
                       {assigningStudent === doc.id ? (
                         <div className="flex items-center gap-2">
                           <Select value={selectedStudentId} onValueChange={setSelectedStudentId}>
-                            <SelectTrigger className="w-40 bg-slate-700 border-slate-500 text-white">
+                            <SelectTrigger className="w-48 bg-slate-700 border-slate-600 text-white">
                               <SelectValue placeholder="Select student" />
                             </SelectTrigger>
-                            <SelectContent>
-                              {allStudents.map((student: any) => (
-                                <SelectItem key={student.id} value={student.id}>
-                                  {student.firstName} {student.lastName}
-                                </SelectItem>
-                              ))}
+                            <SelectContent className="bg-slate-700 border-slate-600">
+                              {allStudents.length === 0 ? (
+                                <div className="p-2 text-slate-400 text-sm">No students found</div>
+                              ) : (
+                                allStudents.map((student: any) => (
+                                  <SelectItem 
+                                    key={student.id} 
+                                    value={student.id}
+                                    className="text-white hover:bg-slate-600"
+                                  >
+                                    {student.firstName} {student.lastName}
+                                  </SelectItem>
+                                ))
+                              )}
                             </SelectContent>
                           </Select>
                           <Button
