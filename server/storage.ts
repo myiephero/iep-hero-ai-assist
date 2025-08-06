@@ -68,6 +68,7 @@ export interface IStorage {
   // Students
   getStudentsByParentId(parentId: string): Promise<Student[]>;
   getStudentsByAdvocateId(advocateId: string): Promise<Student[]>;
+  getStudentById(studentId: string): Promise<Student | undefined>;
   createStudent(student: InsertStudent): Promise<Student>;
   updateStudent(studentId: string, updates: Partial<InsertStudent>): Promise<Student>;
   deleteStudent(studentId: string): Promise<void>;
@@ -528,6 +529,10 @@ export class MemStorage implements IStorage {
     return Array.from(this.students.values()).filter(student => student.advocateId === advocateId);
   }
 
+  async getStudentById(studentId: string): Promise<Student | undefined> {
+    return this.students.get(studentId);
+  }
+
   async createStudent(student: InsertStudent): Promise<Student> {
     const id = randomUUID();
     const newStudent: Student = {
@@ -912,6 +917,11 @@ export class DbStorage implements IStorage {
 
   async getStudentsByAdvocateId(advocateId: string): Promise<Student[]> {
     return await this.db.select().from(students).where(eq(students.advocateId, advocateId));
+  }
+
+  async getStudentById(studentId: string): Promise<Student | undefined> {
+    const result = await this.db.select().from(students).where(eq(students.id, studentId));
+    return result[0] || undefined;
   }
 
   async createStudent(student: InsertStudent): Promise<Student> {

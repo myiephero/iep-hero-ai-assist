@@ -398,6 +398,56 @@ Use professional, supportive language that empowers the parent while being legal
     }
   });
 
+  // Student management routes
+  app.get("/api/parent/students", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      const students = await storage.getStudentsByParentId(user.id);
+      res.json(students);
+    } catch (error: any) {
+      console.error('Error fetching parent students:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.get("/api/advocate/students", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      const students = await storage.getStudentsByAdvocateId(user.id);
+      res.json(students);
+    } catch (error: any) {
+      console.error('Error fetching advocate students:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/students", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      const studentData = {
+        ...req.body,
+        parentId: user.role === 'parent' ? user.id : req.body.parentId,
+        advocateId: user.role === 'advocate' ? user.id : req.body.advocateId
+      };
+      const student = await storage.createStudent(studentData);
+      res.json(student);
+    } catch (error: any) {
+      console.error('Error creating student:', error);
+      res.status(400).json({ message: error.message });
+    }
+  });
+
+  app.get("/api/students/:id/documents", requireAuth, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const documents = await storage.getDocumentsByStudentId(id);
+      res.json(documents);
+    } catch (error: any) {
+      console.error('Error fetching student documents:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   // Generated Documents API - Save AI-generated content to document vault
   app.post("/api/documents/generate", requireAuth, async (req, res) => {
     try {
@@ -1318,6 +1368,22 @@ Be supportive and parent-friendly in your language while maintaining accuracy.`;
 
   // Register student management routes
   app.use("/api/students", requireAuth, studentsRoutes);
+  
+  // Parent students endpoint - get students for parent
+  app.get("/api/parent/students", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      if (user.role !== 'parent') {
+        return res.status(403).json({ message: 'Access denied: Parents only' });
+      }
+      
+      const students = await storage.getStudentsByParentId(user.id);
+      res.json(students);
+    } catch (error: any) {
+      console.error('Error fetching parent students:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
   
   // Register advocate client management routes
   app.use("/api/advocate/clients", requireAuth, advocateClientsRoutes);
