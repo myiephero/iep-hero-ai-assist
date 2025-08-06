@@ -10,7 +10,7 @@ import { Loader2, MessageCircle, FileText, Brain, ArrowLeft } from "lucide-react
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { Link } from "wouter";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Document {
   id: string;

@@ -12,7 +12,7 @@ import { format } from "date-fns";
 import type { Document } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Documents() {
   const [showFileUpload, setShowFileUpload] = useState(false);
