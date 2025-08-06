@@ -31,18 +31,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const checkAuth = async () => {
     try {
+      console.log('🔄 Checking authentication status...');
       const response = await fetch('/api/current-user', {
         credentials: 'include',
       });
       
+      console.log('🔄 Auth check response status:', response.status);
+      
       if (response.ok) {
         const userData = await response.json();
+        console.log('✅ User authenticated:', userData.user);
         setUser(userData.user);
       } else {
+        console.log('❌ User not authenticated');
         setUser(null);
       }
     } catch (error) {
-      console.error('Auth check failed:', error);
+      console.error('❌ Auth check failed:', error);
       setUser(null);
     } finally {
       setLoading(false);
@@ -51,6 +56,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signIn = async (email: string, password: string) => {
     try {
+      console.log('🔄 Attempting login for:', email);
       const response = await fetch('/api/login', {
         method: 'POST',
         headers: {
@@ -60,15 +66,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         credentials: 'include',
       });
 
+      console.log('🔄 Login response status:', response.status);
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Login failed');
       }
 
       const userData = await response.json();
+      console.log('✅ Login successful, user data:', userData);
       setUser(userData.user);
+      
+      // Force a re-check of auth status after login with longer delay
+      setTimeout(() => {
+        console.log('🔄 Re-checking auth after login...');
+        checkAuth();
+      }, 500);
+      
     } catch (error: any) {
-      console.error('Sign in error:', error);
+      console.error('❌ Sign in error:', error);
       throw error;
     }
   };
