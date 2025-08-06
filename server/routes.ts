@@ -1019,6 +1019,33 @@ Focus on functional skills that will help the student succeed in their education
     }
   });
 
+  // Assign document to student
+  app.patch("/api/documents/:documentId/assign", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      const { documentId } = req.params;
+      const { studentId } = req.body;
+
+      if (!studentId) {
+        return res.status(400).json({ message: 'Student ID is required' });
+      }
+
+      // Update document with student assignment
+      const updatedDocument = await storage.updateDocument(documentId, { 
+        studentId,
+        userId: user.id 
+      });
+
+      if (!updatedDocument) {
+        return res.status(404).json({ message: 'Document not found' });
+      }
+
+      res.json(updatedDocument);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   // AI Document Analysis route
   app.post("/api/documents/:id/analyze", requireAuth, async (req, res) => {
     try {
