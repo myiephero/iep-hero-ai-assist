@@ -1346,69 +1346,6 @@ The report should be comprehensive yet concise, approximately 2-3 pages when pri
     }
   });
 
-  // IEP Goals Generation endpoint
-  app.post("/api/generate-iep-goals", async (req, res) => {
-    try {
-      const { diagnosis } = req.body;
-
-      if (!diagnosis) {
-        return res.status(400).json({ error: "Diagnosis is required" });
-      }
-
-      if (!process.env.OPENAI_API_KEY) {
-        return res.status(503).json({ 
-          error: "AI service temporarily unavailable. Please ensure OPENAI_API_KEY is configured." 
-        });
-      }
-
-      const prompt = `You are an expert special education professional. Based on the following diagnosis: "${diagnosis}", please generate comprehensive IEP goals and accommodations.
-
-Please provide:
-1. 3-5 specific, measurable IEP goals (using SMART criteria)
-2. Appropriate accommodations and modifications
-3. Suggested services and support
-
-Format the response in a clear, professional manner that could be used in an actual IEP document.
-
-Diagnosis: ${diagnosis}`;
-
-      const openai = new OpenAI({
-        apiKey: process.env.OPENAI_API_KEY,
-      });
-
-      const completion = await openai.chat.completions.create({
-        model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-        messages: [
-          {
-            role: "system",
-            content: "You are an expert special education professional who creates comprehensive, evidence-based IEP goals and accommodations."
-          },
-          {
-            role: "user",
-            content: prompt
-          }
-        ],
-        max_tokens: 2000,
-        temperature: 0.7,
-      });
-
-      const suggestions = completion.choices[0].message.content;
-
-      res.json({ suggestions });
-    } catch (error) {
-      console.error("Error generating IEP goals:", error);
-      res.status(500).json({ error: "Failed to generate IEP goals" });
-    }
-  });
-
-  // Register messaging routes
-  try {
-    const { registerMessagingRoutes } = await import('./routes/messaging');
-    registerMessagingRoutes(app);
-  } catch (error) {
-    console.log('ℹ️ Messaging routes not loaded (development mode)');
-  }
-
   const httpServer = createServer(app);
 
   return httpServer;

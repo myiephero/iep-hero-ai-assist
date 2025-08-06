@@ -174,28 +174,22 @@ export default function Documents() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50/50">
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Clean Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center">
-                <FileText className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-semibold text-gray-900">Document Vault</h1>
-                <p className="text-gray-600">Manage Files</p>
-              </div>
-            </div>
-            <Button 
-              onClick={() => setShowFileUpload(true)}
-              className="bg-blue-500 hover:bg-blue-600 text-white h-10 px-4 rounded-lg font-medium"
-            >
-              <Upload className="w-4 h-4 mr-2" />
-              Upload Document
-            </Button>
+    <div className="min-h-screen bg-gradient-to-b from-[#1A1B2E] to-[#2C2F48] text-white">
+
+
+      <div className="p-6">
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h2 className="text-2xl font-bold text-white mb-2">Document Vault</h2>
+            <p className="text-slate-300">Securely store and analyze your IEP documents</p>
           </div>
+          <Button 
+            onClick={() => setShowFileUpload(true)}
+            className="bg-blue-600 hover:bg-blue-700 text-white"
+          >
+            <Upload className="w-4 h-4 mr-2" />
+            Upload Document
+          </Button>
         </div>
 
         {isLoading ? (
@@ -205,12 +199,12 @@ export default function Documents() {
         ) : (
           <div className="grid gap-4">
             {displayDocuments.map((doc) => (
-              <Card key={doc.id} className="bg-white border-0 shadow-sm rounded-xl hover:shadow-md transition-all">
+              <Card key={doc.id} className="bg-[#3E4161] border-slate-600 hover:bg-[#4A4E76] transition-colors">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                      <div className="p-3 bg-gray-100 rounded-lg">
-                        <FileText className="w-8 h-8 text-gray-600" />
+                      <div className="p-3 bg-slate-700 rounded-lg">
+                        <FileText className="w-8 h-8 text-blue-400" />
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">

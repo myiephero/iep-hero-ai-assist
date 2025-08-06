@@ -85,60 +85,56 @@ export default function AIIEPReviewPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50/50">
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Clean Header */}
+    <div className="min-h-screen bg-gradient-to-b from-[#f2f7fd] to-[#eaf0f8] py-8">
+      <div className="max-w-4xl mx-auto px-6">
+        {/* Header with Back Button */}
         <div className="mb-8">
           <Link href="/dashboard-parent">
-            <Button variant="ghost" size="sm" className="mb-6 text-gray-600 hover:text-gray-900 hover:bg-white">
+            <Button variant="ghost" className="mb-4 text-slate-600 hover:text-slate-900">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Dashboard
             </Button>
           </Link>
           
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 bg-pink-500 rounded-lg flex items-center justify-center">
-              <CheckCircle className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-semibold text-gray-900">AI IEP Review</h1>
-              <p className="text-gray-600">Analyze IEPs</p>
-            </div>
-          </div>
+          <h1 className="text-3xl font-bold mb-3 text-slate-900">AI IEP Review</h1>
+          <p className="text-lg text-slate-600">
+            Upload your child's IEP document for a comprehensive AI-powered analysis of strengths, weaknesses, and compliance.
+          </p>
         </div>
 
-        {/* Clean Upload Section */}
-        <Card className="bg-white border-0 shadow-sm rounded-xl mb-8">
-          <CardContent className="p-8">
+        {/* Upload Section */}
+        <Card className="bg-white shadow-sm border border-slate-200 mb-8">
+          <CardContent className="p-6">
             <div className="space-y-6">
-              <div className="space-y-3">
-                <label htmlFor="iep-file" className="text-sm font-medium text-gray-700">
+              <div>
+                <label htmlFor="iep-file" className="block text-sm font-medium text-slate-700 mb-2">
                   Upload IEP Document
                 </label>
-                <div className="space-y-4">
+                <div className="flex items-center gap-4">
                   <Input
                     id="iep-file"
                     type="file"
                     accept=".pdf,.doc,.docx"
                     onChange={handleFileChange}
-                    className="h-12 border-gray-200 focus:border-blue-400 focus:ring-blue-100"
+                    className="flex-1 border-slate-300 focus:border-blue-500 focus:ring-blue-500"
                   />
                   {file && (
-                    <div className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
+                    <div className="flex items-center gap-2 text-sm text-slate-600">
                       <FileText className="w-4 h-4" />
-                      <span className="font-medium">{file.name}</span>
+                      {file.name}
                     </div>
                   )}
-                  <p className="text-xs text-gray-500">
-                    Supported formats: PDF, DOC, DOCX (max 10MB)
-                  </p>
                 </div>
+                <p className="text-xs text-slate-500 mt-2">
+                  Supported formats: PDF, DOC, DOCX (max 10MB)
+                </p>
               </div>
 
               <Button 
                 disabled={loading || !file} 
                 onClick={submitForReview}
-                className="w-full bg-blue-500 hover:bg-blue-600 text-white h-12 font-medium rounded-lg transition-colors"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 text-lg"
+                size="lg"
               >
                 {loading ? (
                   <>
