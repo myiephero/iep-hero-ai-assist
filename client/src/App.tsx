@@ -16,6 +16,7 @@ import AIIEPReviewPage from "@/pages/ai-iep-review";
 import AskAiAboutDocs from "@/pages/ask-ai-about-docs";
 import GoalGenerator from "@/pages/goal-generator";
 import SimpleAdvocateMatcherForm from "@/pages/simple-advocate-matcher";
+import Messages from "@/pages/messages";
 import ProgressAnalyzer from "@/pages/progress-analyzer";
 import MeetingPrep from "@/pages/meeting-prep";
 import SmartLetterGenerator from "@/pages/smart-letter-generator";
@@ -141,6 +142,11 @@ function Router() {
       <Route path="/matcher">
         <AuthGuard>
           <SimpleAdvocateMatcherForm />
+        </AuthGuard>
+      </Route>
+      <Route path="/messages">
+        <AuthGuard>
+          <Messages />
         </AuthGuard>
       </Route>
       <Route path="/tools/ai-iep-review">

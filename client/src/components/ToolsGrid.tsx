@@ -21,9 +21,9 @@ const tools = [
   },
   {
     title: "Messages",
-    description: "Chat with your advocate",
+    description: "Secure messaging with your advocate",
     icon: "💬",
-    route: "/chat"
+    route: "/messages"
   },
   {
     title: "Progress Notes",

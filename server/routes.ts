@@ -708,6 +708,56 @@ Focus on functional skills that will help the student succeed in their education
     }
   });
 
+  // Messages routes
+  app.get("/api/conversations", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      
+      // Get all users who have exchanged messages with current user
+      const conversations = await storage.getConversationsByUserId(user.id);
+      res.json(conversations);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.get("/api/messages/:recipientId", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      const { recipientId } = req.params;
+      
+      const messages = await storage.getMessagesBetweenUsers(user.id, recipientId);
+      res.json(messages);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/messages", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      const { receiverId, content } = req.body;
+      
+      if (!receiverId || !content) {
+        return res.status(400).json({ message: 'Receiver ID and content are required' });
+      }
+
+      const message = await storage.createMessage({
+        senderId: user.id,
+        receiverId: receiverId,
+        content: content.trim(),
+        messageType: 'text',
+        priority: 'normal',
+        read: false,
+        archived: false
+      });
+      
+      res.json(message);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  });
+
   app.post("/api/goals", requireAuth, async (req, res) => {
     try {
       const user = req.user as any;
