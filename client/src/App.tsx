@@ -36,6 +36,7 @@ import Pricing from "@/pages/pricing";
 import Chat from "@/pages/chat";
 import MyStudents from "@/pages/my-students";
 import MyParents from "@/pages/my-parents";
+import AdvocateStudents from "@/pages/advocate-students";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 import { MobileNavigation } from "@/components/MobileNavigation";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
@@ -234,6 +235,11 @@ function Router() {
       <Route path="/my-parents">
         <AuthGuard>
           <MyParents />
+        </AuthGuard>
+      </Route>
+      <Route path="/advocate-students">
+        <AuthGuard>
+          <AdvocateStudents />
         </AuthGuard>
       </Route>
       <Route path="/">
