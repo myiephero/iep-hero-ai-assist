@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type Goal, type InsertGoal, type Document, type InsertDocument, type Event, type InsertEvent, type Message, type InsertMessage, type SharedMemory, type InsertSharedMemory, type ProgressNote, type InsertProgressNote, type CommunicationLog, type InsertCommunicationLog, type AdvocateMatch, type InsertAdvocateMatch, type Student, type InsertStudent, type AdvocateClient, type InsertAdvocateClient, users, iepGoals, documents, events, messages, sharedMemories, progressNotes, communicationLogs, advocateMatches, students, advocateClients } from "@shared/schema";
+import { type User, type InsertUser, type Goal, type InsertGoal, type Document, type InsertDocument, type Event, type InsertEvent, type Message, type InsertMessage, type SharedMemory, type InsertSharedMemory, type ProgressNote, type InsertProgressNote, type CommunicationLog, type InsertCommunicationLog, type AdvocateMatch, type InsertAdvocateMatch, type Student, type InsertStudent, type AdvocateClient, type InsertAdvocateClient, type IEPDraft, type InsertIEPDraft, users, iepGoals, documents, events, messages, sharedMemories, progressNotes, communicationLogs, advocateMatches, students, advocateClients, iepDrafts } from "@shared/schema";
 import { randomUUID } from "crypto";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
@@ -51,6 +51,10 @@ export interface IStorage {
   // Communication Logs
   getCommunicationLogsByUserId(userId: string): Promise<CommunicationLog[]>;
   createCommunicationLog(userId: string, log: InsertCommunicationLog): Promise<CommunicationLog>;
+  
+  // IEP Drafts
+  getIEPDraftsByUserId(userId: string): Promise<IEPDraft[]>;
+  createIEPDraft(userId: string, draft: InsertIEPDraft): Promise<IEPDraft>;
   
   // Advocate Matches
   getAdvocateMatchesByParentId(parentId: string): Promise<AdvocateMatch[]>;
@@ -796,6 +800,156 @@ export class DbStorage implements IStorage {
     
     const result = await this.db.insert(sharedMemories).values(newSharedMemory).returning();
     return result[0];
+  }
+
+  // Progress Notes
+  async getProgressNotesByUserId(userId: string): Promise<ProgressNote[]> {
+    return await this.db.select().from(progressNotes).where(eq(progressNotes.userId, userId));
+  }
+
+  async createProgressNote(userId: string, note: InsertProgressNote): Promise<ProgressNote> {
+    const id = randomUUID();
+    const newNote = {
+      ...note,
+      id,
+      userId,
+      createdAt: new Date()
+    };
+    
+    const result = await this.db.insert(progressNotes).values(newNote).returning();
+    return result[0];
+  }
+
+  async deleteProgressNote(noteId: string): Promise<void> {
+    await this.db.delete(progressNotes).where(eq(progressNotes.id, noteId));
+  }
+
+  // Communication Logs
+  async getCommunicationLogsByUserId(userId: string): Promise<CommunicationLog[]> {
+    return await this.db.select().from(communicationLogs).where(eq(communicationLogs.userId, userId));
+  }
+
+  async createCommunicationLog(userId: string, log: InsertCommunicationLog): Promise<CommunicationLog> {
+    const id = randomUUID();
+    const newLog = {
+      ...log,
+      id,
+      userId,
+      createdAt: new Date()
+    };
+    
+    const result = await this.db.insert(communicationLogs).values(newLog).returning();
+    return result[0];
+  }
+
+  // IEP Drafts
+  async getIEPDraftsByUserId(userId: string): Promise<IEPDraft[]> {
+    return await this.db.select().from(iepDrafts).where(eq(iepDrafts.userId, userId));
+  }
+
+  async createIEPDraft(userId: string, draft: InsertIEPDraft): Promise<IEPDraft> {
+    const id = randomUUID();
+    const newDraft = {
+      ...draft,
+      id,
+      userId,
+      createdAt: new Date()
+    };
+    
+    const result = await this.db.insert(iepDrafts).values(newDraft).returning();
+    return result[0];
+  }
+
+  // Advocate Matches
+  async getAdvocateMatchesByParentId(parentId: string): Promise<AdvocateMatch[]> {
+    return await this.db.select().from(advocateMatches).where(eq(advocateMatches.parentId, parentId));
+  }
+
+  async getAdvocateMatchesByAdvocateId(advocateId: string): Promise<AdvocateMatch[]> {
+    return await this.db.select().from(advocateMatches).where(eq(advocateMatches.advocateId, advocateId));
+  }
+
+  async createAdvocateMatch(parentId: string, advocateId: string, match: InsertAdvocateMatch): Promise<AdvocateMatch> {
+    const id = randomUUID();
+    const newMatch = {
+      ...match,
+      id,
+      parentId,
+      advocateId,
+      createdAt: new Date()
+    };
+    
+    const result = await this.db.insert(advocateMatches).values(newMatch).returning();
+    return result[0];
+  }
+
+  // Students
+  async getStudentsByParentId(parentId: string): Promise<Student[]> {
+    return await this.db.select().from(students).where(eq(students.parentId, parentId));
+  }
+
+  async getStudentsByAdvocateId(advocateId: string): Promise<Student[]> {
+    return await this.db.select().from(students).where(eq(students.advocateId, advocateId));
+  }
+
+  async createStudent(student: InsertStudent): Promise<Student> {
+    const id = randomUUID();
+    const newStudent = {
+      ...student,
+      id,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    
+    const result = await this.db.insert(students).values(newStudent).returning();
+    return result[0];
+  }
+
+  async updateStudent(studentId: string, updates: Partial<InsertStudent>): Promise<Student> {
+    const result = await this.db
+      .update(students)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(students.id, studentId))
+      .returning();
+    return result[0];
+  }
+
+  async deleteStudent(studentId: string): Promise<void> {
+    await this.db.delete(students).where(eq(students.id, studentId));
+  }
+
+  // Advocate Clients
+  async getAdvocateClientsByAdvocateId(advocateId: string): Promise<AdvocateClient[]> {
+    return await this.db.select().from(advocateClients).where(eq(advocateClients.advocateId, advocateId));
+  }
+
+  async getAdvocateClientsByParentId(parentId: string): Promise<AdvocateClient[]> {
+    return await this.db.select().from(advocateClients).where(eq(advocateClients.parentId, parentId));
+  }
+
+  async createAdvocateClient(client: InsertAdvocateClient): Promise<AdvocateClient> {
+    const id = randomUUID();
+    const newClient = {
+      ...client,
+      id,
+      createdAt: new Date()
+    };
+    
+    const result = await this.db.insert(advocateClients).values(newClient).returning();
+    return result[0];
+  }
+
+  async updateAdvocateClient(clientId: string, updates: Partial<InsertAdvocateClient>): Promise<AdvocateClient> {
+    const result = await this.db
+      .update(advocateClients)
+      .set(updates)
+      .where(eq(advocateClients.id, clientId))
+      .returning();
+    return result[0];
+  }
+
+  async deleteAdvocateClient(clientId: string): Promise<void> {
+    await this.db.delete(advocateClients).where(eq(advocateClients.id, clientId));
   }
 }
 

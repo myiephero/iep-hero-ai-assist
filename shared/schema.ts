@@ -108,6 +108,14 @@ export const communicationLogs = pgTable("communication_logs", {
   createdAt: timestamp("created_at").default(sql`now()`),
 });
 
+export const iepDrafts = pgTable("iep_drafts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  diagnosis: text("diagnosis").notNull(),
+  suggestions: text("suggestions").notNull(),
+  createdAt: timestamp("created_at").default(sql`now()`),
+});
+
 // Student profiles for multi-child families
 export const students = pgTable("students", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -243,6 +251,12 @@ export const insertAdvocateClientSchema = createInsertSchema(advocateClients).om
   assignedDate: true,
 });
 
+export const insertIEPDraftSchema = createInsertSchema(iepDrafts).omit({
+  id: true,
+  userId: true,
+  createdAt: true,
+});
+
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -266,3 +280,5 @@ export type InsertCommunicationLog = z.infer<typeof insertCommunicationLogSchema
 export type CommunicationLog = typeof communicationLogs.$inferSelect;
 export type InsertAdvocateMatch = z.infer<typeof insertAdvocateMatchSchema>;
 export type AdvocateMatch = typeof advocateMatches.$inferSelect;
+export type InsertIEPDraft = z.infer<typeof insertIEPDraftSchema>;
+export type IEPDraft = typeof iepDrafts.$inferSelect;

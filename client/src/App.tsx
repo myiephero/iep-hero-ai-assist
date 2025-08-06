@@ -14,6 +14,7 @@ import Goals from "@/pages/goals";
 import IEPGoalGeneratorPage from "@/pages/iep-goal-generator";
 import AIIEPReviewPage from "@/pages/ai-iep-review";
 import AskAiAboutDocs from "@/pages/ask-ai-about-docs";
+import GoalGenerator from "@/pages/goal-generator";
 import ProgressAnalyzer from "@/pages/progress-analyzer";
 import MeetingPrep from "@/pages/meeting-prep";
 import SmartLetterGenerator from "@/pages/smart-letter-generator";
@@ -119,6 +120,11 @@ function Router() {
       <Route path="/tools/iep-goal-generator">
         <AuthGuard>
           <IEPGoalGeneratorPage />
+        </AuthGuard>
+      </Route>
+      <Route path="/goal-generator">
+        <AuthGuard>
+          <GoalGenerator />
         </AuthGuard>
       </Route>
       <Route path="/tools/ai-iep-review">

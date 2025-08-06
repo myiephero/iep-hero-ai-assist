@@ -639,6 +639,75 @@ Use professional, supportive language that empowers the parent while being legal
     }
   });
 
+  // IEP Drafts routes
+  app.get("/api/iep-drafts", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      const drafts = await storage.getIEPDraftsByUserId(user.id);
+      res.json(drafts);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/iep-drafts", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      const { diagnosis, suggestions } = req.body;
+      
+      if (!diagnosis || !suggestions) {
+        return res.status(400).json({ message: 'Diagnosis and suggestions are required' });
+      }
+
+      const draft = await storage.createIEPDraft(user.id, {
+        diagnosis: diagnosis.trim(),
+        suggestions: suggestions.trim()
+      });
+      
+      res.json(draft);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  });
+
+  // Generate IEP Goals using AI
+  app.post("/api/generate-iep-goals", requireAuth, async (req, res) => {
+    try {
+      const { diagnosis } = req.body;
+      
+      if (!diagnosis) {
+        return res.status(400).json({ message: 'Diagnosis is required' });
+      }
+
+      const { analyzeDocument } = await import('./ai-document-analyzer');
+      
+      const prompt = `You are an expert IEP (Individualized Education Program) goal writer. Generate 3-5 comprehensive, measurable IEP goals for a student diagnosed with: ${diagnosis}
+
+Please ensure each goal follows the SMART criteria:
+- Specific: Clearly defined skill or behavior
+- Measurable: Include specific criteria for success
+- Achievable: Realistic for the student
+- Relevant: Addresses the student's needs
+- Time-bound: Include timeframe (typically 1 year)
+
+Format each goal with:
+1. The specific skill area
+2. Current performance level
+3. Measurable objective
+4. Method of measurement
+5. Timeline
+
+Focus on functional skills that will help the student succeed in their educational environment.`;
+
+      const analysis = await analyzeDocument('', prompt);
+      
+      res.json({ goals: analysis });
+    } catch (error: any) {
+      console.error('Error generating IEP goals:', error);
+      res.status(500).json({ message: error.message || 'Failed to generate IEP goals' });
+    }
+  });
+
   app.post("/api/goals", requireAuth, async (req, res) => {
     try {
       const user = req.user as any;
