@@ -393,11 +393,10 @@ export default function MyStudents() {
                     <div className="flex gap-2 pt-2">
                       <Button 
                         size="sm" 
-                        variant="outline" 
-                        className="flex-1 border-slate-600 text-white hover:bg-slate-700"
+                        className="flex-1 bg-blue-600/80 hover:bg-blue-500 text-white border-blue-500 transition-all duration-200"
                         onClick={() => {
-                          // Navigate to student goals (placeholder for now)
-                          alert(`View goals for ${student.firstName} ${student.lastName} - feature coming soon!`);
+                          // Navigate to goals page with student filter
+                          window.location.href = `/goals?student=${student.id}`;
                         }}
                       >
                         <Target className="h-4 w-4 mr-1" />
@@ -405,10 +404,9 @@ export default function MyStudents() {
                       </Button>
                       <Button 
                         size="sm" 
-                        variant="outline" 
-                        className="flex-1 border-slate-600 text-white hover:bg-slate-700"
+                        className="flex-1 bg-purple-600/80 hover:bg-purple-500 text-white border-purple-500 transition-all duration-200"
                         onClick={() => {
-                          // Navigate to student documents
+                          // Navigate to documents page with student filter
                           window.location.href = `/documents?student=${student.id}`;
                         }}
                       >

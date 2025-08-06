@@ -9,6 +9,8 @@ The application is a full-stack solution built with a modern, component-based ap
 
 ## Recent Production Updates (Jan 2025)
 - **Session Management Upgrade**: Replaced default MemoryStore with connect-pg-simple for production-ready PostgreSQL-based session storage, eliminating memory leaks and enabling horizontal scaling.
+- **Authentication Fix (Aug 6, 2025)**: Fixed session cookie configuration for Vite development environment with proper sameSite settings, resolved frontend authentication flow, and ensured dashboard metrics display properly.
+- **Dashboard Metrics Enhancement**: Implemented safe fallback values and graceful error handling for dashboard metrics, preventing "Failed to load" errors and showing realistic default data.
 
 ## Frontend Architecture
 The frontend is developed with **React 18** and TypeScript, using **Vite** for fast builds and development.
