@@ -506,13 +506,13 @@ Use professional, supportive language that empowers the parent while being legal
         // Send auto-confirmation to parent
         try {
           const { sendParentConfirmation } = await import('./emailTemplates');
-          const mockMatch = {
+          const matchData = {
             gradeLevel: formData.gradeLevel,
             schoolDistrict: formData.schoolDistrict,
             helpAreas: formData.helpAreas,
             contactMethod: formData.contactMethod,
           };
-          await sendParentConfirmation(mockMatch as any, user.email);
+          await sendParentConfirmation(matchData as any, user.email);
         } catch (emailError) {
           console.error('Failed to send confirmation email:', emailError);
         }
@@ -534,8 +534,8 @@ Use professional, supportive language that empowers the parent while being legal
         documentUrls: formData.uploadedFiles || [],
       };
       
-      // Use selected advocate or auto-assign to demo advocate
-      let advocateId = 'advocate-demo-1'; // Default to first demo advocate
+      // Use selected advocate or auto-assign to available advocate
+      let advocateId: string;
       if (formData.selectedAdvocate) {
         advocateId = formData.selectedAdvocate;
       } else {
@@ -543,6 +543,8 @@ Use professional, supportive language that empowers the parent while being legal
         const availableAdvocate = await storage.getUserByEmail('advocate@demo.com');
         if (availableAdvocate) {
           advocateId = availableAdvocate.id;
+        } else {
+          return res.status(400).json({ error: 'No advocates available for assignment' });
         }
       }
 

@@ -1,0 +1,112 @@
+🔥 Awesome — messaging is the final critical layer to complete your Hero Plan workflow. Let’s power it up!
+
+⸻
+
+💬 Phase 6: Real-Time Messaging (Parent ↔ Advocate)
+
+🎯 Key Features:
+	•	Secure chat between matched users
+	•	Real-time updates using Supabase Realtime
+	•	Two-panel UI: conversations + chat
+	•	Shows timestamps and sender info
+	•	Auto-scroll + responsive design
+
+⸻
+
+✅ Step 1: Supabase Table Schema
+
+Make sure your Supabase messages table includes:
+
+Column	Type
+id	uuid (PK)
+sender_id	uuid
+receiver_id	uuid
+message	text
+created_at	timestamp
+
+And RLS (Row-Level Security) should allow:
+
+sender_id = auth.uid() OR receiver_id = auth.uid()
+
+
+⸻
+
+✅ Step 2: Create Messages.jsx
+
+import { useEffect, useRef, useState } from 'react';
+import { supabase } from '@/supabaseClient';
+import { useAuth } from '@/contexts/AuthContext';
+
+export default function Messages() {
+  const { user } = useAuth();
+  const [messages, setMessages] = useState([]);
+  const [newMsg, setNewMsg] = useState('');
+  const [recipient, setRecipient] = useState(''); // Set this from matched advocate/parent ID
+  const endRef = useRef(null);
+
+  useEffect(() => {
+    fetchMessages();
+    const sub = supabase
+      .channel('messages')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, () => fetchMessages())
+      .subscribe();
+
+    return () => { supabase.removeChannel(sub); };
+  }, []);
+
+  const fetchMessages = async () => {
+    const { data } = await supabase
+      .from('messages')
+      .select('*')
+      .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
+      .order('created_at');
+    setMessages(data);
+  };
+
+  const sendMessage = async () => {
+    await supabase.from('messages').insert({
+      sender_id: user.id,
+      receiver_id: recipient,
+      message: newMsg
+    });
+    setNewMsg('');
+  };
+
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  return (
+    <div className="p-6 max-w-3xl mx-auto">
+      <div className="border rounded-xl p-4 h-[400px] overflow-y-scroll bg-white">
+        {messages.map((msg) => (
+          <div key={msg.id} className={`mb-2 ${msg.sender_id === user.id ? 'text-right' : 'text-left'}`}>
+            <div className={`inline-block p-2 rounded-lg ${msg.sender_id === user.id ? 'bg-blue-200' : 'bg-gray-200'}`}>
+              {msg.message}
+            </div>
+          </div>
+        ))}
+        <div ref={endRef} />
+      </div>
+      <div className="mt-4 flex">
+        <input value={newMsg} onChange={(e) => setNewMsg(e.target.value)} className="border flex-grow p-2 rounded" placeholder="Type a message..." />
+        <button onClick={sendMessage} className="ml-2 bg-blue-600 text-white px-4 py-2 rounded">Send</button>
+      </div>
+    </div>
+  );
+}
+
+
+⸻
+
+✅ Step 3: Add Route
+
+<Route path="/messages" element={<PrivateRoute roles={['parent', 'advocate']} component={Messages} />} />
+
+📌 Next step: wire up recipient logic based on matched pair (from advocate_matches table). I can help pull that next if needed.
+
+Once messaging is working, reply:
+
+✅ Messaging live — what’s next?
+
+And I’ll guide how to finalize the dashboard, polish UX, and shift to fundraising prep.
