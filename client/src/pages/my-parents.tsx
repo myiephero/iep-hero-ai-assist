@@ -40,7 +40,7 @@ export default function MyParentsPage() {
   });
 
   // Query for advocate clients
-  const { data: clients = [], isLoading, refetch } = useQuery({
+  const { data: clients = [], isLoading, refetch } = useQuery<any[]>({
     queryKey: ["/api/advocate/clients"],
     enabled: !!user,
   });
@@ -49,18 +49,6 @@ export default function MyParentsPage() {
   const addClientMutation = useMutation({
     mutationFn: async (data: AddClientFormData) => {
       const response = await apiRequest("POST", "/api/advocate/clients", data);
-      if (!response.ok) {
-        try {
-          const error = await response.json();
-          throw new Error(error.message || error.error || "Failed to add client");
-        } catch (jsonError) {
-          // If JSON parsing fails, it's likely an authentication redirect
-          if (response.status === 401) {
-            throw new Error("Please log in as an advocate to add clients");
-          }
-          throw new Error(`Server error: ${response.status} ${response.statusText}`);
-        }
-      }
       return response.json();
     },
     onSuccess: () => {
@@ -70,12 +58,29 @@ export default function MyParentsPage() {
       });
       setShowAddClient(false);
       form.reset();
+      // Invalidate and refetch the clients list
       queryClient.invalidateQueries({ queryKey: ["/api/advocate/clients"] });
+      refetch();
     },
     onError: (error: any) => {
+      console.error("Client creation error:", error);
+      let errorMessage = "Failed to add client";
+      
+      if (error.message) {
+        if (error.message.includes("401")) {
+          errorMessage = "Please log in as an advocate to add clients";
+        } else if (error.message.includes("403")) {
+          errorMessage = "You don't have permission to add clients";
+        } else if (error.message.includes("duplicate")) {
+          errorMessage = "A client with this email already exists";
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
       toast({
         title: "Error",
-        description: error.message || "Failed to add client",
+        description: errorMessage,
         variant: "destructive",
       });
     },
