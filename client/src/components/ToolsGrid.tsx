@@ -2,6 +2,12 @@ import { useLocation } from 'wouter';
 
 const tools = [
   {
+    title: "Goal Generator",
+    description: "Generate AI-powered IEP goals based on diagnosis",
+    icon: "🎯",
+    route: "/goal-generator"
+  },
+  {
     title: "IEP Goal Generator",
     description: "Generate AI-powered IEP goals",
     icon: "🧠",
