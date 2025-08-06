@@ -7,6 +7,9 @@ Preferred communication style: Simple, everyday language.
 # System Architecture
 The application is a full-stack solution built with a modern, component-based approach.
 
+## Recent Production Updates (Jan 2025)
+- **Session Management Upgrade**: Replaced default MemoryStore with connect-pg-simple for production-ready PostgreSQL-based session storage, eliminating memory leaks and enabling horizontal scaling.
+
 ## Frontend Architecture
 The frontend is developed with **React 18** and TypeScript, using **Vite** for fast builds and development.
 - **UI Framework**: **shadcn/ui** components built on **Radix UI** primitives, styled with **Tailwind CSS** using a custom color palette.

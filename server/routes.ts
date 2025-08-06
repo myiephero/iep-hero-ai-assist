@@ -9,6 +9,8 @@ import advocateClientsRoutes from "./routes/advocate-clients";
 import { insertUserSchema, insertGoalSchema, insertDocumentSchema, insertEventSchema, insertMessageSchema } from "@shared/schema";
 import bcrypt from "bcrypt";
 import session from "express-session";
+import pgSession from "connect-pg-simple";
+import pg from "pg";
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import multer from "multer";
@@ -46,12 +48,29 @@ const upload = multer({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Session configuration
+  // Create PostgreSQL session store for production-ready session management
+  const pgSessionStore = pgSession(session);
+  
+  // Configure PostgreSQL connection pool for sessions
+  const sessionPool = new pg.Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+  });
+
+  // Session configuration with PostgreSQL store
   app.use(session({
+    store: new pgSessionStore({
+      pool: sessionPool,
+      tableName: 'session', // Default table name
+      createTableIfMissing: true // Automatically create session table
+    }),
     secret: process.env.SESSION_SECRET || 'iep-hero-secret',
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 } // 24 hours
+    cookie: { 
+      secure: process.env.NODE_ENV === 'production', 
+      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    }
   }));
 
   app.use(passport.initialize());
