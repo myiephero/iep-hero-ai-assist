@@ -27,7 +27,7 @@ export interface IStorage {
   // Documents
   getDocumentsByUserId(userId: string): Promise<Document[]>;
   getDocumentsByStudentId(studentId: string): Promise<Document[]>;
-  createDocument(documentData: any): Promise<Document>;
+  createDocument(documentData: InsertDocument): Promise<Document>;
   deleteDocument(documentId: string): Promise<void>;
   deleteDocuments(documentIds: string[], userId: string): Promise<number>;
   updateDocumentName(documentId: string, displayName: string): Promise<Document>;
@@ -818,13 +818,13 @@ export class DbStorage implements IStorage {
     return await this.db.select().from(documents).where(eq(documents.userId, userId));
   }
 
-  async createDocument(userId: string, document: InsertDocument): Promise<Document> {
+  async createDocument(documentData: InsertDocument): Promise<Document> {
     const id = randomUUID();
     const newDocument = {
-      ...document,
+      ...documentData,
       id,
-      userId,
-      uploadedAt: new Date()
+      uploadedAt: new Date(),
+      createdAt: new Date()
     };
     
     const result = await this.db.insert(documents).values(newDocument).returning();
