@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -15,7 +15,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { CalendarIcon, Plus, Edit, Trash2, Target, TrendingUp, BarChart3 } from "lucide-react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { format } from "date-fns";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -46,6 +46,11 @@ export default function Goals() {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [location] = useLocation();
+  
+  // Check for pre-selected student from URL params
+  const urlParams = new URLSearchParams(location.split('?')[1] || '');
+  const preSelectedStudentId = urlParams.get('student');
 
   const form = useForm<GoalFormData>({
     resolver: zodResolver(goalFormSchema),
@@ -61,6 +66,12 @@ export default function Goals() {
 
   const { data: goals = [], isLoading } = useQuery<Goal[]>({
     queryKey: ["/api/goals"],
+  });
+
+  // Fetch students for the dropdown
+  const { data: students = [] } = useQuery({
+    queryKey: ["/api/parent/students"],
+    enabled: !!user && user.role === 'parent',
   });
 
   const displayGoals = goals;
@@ -119,6 +130,7 @@ export default function Goals() {
     form.reset({
       title: goal.title,
       description: goal.description,
+      studentId: goal.studentId || "",
       status: goal.status as "Not Started" | "In Progress" | "Completed",
       progress: goal.progress || 0,
       dueDate: new Date(goal.dueDate),
@@ -128,9 +140,27 @@ export default function Goals() {
 
   const openNewDialog = () => {
     setEditingGoal(null);
-    form.reset();
+    form.reset({
+      title: "",
+      description: "",
+      studentId: preSelectedStudentId || "",
+      status: "Not Started",
+      progress: 0,
+      dueDate: new Date(),
+    });
     setIsDialogOpen(true);
   };
+
+  // Auto-open dialog when coming from student page
+  useEffect(() => {
+    if (preSelectedStudentId && students.length > 0) {
+      // Check if the student exists
+      const studentExists = students.some((s: any) => s.id === preSelectedStudentId);
+      if (studentExists && !isDialogOpen) {
+        openNewDialog();
+      }
+    }
+  }, [preSelectedStudentId, students, isDialogOpen]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#1A1B2E] to-[#2C2F48] text-white">
@@ -186,6 +216,39 @@ export default function Goals() {
                       </FormItem>
                     )}
                   />
+                  
+                  {/* Student Selector - show for parents when they have students */}
+                  {user?.role === 'parent' && students.length > 0 && (
+                    <FormField
+                      control={form.control}
+                      name="studentId"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-slate-300">
+                            Student {preSelectedStudentId && (
+                              <span className="text-blue-400 text-xs ml-2">(pre-selected)</span>
+                            )}
+                          </FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger className="bg-[#3E4161] border-slate-500 text-white">
+                                <SelectValue placeholder="Select a student" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent className="bg-[#3E4161] border-slate-500">
+                              {students.map((student: any) => (
+                                <SelectItem key={student.id} value={student.id}>
+                                  {student.firstName} {student.lastName}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
+
                   <div className="grid grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
