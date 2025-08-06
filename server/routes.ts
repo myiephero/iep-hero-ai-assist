@@ -946,20 +946,60 @@ Focus on functional skills that will help the student succeed in their education
         return res.status(400).json({ message: 'No file uploaded' });
       }
 
-      const { type, description } = req.body;
+      console.log('📄 File uploaded:', {
+        originalname: req.file.originalname,
+        mimetype: req.file.mimetype,
+        size: req.file.size,
+        path: req.file.path
+      });
+
+      const { type, description, studentId } = req.body;
+
+      // Read file content for AI analysis
+      let fileContent = '';
+      try {
+        if (req.file.mimetype === 'text/plain' || req.file.originalname.endsWith('.txt')) {
+          fileContent = fs.readFileSync(req.file.path, 'utf8');
+        } else {
+          // For non-text files, use filename and description
+          fileContent = `Filename: ${req.file.originalname}\nDescription: ${description || ''}`;
+        }
+      } catch (error) {
+        console.warn('Could not read file content for tagging:', error);
+        fileContent = req.file.originalname;
+      }
+
+      // Perform AI tagging and categorization
+      const taggingResult = await analyzeDocumentForTagging(
+        fileContent, 
+        type || 'other',
+        req.file.originalname
+      );
+
+      console.log('🏷️ AI Tagging Result:', taggingResult);
       
       const document = await storage.createDocument({
         userId: user.id,
+        studentId: studentId || null,
         filename: req.file.filename,
         originalName: req.file.originalname,
+        displayName: req.file.originalname,
         type: type || 'other',
+        category: taggingResult.category,
+        tags: taggingResult.tags,
+        confidence: taggingResult.confidence,
         description: description || '',
         fileUrl: `/uploads/${req.file.filename}`
       });
 
-      res.json(document);
+      res.json({
+        ...document,
+        tagging: taggingResult,
+        message: "Document uploaded and automatically categorized"
+      });
     } catch (error: any) {
-      res.status(400).json({ message: error.message });
+      console.error('Error uploading document:', error);
+      res.status(500).json({ message: error.message });
     }
   });
 
@@ -1084,6 +1124,42 @@ Focus on functional skills that will help the student succeed in their education
         message: 'Analysis failed', 
         error: error.message 
       });
+    }
+  });
+
+  // API endpoint to retag existing documents with AI-powered categorization
+  app.post("/api/documents/:id/retag", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      const { id } = req.params;
+      
+      const documents = await storage.getDocumentsByUserId(user.id);
+      const document = documents.find(doc => doc.id === id);
+      
+      if (!document) {
+        return res.status(404).json({ error: "Document not found" });
+      }
+
+      // Use existing content or filename for retagging
+      const content = document.content || document.description || document.originalName || document.filename;
+      
+      const taggingResult = await analyzeDocumentForTagging(
+        content,
+        document.type,
+        document.originalName
+      );
+
+      console.log('🏷️ Retagging result for', document.originalName, ':', taggingResult);
+
+      res.json({ 
+        success: true,
+        document: { ...document, ...taggingResult },
+        tagging: taggingResult,
+        message: "Document retagged successfully" 
+      });
+    } catch (error: any) {
+      console.error('Error retagging document:', error);
+      res.status(500).json({ error: 'Failed to retag document' });
     }
   });
 

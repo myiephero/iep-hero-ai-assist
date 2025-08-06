@@ -335,8 +335,8 @@ export default function SmartLetterGenerator() {
         const timestamp = new Date().getTime();
         const filename = `${documentTitle.replace(/[^a-zA-Z0-9\-_\s]/g, '').replace(/\s+/g, '_')}_${timestamp}.txt`;
 
-        // Insert document directly into Supabase
-        const { data: document, error: insertError } = await supabase
+        // Insert document directly into Supabase with minimal return to avoid RLS SELECT issues
+        const { error: insertError } = await supabase
           .from('documents')
           .insert({
             user_id: session.user.id,
@@ -350,9 +350,7 @@ export default function SmartLetterGenerator() {
             generated_by: 'Smart Letter Generator',
             created_at: new Date().toISOString(),
             uploaded_at: new Date().toISOString()
-          })
-          .select()
-          .single();
+          });
 
         if (insertError) {
           throw insertError;
