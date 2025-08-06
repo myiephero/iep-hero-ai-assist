@@ -1528,6 +1528,11 @@ export const storage = new class LocalDbStorage implements IStorage {
     return await this.db.select().from(students).where(eq(students.advocateId, advocateId));
   }
 
+  async getStudentById(studentId: string): Promise<Student | undefined> {
+    const result = await this.db.select().from(students).where(eq(students.id, studentId));
+    return result[0] || undefined;
+  }
+
   async createStudent(student: InsertStudent): Promise<Student> {
     const id = randomUUID();
     const newStudent = {

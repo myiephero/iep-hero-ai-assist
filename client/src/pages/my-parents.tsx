@@ -1,248 +1,236 @@
-import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
-import { UserPlus, Search, Users, Target, FileText, Calendar, MessageCircle, Phone } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
-import { format } from 'date-fns';
+import React, { useState } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Search, Plus, Users, Calendar, FileText, User, Mail, Phone } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { queryClient, apiRequest } from "@/lib/queryClient";
+import { useAuth } from "@/contexts/AuthContext";
 
-interface ParentClient {
-  id: string;
-  parentName: string;
-  email: string;
-  phone?: string;
-  studentsCount: number;
-  activeGoals: number;
-  documentsCount: number;
-  lastContact: string;
-  caseStatus: 'active' | 'pending' | 'completed';
-  nextMeeting?: string;
-  students: Array<{
-    name: string;
-    grade: string;
-    school: string;
-  }>;
-}
+const addClientSchema = z.object({
+  parentEmail: z.string().email("Please enter a valid email address"),
+  clientName: z.string().min(2, "Client name must be at least 2 characters"),
+  phone: z.string().optional(),
+  notes: z.string().optional(),
+});
 
-export default function MyParents() {
+type AddClientFormData = z.infer<typeof addClientSchema>;
+
+export default function MyParentsPage() {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [showAddClient, setShowAddClient] = useState(false);
+  const { toast } = useToast();
   const { user } = useAuth();
-  const [searchTerm, setSearchTerm] = useState('');
 
-  const { data: clients, isLoading, error } = useQuery<ParentClient[]>({
-    queryKey: ['/api/advocate/clients'],
-    enabled: !!user && user.role === 'advocate',
+  const form = useForm<AddClientFormData>({
+    resolver: zodResolver(addClientSchema),
+    defaultValues: {
+      parentEmail: "",
+      clientName: "",
+      phone: "",
+      notes: "",
+    },
   });
 
-  if (!user || user.role !== 'advocate') {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-[#1A1B2E] to-[#2C2F48] px-6 py-10 text-white">
-        <div className="max-w-6xl mx-auto">
-          <p className="text-red-300">Access denied. This page is for advocates only.</p>
-        </div>
-      </div>
-    );
-  }
+  // Query for advocate clients
+  const { data: clients = [], isLoading, refetch } = useQuery({
+    queryKey: ["/api/advocate-clients"],
+    enabled: !!user,
+  });
 
-  const filteredClients = clients?.filter(client =>
-    client.parentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    client.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    client.students.some(student => 
-      student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.school.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-  ) || [];
+  // Mutation to add new client
+  const addClientMutation = useMutation({
+    mutationFn: async (data: AddClientFormData) => {
+      const response = await apiRequest("POST", "/api/advocate-clients", data);
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to add client");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Client added successfully",
+      });
+      setShowAddClient(false);
+      form.reset();
+      queryClient.invalidateQueries({ queryKey: ["/api/advocate-clients"] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to add client",
+        variant: "destructive",
+      });
+    },
+  });
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'active': return 'bg-green-500';
-      case 'pending': return 'bg-yellow-500';
-      case 'completed': return 'bg-blue-500';
-      default: return 'bg-gray-500';
-    }
-  };
+  const filteredClients = clients.filter((client: any) =>
+    client.parent?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    client.parent?.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    client.clientName?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case 'active': return 'Active Case';
-      case 'pending': return 'Pending Intake';
-      case 'completed': return 'Case Closed';
-      default: return 'Unknown';
-    }
+  const onSubmit = (data: AddClientFormData) => {
+    addClientMutation.mutate(data);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#1A1B2E] to-[#2C2F48] px-6 py-10 text-white">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6">
+      <div className="mx-auto max-w-7xl">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2 text-white">My Parent Clients</h1>
-          <p className="text-slate-300 mb-6">
-            Manage your advocacy cases and client relationships
-          </p>
-
-          {/* Search and Add Client */}
-          <div className="flex flex-col sm:flex-row gap-4 mb-6">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
-              <Input
-                placeholder="Search clients by name, email, or student..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 bg-[#3E4161]/50 border-slate-600 text-white placeholder-slate-400"
-              />
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold text-white mb-2">My Parent Clients</h1>
+              <p className="text-slate-300">
+                Manage your advocacy cases and client relationships
+              </p>
             </div>
-            <Button 
-              className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
-              onClick={() => {
-                // TODO: Open add client modal or navigate to intake form
-                alert('New Client Intake feature coming soon!');
-              }}
+            <Button
+              onClick={() => setShowAddClient(true)}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
             >
-              <UserPlus className="h-4 w-4 mr-2" />
+              <Plus className="w-4 h-4 mr-2" />
               New Client
             </Button>
           </div>
         </div>
 
-        {/* Loading State */}
-        {isLoading && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {[...Array(4)].map((_, i) => (
-              <Card key={i} className="bg-[#3E4161]/70 border-slate-600">
-                <CardHeader>
-                  <Skeleton className="h-6 w-32 mb-2 bg-slate-600" />
-                  <Skeleton className="h-4 w-48 bg-slate-600" />
-                </CardHeader>
-                <CardContent>
-                  <Skeleton className="h-4 w-full mb-2 bg-slate-600" />
-                  <Skeleton className="h-4 w-3/4 bg-slate-600" />
-                </CardContent>
-              </Card>
-            ))}
+        {/* Search Bar */}
+        <div className="mb-6">
+          <div className="relative max-w-md">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
+            <Input
+              placeholder="Search clients by name, email, or student..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 bg-[#3E4161]/50 border-slate-600 text-white placeholder-slate-400"
+            />
           </div>
-        )}
+        </div>
 
-        {/* Error State */}
-        {error && (
-          <Card className="bg-red-900/30 border-red-600">
-            <CardContent className="p-6">
-              <p className="text-red-300">Failed to load client information. Please try again.</p>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Empty State */}
-        {!isLoading && !error && filteredClients.length === 0 && (
-          <Card className="bg-[#3E4161]/70 border-slate-600">
-            <CardContent className="p-12 text-center">
+        {/* Client Grid */}
+        {isLoading ? (
+          <div className="flex items-center justify-center h-64">
+            <div className="animate-spin w-8 h-8 border-4 border-blue-400 border-t-transparent rounded-full" />
+          </div>
+        ) : filteredClients.length === 0 ? (
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
               <Users className="h-16 w-16 text-slate-400 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-white mb-2">No Clients Found</h3>
+              <h3 className="text-xl font-semibold mb-2 text-white">
+                {searchTerm ? 'No clients found' : 'No clients yet'}
+              </h3>
               <p className="text-slate-400 mb-6">
-                {searchTerm ? 'No clients match your search criteria.' : 'Start building your advocacy practice by adding your first client.'}
+                {searchTerm 
+                  ? `No clients match "${searchTerm}". Try a different search term.`
+                  : 'Start building your advocacy practice by adding your first client'
+                }
               </p>
-              <Button 
-                className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
-                onClick={() => {
-                  alert('New Client Intake feature coming soon!');
-                }}
-              >
-                <UserPlus className="h-4 w-4 mr-2" />
-                Add Your First Client
-              </Button>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Clients Grid */}
-        {!isLoading && filteredClients.length > 0 && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {filteredClients.map((client) => (
-              <Card key={client.id} className="bg-[#3E4161]/70 border-slate-600 hover:bg-[#3E4161]/90 transition-all duration-200">
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <CardTitle className="text-white text-lg mb-1">{client.parentName}</CardTitle>
-                      <p className="text-slate-400 text-sm">{client.email}</p>
-                      {client.phone && (
-                        <p className="text-slate-400 text-sm">{client.phone}</p>
-                      )}
+              {!searchTerm && (
+                <Button 
+                  onClick={() => setShowAddClient(true)}
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Your First Client
+                </Button>
+              )}
+            </div>
+          </div>
+        ) : (
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {filteredClients.map((client: any) => (
+              <Card key={client.id} className="bg-[#3E4161] border-slate-600 hover:bg-[#4A4E76] transition-colors">
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-blue-600 rounded-lg">
+                        <User className="w-6 h-6 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-white">
+                          {client.clientName || client.parent?.username || 'Unknown Client'}
+                        </h3>
+                        <Badge variant="outline" className="text-green-400 border-green-400">
+                          Active Case
+                        </Badge>
+                      </div>
                     </div>
-                    <Badge className={`${getStatusColor(client.caseStatus)} text-white text-xs`}>
-                      {getStatusText(client.caseStatus)}
-                    </Badge>
                   </div>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {/* Students */}
-                    <div>
-                      <h4 className="text-sm font-medium text-slate-300 mb-2">Students ({client.studentsCount})</h4>
-                      <div className="space-y-1">
-                        {client.students.slice(0, 2).map((student, index) => (
-                          <div key={index} className="text-sm text-slate-400">
-                            {student.name} - Grade {student.grade} at {student.school}
-                          </div>
-                        ))}
-                        {client.students.length > 2 && (
-                          <div className="text-sm text-slate-500">
-                            +{client.students.length - 2} more students
-                          </div>
-                        )}
-                      </div>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-sm text-slate-300">
+                      <Mail className="w-4 h-4" />
+                      {client.parent?.email}
                     </div>
+                    {client.phone && (
+                      <div className="flex items-center gap-2 text-sm text-slate-300">
+                        <Phone className="w-4 h-4" />
+                        {client.phone}
+                      </div>
+                    )}
+                  </div>
 
-                    {/* Quick Stats */}
-                    <div className="flex justify-between text-sm">
-                      <div className="flex items-center gap-1 text-slate-300">
-                        <Target className="h-4 w-4" />
-                        <span>{client.activeGoals} Active Goals</span>
-                      </div>
-                      <div className="flex items-center gap-1 text-slate-300">
-                        <FileText className="h-4 w-4" />
-                        <span>{client.documentsCount} Documents</span>
-                      </div>
+                  <div className="space-y-2">
+                    <div className="text-sm text-slate-400">
+                      <strong>Students ({client.students?.length || 0})</strong>
                     </div>
+                    {client.students?.slice(0, 2).map((student: any) => (
+                      <div key={student.id} className="text-sm text-slate-300">
+                        {student.firstName} {student.lastName} - Grade {student.grade} at {student.school || 'Unknown School'}
+                      </div>
+                    ))}
+                    {(client.students?.length || 0) > 2 && (
+                      <div className="text-sm text-slate-400">
+                        +{client.students.length - 2} more students
+                      </div>
+                    )}
+                  </div>
 
-                    {/* Last Contact & Next Meeting */}
-                    <div className="space-y-1 text-sm text-slate-300">
-                      <div>Last contact: {format(new Date(client.lastContact), 'MMM d, yyyy')}</div>
-                      {client.nextMeeting && (
-                        <div className="flex items-center gap-1">
-                          <Calendar className="h-4 w-4" />
-                          <span>Next meeting: {format(new Date(client.nextMeeting), 'MMM d, yyyy')}</span>
+                  <div className="flex items-center justify-between pt-2 border-t border-slate-600">
+                    <div className="text-xs text-slate-400">
+                      <div className="flex items-center gap-1">
+                        <Calendar className="w-3 h-3" />
+                        Last contact: {client.lastContactDate ? new Date(client.lastContactDate).toLocaleDateString() : 'Never'}
+                      </div>
+                      {client.nextMeetingDate && (
+                        <div className="flex items-center gap-1 mt-1">
+                          <Calendar className="w-3 h-3" />
+                          Next meeting: {new Date(client.nextMeetingDate).toLocaleDateString()}
                         </div>
                       )}
                     </div>
-
-                    {/* Action Buttons */}
-                    <div className="flex gap-2 pt-2">
-                      <Button 
-                        size="sm" 
-                        variant="outline" 
-                        className="flex-1 border-slate-600 text-white hover:bg-slate-700"
-                        onClick={() => {
-                          // TODO: Open messaging or call functionality
-                          alert('Contact Client feature coming soon!');
-                        }}
-                      >
-                        <MessageCircle className="h-4 w-4 mr-1" />
-                        Message
-                      </Button>
-                      <Button 
-                        size="sm" 
-                        variant="outline" 
-                        className="flex-1 border-slate-600 text-white hover:bg-slate-700"
-                        onClick={() => {
-                          // TODO: Navigate to client case details
-                          alert('View Case Details feature coming soon!');
-                        }}
-                      >
-                        View Case
-                      </Button>
+                    <div className="flex items-center gap-1 text-xs text-slate-400">
+                      <FileText className="w-3 h-3" />
+                      {client.documentsCount || 0} Documents
                     </div>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="flex-1 border-slate-500 text-white hover:bg-slate-700"
+                    >
+                      View Details
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      className="flex-1 bg-blue-600 hover:bg-blue-700"
+                    >
+                      Message
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
@@ -250,6 +238,110 @@ export default function MyParents() {
           </div>
         )}
       </div>
+
+      {/* Add Client Dialog */}
+      <Dialog open={showAddClient} onOpenChange={setShowAddClient}>
+        <DialogContent className="bg-[#3E4161] border-slate-600 text-white max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-white">Add New Client</DialogTitle>
+          </DialogHeader>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="clientName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-white">Client Name</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="Enter client's preferred name"
+                        className="bg-slate-700 border-slate-600 text-white"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="parentEmail"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-white">Parent Email</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="email"
+                        placeholder="parent@example.com"
+                        className="bg-slate-700 border-slate-600 text-white"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-white">Phone (Optional)</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="(555) 123-4567"
+                        className="bg-slate-700 border-slate-600 text-white"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="notes"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-white">Initial Notes (Optional)</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="Case notes, special considerations..."
+                        className="bg-slate-700 border-slate-600 text-white"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="flex gap-3 pt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowAddClient(false)}
+                  className="flex-1 border-slate-500"
+                  disabled={addClientMutation.isPending}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  className="flex-1 bg-blue-600 hover:bg-blue-700"
+                  disabled={addClientMutation.isPending}
+                >
+                  {addClientMutation.isPending ? "Adding..." : "Add Client"}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
