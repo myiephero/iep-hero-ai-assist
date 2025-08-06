@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import FileUploadModal from "@/components/modals/file-upload-modal";
-import { FileText, Upload, Download, Brain, Edit2, Check, X, Eye, Save } from "lucide-react";
+import { FileText, Upload, Download, Brain, Edit2, Check, X, Eye, Save, ArrowLeft, Search } from "lucide-react";
 import { Link } from "wouter";
 import { format } from "date-fns";
 import type { Document } from "@shared/schema";
@@ -22,16 +22,37 @@ export default function Documents() {
   const [viewingAnalysis, setViewingAnalysis] = useState<any>(null);
   const [currentAnalysisDocument, setCurrentAnalysisDocument] = useState<any>(null);
   const [savingToVault, setSavingToVault] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  
+  // Get student ID from URL params if filtering by student
+  const params = new URLSearchParams(window.location.search);
+  const studentId = params.get('student');
 
   const { data: documents = [], isLoading } = useQuery<Document[]>({
-    queryKey: ["/api/documents"],
+    queryKey: studentId ? ["/api/documents", { studentId }] : ["/api/documents"],
   });
 
-  // Use only real documents - no mock data
-  const displayDocuments = documents;
+  // Query for student name if filtering by specific student
+  const { data: student } = useQuery({
+    queryKey: ["/api/students", studentId],
+    enabled: !!studentId,
+  });
+
+  // Filter documents by student if specified and add search functionality
+  const filteredDocuments = documents.filter(doc => {
+    const matchesSearch = !searchTerm || 
+      (doc.displayName || doc.originalName).toLowerCase().includes(searchTerm.toLowerCase()) ||
+      doc.type.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesStudent = !studentId || doc.studentId === studentId;
+    
+    return matchesSearch && matchesStudent;
+  });
+
+  const displayDocuments = filteredDocuments;
   const isHeroPlan = user?.planStatus === 'heroOffer';
 
   // Mutation for updating document name
@@ -258,18 +279,54 @@ PRIORITY LEVEL: ${analysisResult.priority || 'Low'}
 
 
       <div className="p-6">
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h2 className="text-2xl font-bold text-white mb-2">Document Vault</h2>
-            <p className="text-slate-300">Securely store and analyze your IEP documents</p>
+        {/* Header with Navigation */}
+        <div className="mb-6">
+          {studentId ? (
+            <Link href="/my-students">
+              <Button variant="ghost" className="mb-4 text-slate-300 hover:text-white">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to My Students
+              </Button>
+            </Link>
+          ) : (
+            <Link href={user?.role === 'parent' ? '/dashboard-parent' : user?.role === 'advocate' ? '/dashboard-advocate' : '/dashboard'}>
+              <Button variant="ghost" className="mb-4 text-slate-300 hover:text-white">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Dashboard
+              </Button>
+            </Link>
+          )}
+          
+          <div className="flex justify-between items-center">
+            <div>
+              <h2 className="text-2xl font-bold text-white mb-2">
+                {studentId && student ? `${student.firstName} ${student.lastName} - Documents` : 'Document Vault'}
+              </h2>
+              <p className="text-slate-300">
+                {studentId ? `View and manage documents for ${student?.firstName || 'this student'}` : 'Securely store and analyze your IEP documents'}
+              </p>
+            </div>
+            <Button 
+              onClick={() => setShowFileUpload(true)}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              <Upload className="w-4 h-4 mr-2" />
+              Upload Document
+            </Button>
           </div>
-          <Button 
-            onClick={() => setShowFileUpload(true)}
-            className="bg-blue-600 hover:bg-blue-700 text-white"
-          >
-            <Upload className="w-4 h-4 mr-2" />
-            Upload Document
-          </Button>
+        </div>
+
+        {/* Search Bar */}
+        <div className="mb-6">
+          <div className="relative max-w-md">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
+            <Input
+              placeholder="Search documents..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 bg-[#3E4161]/50 border-slate-600 text-white placeholder-slate-400"
+            />
+          </div>
         </div>
 
         {isLoading ? (

@@ -8,7 +8,8 @@ const router = Router();
 // Get all students for the authenticated user (parent)
 router.get("/", async (req, res) => {
   try {
-    const userId = req.user?.id;
+    const user = req.user as any;
+    const userId = user?.id;
     if (!userId) {
       return res.status(401).json({ error: "Authentication required" });
     }
@@ -21,11 +22,37 @@ router.get("/", async (req, res) => {
   }
 });
 
+// Get a single student by ID
+router.get("/:id", async (req, res) => {
+  try {
+    const user = req.user as any;
+    const userId = user?.id;
+    const studentId = req.params.id;
+    
+    if (!userId) {
+      return res.status(401).json({ error: "Authentication required" });
+    }
+
+    const student = await storage.getStudentById(studentId);
+    
+    // Check if user has access to this student
+    if (!student || (student.parentId !== userId && student.advocateId !== userId)) {
+      return res.status(404).json({ error: "Student not found" });
+    }
+    
+    return res.json(student);
+  } catch (error) {
+    console.error("Error fetching student:", error);
+    return res.status(500).json({ error: "Failed to fetch student" });
+  }
+});
+
 // Get students assigned to advocate
 router.get("/advocate", async (req, res) => {
   try {
-    const userId = req.user?.id;
-    if (!userId || req.user?.role !== 'advocate') {
+    const user = req.user as any;
+    const userId = user?.id;
+    if (!userId || user?.role !== 'advocate') {
       return res.status(401).json({ error: "Advocate authentication required" });
     }
 
@@ -40,7 +67,8 @@ router.get("/advocate", async (req, res) => {
 // Create new student
 router.post("/", async (req, res) => {
   try {
-    const userId = req.user?.id;
+    const user = req.user as any;
+    const userId = user?.id;
     if (!userId) {
       return res.status(401).json({ error: "Authentication required" });
     }
@@ -65,7 +93,8 @@ router.post("/", async (req, res) => {
 // Update student
 router.put("/:id", async (req, res) => {
   try {
-    const userId = req.user?.id;
+    const user = req.user as any;
+    const userId = user?.id;
     const studentId = req.params.id;
     
     if (!userId) {
@@ -89,7 +118,8 @@ router.put("/:id", async (req, res) => {
 // Delete student
 router.delete("/:id", async (req, res) => {
   try {
-    const userId = req.user?.id;
+    const user = req.user as any;
+    const userId = user?.id;
     const studentId = req.params.id;
     
     if (!userId) {
@@ -107,7 +137,8 @@ router.delete("/:id", async (req, res) => {
 // Get documents for a specific student
 router.get("/:id/documents", async (req, res) => {
   try {
-    const userId = req.user?.id;
+    const user = req.user as any;
+    const userId = user?.id;
     const studentId = req.params.id;
     
     if (!userId) {
