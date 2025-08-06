@@ -668,7 +668,7 @@ Use professional, supportive language that empowers the parent while being legal
     }
   });
 
-  app.post("/api/documents", requireAuth, upload.single('file'), async (req, res) => {
+  app.post("/api/documents", requireAuth, upload.single('document'), async (req, res) => {
     try {
       const user = req.user as any;
       
@@ -731,6 +731,42 @@ Use professional, supportive language that empowers the parent while being legal
         message: 'Analysis failed', 
         error: error.message 
       });
+    }
+  });
+
+  // Download document route
+  app.get("/api/documents/:id/download", requireAuth, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const user = req.user as any;
+      
+      // Get document details
+      const documents = await storage.getDocumentsByUserId(user.id);
+      const document = documents.find((doc: any) => doc.id === id);
+      
+      if (!document) {
+        return res.status(404).json({ message: 'Document not found' });
+      }
+      
+      // Construct full file path
+      const filePath = path.join(process.cwd(), 'uploads', document.filename);
+      
+      // Check if file exists
+      if (!fs.existsSync(filePath)) {
+        return res.status(404).json({ message: 'File not found on disk' });
+      }
+      
+      // Set appropriate headers
+      res.setHeader('Content-Disposition', `attachment; filename="${document.originalName}"`);
+      res.setHeader('Content-Type', 'application/octet-stream');
+      
+      // Stream the file
+      const fileStream = fs.createReadStream(filePath);
+      fileStream.pipe(res);
+      
+    } catch (error: any) {
+      console.error('Document download error:', error);
+      res.status(500).json({ message: 'Download failed', error: error.message });
     }
   });
 
