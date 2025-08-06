@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Upload, FileText, CheckCircle, AlertCircle, Save } from 'lucide-react';
+import { ArrowLeft, Upload, FileText, CheckCircle, AlertCircle } from 'lucide-react';
 import { Link } from 'wouter';
 import { apiRequest } from '@/lib/queryClient';
 
@@ -20,7 +20,6 @@ export default function AIIEPReviewPage() {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<ReviewResult | null>(null);
-  const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -88,58 +87,7 @@ export default function AIIEPReviewPage() {
     return <AlertCircle className="w-5 h-5" />;
   };
 
-  const saveToVault = async () => {
-    if (!result || !file) return;
 
-    setIsSaving(true);
-    try {
-      // Format the analysis result into a comprehensive report
-      const analysisReport = `IEP ANALYSIS REPORT
-Generated on: ${new Date().toLocaleDateString()}
-Document: ${file.name}
-
-EXECUTIVE SUMMARY
-${result.summary}
-
-COMPLIANCE SCORE: ${result.complianceScore}%
-
-STRENGTHS IDENTIFIED:
-${result.strengths.map((strength, index) => `${index + 1}. ${strength}`).join('\n')}
-
-AREAS FOR IMPROVEMENT:
-${result.weaknesses.map((weakness, index) => `${index + 1}. ${weakness}`).join('\n')}
-
-RECOMMENDATIONS:
-${result.recommendations.map((rec, index) => `${index + 1}. ${rec}`).join('\n')}
-
-This analysis was generated using AI-powered document review to assess IEP compliance, goal quality, and implementation effectiveness.`;
-
-      // Save to vault using the documents/generate endpoint
-      const documentData = {
-        content: analysisReport,
-        type: 'analysis',
-        generatedBy: 'AI IEP Review',
-        displayName: `IEP Analysis - ${file.name} - ${new Date().toLocaleDateString()}`,
-        parentDocumentId: null
-      };
-
-      await apiRequest('POST', '/api/documents/generate', documentData);
-
-      toast({
-        title: "Saved to Vault!",
-        description: "IEP analysis has been saved to your document vault",
-      });
-    } catch (error) {
-      console.error('Error saving to vault:', error);
-      toast({
-        title: "Save Failed",
-        description: "Unable to save analysis to document vault",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSaving(false);
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#f2f7fd] to-[#eaf0f8] py-8">
@@ -215,25 +163,6 @@ This analysis was generated using AI-powered document review to assess IEP compl
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-semibold text-slate-900">IEP Analysis Results</h2>
               <div className="flex items-center gap-4">
-                <Button 
-                  onClick={saveToVault} 
-                  variant="outline" 
-                  size="sm"
-                  disabled={isSaving}
-                  className="bg-green-50 border-green-200 hover:bg-green-100"
-                >
-                  {isSaving ? (
-                    <>
-                      <div className="animate-spin w-3 h-3 border-2 border-green-600 border-t-transparent rounded-full mr-1" />
-                      Saving...
-                    </>
-                  ) : (
-                    <>
-                      <Save className="w-4 h-4 mr-1" />
-                      Save to Vault
-                    </>
-                  )}
-                </Button>
                 <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium ${getScoreColor(result.complianceScore)}`}>
                   {getScoreIcon(result.complianceScore)}
                   Compliance Score: {result.complianceScore}%
