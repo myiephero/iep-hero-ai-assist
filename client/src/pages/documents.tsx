@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import FileUploadModal from "@/components/modals/file-upload-modal";
-import { FileText, Upload, Download, Brain, Edit2, Check, X, Eye } from "lucide-react";
+import { FileText, Upload, Download, Brain, Edit2, Check, X, Eye, Save } from "lucide-react";
 import { Link } from "wouter";
 import { format } from "date-fns";
 import type { Document } from "@shared/schema";
@@ -20,6 +20,8 @@ export default function Documents() {
   const [editingDocument, setEditingDocument] = useState<string | null>(null);
   const [editingName, setEditingName] = useState("");
   const [viewingAnalysis, setViewingAnalysis] = useState<any>(null);
+  const [currentAnalysisDocument, setCurrentAnalysisDocument] = useState<any>(null);
+  const [savingToVault, setSavingToVault] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -56,6 +58,68 @@ export default function Documents() {
         description: error.message || "Failed to update document name",
         variant: "destructive"
       });
+    }
+  });
+
+  // Save analysis to vault mutation
+  const saveAnalysisToVaultMutation = useMutation({
+    mutationFn: async ({ analysisResult, documentName, parentDocumentId }: { 
+      analysisResult: any; 
+      documentName: string;
+      parentDocumentId: string;
+    }) => {
+      const analysisContent = `IEP DOCUMENT ANALYSIS REPORT
+
+Generated: ${new Date().toLocaleString()}
+Original Document: ${documentName}
+
+OVERALL SCORE: ${analysisResult.overallScore}/5
+IDEA COMPLIANCE: ${analysisResult.complianceCheck?.ideaCompliance || 'N/A'}%
+
+SUMMARY:
+${analysisResult.summary}
+
+STRENGTHS:
+${analysisResult.strengths?.map((s: string, i: number) => `${i + 1}. ${s}`).join('\n') || 'None identified'}
+
+AREAS FOR IMPROVEMENT:
+${analysisResult.improvements?.map((i: string, idx: number) => `${idx + 1}. ${i}`).join('\n') || 'None identified'}
+
+NEXT STEPS:
+${analysisResult.nextSteps?.map((s: string, i: number) => `${i + 1}. ${s}`).join('\n') || 'None identified'}
+
+PRIORITY LEVEL: ${analysisResult.priority || 'Low'}
+`;
+
+      const response = await apiRequest("POST", "/api/documents/generate", {
+        content: analysisContent,
+        type: "analysis_report",
+        generatedBy: "AI Document Analysis",
+        displayName: `${documentName} - AI Analysis Report`,
+        parentDocumentId
+      });
+      
+      if (!response.ok) {
+        throw new Error("Failed to save analysis to vault");
+      }
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/documents"] });
+      toast({
+        title: "Saved to Vault!",
+        description: "Analysis report has been saved to your Document Vault"
+      });
+      setSavingToVault(false);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Save Failed",
+        description: error.message || "Failed to save analysis to vault",
+        variant: "destructive"
+      });
+      setSavingToVault(false);
     }
   });
 
@@ -256,8 +320,8 @@ export default function Documents() {
                           <Badge className={getDocumentTypeColor(doc.type)}>
                             {getDocumentTypeLabel(doc.type)}
                           </Badge>
-                          {doc.size && (
-                            <span className="text-sm text-slate-400">{doc.size}</span>
+                          {doc.fileSize && (
+                            <span className="text-sm text-slate-400">{doc.fileSize} bytes</span>
                           )}
                           {doc.analysisResult && (
                             <Badge className="bg-emerald-600 text-white">
@@ -284,7 +348,10 @@ export default function Documents() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => setViewingAnalysis(doc.analysisResult)}
+                          onClick={() => {
+                            setViewingAnalysis(doc.analysisResult);
+                            setCurrentAnalysisDocument(doc);
+                          }}
                           className="border-emerald-500 text-emerald-300 hover:bg-emerald-700"
                         >
                           <Eye className="w-4 h-4 mr-1" />
@@ -295,7 +362,10 @@ export default function Documents() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => setViewingAnalysis(doc.content)}
+                          onClick={() => {
+                            setViewingAnalysis(doc.content);
+                            setCurrentAnalysisDocument(doc);
+                          }}
                           className="border-blue-500 text-blue-300 hover:bg-blue-700"
                         >
                           <Eye className="w-4 h-4 mr-1" />
@@ -346,10 +416,80 @@ export default function Documents() {
       />
 
       {/* Analysis Results Dialog */}
-      <Dialog open={!!viewingAnalysis} onOpenChange={() => setViewingAnalysis(null)}>
+      <Dialog open={!!viewingAnalysis} onOpenChange={() => {
+        setViewingAnalysis(null);
+        setCurrentAnalysisDocument(null);
+      }}>
         <DialogContent className="bg-[#3E4161] border-slate-600 text-white max-w-4xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
+          <DialogHeader className="flex flex-row items-center justify-between">
             <DialogTitle className="text-xl font-bold text-white">AI Document Analysis</DialogTitle>
+            {currentAnalysisDocument && (
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => {
+                    setSavingToVault(true);
+                    saveAnalysisToVaultMutation.mutate({
+                      analysisResult: viewingAnalysis,
+                      documentName: currentAnalysisDocument.displayName || currentAnalysisDocument.originalName,
+                      parentDocumentId: currentAnalysisDocument.id
+                    });
+                  }}
+                  disabled={savingToVault}
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                  size="sm"
+                >
+                  <Save className="w-4 h-4 mr-1" />
+                  {savingToVault ? "Saving..." : "Save to Vault"}
+                </Button>
+                <Button
+                  onClick={() => {
+                    const analysisText = `IEP DOCUMENT ANALYSIS REPORT
+
+Generated: ${new Date().toLocaleString()}
+Original Document: ${currentAnalysisDocument.displayName || currentAnalysisDocument.originalName}
+
+OVERALL SCORE: ${viewingAnalysis.overallScore}/5
+IDEA COMPLIANCE: ${viewingAnalysis.complianceCheck?.ideaCompliance || 'N/A'}%
+
+SUMMARY:
+${viewingAnalysis.summary}
+
+STRENGTHS:
+${viewingAnalysis.strengths?.map((s: string, i: number) => `${i + 1}. ${s}`).join('\n') || 'None identified'}
+
+AREAS FOR IMPROVEMENT:
+${viewingAnalysis.improvements?.map((i: string, idx: number) => `${idx + 1}. ${i}`).join('\n') || 'None identified'}
+
+NEXT STEPS:
+${viewingAnalysis.nextSteps?.map((s: string, i: number) => `${i + 1}. ${s}`).join('\n') || 'None identified'}
+
+PRIORITY LEVEL: ${viewingAnalysis.priority || 'Low'}
+`;
+                    
+                    const blob = new Blob([analysisText], { type: 'text/plain' });
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${currentAnalysisDocument.displayName || currentAnalysisDocument.originalName}_Analysis.txt`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                    
+                    toast({
+                      title: "Downloaded",
+                      description: "Analysis report downloaded successfully"
+                    });
+                  }}
+                  variant="outline"
+                  className="border-slate-500 text-white hover:bg-slate-700"
+                  size="sm"
+                >
+                  <Download className="w-4 h-4 mr-1" />
+                  Download
+                </Button>
+              </div>
+            )}
           </DialogHeader>
           {viewingAnalysis && (
             <div className="space-y-6">
