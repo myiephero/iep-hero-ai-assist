@@ -66,8 +66,7 @@ export default function AdvocateMatcher() {
 
   // Check if user has Hero plan access
   const hasHeroAccess = user?.planStatus === 'heroOffer' || 
-                        user?.email === 'parent@demo.com' ||
-                        (process.env.NODE_ENV === 'development' && user?.role === 'parent');
+                        user?.email === 'parent@demo.com';
 
   const form = useForm<AdvocateMatchForm>({
     resolver: zodResolver(advocateMatchSchema),
@@ -464,10 +463,7 @@ export default function AdvocateMatcher() {
                             </FormControl>
                             <SelectContent>
                               <SelectItem value="">Auto-assign best match</SelectItem>
-                              <SelectItem value="advocate-demo-1">Sarah Mitchell - Special Education Law</SelectItem>
-                              <SelectItem value="advocate-demo-2">David Chen - IEP Compliance Expert</SelectItem>
-                              <SelectItem value="advocate-demo-3">Maria Rodriguez - Behavioral Support Specialist</SelectItem>
-                              <SelectItem value="advocate-demo-4">Jennifer Thompson - Transition Planning</SelectItem>
+
                             </SelectContent>
                           </Select>
                           <p className="text-xs text-gray-500">

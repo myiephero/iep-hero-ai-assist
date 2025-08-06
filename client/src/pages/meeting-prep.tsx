@@ -38,10 +38,9 @@ export default function MeetingPrep() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [prepPackage, setPrepPackage] = useState<any>(null);
 
-  // Check if user has Hero plan access - force enable for demo accounts
+  // Check if user has Hero plan access
   const hasHeroAccess = user?.planStatus === 'heroOffer' || 
-                        user?.email === 'parent@demo.com' ||
-                        (process.env.NODE_ENV === 'development' && user?.role === 'parent');
+                        user?.email === 'parent@demo.com';
 
   // Fetch goals
   const { data: goals = [] } = useQuery<Goal[]>({

@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Plus, Edit, Trash2, Mail, Calendar, Clock, AlertCircle } from "lucide-react";
+import { ArrowLeft, Plus, Edit, Trash2, Mail, Calendar, Clock, AlertCircle, Phone, FileText } from "lucide-react";
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
@@ -87,10 +87,9 @@ export default function CommunicationPlan() {
     status: 'upcoming' as const
   });
 
-  // Check if user has Hero plan access - force enable for demo accounts  
+  // Check if user has Hero plan access
   const hasHeroAccess = user?.planStatus === 'heroOffer' || 
-                        user?.email === 'parent@demo.com' ||
-                        (process.env.NODE_ENV === 'development' && user?.role === 'parent');
+                        user?.email === 'parent@demo.com';
 
   if (!hasHeroAccess) {
     return (

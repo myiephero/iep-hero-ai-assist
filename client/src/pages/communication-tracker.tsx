@@ -58,8 +58,7 @@ export default function CommunicationTracker() {
 
   // Check if user has Hero plan access
   const hasHeroAccess = user?.planStatus === 'heroOffer' || 
-                        user?.email === 'parent@demo.com' ||
-                        (process.env.NODE_ENV === 'development' && user?.role === 'parent');
+                        user?.email === 'parent@demo.com';
 
   const form = useForm<CommunicationLogForm>({
     resolver: zodResolver(communicationLogSchema),

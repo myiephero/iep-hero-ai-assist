@@ -63,27 +63,7 @@ export default function Goals() {
     queryKey: ["/api/goals"],
   });
 
-  // Mock goals for demo
-  const mockGoals = [
-    {
-      id: "1",
-      title: "Improve Reading Comprehension",
-      description: "Student will demonstrate improved reading comprehension skills",
-      status: "In Progress" as const,
-      progress: 75,
-      dueDate: new Date("2024-06-15"),
-    },
-    {
-      id: "2",
-      title: "Math Problem Solving",
-      description: "Student will solve multi-step math word problems",
-      status: "In Progress" as const,
-      progress: 45,
-      dueDate: new Date("2024-05-30"),
-    },
-  ];
-
-  const displayGoals = goals.length > 0 ? goals : mockGoals;
+  const displayGoals = goals;
   const isHeroPlan = user?.planStatus === 'heroOffer';
 
   const createGoalMutation = useMutation({
