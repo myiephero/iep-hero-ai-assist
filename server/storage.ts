@@ -594,14 +594,27 @@ export class DbStorage implements IStorage {
   private db: ReturnType<typeof drizzle>;
 
   constructor() {
-    // Use Supabase database connection
-    const supabaseUrl = process.env.DATABASE_URL || 'postgresql://postgres:[MyIEPHero2025$]@db.wktcfhegoxjearpzdxpz.supabase.co:5432/postgres';
+    // Use environment variable or construct Supabase connection string
+    let connectionString = process.env.DATABASE_URL;
     
-    const sql = postgres(supabaseUrl, { 
+    if (!connectionString && process.env.SUPABASE_URL) {
+      // Extract project reference from SUPABASE_URL
+      const projectRef = process.env.SUPABASE_URL.replace('https://', '').replace('.supabase.co', '');
+      connectionString = `postgresql://postgres.${projectRef}:MyIEPHero2025$@aws-0-us-west-1.pooler.supabase.com:6543/postgres`;
+    }
+    
+    if (!connectionString) {
+      console.error("❌ No database connection string available");
+      throw new Error("DATABASE_URL or SUPABASE_URL must be provided");
+    }
+    
+    console.log("🔗 Connecting to database:", connectionString.replace(/:[^:@]*@/, ':***@'));
+    
+    const sql = postgres(connectionString, { 
       ssl: { rejectUnauthorized: false },
-      max: 1,
-      connect_timeout: 30,
-      idle_timeout: 60
+      max: 5,
+      connect_timeout: 60,
+      idle_timeout: 300
     });
     this.db = drizzle(sql);
   }
