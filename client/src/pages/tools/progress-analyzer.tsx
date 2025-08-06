@@ -8,8 +8,11 @@ import { Label } from "@/components/ui/label";
 import { ArrowLeft, BarChart3, TrendingUp, Download, Save } from "lucide-react";
 import { Link } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
+import { useMutation } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
 
 export default function ProgressAnalyzer() {
+  const { toast } = useToast();
   const [formData, setFormData] = useState({
     studentName: "",
     reportingPeriod: "",
@@ -21,6 +24,7 @@ export default function ProgressAnalyzer() {
   });
   const [generatedReport, setGeneratedReport] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [savingToVault, setSavingToVault] = useState(false);
 
   const handleGenerate = async () => {
     setIsGenerating(true);
@@ -29,9 +33,6 @@ export default function ProgressAnalyzer() {
       
       const report = generateProgressReport(formData);
       setGeneratedReport(report);
-      
-      // Auto-save to document vault
-      await saveToDocumentVault(report);
     } catch (error) {
       console.error("Generation failed:", error);
     } finally {
@@ -104,19 +105,39 @@ PARENT COMMUNICATION:
 This analysis was generated using AI pattern recognition and should be reviewed by the IEP team for accuracy and appropriateness.`;
   };
 
-  const saveToDocumentVault = async (content: string) => {
-    try {
-      await apiRequest("POST", "/api/documents/generate", {
-        content,
-        type: "generated",
-        generatedBy: "progress-analyzer",
-        displayName: `Progress Analysis Report - ${formData.studentName || 'Student'} - ${new Date().toLocaleDateString()}`
+  // Save to vault mutation
+  const saveToVaultMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest("POST", "/api/documents/generate", {
+        content: generatedReport,
+        type: "progress_analysis",
+        generatedBy: "Progress Analyzer",
+        displayName: `Progress Analysis Report - ${formData.studentName || 'Student'} - ${new Date().toLocaleDateString()}`,
+        parentDocumentId: null
       });
-      console.log("Report saved to document vault");
-    } catch (error) {
-      console.error("Failed to save report:", error);
+      
+      if (!response.ok) {
+        throw new Error("Failed to save to vault");
+      }
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Saved to Vault!",
+        description: "Progress analysis report has been saved to your Document Vault"
+      });
+      setSavingToVault(false);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Save Failed",
+        description: error.message || "Failed to save to Document Vault",
+        variant: "destructive"
+      });
+      setSavingToVault(false);
     }
-  };
+  });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 p-6">
@@ -274,11 +295,15 @@ This analysis was generated using AI pattern recognition and should be reviewed 
                       Download
                     </Button>
                     <Button
-                      onClick={() => saveToDocumentVault(generatedReport)}
-                      className="bg-green-600 hover:bg-green-700"
+                      onClick={() => {
+                        setSavingToVault(true);
+                        saveToVaultMutation.mutate();
+                      }}
+                      disabled={savingToVault}
+                      className="bg-green-600 hover:bg-green-700 text-white disabled:bg-slate-600"
                     >
                       <Save className="w-4 h-4 mr-2" />
-                      Save to Vault
+                      {savingToVault ? "Saving..." : "Save to Vault"}
                     </Button>
                   </div>
                 </div>

@@ -5,7 +5,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Save, Plus, User, Upload } from 'lucide-react';
+import { ArrowLeft, Save, Plus, User, Upload, FileText } from 'lucide-react';
 import { Link } from 'wouter';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
@@ -18,6 +18,7 @@ export default function IEPGoalGeneratorPage() {
   const [goals, setGoals] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [savingToVault, setSavingToVault] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -176,6 +177,59 @@ export default function IEPGoalGeneratorPage() {
     }
   };
 
+  // Save to vault mutation
+  const saveToVaultMutation = useMutation({
+    mutationFn: async () => {
+      if (goals.length === 0) {
+        throw new Error("No goals to save");
+      }
+
+      const goalsContent = `SMART IEP GOALS GENERATED
+Generated: ${new Date().toLocaleString()}
+Goal Area: ${area}
+Student: ${students.find(s => s.id === selectedStudentId)?.name || 'Selected Student'}
+
+GENERATED IEP GOALS:
+
+${goals.map((goal, index) => `GOAL ${index + 1}:
+${goal}
+
+`).join('')}
+
+---
+These SMART IEP goals were generated using AI assistance based on the specified goal area and should be reviewed and customized by the IEP team before implementation.`;
+
+      const response = await apiRequest("POST", "/api/documents/generate", {
+        content: goalsContent,
+        type: "iep_goals",
+        generatedBy: "IEP Goal Generator",
+        displayName: `IEP Goals - ${area} - ${new Date().toLocaleDateString()}`,
+        parentDocumentId: null
+      });
+      
+      if (!response.ok) {
+        throw new Error("Failed to save to vault");
+      }
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Saved to Vault!",
+        description: "Generated IEP goals have been saved to your Document Vault"
+      });
+      setSavingToVault(false);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Save Failed",
+        description: error.message || "Failed to save to Document Vault",
+        variant: "destructive"
+      });
+      setSavingToVault(false);
+    }
+  });
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#f2f7fd] to-[#eaf0f8] py-8">
       <div className="max-w-4xl mx-auto px-6">
@@ -284,6 +338,18 @@ export default function IEPGoalGeneratorPage() {
               <div className="flex items-center gap-4">
                 <span className="text-sm text-slate-500">{goals.length} goals generated</span>
                 <Button 
+                  onClick={() => {
+                    setSavingToVault(true);
+                    saveToVaultMutation.mutate();
+                  }}
+                  disabled={savingToVault}
+                  className="bg-blue-600 hover:bg-blue-700 text-white disabled:bg-slate-600"
+                  size="sm"
+                >
+                  <FileText className="w-4 h-4 mr-2" />
+                  {savingToVault ? "Saving..." : "Save to Vault"}
+                </Button>
+                <Button 
                   onClick={saveGoalsToDatabase} 
                   disabled={saving}
                   className="bg-green-600 hover:bg-green-700 text-white"
@@ -337,6 +403,7 @@ export default function IEPGoalGeneratorPage() {
             <div className="mt-8 p-6 bg-green-50 rounded-lg border border-green-200">
               <h3 className="font-semibold text-green-800 mb-2">Next Steps</h3>
               <ul className="text-sm text-green-700 space-y-1">
+                <li>• Click "Save to Vault" to save these goals as a document for future reference</li>
                 <li>• Click "Save All Goals" to add these to your IEP goals tracker</li>
                 <li>• Review these goals with your child's IEP team</li>
                 <li>• Customize the goals to better fit your child's specific needs</li>

@@ -10,7 +10,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { ArrowLeft, Download, Copy, FileText, Clock, AlertCircle } from "lucide-react";
+import { ArrowLeft, Download, Copy, FileText, Clock, AlertCircle, Save } from "lucide-react";
+import { useMutation } from "@tanstack/react-query";
 import { Link } from "wouter";
 
 const formSchema = z.object({
@@ -31,6 +32,7 @@ export default function AdvocacyReportGenerator() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedReport, setGeneratedReport] = useState<string>("");
   const [reportMetadata, setReportMetadata] = useState<any>(null);
+  const [savingToVault, setSavingToVault] = useState(false);
   const { toast } = useToast();
 
   const form = useForm<FormData>({
@@ -99,6 +101,40 @@ export default function AdvocacyReportGenerator() {
     });
   };
 
+  // Save to vault mutation
+  const saveToVaultMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest("POST", "/api/documents/generate", {
+        content: generatedReport,
+        type: "advocacy_report",
+        generatedBy: "Advocacy Report Generator",
+        displayName: `Advocacy Report - ${reportMetadata?.studentName} - ${new Date().toLocaleDateString()}`,
+        parentDocumentId: null
+      });
+      
+      if (!response.ok) {
+        throw new Error("Failed to save to vault");
+      }
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Saved to Vault!",
+        description: "Advocacy report has been saved to your Document Vault"
+      });
+      setSavingToVault(false);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Save Failed",
+        description: error.message || "Failed to save to Document Vault",
+        variant: "destructive"
+      });
+      setSavingToVault(false);
+    }
+  });
+
   const resetForm = () => {
     form.reset();
     setGeneratedReport("");
@@ -133,6 +169,18 @@ export default function AdvocacyReportGenerator() {
                 </CardDescription>
               </div>
               <div className="flex gap-2">
+                <Button 
+                  onClick={() => {
+                    setSavingToVault(true);
+                    saveToVaultMutation.mutate();
+                  }}
+                  disabled={savingToVault}
+                  className="bg-green-600 hover:bg-green-700 text-white disabled:bg-slate-600" 
+                  size="sm"
+                >
+                  <Save className="h-4 w-4 mr-1" />
+                  {savingToVault ? "Saving..." : "Save to Vault"}
+                </Button>
                 <Button onClick={copyToClipboard} variant="outline" size="sm" className="gap-2">
                   <Copy className="h-4 w-4" />
                   Copy

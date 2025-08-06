@@ -9,8 +9,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { ArrowLeft, Calendar, Users, Download, Save, CheckCircle } from "lucide-react";
 import { Link } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
+import { useMutation } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
 
 export default function MeetingPrepWizard() {
+  const { toast } = useToast();
   const [formData, setFormData] = useState({
     meetingType: "",
     studentName: "",
@@ -24,6 +27,7 @@ export default function MeetingPrepWizard() {
   });
   const [generatedPrep, setGeneratedPrep] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [savingToVault, setSavingToVault] = useState(false);
 
   const meetingTypes = {
     "initial": "Initial IEP Meeting",
@@ -61,9 +65,6 @@ export default function MeetingPrepWizard() {
       
       const prep = generateMeetingPrep(formData);
       setGeneratedPrep(prep);
-      
-      // Auto-save to document vault
-      await saveToDocumentVault(prep);
     } catch (error) {
       console.error("Generation failed:", error);
     } finally {
@@ -218,19 +219,39 @@ Remember: You are an equal member of the IEP team. Your input and concerns are v
 This preparation guide was generated using AI assistance and should be customized to your specific situation and needs.`;
   };
 
-  const saveToDocumentVault = async (content: string) => {
-    try {
-      await apiRequest("POST", "/api/documents/generate", {
+  // Save to vault mutation
+  const saveToVaultMutation = useMutation({
+    mutationFn: async (content: string) => {
+      const response = await apiRequest("POST", "/api/documents/generate", {
         content,
-        type: "generated",
-        generatedBy: "meeting-prep-wizard",
-        displayName: `Meeting Prep Guide - ${formData.studentName || 'Student'} - ${formData.meetingDate || new Date().toLocaleDateString()}`
+        type: "meeting_prep",
+        generatedBy: "Meeting Prep Wizard",
+        displayName: `Meeting Prep Guide - ${formData.studentName || 'Student'} - ${formData.meetingDate || new Date().toLocaleDateString()}`,
+        parentDocumentId: null
       });
-      console.log("Meeting prep saved to document vault");
-    } catch (error) {
-      console.error("Failed to save meeting prep:", error);
+      
+      if (!response.ok) {
+        throw new Error("Failed to save to vault");
+      }
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Saved to Vault!",
+        description: "Meeting prep guide has been saved to your Document Vault"
+      });
+      setSavingToVault(false);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Save Failed",
+        description: error.message || "Failed to save to Document Vault",
+        variant: "destructive"
+      });
+      setSavingToVault(false);
     }
-  };
+  });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 p-6">
@@ -402,11 +423,15 @@ This preparation guide was generated using AI assistance and should be customize
                       Download
                     </Button>
                     <Button
-                      onClick={() => saveToDocumentVault(generatedPrep)}
-                      className="bg-green-600 hover:bg-green-700"
+                      onClick={() => {
+                        setSavingToVault(true);
+                        saveToVaultMutation.mutate(generatedPrep);
+                      }}
+                      disabled={savingToVault}
+                      className="bg-green-600 hover:bg-green-700 text-white disabled:bg-slate-600"
                     >
                       <Save className="w-4 h-4 mr-2" />
-                      Save to Vault
+                      {savingToVault ? "Saving..." : "Save to Vault"}
                     </Button>
                   </div>
                 </div>
