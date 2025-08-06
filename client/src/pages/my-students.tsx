@@ -97,7 +97,7 @@ export default function MyStudentsPage() {
 
   // Query for advocate's clients (parents)
   const { data: clients = [] } = useQuery({
-    queryKey: ["/api/advocate-clients"],
+    queryKey: ["/api/advocate/clients"],
     enabled: !!user,
   });
 
@@ -442,11 +442,16 @@ export default function MyStudentsPage() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent className="bg-slate-700 border-slate-600">
-                        {clients.map((client: any) => (
-                          <SelectItem key={client.parentId} value={client.parentId}>
-                            {client.clientName || client.parent?.username} ({client.parent?.email})
-                          </SelectItem>
-                        ))}
+                        {clients.length === 0 ? (
+                          <div className="p-2 text-slate-400 text-sm">No parent clients found</div>
+                        ) : (
+                          clients.map((client: any) => (
+                            <SelectItem key={client.parentId || client.id} value={client.parentId || client.id}>
+                              {client.clientName || client.parent?.username || client.parent?.email} 
+                              {client.parent?.email && ` (${client.parent.email})`}
+                            </SelectItem>
+                          ))
+                        )}
                       </SelectContent>
                     </Select>
                     <FormMessage />
