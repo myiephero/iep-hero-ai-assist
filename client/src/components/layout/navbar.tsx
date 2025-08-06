@@ -64,7 +64,7 @@ const NavLinks = ({ mobile = false }: { mobile?: boolean }) => {
 };
 
 const UserMenu = () => {
-  const { user, logout } = useAuth();
+  const { user, signOut } = useAuth();
 
   if (!user) return null;
 
@@ -91,7 +91,7 @@ const UserMenu = () => {
           </div>
         </div>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={logout} className="text-gray-700 hover:bg-gray-100">
+        <DropdownMenuItem onClick={signOut} className="text-gray-700 hover:bg-gray-100">
           Log out
         </DropdownMenuItem>
       </DropdownMenuContent>
