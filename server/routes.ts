@@ -426,6 +426,13 @@ Use professional, supportive language that empowers the parent while being legal
         fileUrl: "", // Empty string instead of null since field is required
       };
 
+      console.log('🔍 Document data being saved:', {
+        filename: documentData.filename,
+        originalName: documentData.originalName,
+        displayName: documentData.displayName,
+        type: documentData.type
+      });
+
       const document = await storage.createDocument(documentData);
       
       res.json({ 
