@@ -1147,4 +1147,47 @@ export const storage = new class LocalDbStorage implements IStorage {
   async getUsersByRole(role: string): Promise<User[]> {
     return await this.db.select().from(users).where(eq(users.role, role));
   }
+
+  // Student management methods
+  async getStudentsByParentId(parentId: string): Promise<Student[]> {
+    return await this.db.select().from(students).where(eq(students.parentId, parentId));
+  }
+
+  async getStudentsByAdvocateId(advocateId: string): Promise<Student[]> {
+    return await this.db.select().from(students).where(eq(students.advocateId, advocateId));
+  }
+
+  async createStudent(student: InsertStudent): Promise<Student> {
+    const id = randomUUID();
+    const newStudent = {
+      ...student,
+      id,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    
+    const result = await this.db.insert(students).values(newStudent).returning();
+    return result[0];
+  }
+
+  async updateStudent(studentId: string, updates: Partial<InsertStudent>): Promise<Student> {
+    const result = await this.db
+      .update(students)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(students.id, studentId))
+      .returning();
+    
+    if (result.length === 0) {
+      throw new Error("Student not found");
+    }
+    return result[0];
+  }
+
+  async deleteStudent(studentId: string): Promise<void> {
+    await this.db.delete(students).where(eq(students.id, studentId));
+  }
+
+  async getDocumentsByStudentId(studentId: string): Promise<Document[]> {
+    return await this.db.select().from(documents).where(eq(documents.studentId, studentId));
+  }
 }();
