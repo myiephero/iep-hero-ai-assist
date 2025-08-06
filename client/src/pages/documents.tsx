@@ -559,10 +559,10 @@ PRIORITY LEVEL: ${analysisResult.priority || 'Low'}
                       {assigningStudent === doc.id ? (
                         <div className="flex items-center gap-2">
                           <Select value={selectedStudentId} onValueChange={setSelectedStudentId}>
-                            <SelectTrigger className="w-48 bg-slate-700 border-slate-600 text-white">
+                            <SelectTrigger className="w-48 bg-[#3E4161] border-slate-600 text-white [&>span]:text-white hover:bg-slate-600">
                               <SelectValue placeholder="Select student" />
                             </SelectTrigger>
-                            <SelectContent className="bg-slate-700 border-slate-600">
+                            <SelectContent className="bg-[#3E4161] border-slate-600 text-white">
                               {allStudents.length === 0 ? (
                                 <div className="p-2 text-slate-400 text-sm">No students found</div>
                               ) : (
@@ -570,7 +570,7 @@ PRIORITY LEVEL: ${analysisResult.priority || 'Low'}
                                   <SelectItem 
                                     key={student.id} 
                                     value={student.id}
-                                    className="text-white hover:bg-slate-600"
+                                    className="text-white hover:bg-slate-600 focus:bg-slate-600 data-[highlighted]:bg-slate-600"
                                   >
                                     {student.firstName} {student.lastName}
                                   </SelectItem>
