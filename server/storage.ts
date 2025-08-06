@@ -1188,6 +1188,20 @@ export const storage = new class LocalDbStorage implements IStorage {
     return result[0];
   }
 
+  async getUserByVerificationToken(token: string): Promise<User | undefined> {
+    const result = await this.db.select().from(users).where(eq(users.verificationToken, token)).limit(1);
+    return result[0];
+  }
+
+  async verifyUserEmail(userId: string): Promise<User> {
+    const result = await this.db
+      .update(users)
+      .set({ emailVerified: true, verificationToken: null })
+      .where(eq(users.id, userId))
+      .returning();
+    return result[0];
+  }
+
   async getAllUsers(): Promise<User[]> {
     return await this.db.select().from(users);
   }
@@ -1599,6 +1613,15 @@ export const storage = new class LocalDbStorage implements IStorage {
     return await this.db.select().from(documents).where(eq(documents.studentId, studentId));
   }
 
+  async updateDocument(documentId: string, updates: Partial<Document>): Promise<Document> {
+    const result = await this.db
+      .update(documents)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(documents.id, documentId))
+      .returning();
+    return result[0];
+  }
+
   // Advocate Client methods
   async getAdvocateClientsByAdvocateId(advocateId: string): Promise<AdvocateClient[]> {
     return await this.db.select().from(advocateClients).where(eq(advocateClients.advocateId, advocateId));
@@ -1635,5 +1658,80 @@ export const storage = new class LocalDbStorage implements IStorage {
 
   async deleteAdvocateClient(clientId: string): Promise<void> {
     await this.db.delete(advocateClients).where(eq(advocateClients.id, clientId));
+  }
+
+  // Missing methods for interface compliance
+  async updateStripeCustomerId(userId: string, customerId: string): Promise<User> {
+    const result = await this.db
+      .update(users)
+      .set({ stripeCustomerId: customerId })
+      .where(eq(users.id, userId))
+      .returning();
+    return result[0];
+  }
+
+  async deleteDocuments(documentIds: string[], userId: string): Promise<number> {
+    const result = await this.db
+      .delete(documents)
+      .where(and(
+        inArray(documents.id, documentIds),
+        eq(documents.userId, userId)
+      ));
+    return result.count || documentIds.length;
+  }
+
+  async getIEPDraftsByUserId(userId: string): Promise<IEPDraft[]> {
+    return await this.db.select().from(iepDrafts).where(eq(iepDrafts.userId, userId));
+  }
+
+  async createIEPDraft(userId: string, draft: InsertIEPDraft): Promise<IEPDraft> {
+    const id = randomUUID();
+    const newDraft = {
+      ...draft,
+      id,
+      userId,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    
+    const result = await this.db.insert(iepDrafts).values(newDraft).returning();
+    return result[0];
+  }
+
+  async getConversationsByUserId(userId: string): Promise<any[]> {
+    // Simple implementation for conversations - returns unique conversation partners
+    const sentMessages = await this.db
+      .select()
+      .from(messages)
+      .where(eq(messages.senderId, userId));
+    
+    const receivedMessages = await this.db
+      .select()
+      .from(messages)
+      .where(eq(messages.receiverId, userId));
+    
+    return [...sentMessages, ...receivedMessages];
+  }
+
+  async getMessagesBetweenUsers(userId1: string, userId2: string): Promise<Message[]> {
+    const messages1 = await this.db
+      .select()
+      .from(messages)
+      .where(and(
+        eq(messages.senderId, userId1),
+        eq(messages.receiverId, userId2)
+      ));
+    
+    const messages2 = await this.db
+      .select()
+      .from(messages)
+      .where(and(
+        eq(messages.senderId, userId2),
+        eq(messages.receiverId, userId1)
+      ));
+    
+    return [...messages1, ...messages2].sort((a, b) => 
+      (a.sentAt?.getTime() || 0) - (b.sentAt?.getTime() || 0)
+    );
   }
 }();
