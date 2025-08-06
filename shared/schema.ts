@@ -142,12 +142,10 @@ export const advocateClients = pgTable("advocate_clients", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   advocateId: varchar("advocate_id").notNull().references(() => users.id),
   parentId: varchar("parent_id").notNull().references(() => users.id),
-  status: text("status").notNull().default("active"), // active, inactive, pending
-  assignedDate: timestamp("assigned_date").default(sql`now()`),
-  caseType: text("case_type"), // initial_iep, annual_review, due_process, etc.
-  priority: text("priority").default("medium"), // low, medium, high, urgent
-  lastContact: timestamp("last_contact"),
-  nextMeeting: timestamp("next_meeting"),
+  studentId: varchar("student_id").references(() => students.id),
+  relationshipStatus: text("relationship_status").notNull().default("active"),
+  startDate: timestamp("start_date").default(sql`now()`),
+  endDate: timestamp("end_date"),
   notes: text("notes"),
   createdAt: timestamp("created_at").default(sql`now()`),
 });
@@ -249,7 +247,7 @@ export const insertStudentSchema = createInsertSchema(students).omit({
 export const insertAdvocateClientSchema = createInsertSchema(advocateClients).omit({
   id: true,
   createdAt: true,
-  assignedDate: true,
+  startDate: true,
 });
 
 export const insertIEPDraftSchema = createInsertSchema(iepDrafts).omit({

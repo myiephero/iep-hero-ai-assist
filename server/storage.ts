@@ -1566,4 +1566,42 @@ export const storage = new class LocalDbStorage implements IStorage {
   async getDocumentsByStudentId(studentId: string): Promise<Document[]> {
     return await this.db.select().from(documents).where(eq(documents.studentId, studentId));
   }
+
+  // Advocate Client methods
+  async getAdvocateClientsByAdvocateId(advocateId: string): Promise<AdvocateClient[]> {
+    return await this.db.select().from(advocateClients).where(eq(advocateClients.advocateId, advocateId));
+  }
+
+  async getAdvocateClientsByParentId(parentId: string): Promise<AdvocateClient[]> {
+    return await this.db.select().from(advocateClients).where(eq(advocateClients.parentId, parentId));
+  }
+
+  async createAdvocateClient(client: any): Promise<AdvocateClient> {
+    const id = randomUUID();
+    const newClient = {
+      ...client,
+      id,
+      createdAt: new Date()
+    };
+    
+    const result = await this.db.insert(advocateClients).values(newClient).returning();
+    return result[0];
+  }
+
+  async updateAdvocateClient(clientId: string, updates: Partial<InsertAdvocateClient>): Promise<AdvocateClient> {
+    const result = await this.db
+      .update(advocateClients)
+      .set(updates)
+      .where(eq(advocateClients.id, clientId))
+      .returning();
+    
+    if (result.length === 0) {
+      throw new Error("Client not found");
+    }
+    return result[0];
+  }
+
+  async deleteAdvocateClient(clientId: string): Promise<void> {
+    await this.db.delete(advocateClients).where(eq(advocateClients.id, clientId));
+  }
 }();
