@@ -182,7 +182,7 @@ export default function IEPGoalGeneratorPage() {
         {/* Header with Back Button */}
         <div className="mb-8">
           <Link href={user?.role === 'advocate' ? '/dashboard-advocate' : '/dashboard-parent'}>
-            <Button variant="ghost" className="mb-4 text-slate-600 hover:text-slate-900">
+            <Button className="mb-4 bg-slate-600 hover:bg-slate-700 text-white">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Dashboard
             </Button>
@@ -272,8 +272,7 @@ export default function IEPGoalGeneratorPage() {
                 
                 <Button
                   onClick={() => setShowUploadModal(true)}
-                  variant="outline"
-                  className="w-full"
+                  className="w-full bg-slate-600 hover:bg-slate-700 text-white"
                 >
                   <Upload className="w-4 h-4 mr-2" />
                   Upload Existing IEP or Assessment

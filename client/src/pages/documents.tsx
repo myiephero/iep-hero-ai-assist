@@ -407,8 +407,7 @@ PRIORITY LEVEL: ${analysisResult.priority || 'Low'}
               </Button>
               <Button
                 onClick={() => setBulkActionMode(!bulkActionMode)}
-                variant="outline"
-                className="border-slate-600 text-white hover:bg-slate-700"
+                className="bg-slate-700 hover:bg-slate-600 text-white border border-slate-600"
               >
                 {bulkActionMode ? "Cancel Selection" : "Select Documents"}
               </Button>
