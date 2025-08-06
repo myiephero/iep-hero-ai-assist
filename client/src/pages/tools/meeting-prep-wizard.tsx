@@ -9,14 +9,23 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { ArrowLeft, Calendar, Users, Download, Save, CheckCircle } from "lucide-react";
 import { Link } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function MeetingPrepWizard() {
   const { toast } = useToast();
+  const { user } = useAuth();
+  
+  // Fetch available students
+  const { data: students = [], isLoading: studentsLoading } = useQuery({
+    queryKey: user?.role === 'advocate' ? ["/api/advocate/students"] : ["/api/parent/students"],
+    enabled: !!user,
+  });
+  
   const [formData, setFormData] = useState({
     meetingType: "",
-    studentName: "",
+    studentId: "",
     meetingDate: "",
     attendees: "",
     concerns: "",
@@ -80,7 +89,7 @@ Generated: ${date}
 
 MEETING DETAILS:
 Type: ${meetingTypes[data.meetingType as keyof typeof meetingTypes] || '[Meeting Type]'}
-Student: ${data.studentName || '[Student Name]'}
+Student: ${data.studentId ? (students as any[]).find(s => s.id === data.studentId)?.firstName + ' ' + (students as any[]).find(s => s.id === data.studentId)?.lastName : '[Student Name]'}
 Date: ${data.meetingDate || '[Meeting Date]'}
 Expected Attendees: ${data.attendees || '[Attendees List]'}
 
@@ -297,12 +306,24 @@ This preparation guide was generated using AI assistance and should be customize
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label className="text-white">Student Name</Label>
-                  <Input
-                    value={formData.studentName}
-                    onChange={(e) => setFormData({...formData, studentName: e.target.value})}
-                    placeholder="Enter student name"
-                    className="bg-white/10 border-white/20 text-white placeholder:text-white/60"
-                  />
+                  <Select value={formData.studentId} onValueChange={(value) => setFormData({...formData, studentId: value})}>
+                    <SelectTrigger className="bg-white/10 border-white/20 text-white">
+                      <SelectValue placeholder={studentsLoading ? "Loading students..." : "Select a student"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {(students as any[]).map((student: any) => (
+                        <SelectItem key={student.id} value={student.id}>
+                          {student.firstName} {student.lastName}
+                          {student.gradeLevel && ` (${student.gradeLevel})`}
+                        </SelectItem>
+                      ))}
+                      {(students as any[]).length === 0 && !studentsLoading && (
+                        <SelectItem value="" disabled>
+                          No students available
+                        </SelectItem>
+                      )}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
                   <Label className="text-white">Meeting Date</Label>

@@ -8,6 +8,8 @@ import { Label } from "@/components/ui/label";
 import { ArrowLeft, FileText, Download, Save } from "lucide-react";
 import { Link } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
+import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "@/contexts/AuthContext";
 
 const letterTemplates = {
   "request-meeting": "Request for IEP Team Meeting",
@@ -19,9 +21,17 @@ const letterTemplates = {
 };
 
 export default function SmartLetterGenerator() {
+  const { user } = useAuth();
+  
+  // Fetch available students
+  const { data: students = [], isLoading: studentsLoading } = useQuery({
+    queryKey: user?.role === 'advocate' ? ["/api/advocate/students"] : ["/api/parent/students"],
+    enabled: !!user,
+  });
+  
   const [selectedTemplate, setSelectedTemplate] = useState("");
   const [formData, setFormData] = useState({
-    studentName: "",
+    studentId: "",
     schoolName: "",
     teacherName: "",
     concerns: "",
@@ -52,6 +62,8 @@ export default function SmartLetterGenerator() {
 
   const generateLetterContent = (template: string, data: any) => {
     const date = new Date().toLocaleDateString();
+    const selectedStudent = data.studentId ? (students as any[]).find(s => s.id === data.studentId) : null;
+    const studentName = selectedStudent ? `${selectedStudent.firstName} ${selectedStudent.lastName}` : '[Student Name]';
     
     const templates = {
       "request-meeting": `${date}
@@ -62,7 +74,7 @@ export default function SmartLetterGenerator() {
 
 Dear [Administrator Name],
 
-I am writing to formally request an IEP team meeting for my child, ${data.studentName}, who is currently enrolled in ${data.teacherName}'s class at ${data.schoolName}.
+I am writing to formally request an IEP team meeting for my child, ${studentName}, who is currently enrolled in ${data.teacherName}'s class at ${data.schoolName}.
 
 REASON FOR MEETING REQUEST:
 ${data.concerns}
@@ -78,7 +90,7 @@ Please provide me with:
 - List of team members who will attend
 - Meeting location and format (in-person/virtual)
 
-I look forward to collaborating with the team to ensure ${data.studentName}'s educational needs are met.
+I look forward to collaborating with the team to ensure ${studentName}'s educational needs are met.
 
 Sincerely,
 [Your Name]
@@ -93,11 +105,11 @@ LEGAL REFERENCE: 34 CFR §300.501(b)(1) - Parent participation in meetings`,
 [School Name]
 [School Address]
 
-RE: Response to Prior Written Notice for ${data.studentName}
+RE: Response to Prior Written Notice for ${studentName}
 
 Dear [Administrator Name],
 
-I am responding to the Prior Written Notice dated [DATE] regarding proposed changes to ${data.studentName}'s IEP.
+I am responding to the Prior Written Notice dated [DATE] regarding proposed changes to ${studentName}'s IEP.
 
 MY CONCERNS:
 ${data.concerns}
@@ -105,7 +117,7 @@ ${data.concerns}
 REQUESTED ACTIONS:
 ${data.requestedActions}
 
-I do not consent to the proposed changes and request an IEP team meeting to discuss alternatives that would better meet ${data.studentName}'s educational needs.
+I do not consent to the proposed changes and request an IEP team meeting to discuss alternatives that would better meet ${studentName}'s educational needs.
 
 Please schedule this meeting within 10 school days and provide:
 - Detailed explanation of the proposed changes
@@ -127,11 +139,11 @@ LEGAL REFERENCE: 34 CFR §300.503 - Prior notice by the public agency`,
 [School Name]
 [School Address]
 
-RE: Request for Educational Evaluation - ${data.studentName}
+RE: Request for Educational Evaluation - ${studentName}
 
 Dear [Administrator Name],
 
-I am formally requesting a comprehensive educational evaluation for my child, ${data.studentName}, who is currently in ${data.teacherName}'s class.
+I am formally requesting a comprehensive educational evaluation for my child, ${studentName}, who is currently in ${data.teacherName}'s class.
 
 AREAS OF CONCERN:
 ${data.concerns}
@@ -216,12 +228,24 @@ LEGAL REFERENCE: 34 CFR §300.301 - Initial evaluations`
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label className="text-white">Student Name</Label>
-                  <Input
-                    value={formData.studentName}
-                    onChange={(e) => setFormData({...formData, studentName: e.target.value})}
-                    placeholder="Enter student name"
-                    className="bg-white/10 border-white/20 text-white placeholder:text-white/60"
-                  />
+                  <Select value={formData.studentId} onValueChange={(value) => setFormData({...formData, studentId: value})}>
+                    <SelectTrigger className="bg-white/10 border-white/20 text-white">
+                      <SelectValue placeholder={studentsLoading ? "Loading students..." : "Select a student"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {(students as any[]).map((student: any) => (
+                        <SelectItem key={student.id} value={student.id}>
+                          {student.firstName} {student.lastName}
+                          {student.gradeLevel && ` (${student.gradeLevel})`}
+                        </SelectItem>
+                      ))}
+                      {(students as any[]).length === 0 && !studentsLoading && (
+                        <SelectItem value="" disabled>
+                          No students available
+                        </SelectItem>
+                      )}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
                   <Label className="text-white">School Name</Label>

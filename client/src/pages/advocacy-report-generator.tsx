@@ -11,11 +11,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { ArrowLeft, Download, Copy, FileText, Clock, AlertCircle, Save } from "lucide-react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
+import { useAuth } from "@/contexts/AuthContext";
 
 const formSchema = z.object({
-  studentName: z.string().min(2, "Student name must be at least 2 characters"),
+  studentId: z.string().min(1, "Please select a student"),
   gradeLevel: z.string().min(1, "Grade level is required"),
   disability: z.string().min(2, "Primary disability is required"),
   currentServices: z.string().min(10, "Current services description is required"),
@@ -34,11 +35,18 @@ export default function AdvocacyReportGenerator() {
   const [reportMetadata, setReportMetadata] = useState<any>(null);
   const [savingToVault, setSavingToVault] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
+
+  // Fetch available students based on user role
+  const { data: students = [], isLoading: studentsLoading } = useQuery({
+    queryKey: user?.role === 'advocate' ? ["/api/advocate/students"] : ["/api/parent/students"],
+    enabled: !!user,
+  });
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      studentName: "",
+      studentId: "",
       gradeLevel: "",
       disability: "",
       currentServices: "",
@@ -243,13 +251,30 @@ export default function AdvocacyReportGenerator() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
-                      name="studentName"
+                      name="studentId"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Student Name</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Enter student's full name" {...field} />
-                          </FormControl>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder={studentsLoading ? "Loading students..." : "Select a student"} />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {(students as any[]).map((student: any) => (
+                                <SelectItem key={student.id} value={student.id}>
+                                  {student.firstName} {student.lastName}
+                                  {student.gradeLevel && ` (${student.gradeLevel})`}
+                                </SelectItem>
+                              ))}
+                              {(students as any[]).length === 0 && !studentsLoading && (
+                                <SelectItem value="" disabled>
+                                  No students available
+                                </SelectItem>
+                              )}
+                            </SelectContent>
+                          </Select>
                           <FormMessage />
                         </FormItem>
                       )}
