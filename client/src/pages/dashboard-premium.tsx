@@ -293,12 +293,17 @@ export default function DashboardAdvocate() {
                   : "This AI tool will help you with IEP management."}
               </p>
               {selectedTool === "AI IEP Review" && (
-                <Input 
-                  type="file" 
-                  accept=".pdf,.doc,.docx"
-                  onChange={(e) => setUpload(e.target.files?.[0] || null)}
-                  className="bg-[#3E4161] border-slate-500 text-white"
-                />
+                <div>
+                  <Input 
+                    type="file" 
+                    accept=".pdf,.doc,.docx"
+                    onChange={(e) => setUpload(e.target.files?.[0] || null)}
+                    className="bg-[#3E4161] border-slate-500 text-white"
+                  />
+                  <p className="text-xs text-slate-400 mt-1">
+                    Upload PDF, DOC, or DOCX files (max 10MB)
+                  </p>
+                </div>
               )}
               <div className="flex gap-2">
                 <Button 

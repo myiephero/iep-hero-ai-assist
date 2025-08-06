@@ -302,12 +302,17 @@ export default function ParentDashboard() {
                     : "This tool will help you with your child's IEP management."}
                 </p>
                 {selectedTool === "Ask AI About My Docs" && (
-                  <Input 
-                    type="file" 
-                    accept=".pdf,.doc,.docx"
-                    onChange={(e) => setUpload(e.target.files?.[0] || null)}
-                    className="border-slate-300"
-                  />
+                  <div>
+                    <Input 
+                      type="file" 
+                      accept=".pdf,.doc,.docx"
+                      onChange={(e) => setUpload(e.target.files?.[0] || null)}
+                      className="border-slate-300"
+                    />
+                    <p className="text-xs text-slate-500 mt-1">
+                      Upload PDF, DOC, or DOCX files (max 10MB)
+                    </p>
+                  </div>
                 )}
                 <div className="flex gap-2">
                   <Button 

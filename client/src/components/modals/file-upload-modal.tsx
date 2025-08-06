@@ -1,13 +1,13 @@
 import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CloudUpload } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Upload, FileText, X } from "lucide-react";
 
 interface FileUploadModalProps {
   open: boolean;
@@ -15,20 +15,15 @@ interface FileUploadModalProps {
 }
 
 export default function FileUploadModal({ open, onOpenChange }: FileUploadModalProps) {
-  const [file, setFile] = useState<File | null>(null);
-  const [type, setType] = useState<string>("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [type, setType] = useState("iep");
   const [description, setDescription] = useState("");
-  const [isDragOver, setIsDragOver] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const uploadMutation = useMutation({
-    mutationFn: async (data: { file: File; type: string; description: string }) => {
-      const formData = new FormData();
-      formData.append("file", data.file);
-      formData.append("type", data.type);
-      formData.append("description", data.description);
-
+    mutationFn: async (formData: FormData) => {
       const response = await fetch("/api/documents", {
         method: "POST",
         body: formData,
@@ -36,170 +31,228 @@ export default function FileUploadModal({ open, onOpenChange }: FileUploadModalP
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `Upload failed with status ${response.status}`);
+        const error = await response.json().catch(() => ({ message: "Upload failed" }));
+        throw new Error(error.message || "Upload failed");
       }
 
       return response.json();
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/documents"] });
       toast({
         title: "Success",
         description: "Document uploaded successfully",
       });
-      queryClient.invalidateQueries({ queryKey: ["/api/documents"] });
       handleClose();
     },
     onError: (error: any) => {
-      console.error('Upload error:', error);
       toast({
-        title: "Upload Failed",
-        description: error.message || "Failed to upload document. Please check file type and size.",
+        title: "Error",
+        description: error.message || "Failed to upload document",
         variant: "destructive",
       });
     },
   });
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0];
-    if (selectedFile) {
-      console.log('File selected:', selectedFile.name, selectedFile.type, selectedFile.size);
-      setFile(selectedFile);
-    }
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(true);
-  };
-
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(false);
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(false);
+  const handleFileSelect = (file: File) => {
+    const allowedTypes = ['.pdf', '.doc', '.docx'];
+    const fileExtension = '.' + file.name.split('.').pop()?.toLowerCase();
     
-    const droppedFile = e.dataTransfer.files[0];
-    if (droppedFile) {
-      const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-      if (allowedTypes.includes(droppedFile.type)) {
-        console.log('File dropped:', droppedFile.name, droppedFile.type, droppedFile.size);
-        setFile(droppedFile);
-      } else {
-        toast({
-          title: "Invalid file type",
-          description: "Only PDF, DOC, and DOCX files are allowed",
-          variant: "destructive",
-        });
-      }
-    }
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!file || !type) {
+    if (!allowedTypes.includes(fileExtension)) {
       toast({
-        title: "Error",
-        description: "Please select a file and document type",
+        title: "Invalid file type",
+        description: "Only PDF, DOC, and DOCX files are allowed",
         variant: "destructive",
       });
       return;
     }
 
-    console.log('Uploading file:', file.name, 'Type:', type, 'Description:', description);
-    uploadMutation.mutate({ file, type, description });
+    if (file.size > 10 * 1024 * 1024) { // 10MB limit
+      toast({
+        title: "File too large",
+        description: "File size must be less than 10MB",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setSelectedFile(file);
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleFileSelect(file);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      handleFileSelect(file);
+    }
+  };
+
+  const handleSubmit = () => {
+    if (!selectedFile) {
+      toast({
+        title: "No file selected",
+        description: "Please select a file to upload",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("document", selectedFile);
+    formData.append("type", type);
+    formData.append("description", description);
+
+    uploadMutation.mutate(formData);
   };
 
   const handleClose = () => {
-    setFile(null);
-    setType("");
+    setSelectedFile(null);
+    setType("iep");
     setDescription("");
+    setIsDragging(false);
     onOpenChange(false);
   };
 
+  const getFileIcon = () => {
+    if (!selectedFile) return <Upload className="w-8 h-8 text-gray-400" />;
+    return <FileText className="w-8 h-8 text-blue-500" />;
+  };
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+    <Dialog open={open} onOpenChange={handleClose}>
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Upload IEP Document</DialogTitle>
+          <DialogTitle>Upload Document</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-6">
+        
+        <div className="space-y-4">
+          {/* File Upload Area */}
           <div 
-            className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors cursor-pointer ${
-              isDragOver 
-                ? 'border-primary bg-primary/5' 
-                : 'border-gray-300 hover:border-primary'
+            className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+              isDragging 
+                ? 'border-blue-500 bg-blue-50' 
+                : selectedFile 
+                  ? 'border-green-500 bg-green-50' 
+                  : 'border-gray-300 hover:border-gray-400'
             }`}
-            onClick={() => document.getElementById('file-upload')?.click()}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
           >
-            <CloudUpload className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h4 className="text-lg font-medium text-gray-900 mb-2">
-              Drop files here or click to browse
-            </h4>
-            <p className="text-sm text-gray-500 mb-4">
-              Supports PDF, DOC, DOCX files up to 10MB
-            </p>
-            <input
-              type="file"
-              accept=".pdf,.doc,.docx"
-              onChange={handleFileChange}
-              className="hidden"
-              id="file-upload"
-            />
-            <Button type="button" variant="outline">
-              Choose File
-            </Button>
-            {file && (
-              <p className="mt-2 text-sm text-gray-600">
-                Selected: {file.name}
-              </p>
+            {getFileIcon()}
+            
+            {selectedFile ? (
+              <div className="mt-2">
+                <p className="text-sm font-medium text-green-700">{selectedFile.name}</p>
+                <p className="text-xs text-gray-500">
+                  {(selectedFile.size / (1024 * 1024)).toFixed(2)} MB
+                </p>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setSelectedFile(null)}
+                  className="mt-2 text-red-600 hover:text-red-700"
+                >
+                  <X className="w-4 h-4 mr-1" />
+                  Remove
+                </Button>
+              </div>
+            ) : (
+              <div className="mt-2">
+                <p className="text-sm text-gray-600 mb-2">
+                  Drag and drop your file here, or click to browse
+                </p>
+                <Input
+                  type="file"
+                  accept=".pdf,.doc,.docx"
+                  onChange={handleFileChange}
+                  className="hidden"
+                  id="file-upload"
+                />
+                <Label htmlFor="file-upload">
+                  <Button variant="outline" className="cursor-pointer" asChild>
+                    <span>Choose File</span>
+                  </Button>
+                </Label>
+                <p className="text-xs text-gray-500 mt-2">
+                  Supported formats: PDF, DOC, DOCX (max 10MB)
+                </p>
+              </div>
             )}
           </div>
 
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="type">Document Type</Label>
-              <Select value={type} onValueChange={setType}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select document type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="iep">IEP Document</SelectItem>
-                  <SelectItem value="assessment">Assessment Report</SelectItem>
-                  <SelectItem value="progress_report">Progress Report</SelectItem>
-                  <SelectItem value="meeting_notes">Meeting Notes</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <Label htmlFor="description">Description (Optional)</Label>
-              <Textarea
-                id="description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Add any additional context about this document..."
-                rows={3}
-              />
-            </div>
+          {/* Document Type */}
+          <div>
+            <Label htmlFor="document-type">Document Type</Label>
+            <Select value={type} onValueChange={setType}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select document type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="iep">IEP Document</SelectItem>
+                <SelectItem value="assessment">Assessment Report</SelectItem>
+                <SelectItem value="progress_report">Progress Report</SelectItem>
+                <SelectItem value="meeting_notes">Meeting Notes</SelectItem>
+                <SelectItem value="other">Other</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
-          <div className="flex justify-end space-x-3">
-            <Button type="button" variant="outline" onClick={handleClose}>
+          {/* Description */}
+          <div>
+            <Label htmlFor="description">Description (Optional)</Label>
+            <Textarea
+              id="description"
+              placeholder="Add a description for this document..."
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              rows={3}
+            />
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex gap-2">
+            <Button
+              onClick={handleSubmit}
+              disabled={!selectedFile || uploadMutation.isPending}
+              className="flex-1"
+            >
+              {uploadMutation.isPending ? (
+                <>
+                  <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2" />
+                  Uploading...
+                </>
+              ) : (
+                <>
+                  <Upload className="w-4 h-4 mr-2" />
+                  Upload Document
+                </>
+              )}
+            </Button>
+            <Button variant="outline" onClick={handleClose}>
               Cancel
             </Button>
-            <Button type="submit" disabled={uploadMutation.isPending}>
-              {uploadMutation.isPending ? "Uploading..." : "Upload Document"}
-            </Button>
           </div>
-        </form>
+        </div>
       </DialogContent>
     </Dialog>
   );

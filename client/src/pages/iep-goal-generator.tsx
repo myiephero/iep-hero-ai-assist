@@ -5,11 +5,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Save, Plus, User } from 'lucide-react';
+import { ArrowLeft, Save, Plus, User, Upload } from 'lucide-react';
 import { Link } from 'wouter';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { useAuth } from '@/hooks/use-auth';
+import FileUploadModal from '@/components/modals/file-upload-modal';
 
 export default function IEPGoalGeneratorPage() {
   const [area, setArea] = useState('');
@@ -17,6 +18,7 @@ export default function IEPGoalGeneratorPage() {
   const [goals, setGoals] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [showUploadModal, setShowUploadModal] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { user } = useAuth();
@@ -251,14 +253,25 @@ export default function IEPGoalGeneratorPage() {
                 />
               </div>
 
-              <Button 
-                disabled={loading || !area.trim()} 
-                onClick={generateGoals}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 text-lg"
-                size="lg"
-              >
-                {loading ? 'Generating SMART Goals...' : 'Generate IEP Goals'}
-              </Button>
+              <div className="space-y-3">
+                <Button 
+                  disabled={loading || !area.trim()} 
+                  onClick={generateGoals}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 text-lg"
+                  size="lg"
+                >
+                  {loading ? 'Generating SMART Goals...' : 'Generate IEP Goals'}
+                </Button>
+                
+                <Button
+                  onClick={() => setShowUploadModal(true)}
+                  variant="outline"
+                  className="w-full"
+                >
+                  <Upload className="w-4 h-4 mr-2" />
+                  Upload Existing IEP or Assessment
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -334,6 +347,12 @@ export default function IEPGoalGeneratorPage() {
           </div>
         )}
       </div>
+      
+      {/* File Upload Modal */}
+      <FileUploadModal 
+        open={showUploadModal} 
+        onOpenChange={setShowUploadModal}
+      />
     </div>
   );
 }
