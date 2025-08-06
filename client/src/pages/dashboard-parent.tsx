@@ -8,6 +8,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLocation } from 'wouter';
 import IEPGoalGenerator from '@/components/IEPGoalGenerator';
 import { IEPStatusViewer } from '@/components/IEPStatusViewer';
+import { DashboardMetrics } from '@/components/DashboardMetrics';
 
 
 const parentTools = [
@@ -151,6 +152,9 @@ export default function ParentDashboard() {
         <p className="text-slate-300 mb-8">
           Your complete toolkit for IEP advocacy and support
         </p>
+
+        {/* Dashboard Metrics - Real Data */}
+        <DashboardMetrics className="mb-8" />
 
         {/* Quick Access Tools */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
