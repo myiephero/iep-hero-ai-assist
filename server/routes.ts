@@ -1046,6 +1046,28 @@ Focus on functional skills that will help the student succeed in their education
     }
   });
 
+  // Bulk delete documents
+  app.delete("/api/documents/bulk", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      const { documentIds } = req.body;
+
+      if (!documentIds || !Array.isArray(documentIds) || documentIds.length === 0) {
+        return res.status(400).json({ message: 'Document IDs array is required' });
+      }
+
+      // Delete documents and their files
+      const deletedCount = await storage.deleteDocuments(documentIds, user.id);
+
+      res.json({ 
+        message: `Successfully deleted ${deletedCount} documents`,
+        deletedCount 
+      });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   // AI Document Analysis route
   app.post("/api/documents/:id/analyze", requireAuth, async (req, res) => {
     try {

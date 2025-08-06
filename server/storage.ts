@@ -3,6 +3,7 @@ import { randomUUID } from "crypto";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import { eq, and } from "drizzle-orm";
+import fs from "fs";
 
 export interface IStorage {
   // User management
@@ -569,6 +570,29 @@ export class MemStorage implements IStorage {
 
   async getDocumentsByStudentId(studentId: string): Promise<Document[]> {
     return Array.from(this.documents.values()).filter(doc => doc.studentId === studentId);
+  }
+
+  async deleteDocuments(documentIds: string[], userId: string): Promise<number> {
+    let deletedCount = 0;
+    for (const documentId of documentIds) {
+      const document = this.documents.get(documentId);
+      if (document && document.userId === userId) {
+        // Delete physical file if it exists
+        if (document.filename) {
+          const filePath = `uploads/${document.filename}`;
+          if (fs.existsSync(filePath)) {
+            try {
+              fs.unlinkSync(filePath);
+            } catch (error) {
+              console.error(`Failed to delete file ${filePath}:`, error);
+            }
+          }
+        }
+        this.documents.delete(documentId);
+        deletedCount++;
+      }
+    }
+    return deletedCount;
   }
 
   // Advocate Client methods
