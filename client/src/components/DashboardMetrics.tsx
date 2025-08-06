@@ -66,6 +66,9 @@ export function DashboardMetrics({ className = "" }: DashboardMetricsProps) {
               <div>
                 <p className="text-sm text-slate-400">Active Goals</p>
                 <p className="text-2xl font-bold text-white">{defaultMetrics.activeGoals}</p>
+                {defaultMetrics.activeGoals === 0 && (
+                  <p className="text-xs text-blue-300 mt-1">Create your first goal</p>
+                )}
               </div>
             </div>
           </CardContent>
@@ -81,6 +84,9 @@ export function DashboardMetrics({ className = "" }: DashboardMetricsProps) {
               <div>
                 <p className="text-sm text-slate-400">Progress Rate</p>
                 <p className="text-2xl font-bold text-white">{defaultMetrics.progressRate}%</p>
+                {defaultMetrics.progressRate === 0 && (
+                  <p className="text-xs text-green-300 mt-1">Start making progress</p>
+                )}
               </div>
             </div>
           </CardContent>
@@ -96,10 +102,10 @@ export function DashboardMetrics({ className = "" }: DashboardMetricsProps) {
               <div className="min-w-0 flex-1">
                 <p className="text-sm text-slate-400">Next Meeting</p>
                 <p className="text-sm font-semibold text-white truncate">
-                  No upcoming meetings
+                  No meetings scheduled
                 </p>
                 <p className="text-xs text-slate-500">
-                  No upcoming meetings
+                  Schedule your next IEP meeting
                 </p>
               </div>
             </div>
@@ -116,6 +122,9 @@ export function DashboardMetrics({ className = "" }: DashboardMetricsProps) {
               <div>
                 <p className="text-sm text-slate-400">Documents</p>
                 <p className="text-2xl font-bold text-white">{defaultMetrics.documents}</p>
+                {defaultMetrics.documents === 0 && (
+                  <p className="text-xs text-orange-300 mt-1">Upload your first document</p>
+                )}
               </div>
             </div>
           </CardContent>
