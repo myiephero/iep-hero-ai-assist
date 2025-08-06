@@ -10,7 +10,8 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import FileUploadModal from "@/components/modals/file-upload-modal";
-import { FileText, Upload, Download, Brain, Edit2, Check, X, Eye, Save, ArrowLeft, Search, User, Trash2, Archive, MoreHorizontal } from "lucide-react";
+import DocumentTagsDisplay from "@/components/DocumentTagsDisplay";
+import { FileText, Upload, Download, Brain, Edit2, Check, X, Eye, Save, ArrowLeft, Search, User, Trash2, Archive, MoreHorizontal, RefreshCw } from "lucide-react";
 import { Link } from "wouter";
 import { format } from "date-fns";
 import type { Document } from "@shared/schema";
@@ -31,6 +32,7 @@ export default function Documents() {
   const [selectedStudentId, setSelectedStudentId] = useState<string>("");
   const [selectedDocuments, setSelectedDocuments] = useState<Set<string>>(new Set());
   const [bulkActionMode, setBulkActionMode] = useState(false);
+  const [retaggingDocument, setRetaggingDocument] = useState<string | null>(null);
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -253,6 +255,35 @@ PRIORITY LEVEL: ${analysisResult.priority || 'Low'}
   const cancelEditing = () => {
     setEditingDocument(null);
     setEditingName("");
+  };
+
+  // Mutation for retagging documents
+  const retagDocumentMutation = useMutation({
+    mutationFn: async (documentId: string) => {
+      const response = await apiRequest("POST", `/api/documents/${documentId}/retag`);
+      return response;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/documents"] });
+      toast({
+        title: "Document retagged!",
+        description: "AI tags and categories updated successfully.",
+      });
+      setRetaggingDocument(null);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Retagging failed",
+        description: error.message || "Failed to update document tags",
+        variant: "destructive",
+      });
+      setRetaggingDocument(null);
+    },
+  });
+
+  const handleRetag = (documentId: string) => {
+    setRetaggingDocument(documentId);
+    retagDocumentMutation.mutate(documentId);
   };
 
   const downloadDocument = async (documentId: string, filename: string) => {
@@ -550,6 +581,14 @@ PRIORITY LEVEL: ${analysisResult.priority || 'Low'}
                               Student Assigned
                             </Badge>
                           )}
+                        </div>
+                        {/* Smart Tags Display */}
+                        <div className="mt-3">
+                          <DocumentTagsDisplay 
+                            document={doc} 
+                            onRetag={handleRetag}
+                            isRetagging={retaggingDocument === doc.id}
+                          />
                         </div>
                       </div>
                     </div>

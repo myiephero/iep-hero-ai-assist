@@ -12,6 +12,7 @@ The application is a full-stack solution built with a modern, component-based ap
 - **Authentication Fix (Aug 6, 2025)**: Fixed session cookie configuration for Vite development environment with proper sameSite settings, resolved frontend authentication flow, and ensured dashboard metrics display properly.
 - **Dashboard Metrics Enhancement**: Implemented safe fallback values and graceful error handling for dashboard metrics, preventing "Failed to load" errors and showing realistic default data.
 - **Universal Document Vault Enhancement (Aug 6, 2025)**: Implemented bulk document management with selection, bulk delete functionality, and enhanced document operations universally across both Parent and Advocate dashboards. All Document Vault features now work consistently regardless of user role.
+- **Smart Document Tagging System (Aug 6, 2025)**: Implemented AI-powered document categorization and tagging using OpenAI GPT-4o. Documents are automatically analyzed and tagged with categories (academic, behavioral, medical, legal, etc.) and relevant tags. Features include auto-categorization on upload, retagging functionality, confidence scoring, and visual tag display with DocumentTagsDisplay component.
 
 ## Frontend Architecture
 The frontend is developed with **React 18** and TypeScript, using **Vite** for fast builds and development.
@@ -37,7 +38,7 @@ The backend is a **REST API** built with **Express.js** and TypeScript.
 - **Storage Interface**: An abstraction layer (IStorage interface) supports different storage backends, including PostgreSQL and an in-memory option for development.
 
 ## System Design Choices
-- **AI Integration**: Deep integration with **OpenAI GPT-4o** for features like AI-powered document analysis, IEP goal generation, smart letter generation, and meeting prep sheet generation. AI output validation requires specific keywords.
+- **AI Integration**: Deep integration with **OpenAI GPT-4o** for features like AI-powered document analysis, IEP goal generation, smart letter generation, meeting prep sheet generation, and intelligent document categorization with automatic tagging. AI output validation requires specific keywords, and document tagging includes confidence scoring for quality assurance.
 - **Authentication System**: **Supabase Auth** with graceful fallback to demo authentication for development. Supports role-based access control (Parent, Advocate, Professional) with protected routes and user metadata management.
 - **Subscription Management**: Supports multiple subscription tiers (Free, Hero Plan) with conditional tool access and a clear signup flow showcasing pricing transparency. A plan status tracking system visually indicates user subscription levels.
 - **Communication & Notifications**: Integrates **Resend** for email notifications (e.g., welcome emails, advocate notifications). Features an Advocate Matcher MVP with automated email notifications and real-time Slack integration for team alerts.
