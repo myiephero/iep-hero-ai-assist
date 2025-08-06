@@ -1,9 +1,16 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { User } from '@supabase/supabase-js';
-import { supabase } from '../utils/supabaseClient';
+
+interface AuthUser {
+  id: string;
+  email: string;
+  username: string;
+  role: string;
+  planStatus: string;
+  subscriptionTier?: string;
+}
 
 interface AuthContextType {
-  user: User | null;
+  user: AuthUser | null;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, userData?: any) => Promise<void>;
   signOut: () => Promise<void>;
@@ -14,91 +21,104 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }: any) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event: any, session: any) => {
-        setUser(session?.user ?? null);
-        setLoading(false);
-      }
-    );
-
-    return () => subscription?.unsubscribe();
+    // Check session-based authentication with backend
+    checkAuth();
   }, []);
+
+  const checkAuth = async () => {
+    try {
+      const response = await fetch('/api/current-user', {
+        credentials: 'include',
+      });
+      
+      if (response.ok) {
+        const userData = await response.json();
+        setUser(userData.user);
+      } else {
+        setUser(null);
+      }
+    } catch (error) {
+      console.error('Auth check failed:', error);
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const signIn = async (email: string, password: string) => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+        credentials: 'include',
       });
-      if (error) throw error;
-    } catch (error: any) {
-      // Fallback to demo accounts if Supabase is not configured
-      if (error.message === 'Supabase not configured') {
-        console.warn('Using demo authentication fallback');
-        // Set mock user for demo purposes
-        setUser({ 
-          id: 'demo-' + email.split('@')[0],
-          email,
-          user_metadata: { role: email.includes('advocate') ? 'advocate' : 'parent' }
-        } as any);
-        return;
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Login failed');
       }
+
+      const userData = await response.json();
+      setUser(userData.user);
+    } catch (error: any) {
+      console.error('Sign in error:', error);
       throw error;
     }
   };
 
   const signUp = async (email: string, password: string, userData?: any) => {
     try {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: userData,
+      const response = await fetch('/api/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
+        body: JSON.stringify({ 
+          email, 
+          password, 
+          username: userData?.username || email.split('@')[0],
+          role: userData?.role || 'parent',
+          planStatus: userData?.planStatus || 'free'
+        }),
+        credentials: 'include',
       });
-      if (error) throw error;
-    } catch (error: any) {
-      if (error.message === 'Supabase not configured') {
-        console.warn('Using demo authentication fallback');
-        // Set mock user for demo purposes
-        setUser({ 
-          id: 'demo-' + email.split('@')[0],
-          email,
-          user_metadata: userData
-        } as any);
-        return;
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Registration failed');
       }
+
+      const newUser = await response.json();
+      setUser(newUser.user);
+    } catch (error: any) {
+      console.error('Sign up error:', error);
       throw error;
     }
   };
 
   const signOut = async () => {
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-    } catch (error: any) {
-      if (error.message === 'Supabase not configured') {
-        setUser(null);
-        return;
-      }
-      throw error;
+      await fetch('/api/logout', {
+        method: 'POST',
+        credentials: 'include',
+      });
+      setUser(null);
+    } catch (error) {
+      console.error('Sign out error:', error);
+      // Clear user even if logout request fails
+      setUser(null);
     }
   };
 
   const getUserRole = () => {
-    if (!user) return 'guest';
-    return user.user_metadata?.role || user.app_metadata?.role || 'parent';
+    return user?.role || 'parent';
   };
 
   const value = {
