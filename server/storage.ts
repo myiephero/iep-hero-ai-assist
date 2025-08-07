@@ -361,6 +361,7 @@ export class MemStorage implements IStorage {
       id,
       userId,
       studentId: insertGoal.studentId || null,
+      targetDate: insertGoal.targetDate || null,
       createdAt: new Date(),
       updatedAt: new Date()
     };
@@ -384,7 +385,7 @@ export class MemStorage implements IStorage {
   async getDocumentsByUserId(userId: string): Promise<Document[]> {
     return Array.from(this.documents.values())
       .filter(doc => doc.userId === userId)
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      .sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
   }
 
   async createDocument(documentData: InsertDocument): Promise<Document> {
@@ -392,7 +393,7 @@ export class MemStorage implements IStorage {
     const document: Document = {
       ...documentData,
       id,
-      userId: documentData.userId,
+      studentId: documentData.studentId || null,
       uploadedAt: new Date(),
       createdAt: new Date()
     };
@@ -842,7 +843,7 @@ export class DbStorage implements IStorage {
       createdAt: new Date()
     };
     
-    const result = await this.db.insert(documents).values(newDocument).returning();
+    const result = await this.db.insert(documents).values([newDocument]).returning();
     return result[0];
   }
 
