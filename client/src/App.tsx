@@ -224,6 +224,16 @@ function Router() {
           <AdvocateMatcher />
         </AuthGuard>
       </Route>
+      <Route path="/tools/goal-generator">
+        <AuthGuard>
+          <GoalGenerator />
+        </AuthGuard>
+      </Route>
+      <Route path="/tools/ai-document-review">
+        <AuthGuard>
+          <AIIEPReviewPage />
+        </AuthGuard>
+      </Route>
       <Route path="/tools/advocacy-report-generator">
         <AuthGuard>
           <AdvocacyReportGenerator />
