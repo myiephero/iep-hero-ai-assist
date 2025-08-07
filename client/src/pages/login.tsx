@@ -7,10 +7,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { GraduationCap, Eye, EyeOff, Mail, Lock, ArrowRight, CheckCircle, Sparkles } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { useRoleAwareDashboard } from "@/utils/navigation";
 
 export default function Login() {
   const [, setLocation] = useLocation();
   const { signIn } = useAuth();
+  const { getDashboardRoute } = useRoleAwareDashboard();
   const { toast } = useToast();
   
   const [loginData, setLoginData] = useState({
@@ -40,7 +42,7 @@ export default function Login() {
       // Force immediate redirect
       console.log('🔄 Redirecting to dashboard...');
       setTimeout(() => {
-        setLocation("/dashboard");
+        setLocation(getDashboardRoute());
       }, 500); // Give time for state updates
       
     } catch (error: any) {

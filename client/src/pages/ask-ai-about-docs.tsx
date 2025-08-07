@@ -12,6 +12,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
 import { useAuth } from "@/contexts/AuthContext";
+import { useRoleAwareDashboard } from "@/utils/navigation";
 
 interface Document {
   id: string;
@@ -21,6 +22,7 @@ interface Document {
 
 export default function AskAiAboutDocs() {
   const { user } = useAuth();
+  const { getDashboardRoute } = useRoleAwareDashboard();
   const { toast } = useToast();
   const [question, setQuestion] = useState("");
   const [mode, setMode] = useState<"single" | "all">("all");
@@ -117,7 +119,7 @@ This Q&A was generated using AI-powered document analysis to provide insights fr
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
         <div className="max-w-4xl mx-auto">
           <div className="mb-6">
-            <Link href="/dashboard">
+            <Link href={getDashboardRoute()}>
               <Button variant="ghost" className="mb-4">
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to Dashboard
@@ -158,7 +160,7 @@ This Q&A was generated using AI-powered document analysis to provide insights fr
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
       <div className="max-w-4xl mx-auto">
         <div className="mb-6">
-          <Link href="/dashboard">
+          <Link href={getDashboardRoute()}>
             <Button variant="ghost" className="mb-4">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Dashboard

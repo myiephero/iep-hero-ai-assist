@@ -3,6 +3,8 @@ import { loadStripe } from '@stripe/stripe-js';
 import { useEffect, useState } from 'react';
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
+import { useRoleAwareDashboard } from "@/utils/navigation";
 import Footer from "@/components/layout/footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,6 +21,7 @@ const SubscribeForm = () => {
   const stripe = useStripe();
   const elements = useElements();
   const { toast } = useToast();
+  const { getDashboardRoute } = useRoleAwareDashboard();
   const [, setLocation] = useLocation();
   
   const handleSubmit = async (e: React.FormEvent) => {
@@ -31,7 +34,7 @@ const SubscribeForm = () => {
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        return_url: `${window.location.origin}/dashboard`,
+        return_url: `${window.location.origin}${getDashboardRoute()}`,
       },
     });
 
@@ -46,7 +49,7 @@ const SubscribeForm = () => {
         title: "Payment Successful",
         description: "You are now subscribed!",
       });
-      setLocation("/dashboard");
+      setLocation(getDashboardRoute());
     }
   };
 
@@ -72,6 +75,7 @@ export default function Subscribe() {
   const [error, setError] = useState("");
   const [location] = useLocation();
   const { toast } = useToast();
+  const { getDashboardRoute } = useRoleAwareDashboard();
   const [isRedirecting, setIsRedirecting] = useState(false);
   
   // Extract price ID from URL params
@@ -88,7 +92,7 @@ export default function Subscribe() {
     });
     
     setTimeout(() => {
-      window.location.href = '/dashboard';
+      window.location.href = getDashboardRoute();
     }, 3000);
   }, [priceId]);
 

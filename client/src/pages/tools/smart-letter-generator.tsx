@@ -10,6 +10,7 @@ import { Link } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
+import { useRoleAwareDashboard } from "@/utils/navigation";
 
 const letterTemplates = {
   "request-meeting": "Request for IEP Team Meeting",
@@ -22,6 +23,7 @@ const letterTemplates = {
 
 export default function SmartLetterGenerator() {
   const { user } = useAuth();
+  const { getDashboardRoute } = useRoleAwareDashboard();
   
   // Fetch available students
   const { data: students = [], isLoading: studentsLoading } = useQuery({
@@ -189,7 +191,7 @@ LEGAL REFERENCE: 34 CFR §300.301 - Initial evaluations`
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex items-center gap-4 mb-6">
-          <Link href="/dashboard">
+          <Link href={getDashboardRoute()}>
             <Button variant="ghost" className="text-white hover:text-white/80">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Dashboard

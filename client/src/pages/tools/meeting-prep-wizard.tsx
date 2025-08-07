@@ -12,10 +12,12 @@ import { apiRequest } from "@/lib/queryClient";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import { useRoleAwareDashboard } from "@/utils/navigation";
 
 export default function MeetingPrepWizard() {
   const { toast } = useToast();
   const { user } = useAuth();
+  const { getDashboardRoute } = useRoleAwareDashboard();
   
   // Fetch available students
   const { data: students = [], isLoading: studentsLoading } = useQuery({
@@ -271,7 +273,7 @@ This preparation guide was generated using AI assistance and should be customize
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex items-center gap-4 mb-6">
-          <Link href="/dashboard">
+          <Link href={getDashboardRoute()}>
             <Button variant="ghost" className="text-white hover:text-white/80">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Dashboard

@@ -1,4 +1,6 @@
 import { Link } from "wouter";
+import { useAuth } from "@/contexts/AuthContext";
+import { useRoleAwareDashboard } from "@/utils/navigation";
 import { 
   Mail, 
   Phone, 
@@ -16,6 +18,8 @@ import {
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
+  const { user } = useAuth();
+  const { getDashboardRoute } = useRoleAwareDashboard();
 
   return (
     <footer className="bg-slate-900 text-white mt-auto">
@@ -56,7 +60,7 @@ export default function Footer() {
             <h4 className="text-lg font-semibold">Platform</h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/dashboard" className="text-gray-300 hover:text-white transition-colors flex items-center">
+                <Link href={getDashboardRoute()} className="text-gray-300 hover:text-white transition-colors flex items-center">
                   Dashboard
                 </Link>
               </li>
