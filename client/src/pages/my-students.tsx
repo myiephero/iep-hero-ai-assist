@@ -17,7 +17,8 @@ import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLocation } from "wouter";
 
-const addStudentSchema = z.object({
+// Define schema factory based on user role
+const createAddStudentSchema = (userRole?: string) => z.object({
   firstName: z.string().min(2, "First name must be at least 2 characters"),
   lastName: z.string().min(2, "Last name must be at least 2 characters"),
   dateOfBirth: z.string().min(1, "Date of birth is required"),
@@ -27,7 +28,9 @@ const addStudentSchema = z.object({
   disabilities: z.array(z.string()).default([]),
   currentServices: z.array(z.string()).default([]),
   iepStatus: z.enum(["active", "inactive", "developing"]).default("active"),
-  parentId: z.string().min(1, "Parent selection is required"),
+  parentId: userRole === 'parent' 
+    ? z.string().optional() // Optional for parents (auto-set)
+    : z.string().min(1, "Parent selection is required"), // Required for advocates
 });
 
 type AddStudentFormData = z.infer<typeof addStudentSchema>;
@@ -74,7 +77,7 @@ export default function MyStudentsPage() {
   const [, setLocation] = useLocation();
 
   const form = useForm<AddStudentFormData>({
-    resolver: zodResolver(addStudentSchema),
+    resolver: zodResolver(createAddStudentSchema(user?.role)),
     defaultValues: {
       firstName: "",
       lastName: "",
@@ -85,31 +88,41 @@ export default function MyStudentsPage() {
       disabilities: [],
       currentServices: [],
       iepStatus: "active",
-      parentId: "",
+      parentId: user?.role === 'parent' ? user?.id : "", // Auto-set for parents
     },
   });
 
-  // Query for advocate's students
+  // Query for students based on user role
   const { data: students = [], isLoading, refetch } = useQuery({
-    queryKey: ["/api/advocate/students"],
+    queryKey: user?.role === 'parent' ? ["/api/parent/students"] : ["/api/advocate/students"],
     enabled: !!user,
   });
 
-  // Query for advocate's clients (parents)
+  // Query for advocate's clients (parents) - only for advocates
   const { data: clients = [] } = useQuery({
     queryKey: ["/api/advocate/clients"],
-    enabled: !!user,
+    enabled: !!user && user?.role === 'advocate',
   });
 
-  // Mutation to add new student
+  // Mutation to add new student - role-aware
   const addStudentMutation = useMutation({
     mutationFn: async (data: AddStudentFormData) => {
-      const response = await apiRequest("POST", "/api/advocate/students", {
-        ...data,
-        advocateId: user?.id,
-        disabilities: selectedDisabilities,
-        currentServices: selectedServices,
-      });
+      const endpoint = user?.role === 'parent' ? "/api/students" : "/api/advocate/students";
+      const payload = user?.role === 'parent' 
+        ? {
+            ...data,
+            disabilities: selectedDisabilities,
+            currentServices: selectedServices,
+            // For parents, parentId is automatically set by backend from session
+          }
+        : {
+            ...data,
+            advocateId: user?.id,
+            disabilities: selectedDisabilities,
+            currentServices: selectedServices,
+          };
+
+      const response = await apiRequest("POST", endpoint, payload);
       if (!response.ok) {
         const error = await response.json();
         throw new Error(error.message || "Failed to add student");
@@ -125,7 +138,9 @@ export default function MyStudentsPage() {
       form.reset();
       setSelectedDisabilities([]);
       setSelectedServices([]);
-      queryClient.invalidateQueries({ queryKey: ["/api/advocate/students"] });
+      // Invalidate the correct query based on user role
+      const queryKey = user?.role === 'parent' ? ["/api/parent/students"] : ["/api/advocate/students"];
+      queryClient.invalidateQueries({ queryKey });
     },
     onError: (error: any) => {
       toast({
@@ -143,11 +158,22 @@ export default function MyStudentsPage() {
   );
 
   const onSubmit = (data: AddStudentFormData) => {
-    addStudentMutation.mutate({
-      ...data,
-      disabilities: selectedDisabilities,
-      currentServices: selectedServices,
-    });
+    // For parent users, validate that required fields are filled, but parentId is auto-handled
+    if (user?.role === 'parent') {
+      addStudentMutation.mutate({
+        ...data,
+        disabilities: selectedDisabilities,
+        currentServices: selectedServices,
+        parentId: user.id, // Ensure parentId is set for parents
+      });
+    } else {
+      // For advocates, require parentId selection
+      addStudentMutation.mutate({
+        ...data,
+        disabilities: selectedDisabilities,
+        currentServices: selectedServices,
+      });
+    }
   };
 
   const toggleDisability = (disability: string) => {
@@ -428,35 +454,54 @@ export default function MyStudentsPage() {
                 />
               </div>
 
-              <FormField
-                control={form.control}
-                name="parentId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-white">Parent/Guardian</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
-                          <SelectValue placeholder="Select parent/guardian" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent className="bg-slate-700 border-slate-600">
-                        {clients.length === 0 ? (
-                          <div className="p-2 text-slate-400 text-sm">No parent clients found</div>
-                        ) : (
-                          clients.map((client: any) => (
-                            <SelectItem key={client.parentId || client.id} value={client.parentId || client.id}>
-                              {client.clientName || client.parent?.username || client.parent?.email} 
-                              {client.parent?.email && ` (${client.parent.email})`}
-                            </SelectItem>
-                          ))
-                        )}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {/* Parent/Guardian field - only show for advocates */}
+              {user?.role === 'advocate' && (
+                <FormField
+                  control={form.control}
+                  name="parentId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-white">Parent/Guardian</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
+                            <SelectValue placeholder="Select parent/guardian" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent className="bg-slate-700 border-slate-600">
+                          {clients.length === 0 ? (
+                            <div className="p-2 text-slate-400 text-sm">No parent clients found</div>
+                          ) : (
+                            clients.map((client: any) => (
+                              <SelectItem key={client.parentId || client.id} value={client.parentId || client.id}>
+                                {client.clientName || client.parent?.username || client.parent?.email} 
+                                {client.parent?.email && ` (${client.parent.email})`}
+                              </SelectItem>
+                            ))
+                          )}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+
+              {/* Auto-parent info for parent users */}
+              {user?.role === 'parent' && (
+                <div className="bg-slate-700/50 border border-slate-600 rounded-lg p-4">
+                  <div className="flex items-center gap-2 text-green-400 mb-2">
+                    <User className="w-4 h-4" />
+                    <span className="font-medium">Parent/Guardian</span>
+                  </div>
+                  <p className="text-slate-300 text-sm">
+                    {user?.username || user?.email} (You)
+                  </p>
+                  <p className="text-slate-400 text-xs mt-1">
+                    This student will automatically be linked to your account.
+                  </p>
+                </div>
+              )}
 
               <div className="grid grid-cols-2 gap-4">
                 <FormField
