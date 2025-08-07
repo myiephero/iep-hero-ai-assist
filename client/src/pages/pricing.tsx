@@ -4,14 +4,30 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLocation } from 'wouter';
-import { Check, Crown, User, Zap, Star, ArrowRight, Shield } from 'lucide-react';
+import { Check, Crown, User, Zap, Star, ArrowRight, Shield, ArrowLeft } from 'lucide-react';
+import { useRoleAwareDashboard } from '@/utils/navigation';
+import { Link } from 'wouter';
+
+interface PricingPlan {
+  name: string;
+  price: { monthly: number; annual: number };
+  description: string;
+  icon: React.ReactElement;
+  color: string;
+  buttonText: string;
+  features: string[];
+  popular?: boolean;
+  oneTime?: boolean;
+}
 
 export default function Pricing() {
   const { user } = useAuth();
   const [, setLocation] = useLocation();
+  const { getDashboardRoute } = useRoleAwareDashboard();
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('monthly');
 
-  const plans = [
+  // Parent-specific pricing plans
+  const parentPlans: PricingPlan[] = [
     {
       name: 'Free Plan',
       price: { monthly: 0, annual: 0 },
@@ -20,44 +36,141 @@ export default function Pricing() {
       color: 'border-slate-600',
       buttonText: 'Current Plan',
       features: [
-        'Basic goal tracking',
-        'Document storage (up to 5 files)',
-        'Simple progress monitoring',
-        'Community support',
-        'Basic meeting prep tools'
-      ],
-      limitations: [
-        'No AI-powered features',
-        'Limited document analysis',
-        'Basic templates only',
-        'No advocate matching'
+        'Access to IEP education hub',
+        'Downloadable template letters',
+        'Advocacy articles & tips'
       ]
     },
     {
-      name: 'Hero Plan',
+      name: 'Basic Plan',
+      price: { monthly: 19, annual: 190 },
+      description: 'Everything in Free, plus enhanced document management',
+      icon: <User className="h-6 w-6" />,
+      color: 'border-blue-500',
+      buttonText: 'Upgrade to Basic',
+      features: [
+        'Everything in Free, plus:',
+        'Document intake vault',
+        'Personalized IEP checklist',
+        'Pre-built letter builder (for common requests)',
+        'Parent-to-parent community'
+      ]
+    },
+    {
+      name: 'Plus Plan',
       price: { monthly: 29, annual: 290 },
-      description: 'Complete IEP management with AI-powered tools and advocacy support',
+      description: 'Advanced tracking and self-serve IEP tools',
+      icon: <Zap className="h-6 w-6" />,
+      color: 'border-green-500',
+      buttonText: 'Upgrade to Plus',
+      features: [
+        'Everything in Basic, plus:',
+        'Progress tracking dashboard',
+        'Calendar & reminders for IEP goals',
+        'Self-serve IEP builder with smart forms',
+        'Upload & annotate school documents'
+      ]
+    },
+    {
+      name: 'Premium Plan',
+      price: { monthly: 49, annual: 490 },
+      description: 'Live advocate support and AI-powered reviews',
       icon: <Crown className="h-6 w-6 text-yellow-400" />,
       color: 'border-purple-500',
       popular: true,
-      buttonText: user?.planStatus === 'heroOffer' ? 'Current Plan' : 'Upgrade to Hero',
+      buttonText: user?.planStatus === 'heroOffer' ? 'Current Plan' : 'Upgrade to Premium',
       features: [
-        'Everything in Free Plan',
-        'Unlimited AI-powered document analysis',
-        'Smart letter generation with templates',
-        'Advanced goal generator with AI insights',
-        'Autism accommodation builder',
-        'Professional advocate matching',
-        'Meeting prep wizard with AI suggestions',
-        'Unlimited document storage',
-        'Priority email support',
-        'Advanced progress analytics',
-        'Communication tracker',
-        'Ask AI about your docs feature'
-      ],
-      limitations: []
+        'Everything in Plus, plus:',
+        'Live advocate chat access',
+        'AI-powered IEP review (1 per month)',
+        'Discounts on 1:1 strategy calls',
+        'Priority support'
+      ]
+    },
+    {
+      name: 'Hero Pack',
+      price: { monthly: 495, annual: 495 },
+      oneTime: true,
+      description: 'Comprehensive advocacy support package',
+      icon: <Shield className="h-6 w-6 text-gold-400" />,
+      color: 'border-gold-500',
+      buttonText: 'Get Hero Pack',
+      features: [
+        '1:1 IEP strategy session (Zoom)',
+        'Full document review + prep',
+        'Advocate present for 1 IEP meeting',
+        '30-day Premium access included',
+        'Customized follow-up action plan'
+      ]
     }
   ];
+
+  // Advocate-specific pricing plans
+  const advocatePlans: PricingPlan[] = [
+    {
+      name: 'Starter Plan',
+      price: { monthly: 49, annual: 490 },
+      description: 'Essential tools for solo advocates',
+      icon: <User className="h-6 w-6" />,
+      color: 'border-blue-500',
+      buttonText: 'Start with Starter',
+      features: [
+        'Advocate CRM (clients, case notes)',
+        'Automated IEP letter builder',
+        'Template library + smart forms',
+        '1 seat'
+      ]
+    },
+    {
+      name: 'Pro Plan',
+      price: { monthly: 75, annual: 750 },
+      description: 'Advanced practice management tools',
+      icon: <Zap className="h-6 w-6" />,
+      color: 'border-green-500',
+      popular: true,
+      buttonText: 'Upgrade to Pro',
+      features: [
+        'Everything in Starter, plus:',
+        'Scheduling calendar with parent bookings',
+        'Intake forms + onboarding flows',
+        'Document request tracking',
+        '1 seat'
+      ]
+    },
+    {
+      name: 'Agency Plan',
+      price: { monthly: 149, annual: 1490 },
+      description: 'Team collaboration and client management',
+      icon: <Crown className="h-6 w-6 text-yellow-400" />,
+      color: 'border-purple-500',
+      buttonText: 'Scale with Agency',
+      features: [
+        'Everything in Pro, plus:',
+        '2 seats included (advocate + admin)',
+        'Shared client access for teams',
+        'Invoicing + billing dashboard',
+        'Advocate permissions management'
+      ]
+    },
+    {
+      name: 'Agency+ Plan',
+      price: { monthly: 249, annual: 2490 },
+      description: 'Enterprise features and AI credits',
+      icon: <Shield className="h-6 w-6 text-gold-400" />,
+      color: 'border-gold-500',
+      buttonText: 'Go Enterprise',
+      features: [
+        'Everything in Agency, plus:',
+        '5 seats included',
+        'AI credits included (10/mo)',
+        'Onboarding training portal',
+        'Priority support line',
+        'Access to future compliance tools'
+      ]
+    }
+  ];
+
+  const plans = user?.role === 'advocate' ? advocatePlans : parentPlans;
 
   const handleUpgrade = (planName: string) => {
     if (planName === 'Hero Plan') {
@@ -71,13 +184,28 @@ export default function Pricing() {
   return (
     <div className="min-h-screen bg-slate-900">
       <div className="max-w-6xl mx-auto py-12 px-4">
+        {/* Back to Dashboard Button */}
+        <div className="mb-6">
+          <Link href={getDashboardRoute()}>
+            <Button variant="ghost" className="text-slate-400 hover:text-white">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Dashboard
+            </Button>
+          </Link>
+        </div>
+
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-white mb-4">
             Choose Your IEP Hero Plan
           </h1>
-          <p className="text-xl text-slate-400 mb-8">
-            Empower your child's educational journey with the right tools
+          <p className="text-xl text-slate-400 mb-4">
+            {user?.role === 'advocate' 
+              ? 'Professional tools for advocacy practice management' 
+              : "Empower your child's educational journey with the right tools"}
+          </p>
+          <p className="text-sm text-slate-500 mb-8">
+            Showing {user?.role === 'advocate' ? 'Advocate & Agency' : 'Parent'} subscription tiers
           </p>
 
           {/* Billing Toggle */}
@@ -103,7 +231,7 @@ export default function Pricing() {
         </div>
 
         {/* Plans Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
           {plans.map((plan, index) => (
             <Card 
               key={index}
@@ -126,7 +254,9 @@ export default function Pricing() {
                 <div className="text-4xl font-bold text-white mb-2">
                   ${plan.price[billingCycle]}
                   <span className="text-lg text-slate-400 font-normal">
-                    {plan.price[billingCycle] > 0 ? (billingCycle === 'monthly' ? '/month' : '/year') : ''}
+                    {plan.price[billingCycle] > 0 ? (
+                      plan.oneTime ? ' one-time' : (billingCycle === 'monthly' ? '/month' : '/year')
+                    ) : ''}
                   </span>
                 </div>
                 <p className="text-slate-400 text-sm">{plan.description}</p>
@@ -149,44 +279,34 @@ export default function Pricing() {
                   </ul>
                 </div>
 
-                {/* Limitations (if any) */}
-                {plan.limitations.length > 0 && (
-                  <div>
-                    <h4 className="font-semibold text-slate-400 mb-3 text-sm">
-                      Limitations
-                    </h4>
-                    <ul className="space-y-1">
-                      {plan.limitations.map((limitation, i) => (
-                        <li key={i} className="text-xs text-slate-500">
-                          • {limitation}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
+
 
                 {/* Action Button */}
                 <Button
                   onClick={() => handleUpgrade(plan.name)}
-                  disabled={user?.planStatus === 'heroOffer' && plan.name === 'Hero Plan'}
+                  disabled={
+                    (user?.planStatus === 'heroOffer' && (plan.name === 'Hero Plan' || plan.name === 'Premium Plan')) ||
+                    (user?.planStatus === 'free' && plan.name === 'Free Plan')
+                  }
                   className={`w-full ${
                     plan.popular 
                       ? 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600' 
-                      : user?.planStatus === 'free' && plan.name === 'Free Plan'
+                      : (user?.planStatus === 'heroOffer' && (plan.name === 'Hero Plan' || plan.name === 'Premium Plan')) ||
+                        (user?.planStatus === 'free' && plan.name === 'Free Plan')
                       ? 'bg-slate-600 text-slate-400 cursor-not-allowed'
                       : 'bg-slate-700 hover:bg-slate-600 text-white'
                   }`}
                 >
-                  {user?.planStatus === 'heroOffer' && plan.name === 'Hero Plan' ? (
+                  {(user?.planStatus === 'heroOffer' && (plan.name === 'Hero Plan' || plan.name === 'Premium Plan')) ? (
                     <>
                       <Crown className="h-4 w-4 mr-2" />
                       Current Plan
                     </>
                   ) : user?.planStatus === 'free' && plan.name === 'Free Plan' ? (
                     'Current Plan'
-                  ) : plan.name === 'Hero Plan' ? (
+                  ) : plan.name === 'Hero Plan' || plan.name === 'Premium Plan' ? (
                     <>
-                      Upgrade to Hero
+                      {plan.buttonText}
                       <ArrowRight className="h-4 w-4 ml-2" />
                     </>
                   ) : (
