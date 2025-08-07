@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import Stripe from "stripe";
+import OpenAI from "openai";
 import { storage } from "./storage";
 import { registerShareMemoryRoutes } from "./routes/share-memory";
 import { registerTestMemoryRoutes } from "./routes/test-memory";
@@ -20,7 +21,6 @@ import { Resend } from "resend";
 import { randomUUID } from "crypto";
 import { analyzeIEPDocument, generateIEPGoals, generateIEPGoalsFromArea } from "./ai-document-analyzer";
 import { analyzeDocumentForTagging } from "./document-tagger";
-import OpenAI from "openai";
 import { sql } from "drizzle-orm";
 
 if (!process.env.STRIPE_SECRET_KEY) {
@@ -33,6 +33,11 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 
 // Initialize Resend for email functionality
 const resend = new Resend(process.env.RESEND_API_KEY);
+
+// Initialize OpenAI client
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
 // Configure multer for file uploads
 const upload = multer({
