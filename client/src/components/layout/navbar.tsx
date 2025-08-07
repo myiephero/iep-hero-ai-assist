@@ -94,6 +94,17 @@ const UserMenu = () => {
           </div>
         </div>
         <DropdownMenuSeparator />
+        <Link href="/profile">
+          <DropdownMenuItem className="text-gray-700 hover:bg-gray-100 cursor-pointer">
+            Profile & Settings
+          </DropdownMenuItem>
+        </Link>
+        <Link href="/pricing">
+          <DropdownMenuItem className="text-gray-700 hover:bg-gray-100 cursor-pointer">
+            Pricing & Plans
+          </DropdownMenuItem>
+        </Link>
+        <DropdownMenuSeparator />
         <DropdownMenuItem onClick={signOut} className="text-gray-700 hover:bg-gray-100">
           Log out
         </DropdownMenuItem>

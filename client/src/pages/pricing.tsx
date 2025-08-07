@@ -1,320 +1,275 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Check, Star, Users, FileText, Calendar, MessageSquare, Shield, Zap } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
-import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
+import { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { useAuth } from '@/contexts/AuthContext';
+import { useLocation } from 'wouter';
+import { Check, Crown, User, Zap, Star, ArrowRight, Shield } from 'lucide-react';
 
 export default function Pricing() {
   const { user } = useAuth();
-  const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
-  const [heroModalOpen, setHeroModalOpen] = useState(false);
+  const [, setLocation] = useLocation();
+  const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('monthly');
 
-  const handleHeroPlanSubscribe = async () => {
-    if (!user) {
-      toast({
-        title: "Authentication Required",
-        description: "Please log in to subscribe to the Hero Plan.",
-        variant: "destructive",
-      });
-      return;
+  const plans = [
+    {
+      name: 'Free Plan',
+      price: { monthly: 0, annual: 0 },
+      description: 'Perfect for getting started with basic IEP management',
+      icon: <User className="h-6 w-6" />,
+      color: 'border-slate-600',
+      buttonText: 'Current Plan',
+      features: [
+        'Basic goal tracking',
+        'Document storage (up to 5 files)',
+        'Simple progress monitoring',
+        'Community support',
+        'Basic meeting prep tools'
+      ],
+      limitations: [
+        'No AI-powered features',
+        'Limited document analysis',
+        'Basic templates only',
+        'No advocate matching'
+      ]
+    },
+    {
+      name: 'Hero Plan',
+      price: { monthly: 29, annual: 290 },
+      description: 'Complete IEP management with AI-powered tools and advocacy support',
+      icon: <Crown className="h-6 w-6 text-yellow-400" />,
+      color: 'border-purple-500',
+      popular: true,
+      buttonText: user?.planStatus === 'heroOffer' ? 'Current Plan' : 'Upgrade to Hero',
+      features: [
+        'Everything in Free Plan',
+        'Unlimited AI-powered document analysis',
+        'Smart letter generation with templates',
+        'Advanced goal generator with AI insights',
+        'Autism accommodation builder',
+        'Professional advocate matching',
+        'Meeting prep wizard with AI suggestions',
+        'Unlimited document storage',
+        'Priority email support',
+        'Advanced progress analytics',
+        'Communication tracker',
+        'Ask AI about your docs feature'
+      ],
+      limitations: []
     }
+  ];
 
-    setIsLoading(true);
-    try {
-      // For Hero Plan - $495/year subscription
-      const response = await apiRequest("POST", "/api/create-subscription", {
-        planType: "hero" // Let the server determine the price ID
-      });
-      const data = await response.json();
-      
-      if (data.clientSecret) {
-        // Redirect to Stripe checkout
-        window.location.href = `/subscribe?client_secret=${data.clientSecret}`;
-      } else {
-        throw new Error("Failed to create subscription");
+  const handleUpgrade = (planName: string) => {
+    if (planName === 'Hero Plan') {
+      if (user?.planStatus === 'heroOffer') {
+        return; // Already on Hero Plan
       }
-    } catch (error) {
-      console.error("Subscription error:", error);
-      toast({
-        title: "Subscription Error",
-        description: "Failed to start subscription process. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-      setHeroModalOpen(false);
+      setLocation('/subscribe');
     }
   };
 
-  const freePlanFeatures = [
-    "Basic IEP goal tracking",
-    "Document storage (up to 5 files)",
-    "Calendar for IEP meetings",
-    "Basic progress monitoring",
-    "Email notifications",
-  ];
-
-  const heroPlanFeatures = [
-    "Everything in Free Plan",
-    "Unlimited document storage",
-    "AI-powered Memory Q&A with advocate sharing",
-    "Advanced progress analytics",
-    "Priority email support",
-    "Team collaboration tools",
-    "Custom goal templates",
-    "Automated progress reports",
-    "Mobile app access",
-    "Data export capabilities",
-  ];
-
-  const heroOnlyFeatures = [
-    "AI-powered Memory Q&A system",
-    "Advocate sharing and notifications",
-    "Advanced progress analytics dashboard",
-    "Priority support (24-hour response)",
-    "Team collaboration workspace",
-    "Custom goal and accommodation templates",
-    "Automated progress report generation",
-    "Full mobile app with offline access",
-    "Complete data export and backup",
-    "Advanced security and compliance features",
-  ];
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-blue-900">
-      <div className="container mx-auto px-4 py-16">
+    <div className="min-h-screen bg-slate-900">
+      <div className="max-w-6xl mx-auto py-12 px-4">
         {/* Header */}
-        <div className="text-center mb-16">
-          <Badge variant="secondary" className="mb-4">
-            Pricing Plans
-          </Badge>
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
-            Choose Your IEP Journey
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-white mb-4">
+            Choose Your IEP Hero Plan
           </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-            Start with our free plan or unlock the full potential of IEP management with our Hero Plan.
-            Every child deserves an advocate, and every parent deserves the right tools.
+          <p className="text-xl text-slate-400 mb-8">
+            Empower your child's educational journey with the right tools
           </p>
+
+          {/* Billing Toggle */}
+          <div className="flex items-center justify-center gap-4 mb-8">
+            <span className={`text-sm ${billingCycle === 'monthly' ? 'text-white font-semibold' : 'text-slate-400'}`}>
+              Monthly
+            </span>
+            <button
+              onClick={() => setBillingCycle(billingCycle === 'monthly' ? 'annual' : 'monthly')}
+              className={`relative w-14 h-8 rounded-full transition-colors ${billingCycle === 'annual' ? 'bg-purple-600' : 'bg-slate-600'}`}
+            >
+              <div className={`absolute w-6 h-6 bg-white rounded-full top-1 transition-transform ${billingCycle === 'annual' ? 'translate-x-7' : 'translate-x-1'}`} />
+            </button>
+            <span className={`text-sm ${billingCycle === 'annual' ? 'text-white font-semibold' : 'text-slate-400'}`}>
+              Annual
+            </span>
+            {billingCycle === 'annual' && (
+              <Badge className="bg-green-600 text-white ml-2">
+                Save 20%
+              </Badge>
+            )}
+          </div>
         </div>
 
-        {/* Pricing Cards */}
-        <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-          {/* Free Plan */}
-          <Card className="relative border-2 border-gray-200 dark:border-gray-700">
-            <CardHeader className="text-center pb-8">
-              <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white">
-                Free Plan
-              </CardTitle>
-              <CardDescription className="text-gray-600 dark:text-gray-300">
-                Perfect for getting started with IEP management
-              </CardDescription>
-              <div className="mt-4">
-                <span className="text-4xl font-bold text-gray-900 dark:text-white">$0</span>
-                <span className="text-gray-600 dark:text-gray-300">/month</span>
-              </div>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <ul className="space-y-3">
-                {freePlanFeatures.map((feature, index) => (
-                  <li key={index} className="flex items-center gap-3">
-                    <Check className="h-5 w-5 text-green-500 flex-shrink-0" />
-                    <span className="text-gray-700 dark:text-gray-300">{feature}</span>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-            <CardFooter>
-              <Button 
-                className="w-full bg-slate-600 hover:bg-slate-700 text-white" 
-                disabled={user !== null}
-              >
-                {user ? "Current Plan" : "Get Started Free"}
-              </Button>
-            </CardFooter>
-          </Card>
+        {/* Plans Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          {plans.map((plan, index) => (
+            <Card 
+              key={index}
+              className={`relative bg-slate-800 ${plan.color} ${plan.popular ? 'ring-2 ring-purple-500' : ''}`}
+            >
+              {plan.popular && (
+                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                  <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-1">
+                    <Star className="h-3 w-3 mr-1" />
+                    Most Popular
+                  </Badge>
+                </div>
+              )}
+              
+              <CardHeader className="text-center pb-4">
+                <div className="flex items-center justify-center mb-2">
+                  {plan.icon}
+                </div>
+                <CardTitle className="text-2xl text-white">{plan.name}</CardTitle>
+                <div className="text-4xl font-bold text-white mb-2">
+                  ${plan.price[billingCycle]}
+                  <span className="text-lg text-slate-400 font-normal">
+                    {plan.price[billingCycle] > 0 ? (billingCycle === 'monthly' ? '/month' : '/year') : ''}
+                  </span>
+                </div>
+                <p className="text-slate-400 text-sm">{plan.description}</p>
+              </CardHeader>
 
-          {/* Hero Plan */}
-          <Card className="relative border-2 border-blue-500 dark:border-blue-400 shadow-lg">
-            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-              <Badge className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-1">
-                <Star className="h-4 w-4 mr-1" />
-                Most Popular
-              </Badge>
-            </div>
-            <CardHeader className="text-center pb-8">
-              <CardTitle className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                Hero Plan
-              </CardTitle>
-              <CardDescription className="text-gray-600 dark:text-gray-300">
-                Complete IEP advocacy and management solution
-              </CardDescription>
-              <div className="mt-4">
-                <span className="text-4xl font-bold text-blue-600 dark:text-blue-400">$495</span>
-                <span className="text-gray-600 dark:text-gray-300">/year</span>
-              </div>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-                Billed annually • $41.25/month
-              </p>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <ul className="space-y-3">
-                {heroPlanFeatures.map((feature, index) => (
-                  <li key={index} className="flex items-center gap-3">
-                    <Check className="h-5 w-5 text-blue-500 flex-shrink-0" />
-                    <span className="text-gray-700 dark:text-gray-300">{feature}</span>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-            <CardFooter>
-              <Dialog open={heroModalOpen} onOpenChange={setHeroModalOpen}>
-                <DialogTrigger asChild>
-                  <Button className="w-full bg-blue-500 hover:bg-blue-600 text-white">
-                    Choose Hero Plan
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-2xl">
-                  <DialogHeader>
-                    <DialogTitle className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                      Hero Plan - Complete IEP Solution
-                    </DialogTitle>
-                    <DialogDescription className="text-gray-600 dark:text-gray-300">
-                      Everything you need to be your child's strongest advocate
-                    </DialogDescription>
-                  </DialogHeader>
-                  
-                  <div className="space-y-6">
-                    {/* Pricing Summary */}
-                    <div className="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-lg">
-                      <div className="flex justify-between items-center mb-4">
-                        <span className="text-lg font-semibold text-gray-900 dark:text-white">Hero Plan</span>
-                        <div className="text-right">
-                          <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">$495/year</div>
-                          <div className="text-sm text-gray-500 dark:text-gray-400">$41.25/month</div>
-                        </div>
-                      </div>
-                    </div>
+              <CardContent className="space-y-6">
+                {/* Features */}
+                <div>
+                  <h4 className="font-semibold text-white mb-3 flex items-center gap-2">
+                    <Check className="h-4 w-4 text-green-400" />
+                    What's Included
+                  </h4>
+                  <ul className="space-y-2">
+                    {plan.features.map((feature, i) => (
+                      <li key={i} className="flex items-start gap-2 text-sm text-slate-300">
+                        <Check className="h-4 w-4 text-green-400 mt-0.5 flex-shrink-0" />
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
 
-                    {/* Hero-Only Features */}
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                        <Zap className="h-5 w-5 text-blue-500" />
-                        Hero Plan Exclusive Features
-                      </h3>
-                      <div className="grid gap-3">
-                        {heroOnlyFeatures.map((feature, index) => (
-                          <div key={index} className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                            <Check className="h-5 w-5 text-blue-500 flex-shrink-0 mt-0.5" />
-                            <span className="text-gray-700 dark:text-gray-300">{feature}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Key Benefits */}
-                    <div className="border-t pt-6">
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                        Why Choose Hero Plan?
-                      </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="flex items-start gap-3">
-                          <Users className="h-6 w-6 text-blue-500 flex-shrink-0" />
-                          <div>
-                            <div className="font-medium text-gray-900 dark:text-white">Expert Support</div>
-                            <div className="text-sm text-gray-600 dark:text-gray-300">Direct access to IEP advocates</div>
-                          </div>
-                        </div>
-                        <div className="flex items-start gap-3">
-                          <Shield className="h-6 w-6 text-blue-500 flex-shrink-0" />
-                          <div>
-                            <div className="font-medium text-gray-900 dark:text-white">Data Security</div>
-                            <div className="text-sm text-gray-600 dark:text-gray-300">FERPA compliant storage</div>
-                          </div>
-                        </div>
-                        <div className="flex items-start gap-3">
-                          <FileText className="h-6 w-6 text-blue-500 flex-shrink-0" />
-                          <div>
-                            <div className="font-medium text-gray-900 dark:text-white">Unlimited Storage</div>
-                            <div className="text-sm text-gray-600 dark:text-gray-300">All your IEP documents in one place</div>
-                          </div>
-                        </div>
-                        <div className="flex items-start gap-3">
-                          <MessageSquare className="h-6 w-6 text-blue-500 flex-shrink-0" />
-                          <div>
-                            <div className="font-medium text-gray-900 dark:text-white">AI Assistant</div>
-                            <div className="text-sm text-gray-600 dark:text-gray-300">Smart IEP analysis and insights</div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* CTA Buttons */}
-                    <div className="flex gap-3 pt-6 border-t">
-                      <Button
-                        variant="outline"
-                        className="flex-1"
-                        onClick={() => setHeroModalOpen(false)}
-                      >
-                        Not Now
-                      </Button>
-                      <Button
-                        className="flex-1 bg-blue-500 hover:bg-blue-600 text-white"
-                        onClick={handleHeroPlanSubscribe}
-                        disabled={isLoading}
-                      >
-                        {isLoading ? "Processing..." : "Subscribe to Hero Plan"}
-                      </Button>
-                    </div>
+                {/* Limitations (if any) */}
+                {plan.limitations.length > 0 && (
+                  <div>
+                    <h4 className="font-semibold text-slate-400 mb-3 text-sm">
+                      Limitations
+                    </h4>
+                    <ul className="space-y-1">
+                      {plan.limitations.map((limitation, i) => (
+                        <li key={i} className="text-xs text-slate-500">
+                          • {limitation}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                </DialogContent>
-              </Dialog>
-            </CardFooter>
-          </Card>
+                )}
+
+                {/* Action Button */}
+                <Button
+                  onClick={() => handleUpgrade(plan.name)}
+                  disabled={user?.planStatus === 'heroOffer' && plan.name === 'Hero Plan'}
+                  className={`w-full ${
+                    plan.popular 
+                      ? 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600' 
+                      : user?.planStatus === 'free' && plan.name === 'Free Plan'
+                      ? 'bg-slate-600 text-slate-400 cursor-not-allowed'
+                      : 'bg-slate-700 hover:bg-slate-600 text-white'
+                  }`}
+                >
+                  {user?.planStatus === 'heroOffer' && plan.name === 'Hero Plan' ? (
+                    <>
+                      <Crown className="h-4 w-4 mr-2" />
+                      Current Plan
+                    </>
+                  ) : user?.planStatus === 'free' && plan.name === 'Free Plan' ? (
+                    'Current Plan'
+                  ) : plan.name === 'Hero Plan' ? (
+                    <>
+                      Upgrade to Hero
+                      <ArrowRight className="h-4 w-4 ml-2" />
+                    </>
+                  ) : (
+                    plan.buttonText
+                  )}
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Features Comparison */}
+        <div className="mt-16">
+          <h2 className="text-2xl font-bold text-white text-center mb-8">
+            Why Choose Hero Plan?
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Card className="bg-slate-800 border-slate-700">
+              <CardContent className="p-6 text-center">
+                <Zap className="h-12 w-12 text-yellow-400 mx-auto mb-4" />
+                <h3 className="font-semibold text-white mb-2">AI-Powered Tools</h3>
+                <p className="text-slate-400 text-sm">
+                  Advanced AI analysis, smart letter generation, and personalized accommodation suggestions
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-slate-800 border-slate-700">
+              <CardContent className="p-6 text-center">
+                <Shield className="h-12 w-12 text-blue-400 mx-auto mb-4" />
+                <h3 className="font-semibold text-white mb-2">Expert Support</h3>
+                <p className="text-slate-400 text-sm">
+                  Professional advocate matching and priority support for complex IEP situations
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-slate-800 border-slate-700">
+              <CardContent className="p-6 text-center">
+                <Star className="h-12 w-12 text-purple-400 mx-auto mb-4" />
+                <h3 className="font-semibold text-white mb-2">Complete Solution</h3>
+                <p className="text-slate-400 text-sm">
+                  Everything you need to successfully navigate your child's IEP journey in one platform
+                </p>
+              </CardContent>
+            </Card>
+          </div>
         </div>
 
         {/* FAQ Section */}
-        <div className="mt-20 text-center">
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">
+        <div className="mt-16">
+          <h2 className="text-2xl font-bold text-white text-center mb-8">
             Frequently Asked Questions
           </h2>
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto text-left">
-            <div>
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
-                Can I upgrade from Free to Hero anytime?
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300">
-                Yes! You can upgrade to the Hero Plan at any time. Your data will be preserved and you'll immediately access all Hero features.
-              </p>
-            </div>
-            <div>
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
-                Is my child's data secure?
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300">
-                Absolutely. We're FERPA compliant and use enterprise-grade security. Your child's information is encrypted and never shared without your permission.
-              </p>
-            </div>
-            <div>
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
-                What if I need to cancel?
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300">
-                You can cancel anytime. Hero Plan subscribers can download all their data before cancellation. No long-term contracts or hidden fees.
-              </p>
-            </div>
-            <div>
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
-                Do you offer support?
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300">
-                Free users get community support. Hero Plan includes priority email support with IEP advocates who understand the process.
-              </p>
-            </div>
+          
+          <div className="max-w-3xl mx-auto space-y-4">
+            <Card className="bg-slate-800 border-slate-700">
+              <CardContent className="p-6">
+                <h3 className="font-semibold text-white mb-2">Can I cancel anytime?</h3>
+                <p className="text-slate-400 text-sm">
+                  Yes, you can cancel your subscription at any time. You'll continue to have access to Hero Plan features until the end of your billing period.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-slate-800 border-slate-700">
+              <CardContent className="p-6">
+                <h3 className="font-semibold text-white mb-2">What payment methods do you accept?</h3>
+                <p className="text-slate-400 text-sm">
+                  We accept all major credit cards and debit cards through our secure Stripe payment processing.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-slate-800 border-slate-700">
+              <CardContent className="p-6">
+                <h3 className="font-semibold text-white mb-2">Is my data secure?</h3>
+                <p className="text-slate-400 text-sm">
+                  Absolutely. We use enterprise-grade security and encryption to protect your family's sensitive information.
+                </p>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>

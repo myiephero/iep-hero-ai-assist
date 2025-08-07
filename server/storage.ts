@@ -17,6 +17,7 @@ export interface IStorage {
   updateUserStripeInfo(userId: string, customerId: string, subscriptionId: string): Promise<User>;
   updateStripeCustomerId(userId: string, customerId: string): Promise<User>;
   updateSubscriptionTier(userId: string, tier: string): Promise<User>;
+  updateUserPassword(userId: string, hashedPassword: string): Promise<void>;
   
   // IEP Goals
   getGoalsByUserId(userId: string): Promise<Goal[]>;
@@ -335,6 +336,17 @@ export class MemStorage implements IStorage {
     };
     this.users.set(userId, updatedUser);
     return updatedUser;
+  }
+
+  async updateUserPassword(userId: string, hashedPassword: string): Promise<void> {
+    const user = this.users.get(userId);
+    if (!user) throw new Error("User not found");
+    
+    const updatedUser = { 
+      ...user, 
+      password: hashedPassword
+    };
+    this.users.set(userId, updatedUser);
   }
 
   async getGoalsByUserId(userId: string): Promise<Goal[]> {
@@ -781,6 +793,13 @@ export class DbStorage implements IStorage {
       .where(eq(users.id, userId))
       .returning();
     return result[0];
+  }
+
+  async updateUserPassword(userId: string, hashedPassword: string): Promise<void> {
+    await this.db
+      .update(users)
+      .set({ password: hashedPassword })
+      .where(eq(users.id, userId));
   }
 
   // IEP Goals
