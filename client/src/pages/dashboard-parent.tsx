@@ -60,9 +60,21 @@ const parentTools = [
 ];
 
 export default function ParentDashboard() {
-  const { user } = useAuth();
+  const { user, getUserRole } = useAuth();
   const [, setLocation] = useLocation();
   const [modalOpen, setModalOpen] = useState(false);
+
+  // Debug logging for role validation
+  console.log('🔍 Parent Dashboard - User:', user?.email, 'Role:', getUserRole());
+
+  // Role validation - redirect if not parent
+  const userRole = getUserRole();
+  if (userRole && userRole !== 'parent') {
+    console.log('❌ Non-parent user accessing parent dashboard, redirecting');
+    setLocation('/dashboard-premium');
+    return null;
+  }
+
   const [selectedTool, setSelectedTool] = useState<string | null>(null);
   const [upload, setUpload] = useState<File | null>(null);
 
@@ -73,7 +85,7 @@ export default function ParentDashboard() {
   });
 
   const displayUser = user || { username: 'Parent Demo', email: 'parent@demo.com' };
-  const isHeroPlan = user?.subscription?.plan === 'Hero Plan';
+  const isHeroPlan = user?.subscriptionTier === 'heroOffer';
 
   const handleTool = (tool: string) => {
     if (tool === "IEP Goal Generator") {
@@ -127,7 +139,7 @@ export default function ParentDashboard() {
     <div className="min-h-screen bg-gradient-to-b from-[#1A1B2E] to-[#2C2F48] px-6 py-10 text-white">
       <div className="max-w-5xl mx-auto">
         <h1 className="text-3xl font-bold mb-2 text-white">
-          Welcome back, {displayUser.username}!
+          Welcome back, {user?.username || 'Parent'}!
         </h1>
         {isHeroPlan && (
           <div className="flex items-center gap-2 mb-4">
@@ -265,32 +277,32 @@ export default function ParentDashboard() {
             <CardContent className="p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-blue-400 mb-1">{metrics?.activeGoals || 0}</div>
+                  <div className="text-2xl font-bold text-blue-400 mb-1">{(metrics as any)?.activeGoals || 0}</div>
                   <div className="text-sm text-slate-400">Active Goals</div>
-                  {(!metrics?.activeGoals || metrics.activeGoals === 0) && (
+                  {(!(metrics as any)?.activeGoals || metrics.activeGoals === 0) && (
                     <div className="text-xs text-blue-300 mt-1">Create your first goal</div>
                   )}
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-green-400 mb-1">{metrics?.progressRate || 0}%</div>
+                  <div className="text-2xl font-bold text-green-400 mb-1">{(metrics as any)?.progressRate || 0}%</div>
                   <div className="text-sm text-slate-400">Overall Progress</div>
-                  {(!metrics?.progressRate || metrics.progressRate === 0) && (
+                  {(!(metrics as any)?.progressRate || metrics.progressRate === 0) && (
                     <div className="text-xs text-green-300 mt-1">Start making progress</div>
                   )}
                 </div>
                 <div className="text-center">
                   <div className="text-sm font-bold text-purple-400 mb-1">
-                    {metrics?.upcomingMeeting ? 'Scheduled' : 'No Meeting'}
+                    {(metrics as any)?.upcomingMeeting ? 'Scheduled' : 'No Meeting'}
                   </div>
                   <div className="text-sm text-slate-400">Next IEP Review</div>
-                  {!metrics?.upcomingMeeting && (
+                  {!(metrics as any)?.upcomingMeeting && (
                     <div className="text-xs text-purple-300 mt-1">Schedule your next meeting</div>
                   )}
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-orange-400 mb-1">{metrics?.documents || 0}</div>
+                  <div className="text-2xl font-bold text-orange-400 mb-1">{(metrics as any)?.documents || 0}</div>
                   <div className="text-sm text-slate-400">Documents</div>
-                  {(!metrics?.documents || metrics.documents === 0) && (
+                  {(!(metrics as any)?.documents || metrics.documents === 0) && (
                     <div className="text-xs text-orange-300 mt-1">Upload your first document</div>
                   )}
                 </div>
@@ -317,7 +329,7 @@ export default function ParentDashboard() {
                 </div>
                 <div className="flex items-center gap-3 p-2 bg-slate-700/50 rounded-lg">
                   <div className="w-2 h-2 bg-orange-400 rounded-full"></div>
-                  <span className="text-sm text-slate-300">{metrics?.documents || 4} documents uploaded</span>
+                  <span className="text-sm text-slate-300">{(metrics as any)?.documents || 4} documents uploaded</span>
                   <span className="text-xs text-slate-500 ml-auto">Today</span>
                 </div>
               </div>
