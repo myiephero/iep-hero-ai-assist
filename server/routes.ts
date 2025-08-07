@@ -2064,6 +2064,122 @@ The report should be comprehensive yet concise, approximately 2-3 pages when pri
     }
   });
 
+  // Autism accommodations endpoints
+  app.post('/api/autism-accommodations/generate', requireAuth, async (req, res) => {
+    try {
+      const { childName, gradeLevel, diagnosisAreas, sensoryPreferences, behavioralChallenges, communicationStyle, additionalNotes } = req.body;
+
+      if (!childName || !gradeLevel || !diagnosisAreas?.length || !sensoryPreferences || !behavioralChallenges || !communicationStyle) {
+        return res.status(400).json({ error: 'All required fields must be provided' });
+      }
+
+      console.log('🧠 Generating autism accommodations for:', childName);
+
+      const openaiResponse = await openai.chat.completions.create({
+        model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+        messages: [
+          {
+            role: "system",
+            content: "You are a special education expert and IEP specialist. Generate IDEA-compliant accommodations specifically designed for students with autism spectrum disorders. Each accommodation should be practical, measurable, and implementable in classroom settings. Respond with JSON in this format: { \"accommodations\": [{ \"title\": \"string\", \"description\": \"string\", \"category\": \"string\", \"implementation\": \"string\" }] }"
+          },
+          {
+            role: "user",
+            content: `Based on the inputs below, generate 8 specific IEP accommodations that support a student with autism. Each accommodation should include a title, description, category (Sensory, Behavioral, Academic, Communication, Social, Environmental, Assessment, or Transition), and practical classroom implementation details.
+
+Student Information:
+• Name: ${childName}
+• Grade: ${gradeLevel}
+• Diagnosis Areas: ${diagnosisAreas.join(', ')}
+• Sensory Preferences: ${sensoryPreferences}
+• Behavioral Challenges: ${behavioralChallenges}
+• Communication Style: ${communicationStyle}
+${additionalNotes ? `• Additional Notes: ${additionalNotes}` : ''}
+
+Generate accommodations that are specific to autism support and address the student's individual needs.`
+          }
+        ],
+        response_format: { type: "json_object" },
+        temperature: 0.7,
+      });
+
+      const aiContent = openaiResponse.choices[0]?.message?.content;
+      if (!aiContent) {
+        throw new Error('No response from AI service');
+      }
+
+      const aiResult = JSON.parse(aiContent);
+      console.log('✅ AI generated accommodations:', aiResult);
+
+      res.json({
+        accommodations: aiResult.accommodations || [],
+        studentInfo: { childName, gradeLevel, diagnosisAreas, communicationStyle }
+      });
+
+    } catch (error: any) {
+      console.error('❌ Error generating autism accommodations:', error);
+      res.status(500).json({ 
+        error: 'Failed to generate accommodations',
+        details: error.message || 'Unknown error' 
+      });
+    }
+  });
+
+  app.post('/api/autism-accommodations/save', requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      const { formData, accommodations, createdBy } = req.body;
+
+      if (!formData || !accommodations) {
+        return res.status(400).json({ error: 'Form data and accommodations are required' });
+      }
+
+      const accommodationText = accommodations.map((acc: any) => 
+        `${acc.title}\nCategory: ${acc.category}\n${acc.description}\nImplementation: ${acc.implementation}\n`
+      ).join('\n');
+
+      const document = await storage.createDocument({
+        title: `Autism Accommodations for ${formData.childName}`,
+        content: `Student: ${formData.childName}\nGrade: ${formData.gradeLevel}\nDiagnosis Areas: ${formData.diagnosisAreas.join(', ')}\nCommunication Style: ${formData.communicationStyle}\n\nGenerated Accommodations:\n\n${accommodationText}`,
+        type: 'autism-accommodations',
+        userId: user.id,
+        tags: ['autism', 'accommodations', 'iep', formData.gradeLevel.toLowerCase()],
+        category: 'autism-support'
+      });
+
+      console.log('✅ Autism accommodations session saved:', document.id);
+
+      res.json({ 
+        success: true, 
+        document,
+        message: 'Autism accommodations session saved successfully' 
+      });
+
+    } catch (error: any) {
+      console.error('❌ Error saving autism accommodations session:', error);
+      res.status(500).json({ 
+        error: 'Failed to save session',
+        details: error.message || 'Unknown error' 
+      });
+    }
+  });
+
+  app.get('/api/autism-accommodations/sessions', requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      const documents = await storage.getDocumentsByUserId(user.id);
+      const autismSessions = documents.filter((doc: any) => doc.type === 'autism-accommodations');
+
+      res.json({ sessions: autismSessions });
+
+    } catch (error: any) {
+      console.error('❌ Error fetching autism sessions:', error);
+      res.status(500).json({ 
+        error: 'Failed to fetch sessions',
+        details: error.message || 'Unknown error' 
+      });
+    }
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;
