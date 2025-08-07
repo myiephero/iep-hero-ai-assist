@@ -224,6 +224,12 @@ function Router() {
           <AdvocateMatcher />
         </AuthGuard>
       </Route>
+      <Route path="/advocate-matcher">
+        <AuthGuard>
+          <Navbar />
+          <AdvocateMatcher />
+        </AuthGuard>
+      </Route>
       <Route path="/tools/goal-generator">
         <AuthGuard>
           <GoalGenerator />
