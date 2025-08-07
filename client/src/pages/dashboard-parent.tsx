@@ -6,10 +6,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLocation } from 'wouter';
+import { useQuery } from '@tanstack/react-query';
 import IEPGoalGenerator from '@/components/IEPGoalGenerator';
 import { IEPStatusViewer } from '@/components/IEPStatusViewer';
 import { DashboardMetrics } from '@/components/DashboardMetrics';
-
 
 const parentTools = [
   {
@@ -53,18 +53,8 @@ const parentTools = [
     icon: '🗂️'
   },
   {
-    name: 'AI IEP Review',
-    description: 'Get comprehensive AI analysis of your child\'s IEP',
-    icon: '🧠'
-  },
-  {
-    name: 'Ask AI About My Docs',
-    description: 'Ask questions about your uploaded IEP documents',
-    icon: '💬'
-  },
-  {
     name: 'Get Expert Help',
-    description: 'Connect with an IEP advocate for personalized support',
+    description: 'Connect with qualified IEP advocates',
     icon: '🤝'
   }
 ];
@@ -76,27 +66,18 @@ export default function ParentDashboard() {
   const [selectedTool, setSelectedTool] = useState<string | null>(null);
   const [upload, setUpload] = useState<File | null>(null);
 
-  // Use demo authentication if no user is logged in
-  const displayUser = user || { 
-    id: "demo_parent_id",
-    email: "parent@demo.com", 
-    username: "Demo Parent", 
-    role: "parent",
-    planStatus: "heroOffer" 
-  };
-  const isHeroPlan = (displayUser as any).planStatus === 'heroOffer';
+  // Fetch dashboard metrics for IEP Overview Panel
+  const { data: metrics } = useQuery({
+    queryKey: ['/api/dashboard/metrics'],
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
 
-  const openToolModal = (tool: string) => {
+  const displayUser = user || { username: 'Parent Demo', email: 'parent@demo.com' };
+  const isHeroPlan = user?.subscription?.plan === 'Hero Plan';
+
+  const handleTool = (tool: string) => {
     if (tool === "IEP Goal Generator") {
-      setLocation("/tools/iep-goal-generator");
-      return;
-    }
-    if (tool === "AI IEP Review") {
-      setLocation("/tools/ai-iep-review");
-      return;
-    }
-    if (tool === "Ask AI About My Docs") {
-      setLocation("/tools/ask-ai-docs");
+      setLocation("/tools/goal-generator");
       return;
     }
     if (tool === "Progress Analyzer") {
@@ -143,8 +124,7 @@ export default function ParentDashboard() {
   };
 
   return (
-    <>
-      <div className="min-h-screen bg-gradient-to-b from-[#1A1B2E] to-[#2C2F48] px-6 py-10 text-white">
+    <div className="min-h-screen bg-gradient-to-b from-[#1A1B2E] to-[#2C2F48] px-6 py-10 text-white">
       <div className="max-w-5xl mx-auto">
         <h1 className="text-3xl font-bold mb-2 text-white">
           Welcome back, {displayUser.username}!
@@ -179,107 +159,203 @@ export default function ParentDashboard() {
         </div>
 
         {/* Essential Tools - Clean Top Row */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <Card 
-            className="bg-[#3E4161]/70 border-slate-600 cursor-pointer hover:bg-[#3E4161]/90 transition-all duration-200"
-            onClick={() => setLocation("/documents")}
-          >
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl mb-2">📁</div>
-              <div className="font-semibold text-white">Document Vault</div>
-              <div className="text-xs text-slate-400">Manage Files</div>
-            </CardContent>
-          </Card>
-          
-          <Card 
-            className="bg-[#3E4161]/70 border-slate-600 cursor-pointer hover:bg-[#3E4161]/90 transition-all duration-200"
-            onClick={() => setLocation("/tools/iep-goal-generator")}
-          >
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl mb-2">🎯</div>
-              <div className="font-semibold text-white">Goal Generator</div>
-              <div className="text-xs text-slate-400">Create Goals</div>
-            </CardContent>
-          </Card>
-          
-          <Card 
-            className="bg-[#3E4161]/70 border-slate-600 cursor-pointer hover:bg-[#3E4161]/90 transition-all duration-200"
-            onClick={() => setLocation("/tools/ai-iep-review")}
-          >
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl mb-2">🧠</div>
-              <div className="font-semibold text-white">AI Review</div>
-              <div className="text-xs text-slate-400">Analyze IEPs</div>
-            </CardContent>
-          </Card>
-          
-          <Card 
-            className="bg-[#3E4161]/70 border-slate-600 cursor-pointer hover:bg-[#3E4161]/90 transition-all duration-200"
-            onClick={() => setLocation("/tools/progress-analyzer")}
-          >
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl mb-2">📊</div>
-              <div className="font-semibold text-white">Reports</div>
-              <div className="text-xs text-slate-400">Track Progress</div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Communication Section */}
         <div className="mb-8">
-          <h2 className="text-xl font-semibold mb-4 text-white">Communication & Support</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <h2 className="text-xl font-semibold mb-4 text-white">Core Tools</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <Card 
+              className="bg-[#3E4161]/70 border-slate-600 cursor-pointer hover:bg-[#3E4161]/90 transition-all duration-200"
+              onClick={() => setLocation("/documents")}
+            >
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl mb-2">🗂️</div>
+                <div className="font-semibold text-white">Document Vault</div>
+                <div className="text-xs text-slate-400">Upload & organize IEP documents</div>
+              </CardContent>
+            </Card>
+            
+            <Card
+              className="bg-[#3E4161]/70 border-slate-600 cursor-pointer hover:bg-[#3E4161]/90 transition-all duration-200"
+              onClick={() => setLocation("/tools/goal-generator")}
+            >
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl mb-2">🎯</div>
+                <div className="font-semibold text-white">Goal Generator</div>
+                <div className="text-xs text-slate-400">Create SMART IEP goals</div>
+              </CardContent>
+            </Card>
+            
+            <Card
+              className="bg-[#3E4161]/70 border-slate-600 cursor-pointer hover:bg-[#3E4161]/90 transition-all duration-200"
+              onClick={() => setLocation("/tools/ai-document-review")}
+            >
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl mb-2">🔍</div>
+                <div className="font-semibold text-white">AI Review</div>
+                <div className="text-xs text-slate-400">Analyze IEP documents</div>
+              </CardContent>
+            </Card>
+            
+            <Card
               className="bg-[#3E4161]/70 border-slate-600 cursor-pointer hover:bg-[#3E4161]/90 transition-all duration-200"
               onClick={() => setLocation("/messages")}
             >
               <CardContent className="p-4 text-center">
                 <div className="text-2xl mb-2">💬</div>
                 <div className="font-semibold text-white">Messages</div>
-                <div className="text-xs text-slate-400">Chat with your advocate</div>
+                <div className="text-xs text-slate-400">Chat with advocates</div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* Additional Tools Section */}
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold mb-4 text-white">Additional Tools</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Card
+              className="bg-[#3E4161]/70 border-slate-600 cursor-pointer hover:bg-[#3E4161]/90 transition-all duration-200"
+              onClick={() => setLocation("/tools/meeting-prep-wizard")}
+            >
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl mb-2">📋</div>
+                <div className="font-semibold text-white">Meeting Prep</div>
+                <div className="text-xs text-slate-400">Prepare for IEP meetings</div>
               </CardContent>
             </Card>
             
-            <Card 
+            <Card
               className="bg-[#3E4161]/70 border-slate-600 cursor-pointer hover:bg-[#3E4161]/90 transition-all duration-200"
-              onClick={() => setLocation("/tools/advocate-matcher")}
+              onClick={() => setLocation("/tools/smart-letter-generator")}
             >
               <CardContent className="p-4 text-center">
-                <div className="text-2xl mb-2">🤝</div>
-                <div className="font-semibold text-white">Get Expert Help</div>
-                <div className="text-xs text-slate-400">Connect with advocates</div>
+                <div className="text-2xl mb-2">✉️</div>
+                <div className="font-semibold text-white">Letter Generator</div>
+                <div className="text-xs text-slate-400">Generate legal letters</div>
+              </CardContent>
+            </Card>
+            
+            <Card
+              className="bg-[#3E4161]/70 border-slate-600 cursor-pointer hover:bg-[#3E4161]/90 transition-all duration-200"
+              onClick={() => setLocation("/tools/progress-notes-logger")}
+            >
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl mb-2">📝</div>
+                <div className="font-semibold text-white">Progress Logger</div>
+                <div className="text-xs text-slate-400">Track service delivery</div>
+              </CardContent>
+            </Card>
+            
+            <Card
+              className="bg-[#3E4161]/70 border-slate-600 cursor-pointer hover:bg-[#3E4161]/90 transition-all duration-200"
+              onClick={() => setLocation("/tools/communication-tracker")}
+            >
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl mb-2">📧</div>
+                <div className="font-semibold text-white">Communication Plan</div>
+                <div className="text-xs text-slate-400">Track emails & requests</div>
               </CardContent>
             </Card>
           </div>
         </div>
 
-        {/* Planning & Documentation Tools */}
+        {/* IEP Overview Panel */}
         <div className="mb-8">
-          <h2 className="text-xl font-semibold mb-4 text-white">Planning & Documentation</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[
-              { name: 'Meeting Prep', desc: 'Prepare for IEP meetings', icon: '🗣️', route: '/tools/meeting-prep-wizard' },
-              { name: 'Letter Generator', desc: 'Request letters & communication', icon: '📄', route: '/tools/smart-letter-generator' },
-              { name: 'Progress Logger', desc: 'Track service delivery', icon: '📝', route: '/tools/progress-notes-logger' }
-            ].map((tool, index) => (
-              <Card
-                key={index}
-                className="bg-[#3E4161]/70 border-slate-600 cursor-pointer hover:bg-[#3E4161]/90 transition-all duration-200"
-                onClick={() => setLocation(tool.route)}
-              >
-                <CardContent className="p-4 text-center">
-                  <div className="text-2xl mb-2">{tool.icon}</div>
-                  <div className="font-semibold text-white">{tool.name}</div>
-                  <div className="text-xs text-slate-400">{tool.desc}</div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          <h2 className="text-xl font-semibold mb-4 text-white">Your Child's IEP Overview</h2>
+          <Card className="bg-[#3E4161]/70 border-slate-600">
+            <CardContent className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-blue-400 mb-1">{metrics?.activeGoals || 0}</div>
+                  <div className="text-sm text-slate-400">Active Goals</div>
+                  {(!metrics?.activeGoals || metrics.activeGoals === 0) && (
+                    <div className="text-xs text-blue-300 mt-1">Create your first goal</div>
+                  )}
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-green-400 mb-1">{metrics?.progressRate || 0}%</div>
+                  <div className="text-sm text-slate-400">Overall Progress</div>
+                  {(!metrics?.progressRate || metrics.progressRate === 0) && (
+                    <div className="text-xs text-green-300 mt-1">Start making progress</div>
+                  )}
+                </div>
+                <div className="text-center">
+                  <div className="text-sm font-bold text-purple-400 mb-1">
+                    {metrics?.upcomingMeeting ? 'Scheduled' : 'No Meeting'}
+                  </div>
+                  <div className="text-sm text-slate-400">Next IEP Review</div>
+                  {!metrics?.upcomingMeeting && (
+                    <div className="text-xs text-purple-300 mt-1">Schedule your next meeting</div>
+                  )}
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-orange-400 mb-1">{metrics?.documents || 0}</div>
+                  <div className="text-sm text-slate-400">Documents</div>
+                  {(!metrics?.documents || metrics.documents === 0) && (
+                    <div className="text-xs text-orange-300 mt-1">Upload your first document</div>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
+        {/* Recent IEP Activity Feed */}
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold mb-4 text-white">Recent Activity</h2>
+          <Card className="bg-[#3E4161]/70 border-slate-600">
+            <CardContent className="p-6">
+              <div className="space-y-3">
+                <div className="flex items-center gap-3 p-2 bg-slate-700/50 rounded-lg">
+                  <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                  <span className="text-sm text-slate-300">Demo account created</span>
+                  <span className="text-xs text-slate-500 ml-auto">Today</span>
+                </div>
+                <div className="flex items-center gap-3 p-2 bg-slate-700/50 rounded-lg">
+                  <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                  <span className="text-sm text-slate-300">Hero Plan activated</span>
+                  <span className="text-xs text-slate-500 ml-auto">Today</span>
+                </div>
+                <div className="flex items-center gap-3 p-2 bg-slate-700/50 rounded-lg">
+                  <div className="w-2 h-2 bg-orange-400 rounded-full"></div>
+                  <span className="text-sm text-slate-300">{metrics?.documents || 4} documents uploaded</span>
+                  <span className="text-xs text-slate-500 ml-auto">Today</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
+        {/* Modal for legacy tools */}
+        <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+          <DialogContent className="bg-slate-800 border-slate-600">
+            <DialogHeader>
+              <DialogTitle className="text-white">{selectedTool}</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 text-white">
+              <p>{parentTools.find(t => t.name === selectedTool)?.description}</p>
+              {selectedTool === "Goal Generator" && <IEPGoalGenerator />}
+              {selectedTool === "IEP Status" && <IEPStatusViewer />}
+              {upload && (
+                <div className="p-3 bg-slate-700 rounded">
+                  <p className="text-sm">Uploaded: {upload.name}</p>
+                </div>
+              )}
+              <div className="flex gap-2">
+                <Button onClick={handleSubmit} className="bg-blue-600 hover:bg-blue-700">
+                  Submit
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => setModalOpen(false)}
+                  className="border-slate-600 text-white hover:bg-slate-700"
+                >
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
-    </>
   );
 }
