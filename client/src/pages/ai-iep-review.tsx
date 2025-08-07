@@ -7,6 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, Upload, FileText, CheckCircle, AlertCircle } from 'lucide-react';
 import { Link } from 'wouter';
 import { apiRequest } from '@/lib/queryClient';
+import { useRoleAwareDashboard } from '@/utils/navigation';
 
 interface ReviewResult {
   summary: string;
