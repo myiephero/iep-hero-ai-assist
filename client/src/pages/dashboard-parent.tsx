@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLocation } from 'wouter';
+import { useRoleAwareDashboard } from '@/utils/navigation';
 import { useQuery } from '@tanstack/react-query';
 import IEPGoalGenerator from '@/components/IEPGoalGenerator';
 import { IEPStatusViewer } from '@/components/IEPStatusViewer';
@@ -62,6 +63,7 @@ const parentTools = [
 export default function ParentDashboard() {
   const { user, getUserRole } = useAuth();
   const [, setLocation] = useLocation();
+  const { getDashboardRoute } = useRoleAwareDashboard();
   const [modalOpen, setModalOpen] = useState(false);
 
   // Debug logging for role validation
@@ -71,7 +73,7 @@ export default function ParentDashboard() {
   const userRole = getUserRole();
   if (userRole && userRole !== 'parent') {
     console.log('❌ Non-parent user accessing parent dashboard, redirecting to premium');
-    setLocation('/dashboard-premium');
+    setLocation(getDashboardRoute());
     return null;
   }
 
