@@ -54,6 +54,25 @@ export const documents = pgTable("documents", {
   createdAt: timestamp("created_at").default(sql`now()`),
 });
 
+export const documentShares = pgTable("document_shares", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  documentId: varchar("document_id").notNull().references(() => documents.id),
+  userId: varchar("user_id").notNull().references(() => users.id), // Who created the share
+  shareToken: text("share_token").notNull().unique(), // Secure random token
+  recipientEmail: text("recipient_email"), // Optional - who it's shared with
+  accessLevel: text("access_level").notNull().default("view"), // view, download, comment
+  expiresAt: timestamp("expires_at").notNull(), // Time-limited access
+  maxViews: integer("max_views"), // Optional view limit
+  currentViews: integer("current_views").default(0),
+  requiresPassword: boolean("requires_password").default(false),
+  password: text("password"), // Hashed password for additional security
+  isActive: boolean("is_active").default(true),
+  lastAccessedAt: timestamp("last_accessed_at"),
+  accessLog: jsonb("access_log").default([]), // Track who accessed and when
+  createdAt: timestamp("created_at").default(sql`now()`),
+  updatedAt: timestamp("updated_at").default(sql`now()`),
+});
+
 export const events = pgTable("events", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").notNull().references(() => users.id),
@@ -198,6 +217,12 @@ export const insertDocumentSchema = createInsertSchema(documents).omit({
   uploadedAt: true,
 });
 
+export const insertDocumentShareSchema = createInsertSchema(documentShares).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export const insertEventSchema = createInsertSchema(events).omit({
   id: true,
   userId: true,
@@ -284,3 +309,5 @@ export type InsertAdvocateMatch = z.infer<typeof insertAdvocateMatchSchema>;
 export type AdvocateMatch = typeof advocateMatches.$inferSelect;
 export type InsertIEPDraft = z.infer<typeof insertIEPDraftSchema>;
 export type IEPDraft = typeof iepDrafts.$inferSelect;
+export type InsertDocumentShare = z.infer<typeof insertDocumentShareSchema>;
+export type DocumentShare = typeof documentShares.$inferSelect;
