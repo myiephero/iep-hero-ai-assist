@@ -10,6 +10,7 @@ import { ArrowLeft, ArrowRight, ChevronLeft, Wand2, Copy, Download, Save, Clipbo
 import { Link } from "wouter";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { useRoleAwareDashboard } from "@/utils/navigation";
 import { apiRequest } from "@/lib/queryClient";
 
 interface WizardStep {
@@ -86,6 +87,7 @@ const wizardSteps: WizardStep[] = [
 
 export default function MeetingPrepWizard() {
   const { user } = useAuth();
+  const { getDashboardRoute } = useRoleAwareDashboard();
   const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<Record<string, string>>({});
@@ -102,7 +104,7 @@ export default function MeetingPrepWizard() {
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
         <div className="max-w-4xl mx-auto">
           <div className="mb-6">
-            <Link href="/dashboard-parent">
+            <Link href={getDashboardRoute()}>
               <Button variant="ghost" className="mb-4">
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to Dashboard
@@ -242,7 +244,7 @@ export default function MeetingPrepWizard() {
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
         <div className="max-w-4xl mx-auto">
           <div className="mb-6">
-            <Link href="/dashboard-parent">
+            <Link href={getDashboardRoute()}>
               <Button variant="ghost" className="mb-4">
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to Dashboard
@@ -311,7 +313,7 @@ export default function MeetingPrepWizard() {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
       <div className="max-w-2xl mx-auto">
         <div className="mb-6">
-          <Link href="/dashboard-parent">
+          <Link href={getDashboardRoute()}>
             <Button variant="ghost" className="mb-4">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Dashboard

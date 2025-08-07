@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useRoleAwareDashboard } from "@/utils/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -34,6 +35,7 @@ export default function AdvocacyReportGenerator() {
   const [generatedReport, setGeneratedReport] = useState<string>("");
   const [reportMetadata, setReportMetadata] = useState<any>(null);
   const [savingToVault, setSavingToVault] = useState(false);
+  const { getDashboardRoute } = useRoleAwareDashboard();
   const { toast } = useToast();
   const { user } = useAuth();
 
@@ -154,7 +156,7 @@ export default function AdvocacyReportGenerator() {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-6">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center gap-4 mb-6">
-            <Link href="/dashboard-advocate">
+            <Link href={getDashboardRoute()}>
               <Button variant="ghost" size="sm" className="gap-2">
                 <ArrowLeft className="h-4 w-4" />
                 Back to Dashboard
@@ -219,7 +221,7 @@ export default function AdvocacyReportGenerator() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-6">
       <div className="max-w-2xl mx-auto">
         <div className="flex items-center gap-4 mb-6">
-          <Link href="/dashboard-advocate">
+          <Link href={getDashboardRoute()}>
             <Button variant="ghost" size="sm" className="gap-2">
               <ArrowLeft className="h-4 w-4" />
               Back to Dashboard

@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ArrowLeft, FileText, Copy, Download, Save, Wand2 } from "lucide-react";
 import { Link } from "wouter";
 import { useAuth } from "@/contexts/AuthContext";
+import { useRoleAwareDashboard } from "@/utils/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { supabase } from "@/utils/supabaseClient";
@@ -141,6 +142,7 @@ const letterTemplates: LetterTemplate[] = [
 
 export default function SmartLetterGenerator() {
   const { user } = useAuth();
+  const { getDashboardRoute } = useRoleAwareDashboard();
   const { toast } = useToast();
   const [selectedTemplate, setSelectedTemplate] = useState<string>('');
   const [selectedStudentId, setSelectedStudentId] = useState<string>('');
@@ -172,7 +174,7 @@ export default function SmartLetterGenerator() {
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
         <div className="max-w-4xl mx-auto">
           <div className="mb-6">
-            <Link href="/dashboard-parent">
+            <Link href={getDashboardRoute()}>
               <Button variant="ghost" className="mb-4">
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to Dashboard
@@ -446,7 +448,7 @@ export default function SmartLetterGenerator() {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-6">
-          <Link href="/dashboard-parent">
+          <Link href={getDashboardRoute()}>
             <Button className="mb-4 bg-slate-600 hover:bg-slate-700 text-white">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Dashboard

@@ -87,7 +87,7 @@ export default function ProgressNotes() {
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
         <div className="max-w-4xl mx-auto">
           <div className="mb-6">
-            <Link href="/dashboard-parent">
+            <Link href={getDashboardRoute()}>
               <Button variant="ghost" className="mb-4">
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to Dashboard
@@ -214,7 +214,7 @@ export default function ProgressNotes() {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-6">
-          <Link href="/dashboard-parent">
+          <Link href={getDashboardRoute()}>
             <Button variant="ghost" className="mb-4">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Dashboard
