@@ -247,9 +247,12 @@ This preparation guide was generated using AI assistance and should be customize
       return response.json();
     },
     onSuccess: () => {
+      const selectedStudent = students.find(s => s.id === formData.studentId);
+      const studentName = selectedStudent ? `${selectedStudent.firstName} ${selectedStudent.lastName}` : 'Student';
+      
       toast({
-        title: "Saved to Vault!",
-        description: "Meeting prep guide has been saved to your Document Vault"
+        title: "Meeting Prep Guide Saved!",
+        description: `Saved to Document Vault for ${studentName}`
       });
       setSavingToVault(false);
     },

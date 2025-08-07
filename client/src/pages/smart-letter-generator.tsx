@@ -367,10 +367,9 @@ export default function SmartLetterGenerator() {
   };
 
   const saveToVault = async () => {
-    console.log("🚀 Step 1: Save to Vault clicked"); // Debug log
+    console.log("🚀 Save to Vault clicked");
     
     if (!generatedLetter || !currentTemplate) {
-      console.log("❌ Missing generatedLetter or currentTemplate");
       toast({
         title: "No Content to Save",
         description: "Please generate a letter first before saving to vault",
@@ -379,114 +378,55 @@ export default function SmartLetterGenerator() {
       return;
     }
 
+    if (!user) {
+      toast({
+        title: "Login Required",
+        description: "Please log in to save documents to your vault",
+        variant: "destructive",
+      });
+      window.location.href = '/login';
+      return;
+    }
+
     setIsSaving(true);
     try {
-      // Check frontend authentication first
-      console.log("Frontend user:", user);
-      if (!user) {
-        console.log("User not authenticated on frontend, redirecting to login");
-        toast({
-          title: "Login Required",
-          description: "Please log in to save documents to your vault",
-          variant: "destructive",
-        });
-        window.location.href = '/login';
-        return;
-      }
-
-      // Test backend authentication first
-      console.log("🔍 Step 2: Testing backend authentication...");
-      const authTest = await fetch('/api/current-user', {
-        method: 'GET',
-        credentials: 'include', // Essential for session-based auth
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      console.log("🔍 Auth test response status:", authTest.status);
+      // Get student name for document title
+      const selectedStudent = students.find(s => s.id === selectedStudentId);
+      const studentName = selectedStudent ? `${selectedStudent.firstName} ${selectedStudent.lastName}` : 'Student';
+      const documentTitle = `${currentTemplate.title} - ${studentName}`;
       
-      if (!authTest.ok) {
-        console.error("❌ Backend authentication failed:", authTest.status);
-        
-        // Try to log in with demo credentials if not authenticated
-        console.log("🔄 Attempting to authenticate with demo credentials...");
-        const loginResponse = await fetch('/api/login', {
-          method: 'POST',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email: 'parent@demo.com',
-            password: 'demo123'
-          }),
-        });
-
-        if (!loginResponse.ok) {
-          console.error("❌ Demo login failed:", loginResponse.status);
-          toast({
-            title: "Authentication Failed",
-            description: "Please log in again to save documents",
-            variant: "destructive",
-          });
-          window.location.href = '/login';
-          return;
-        }
-        
-        console.log("✅ Demo authentication successful");
-      }
-
-      // Use selected student ID or child name from form
-      const studentId = selectedStudentId || null;
-      const selectedStudent = students.find(s => s.id === studentId);
-      const childName = selectedStudent ? `${selectedStudent.firstName} ${selectedStudent.lastName}` : (formData.childName?.trim() || 'Student');
-
-      // Create document title from template and child name
-      const documentTitle = `${currentTemplate.title} - ${childName}`;
-      
-      // Save document using backend API with session credentials
-      console.log("🔍 Step 3: Saving document via backend API...");
+      // Prepare document data
       const documentData = {
         content: generatedLetter,
         type: 'letter',
         generatedBy: 'Smart Letter Generator',
         displayName: documentTitle,
         parentDocumentId: null,
-        studentId: studentId
+        studentId: selectedStudentId || null
       };
 
-      console.log("📤 API request payload:", documentData);
-      const response = await fetch('/api/documents/generate', {
-        method: 'POST',
-        credentials: 'include', // Essential for session-based auth
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(documentData),
-      });
+      console.log("📤 Saving document:", documentData);
       
-      console.log("📊 API response status:", response.status);
+      const response = await apiRequest('POST', '/api/documents/generate', documentData);
       
-      if (!response.ok) {
+      if (response.ok) {
+        const result = await response.json();
+        console.log("✅ Document saved:", result);
+        
+        toast({
+          title: "Letter Saved Successfully!",
+          description: `${documentTitle} has been saved to your Document Vault`,
+        });
+      } else {
         const errorText = await response.text();
-        console.error("❌ API error response:", errorText);
-        throw new Error(`Failed to save document: ${response.status} ${errorText}`);
+        throw new Error(`Save failed: ${response.status} ${errorText}`);
       }
-
-      const savedDocument = await response.json();
-      console.log("✅ Document saved successfully:", savedDocument);
-
-      toast({
-        title: "Letter saved to your Document Vault!",
-        description: `${documentTitle} has been saved successfully`,
-      });
 
     } catch (error: any) {
       console.error('❌ Error saving to vault:', error);
       toast({
         title: "Save Failed",
-        description: error.message || "Unable to save to document vault. Please try logging in again.",
+        description: error.message || "Unable to save to document vault",
         variant: "destructive",
       });
     } finally {
@@ -686,18 +626,6 @@ export default function SmartLetterGenerator() {
                             Save to Vault
                           </>
                         )}
-                      </Button>
-                    )}
-                    
-                    {/* Temporary test button for debugging - only show when authenticated */}
-                    {user && (
-                      <Button 
-                        onClick={testManualInsert}
-                        size="sm"
-                        variant="outline"
-                        className="border-yellow-500 text-yellow-500 hover:bg-yellow-50"
-                      >
-                        Test Insert
                       </Button>
                     )}
                   </div>
