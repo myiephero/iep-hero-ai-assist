@@ -518,10 +518,6 @@ export class MemStorage implements IStorage {
     this.progressNotes.delete(noteId);
   }
 
-  async deleteProgressNote(noteId: string): Promise<void> {
-    this.progressNotes.delete(noteId);
-  }
-
   async getCommunicationLogsByUserId(userId: string): Promise<CommunicationLog[]> {
     return Array.from(this.communicationLogs.values()).filter(log => log.userId === userId);
   }
@@ -610,28 +606,7 @@ export class MemStorage implements IStorage {
     return Array.from(this.documents.values()).filter(doc => doc.studentId === studentId);
   }
 
-  async deleteDocuments(documentIds: string[], userId: string): Promise<number> {
-    let deletedCount = 0;
-    for (const documentId of documentIds) {
-      const document = this.documents.get(documentId);
-      if (document && document.userId === userId) {
-        // Delete physical file if it exists
-        if (document.filename) {
-          const filePath = `uploads/${document.filename}`;
-          if (fs.existsSync(filePath)) {
-            try {
-              fs.unlinkSync(filePath);
-            } catch (error) {
-              console.error(`Failed to delete file ${filePath}:`, error);
-            }
-          }
-        }
-        this.documents.delete(documentId);
-        deletedCount++;
-      }
-    }
-    return deletedCount;
-  }
+
 
   // Advocate Client methods
   async getAdvocateClientsByAdvocateId(advocateId: string): Promise<AdvocateClient[]> {
@@ -673,16 +648,6 @@ export class MemStorage implements IStorage {
   }
 
   // Missing methods for LocalDbStorage compatibility
-  async saveDocumentAnalysis(documentId: string, analysis: any): Promise<Document> {
-    // For local storage, we'll update the document in memory
-    const doc = this.documents.get(documentId);
-    if (doc) {
-      doc.analysisResult = analysis;
-      this.documents.set(documentId, doc);
-      return doc;
-    }
-    throw new Error(`Document ${documentId} not found`);
-  }
 
   async getIEPDraftsByUserId(userId: string): Promise<any[]> {
     // Return empty array for local storage
@@ -749,6 +714,29 @@ export class DbStorage implements IStorage {
 
   async getUserByUsername(username: string): Promise<User | undefined> {
     const result = await this.db.select().from(users).where(eq(users.username, username)).limit(1);
+    return result[0];
+  }
+
+  async getUserByVerificationToken(token: string): Promise<User | undefined> {
+    const result = await this.db.select().from(users).where(eq(users.verificationToken, token)).limit(1);
+    return result[0];
+  }
+
+  async verifyUserEmail(userId: string): Promise<User> {
+    const result = await this.db
+      .update(users)
+      .set({ emailVerified: true, verificationToken: null })
+      .where(eq(users.id, userId))
+      .returning();
+    return result[0];
+  }
+
+  async updateStripeCustomerId(userId: string, customerId: string): Promise<User> {
+    const result = await this.db
+      .update(users)
+      .set({ stripeCustomerId: customerId })
+      .where(eq(users.id, userId))
+      .returning();
     return result[0];
   }
 
@@ -854,6 +842,20 @@ export class DbStorage implements IStorage {
 
   async deleteDocument(documentId: string): Promise<void> {
     await this.db.delete(documents).where(eq(documents.id, documentId));
+  }
+
+  async getDocumentsByStudentId(studentId: string): Promise<Document[]> {
+    return await this.db.select().from(documents).where(eq(documents.studentId, studentId));
+  }
+
+  async deleteDocuments(documentIds: string[], userId: string): Promise<number> {
+    const result = await this.db
+      .delete(documents)
+      .where(and(
+        inArray(documents.id, documentIds),
+        eq(documents.userId, userId)
+      ));
+    return documentIds.length;
   }
 
   async updateDocumentName(documentId: string, displayName: string): Promise<Document> {
@@ -1516,71 +1518,7 @@ export const storage = new class LocalDbStorage implements IStorage {
     return result[0];
   }
 
-  // Email verification methods
-  async getUserByVerificationToken(token: string): Promise<User | undefined> {
-    const result = await this.db.select().from(users).where(eq(users.verificationToken, token)).limit(1);
-    return result[0];
-  }
 
-  async verifyUserEmail(userId: string): Promise<User> {
-    const result = await this.db
-      .update(users)
-      .set({ 
-        emailVerified: true, 
-        verificationToken: null 
-      })
-      .where(eq(users.id, userId))
-      .returning();
-    return result[0];
-  }
-
-  async updateDocumentName(documentId: string, displayName: string): Promise<Document> {
-    const result = await this.db
-      .update(documents)
-      .set({ displayName })
-      .where(eq(documents.id, documentId))
-      .returning();
-    
-    if (result.length === 0) {
-      throw new Error("Document not found");
-    }
-    return result[0];
-  }
-
-  async saveDocumentAnalysis(documentId: string, analysis: any): Promise<Document> {
-    const result = await this.db
-      .update(documents)
-      .set({ analysisResult: analysis })
-      .where(eq(documents.id, documentId))
-      .returning();
-    
-    if (result.length === 0) {
-      throw new Error("Document not found");
-    }
-    return result[0];
-  }
-
-  async updateUserStripeInfo(userId: string, customerId: string, subscriptionId: string): Promise<User> {
-    const result = await this.db
-      .update(users)
-      .set({ 
-        stripeCustomerId: customerId, 
-        stripeSubscriptionId: subscriptionId,
-        subscriptionTier: subscriptionId ? "hero" : "free"
-      })
-      .where(eq(users.id, userId))
-      .returning();
-    return result[0];
-  }
-
-  async updateSubscriptionTier(userId: string, tier: string): Promise<User> {
-    const result = await this.db
-      .update(users)
-      .set({ subscriptionTier: tier })
-      .where(eq(users.id, userId))
-      .returning();
-    return result[0];
-  }
 
   async getUsersByRole(role: string): Promise<User[]> {
     return await this.db.select().from(users).where(eq(users.role, role));
@@ -1628,10 +1566,6 @@ export const storage = new class LocalDbStorage implements IStorage {
 
   async deleteStudent(studentId: string): Promise<void> {
     await this.db.delete(students).where(eq(students.id, studentId));
-  }
-
-  async getDocumentsByStudentId(studentId: string): Promise<Document[]> {
-    return await this.db.select().from(documents).where(eq(documents.studentId, studentId));
   }
 
   async updateDocument(documentId: string, updates: Partial<Document>): Promise<Document> {
@@ -1682,23 +1616,11 @@ export const storage = new class LocalDbStorage implements IStorage {
   }
 
   // Missing methods for interface compliance
-  async updateStripeCustomerId(userId: string, customerId: string): Promise<User> {
-    const result = await this.db
+  async updateUserPassword(userId: string, hashedPassword: string): Promise<void> {
+    await this.db
       .update(users)
-      .set({ stripeCustomerId: customerId })
-      .where(eq(users.id, userId))
-      .returning();
-    return result[0];
-  }
-
-  async deleteDocuments(documentIds: string[], userId: string): Promise<number> {
-    const result = await this.db
-      .delete(documents)
-      .where(and(
-        inArray(documents.id, documentIds),
-        eq(documents.userId, userId)
-      ));
-    return result.count || documentIds.length;
+      .set({ password: hashedPassword })
+      .where(eq(users.id, userId));
   }
 
   async getIEPDraftsByUserId(userId: string): Promise<IEPDraft[]> {
