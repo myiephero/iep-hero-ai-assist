@@ -1,0 +1,93 @@
+Thanks for confirming — let’s now generate the complete and targeted bug report for the “Save to Vault” issue inside the Smart Letter Generator tool.
+
+⸻
+
+🐞 Smart Letter Generator – “Save to Vault” Button Failing
+
+Submit To: 🟣 Replit Agent
+Label: bug, urgent, dashboard, smart-letter-generator
+
+⸻
+
+🧩 Problem Summary
+
+The “Save to Vault” button in the Smart Letter Generator:
+	•	✅ Appears visually
+	•	✅ User is authenticated
+	•	❌ Fails to trigger any insert or Supabase action
+	•	✅ The “Download” button works correctly, so it is isolated to Save functionality.
+
+⸻
+
+🔍 Debugging Recap
+	•	App is using local PostgreSQL in dev, while frontend tries to write to Supabase
+	•	Logs confirmed: no request sent or recorded, no errors shown
+	•	Vault save requires a valid Supabase API call and auth token (supabase.auth.getUser() not firing or user not passed into backend)
+	•	Manual Test Insert works → proves Supabase connectivity is fine if called properly
+
+⸻
+
+✅ Required Fixes
+
+1. Ensure Auth Check Passes
+	•	Confirm supabase.auth.getUser() or session is passed to API route.
+	•	Button should not render at all if unauthenticated (add fallback UI like “Login to Save”).
+
+2. Ensure API Endpoint Integration
+	•	Button must POST to:
+
+/api/documents/generate
+
+with payload:
+
+{
+  "student_id": "Kim Chee",
+  "template": "Prior Written Notice",
+  "content": "...full letter string..."
+}
+
+
+	•	Insert into Supabase’s documents table.
+
+3. Add Feedback / Debugging
+	•	Use console.log or toast feedback on:
+	•	Attempted insert
+	•	Success or error
+	•	Auth status
+
+4. Fix Logic in Button
+
+Check this:
+
+if (!session) {
+  alert("Login to save");
+  return;
+}
+
+Ensure that the button:
+
+onClick={handleSaveToVault}
+
+correctly calls a fetch("/api/documents/generate", {...}) and includes headers.
+
+⸻
+
+🔁 Reproduction Steps
+	1.	Log in as parent@demo.com / demo123
+	2.	Navigate to Smart Letter Generator
+	3.	Fill out any letter
+	4.	Click “Save to Vault”
+	5.	Observe: Nothing happens, no Supabase insert, no error or toast.
+
+⸻
+
+✅ Acceptance Criteria
+	•	Authenticated users can click “Save to Vault” and see success toast
+	•	Letter is inserted into documents table in Supabase
+	•	Unauthenticated users see “Login to Save” instead of green button
+	•	API returns status 200 and logs response
+	•	Save errors are clearly logged in browser console
+
+⸻
+
+Want me to post this directly as a GitHub issue for you? Or want it bundled with the Advocate dashboard fixes?
