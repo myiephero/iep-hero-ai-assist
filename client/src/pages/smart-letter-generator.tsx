@@ -143,6 +143,7 @@ export default function SmartLetterGenerator() {
   const { user } = useAuth();
   const { toast } = useToast();
   const [selectedTemplate, setSelectedTemplate] = useState<string>('');
+  const [selectedStudentId, setSelectedStudentId] = useState<string>('');
   const [formData, setFormData] = useState<Record<string, string>>({});
   const [generatedLetter, setGeneratedLetter] = useState<string>('');
   const [isGenerating, setIsGenerating] = useState(false);
@@ -209,7 +210,16 @@ export default function SmartLetterGenerator() {
   const generateLetter = async () => {
     if (!currentTemplate) return;
 
-    // Validate required fields
+    // Validate required fields including student selection
+    if (!selectedStudentId) {
+      toast({
+        title: "Student Required",
+        description: "Please select a student before generating the letter",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const missingFields = currentTemplate.fields
       .filter(field => field.required && !formData[field.name]?.trim())
       .map(field => field.label);
@@ -427,28 +437,13 @@ export default function SmartLetterGenerator() {
         console.log("✅ Demo authentication successful");
       }
 
-      // Find matching student ID based on child name from form
-      let studentId = null;
-      const childName = formData.childName?.trim();
-      
-      if (childName && students.length > 0) {
-        const matchingStudent = students.find(student => {
-          const fullName = `${student.firstName} ${student.lastName}`.trim().toLowerCase();
-          return fullName === childName.toLowerCase();
-        });
-        
-        if (!matchingStudent) {
-          const firstNameMatch = students.find(student => 
-            student.firstName.toLowerCase() === childName.toLowerCase()
-          );
-          studentId = firstNameMatch?.id || null;
-        } else {
-          studentId = matchingStudent.id;
-        }
-      }
+      // Use selected student ID or child name from form
+      const studentId = selectedStudentId || null;
+      const selectedStudent = students.find(s => s.id === studentId);
+      const childName = selectedStudent ? `${selectedStudent.firstName} ${selectedStudent.lastName}` : (formData.childName?.trim() || 'Student');
 
       // Create document title from template and child name
-      const documentTitle = `${currentTemplate.title} - ${childName || 'Student'}`;
+      const documentTitle = `${currentTemplate.title} - ${childName}`;
       
       // Save document using backend API with session credentials
       console.log("🔍 Step 3: Saving document via backend API...");
@@ -501,6 +496,7 @@ export default function SmartLetterGenerator() {
 
   const resetForm = () => {
     setSelectedTemplate('');
+    setSelectedStudentId('');
     setFormData({});
     setGeneratedLetter('');
   };
@@ -567,6 +563,30 @@ export default function SmartLetterGenerator() {
                 <CardDescription>{currentTemplate.description}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
+                {/* Student Selection */}
+                <div>
+                  <Label htmlFor="studentSelect">
+                    Select Student <span className="text-red-500 ml-1">*</span>
+                  </Label>
+                  <Select value={selectedStudentId} onValueChange={setSelectedStudentId}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Choose a student..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {students.map(student => (
+                        <SelectItem key={student.id} value={student.id}>
+                          {student.firstName} {student.lastName}
+                        </SelectItem>
+                      ))}
+                      {students.length === 0 && (
+                        <SelectItem value="" disabled>
+                          No students available
+                        </SelectItem>
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {currentTemplate.fields.map(field => (
                     <div key={field.name} className={field.type === 'textarea' ? 'md:col-span-2' : ''}>

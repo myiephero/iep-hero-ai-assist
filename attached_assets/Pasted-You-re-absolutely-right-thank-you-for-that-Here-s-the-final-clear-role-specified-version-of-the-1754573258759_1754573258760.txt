@@ -1,0 +1,69 @@
+You’re absolutely right — thank you for that. Here’s the final, clear, role-specified version of the Smart Letter Generator bug report:
+
+⸻
+
+🐞 Bug: Smart Letter Generator “Save to Vault” Button Not Working (Parent + Advocate Sides)
+
+Submit To: 🟣 Replit Agent
+Labels: bug, smart-letter-generator, document-vault, parent-side, advocate-side, priority:high
+
+⸻
+
+🔍 Summary
+
+The “Save to Vault” button within the Smart Letter Generator fails to function across both Parent and Advocate dashboards. This is a critical system-wide issue, as it prevents saving generated letters into the Vault.
+
+⸻
+
+❌ Current Behavior (Both Roles)
+	•	Button visually appears but does not trigger any action
+	•	No document is saved to Supabase
+	•	No network request or feedback is observed
+	•	Users receive no success/failure indication
+	•	They are left assuming it worked (but it didn’t)
+
+⸻
+
+✅ Expected Behavior
+	•	Authenticated users should trigger a POST request to:
+
+/api/documents/generate
+
+
+	•	Payload should include:
+
+{
+  "user_id": "<from session>",
+  "student_id": "<selected student>",
+  "template": "Prior Written Notice",
+  "content": "Letter content here..."
+}
+
+
+	•	On success:
+	•	Letter is inserted into documents table in Supabase
+	•	Vault immediately displays the document at the top
+	•	Toast confirms: "Letter saved to Vault for Kim Chee!"
+
+⸻
+
+🛠 Developer Instructions
+	•	Ensure supabase.auth.getSession() is available and returns a valid access_token
+	•	Button should not be clickable if user is not authenticated
+	•	Add toast/alert feedback for success/failure
+	•	Order Vault by created_at DESC to show new docs at top
+
+⸻
+
+🧪 Steps to Reproduce (Parent & Advocate)
+	1.	Login as either:
+	•	👨‍👩‍👧‍👦 parent@demo.com / demo123
+	•	🧑‍🏫 advocate@demo.com / demo123
+	2.	Go to Smart Letter Generator
+	3.	Fill in and generate a letter
+	4.	Click “Save to Vault”
+	5.	Observe: no confirmation, document does not appear in Vault
+
+⸻
+
+Let me know when you’re ready for the next issue format — I can generate your QA tracker next if you’d like to clean house after these.
