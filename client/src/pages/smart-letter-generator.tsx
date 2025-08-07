@@ -284,8 +284,53 @@ export default function SmartLetterGenerator() {
     });
   };
 
+  // Temporary manual test function
+  const testManualInsert = async () => {
+    try {
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || !session?.user) {
+        console.error("No authenticated session");
+        return;
+      }
+      
+      console.log("Testing manual insert...");
+      const { error } = await supabase.from("documents").insert({
+        user_id: session.user.id,
+        title: "Test Letter",
+        content: "This is a test insert",
+        type: "letter",
+        filename: `test_${Date.now()}.txt`,
+        original_name: "Test Letter.txt",
+        display_name: "Test Letter",
+        generated_by: "Manual Test",
+        created_at: new Date().toISOString()
+      }, { returning: "minimal" });
+      
+      if (error) {
+        console.error("Manual insert error:", error.message);
+        toast({
+          title: "Test Failed", 
+          description: error.message,
+          variant: "destructive"
+        });
+      } else {
+        console.log("✅ Manual test insert successful");
+        toast({
+          title: "Test Successful",
+          description: "Manual insert worked - check your Document Vault!"
+        });
+      }
+    } catch (error: any) {
+      console.error("Manual test error:", error);
+    }
+  };
+
   const saveToVault = async () => {
-    if (!generatedLetter || !currentTemplate) return;
+    console.log("Save to Vault clicked"); // Debug log
+    if (!generatedLetter || !currentTemplate) {
+      console.log("Missing generatedLetter or currentTemplate");
+      return;
+    }
 
     setIsSaving(true);
     try {
@@ -336,6 +381,17 @@ export default function SmartLetterGenerator() {
         const filename = `${documentTitle.replace(/[^a-zA-Z0-9\-_\s]/g, '').replace(/\s+/g, '_')}_${timestamp}.txt`;
 
         // Insert document directly into Supabase with minimal return to avoid RLS SELECT issues
+        console.log("Attempting Supabase insert with data:", {
+          user_id: session.user.id,
+          student_id: studentId,
+          title: documentTitle,
+          type: 'letter',
+          filename: filename,
+          original_name: `${documentTitle}.txt`,
+          display_name: documentTitle,
+          generated_by: 'Smart Letter Generator',
+        });
+
         const { error: insertError } = await supabase
           .from('documents')
           .insert({
@@ -350,11 +406,14 @@ export default function SmartLetterGenerator() {
             generated_by: 'Smart Letter Generator',
             created_at: new Date().toISOString(),
             uploaded_at: new Date().toISOString()
-          });
+          }, { returning: "minimal" });
 
         if (insertError) {
+          console.error("Insert error:", insertError.message);
           throw insertError;
         }
+        
+        console.log("✅ Document successfully inserted into Supabase");
       } else {
         // Fallback to API endpoint for local development
         const documentData = {
@@ -547,6 +606,16 @@ export default function SmartLetterGenerator() {
                           Save to Vault
                         </>
                       )}
+                    </Button>
+                    
+                    {/* Temporary test button for debugging */}
+                    <Button 
+                      onClick={testManualInsert}
+                      size="sm"
+                      variant="outline"
+                      className="border-yellow-500 text-yellow-500 hover:bg-yellow-50"
+                    >
+                      Test Insert
                     </Button>
                   </div>
                 </div>
