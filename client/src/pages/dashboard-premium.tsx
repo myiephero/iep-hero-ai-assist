@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLocation } from "wouter";
+import { useRoleAwareDashboard } from "@/utils/navigation";
 import { DashboardMetrics } from "@/components/DashboardMetrics";
 
 
@@ -29,6 +30,7 @@ export default function DashboardAdvocate() {
   const [upload, setUpload] = useState<File | null>(null);
   const [, setLocation] = useLocation();
   const { user, getUserRole } = useAuth();
+  const { getDashboardRoute } = useRoleAwareDashboard();
 
   // Debug logging for role validation
   console.log('🔍 Advocate Dashboard - User:', user?.email, 'Username:', user?.username, 'Role:', getUserRole());
@@ -37,7 +39,7 @@ export default function DashboardAdvocate() {
   const userRole = getUserRole();
   if (userRole === 'parent') {
     console.log('❌ Parent user accessing advocate dashboard, redirecting to parent');
-    setLocation('/dashboard-parent');
+    setLocation(getDashboardRoute());
     return null;
   }
 
