@@ -335,8 +335,17 @@ export default function SmartLetterGenerator() {
     setIsSaving(true);
     try {
       // Check if user is authenticated
+      console.log("Current user:", user);
       if (!user) {
-        throw new Error('Please log in to save documents');
+        console.log("User not authenticated, redirecting to login");
+        toast({
+          title: "Login Required",
+          description: "Please log in to save documents to your vault",
+          variant: "destructive",
+        });
+        // Redirect to login or show login modal
+        window.location.href = '/login';
+        return;
       }
 
       // Find matching student ID based on child name from form
@@ -589,34 +598,47 @@ export default function SmartLetterGenerator() {
                       <Download className="w-4 h-4 mr-1" />
                       Download
                     </Button>
-                    <Button 
-                      onClick={saveToVault} 
-                      size="sm"
-                      disabled={isSaving}
-                      className="bg-green-600 hover:bg-green-700 text-white disabled:bg-slate-500"
-                    >
-                      {isSaving ? (
-                        <>
-                          <div className="animate-spin w-3 h-3 border-2 border-green-200 border-t-transparent rounded-full mr-1" />
-                          Saving...
-                        </>
-                      ) : (
-                        <>
-                          <Save className="w-4 h-4 mr-1" />
-                          Save to Vault
-                        </>
-                      )}
-                    </Button>
+                    {!user ? (
+                      <Button 
+                        onClick={() => window.location.href = '/login'}
+                        size="sm"
+                        className="bg-blue-600 hover:bg-blue-700 text-white"
+                      >
+                        <Save className="w-4 h-4 mr-1" />
+                        Login to Save
+                      </Button>
+                    ) : (
+                      <Button 
+                        onClick={saveToVault} 
+                        size="sm"
+                        disabled={isSaving}
+                        className="bg-green-600 hover:bg-green-700 text-white disabled:bg-slate-500"
+                      >
+                        {isSaving ? (
+                          <>
+                            <div className="animate-spin w-3 h-3 border-2 border-green-200 border-t-transparent rounded-full mr-1" />
+                            Saving...
+                          </>
+                        ) : (
+                          <>
+                            <Save className="w-4 h-4 mr-1" />
+                            Save to Vault
+                          </>
+                        )}
+                      </Button>
+                    )}
                     
-                    {/* Temporary test button for debugging */}
-                    <Button 
-                      onClick={testManualInsert}
-                      size="sm"
-                      variant="outline"
-                      className="border-yellow-500 text-yellow-500 hover:bg-yellow-50"
-                    >
-                      Test Insert
-                    </Button>
+                    {/* Temporary test button for debugging - only show when authenticated */}
+                    {user && (
+                      <Button 
+                        onClick={testManualInsert}
+                        size="sm"
+                        variant="outline"
+                        className="border-yellow-500 text-yellow-500 hover:bg-yellow-50"
+                      >
+                        Test Insert
+                      </Button>
+                    )}
                   </div>
                 </div>
                 <CardDescription>
