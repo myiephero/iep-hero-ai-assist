@@ -371,18 +371,60 @@ export default function SmartLetterGenerator() {
 
     setIsSaving(true);
     try {
-      // Check if user is authenticated
-      console.log("Current user:", user);
+      // Check frontend authentication first
+      console.log("Frontend user:", user);
       if (!user) {
-        console.log("User not authenticated, redirecting to login");
+        console.log("User not authenticated on frontend, redirecting to login");
         toast({
           title: "Login Required",
           description: "Please log in to save documents to your vault",
           variant: "destructive",
         });
-        // Redirect to login or show login modal
         window.location.href = '/login';
         return;
+      }
+
+      // Test backend authentication first
+      console.log("🔍 Step 2: Testing backend authentication...");
+      const authTest = await fetch('/api/current-user', {
+        method: 'GET',
+        credentials: 'include', // Essential for session-based auth
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      console.log("🔍 Auth test response status:", authTest.status);
+      
+      if (!authTest.ok) {
+        console.error("❌ Backend authentication failed:", authTest.status);
+        
+        // Try to log in with demo credentials if not authenticated
+        console.log("🔄 Attempting to authenticate with demo credentials...");
+        const loginResponse = await fetch('/api/login', {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: 'parent@demo.com',
+            password: 'demo123'
+          }),
+        });
+
+        if (!loginResponse.ok) {
+          console.error("❌ Demo login failed:", loginResponse.status);
+          toast({
+            title: "Authentication Failed",
+            description: "Please log in again to save documents",
+            variant: "destructive",
+          });
+          window.location.href = '/login';
+          return;
+        }
+        
+        console.log("✅ Demo authentication successful");
       }
 
       // Find matching student ID based on child name from form
@@ -390,13 +432,11 @@ export default function SmartLetterGenerator() {
       const childName = formData.childName?.trim();
       
       if (childName && students.length > 0) {
-        // Try to match by full name first
         const matchingStudent = students.find(student => {
           const fullName = `${student.firstName} ${student.lastName}`.trim().toLowerCase();
           return fullName === childName.toLowerCase();
         });
         
-        // If no full name match, try first name only
         if (!matchingStudent) {
           const firstNameMatch = students.find(student => 
             student.firstName.toLowerCase() === childName.toLowerCase()
@@ -410,8 +450,8 @@ export default function SmartLetterGenerator() {
       // Create document title from template and child name
       const documentTitle = `${currentTemplate.title} - ${childName || 'Student'}`;
       
-      // Use backend API endpoint (which handles both Supabase and local database)
-      console.log("🔍 Step 2: Saving document via backend API...");
+      // Save document using backend API with session credentials
+      console.log("🔍 Step 3: Saving document via backend API...");
       const documentData = {
         content: generatedLetter,
         type: 'letter',
@@ -422,7 +462,14 @@ export default function SmartLetterGenerator() {
       };
 
       console.log("📤 API request payload:", documentData);
-      const response = await apiRequest('POST', '/api/documents/generate', documentData);
+      const response = await fetch('/api/documents/generate', {
+        method: 'POST',
+        credentials: 'include', // Essential for session-based auth
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(documentData),
+      });
       
       console.log("📊 API response status:", response.status);
       
@@ -441,10 +488,10 @@ export default function SmartLetterGenerator() {
       });
 
     } catch (error: any) {
-      console.error('Error saving to vault:', error);
+      console.error('❌ Error saving to vault:', error);
       toast({
         title: "Save Failed",
-        description: error.message || "Unable to save to document vault",
+        description: error.message || "Unable to save to document vault. Please try logging in again.",
         variant: "destructive",
       });
     } finally {
