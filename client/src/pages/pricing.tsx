@@ -183,19 +183,25 @@ export default function Pricing() {
 
   return (
     <div className="min-h-screen bg-slate-900">
-      <div className="max-w-6xl mx-auto py-12 px-4">
-        {/* Back to Dashboard Button */}
-        <div className="mb-8">
+      {/* Prominent Navigation Bar */}
+      <div className="bg-slate-800 border-b border-slate-700 py-4 px-6 sticky top-0 z-50">
+        <div className="max-w-6xl mx-auto flex items-center justify-between">
           <Link href={getDashboardRoute()}>
             <Button 
-              variant="outline" 
-              className="bg-slate-800 border-slate-600 text-white hover:bg-slate-700 hover:text-white transition-colors"
+              size="lg"
+              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3"
             >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Dashboard
+              <ArrowLeft className="w-5 h-5 mr-2" />
+              Return to Dashboard
             </Button>
           </Link>
+          <div className="text-white font-semibold">
+            My IEP Hero - Pricing Plans
+          </div>
         </div>
+      </div>
+
+      <div className="max-w-6xl mx-auto py-12 px-4">
 
         {/* Header */}
         <div className="text-center mb-12">
