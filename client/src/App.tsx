@@ -37,6 +37,7 @@ import Chat from "@/pages/chat";
 import MyStudents from "@/pages/my-students";
 import MyParents from "@/pages/my-parents";
 import AdvocateStudents from "@/pages/advocate-students";
+import SharedDocumentPage from "@/pages/shared-document";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 import { MobileNavigation } from "@/components/MobileNavigation";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
@@ -257,6 +258,11 @@ function Router() {
           <AdvocateStudents />
         </AuthGuard>
       </Route>
+      {/* Public route for shared documents */}
+      <Route path="/shared/:token">
+        <SharedDocumentPage />
+      </Route>
+      
       <Route path="/">
         <Redirect to="/dashboard" />
       </Route>

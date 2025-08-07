@@ -21,6 +21,7 @@ import { randomUUID } from "crypto";
 import { analyzeIEPDocument, generateIEPGoals, generateIEPGoalsFromArea } from "./ai-document-analyzer";
 import { analyzeDocumentForTagging } from "./document-tagger";
 import OpenAI from "openai";
+import { sql } from "drizzle-orm";
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
@@ -1000,6 +1001,178 @@ Focus on functional skills that will help the student succeed in their education
     } catch (error: any) {
       console.error('Error uploading document:', error);
       res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Secure Document Sharing API
+  app.post("/api/documents/:id/share", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      const documentId = req.params.id;
+      const { recipientEmail, accessLevel = 'view', expiresIn = 7, maxViews, requiresPassword = false, password } = req.body;
+
+      // Check if user owns the document
+      const documents = await storage.getDocumentsByUserId(user.id);
+      const userDocument = documents.find(doc => doc.id === documentId);
+      if (!userDocument) {
+        return res.status(404).json({ message: 'Document not found' });
+      }
+
+      // Generate secure share token
+      const shareToken = randomUUID() + '-' + randomUUID();
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + expiresIn);
+
+      // Hash password if provided
+      const hashedPassword = password ? await bcrypt.hash(password, 10) : null;
+
+      // Create share record directly in database using raw SQL
+      await storage.db.execute(sql`
+        INSERT INTO document_shares (document_id, user_id, share_token, recipient_email, access_level, expires_at, max_views, requires_password, password, is_active, current_views)
+        VALUES (${documentId}, ${user.id}, ${shareToken}, ${recipientEmail || null}, ${accessLevel}, ${expiresAt.toISOString()}, ${maxViews || null}, ${requiresPassword}, ${hashedPassword}, true, 0)
+      `);
+
+      // Generate share URL
+      const baseUrl = req.get('host') || 'localhost:5000';
+      const protocol = req.secure ? 'https' : 'http';
+      const shareUrl = `${protocol}://${baseUrl}/shared/${shareToken}`;
+
+      res.json({
+        shareUrl,
+        token: shareToken,
+        expiresAt,
+        accessLevel,
+        maxViews,
+        requiresPassword,
+        message: 'Secure share link created successfully'
+      });
+    } catch (error: any) {
+      console.error('Share creation error:', error);
+      res.status(500).json({ message: error.message || 'Failed to create share' });
+    }
+  });
+
+  // Access shared document
+  app.get("/shared/:token", async (req, res) => {
+    try {
+      const token = req.params.token;
+      const { password } = req.query;
+
+      // Find share record using raw SQL
+      const shareResult = await storage.db.execute(sql`
+        SELECT * FROM document_shares WHERE share_token = ${token} LIMIT 1
+      `);
+      const shareRecord = shareResult.rows[0];
+      
+      if (!shareRecord) {
+        return res.status(404).json({ message: 'Shared document not found or expired' });
+      }
+
+      // Check if share is still active
+      if (!shareRecord.is_active || new Date() > new Date(shareRecord.expires_at)) {
+        return res.status(410).json({ message: 'This shared link has expired' });
+      }
+
+      // Check view limit
+      if (shareRecord.max_views && shareRecord.current_views >= shareRecord.max_views) {
+        return res.status(410).json({ message: 'This shared link has reached its view limit' });
+      }
+
+      // Check password if required
+      if (shareRecord.requires_password && shareRecord.password) {
+        if (!password || !await bcrypt.compare(password as string, shareRecord.password)) {
+          return res.status(401).json({ 
+            requiresPassword: true, 
+            message: 'Password required' 
+          });
+        }
+      }
+
+      // Get document details
+      const docResult = await storage.db.execute(sql`
+        SELECT * FROM documents WHERE id = ${shareRecord.document_id} LIMIT 1
+      `);
+      const document = docResult.rows[0];
+      
+      if (!document) {
+        return res.status(404).json({ message: 'Document not found' });
+      }
+
+      // Update access count
+      await storage.db.execute(sql`
+        UPDATE document_shares 
+        SET current_views = current_views + 1, last_accessed_at = NOW() 
+        WHERE share_token = ${token}
+      `);
+
+      // Return document preview/info
+      res.json({
+        document: {
+          id: document.id,
+          displayName: document.display_name || document.original_name,
+          type: document.type,
+          description: document.description,
+          createdAt: document.created_at,
+          content: shareRecord.access_level === 'view' || shareRecord.access_level === 'download' ? document.content : null
+        },
+        accessLevel: shareRecord.access_level,
+        canDownload: shareRecord.access_level === 'download',
+        sharedBy: shareRecord.recipient_email ? 'Your advocate' : 'IEP Hero Team'
+      });
+    } catch (error: any) {
+      console.error('Share access error:', error);
+      res.status(500).json({ message: error.message || 'Failed to access shared document' });
+    }
+  });
+
+  // Get shares for a document
+  app.get("/api/documents/:id/shares", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      const documentId = req.params.id;
+
+      // Check if user owns the document
+      const documents = await storage.getDocumentsByUserId(user.id);
+      const userDocument = documents.find(doc => doc.id === documentId);
+      if (!userDocument) {
+        return res.status(404).json({ message: 'Document not found' });
+      }
+
+      const sharesResult = await storage.db.execute(sql`
+        SELECT * FROM document_shares WHERE document_id = ${documentId} AND is_active = true
+        ORDER BY created_at DESC
+      `);
+      
+      res.json({ shares: sharesResult.rows });
+    } catch (error: any) {
+      console.error('Get shares error:', error);
+      res.status(500).json({ message: error.message || 'Failed to get shares' });
+    }
+  });
+
+  // Revoke a share
+  app.delete("/api/shares/:token", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      const token = req.params.token;
+
+      const shareResult = await storage.db.execute(sql`
+        SELECT * FROM document_shares WHERE share_token = ${token} LIMIT 1
+      `);
+      const shareRecord = shareResult.rows[0];
+      
+      if (!shareRecord || shareRecord.user_id !== user.id) {
+        return res.status(404).json({ message: 'Share not found' });
+      }
+
+      await storage.db.execute(sql`
+        UPDATE document_shares SET is_active = false WHERE share_token = ${token}
+      `);
+
+      res.json({ message: 'Share revoked successfully' });
+    } catch (error: any) {
+      console.error('Revoke share error:', error);
+      res.status(500).json({ message: error.message || 'Failed to revoke share' });
     }
   });
 

@@ -11,7 +11,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import FileUploadModal from "@/components/modals/file-upload-modal";
 import DocumentTagsDisplay from "@/components/DocumentTagsDisplay";
-import { FileText, Upload, Download, Brain, Edit2, Check, X, Eye, Save, ArrowLeft, Search, User, Trash2, Archive, MoreHorizontal, RefreshCw } from "lucide-react";
+import { DocumentShareModal } from "@/components/DocumentShareModal";
+import { FileText, Upload, Download, Brain, Edit2, Check, X, Eye, Save, ArrowLeft, Search, User, Trash2, Archive, MoreHorizontal, RefreshCw, Share2 } from "lucide-react";
 import { Link } from "wouter";
 import { format } from "date-fns";
 import type { Document } from "@shared/schema";
@@ -33,6 +34,7 @@ export default function Documents() {
   const [selectedDocuments, setSelectedDocuments] = useState<Set<string>>(new Set());
   const [bulkActionMode, setBulkActionMode] = useState(false);
   const [retaggingDocument, setRetaggingDocument] = useState<string | null>(null);
+  const [sharingDocument, setSharingDocument] = useState<Document | null>(null);
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -664,6 +666,16 @@ PRIORITY LEVEL: ${analysisResult.priority || 'Low'}
                         <Download className="w-4 h-4 mr-1" />
                         Download
                       </Button>
+                      
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setSharingDocument(doc)}
+                        className="bg-green-700 border-green-500 text-white hover:bg-green-600 hover:border-green-400"
+                      >
+                        <Share2 className="w-4 h-4 mr-1" />
+                        Share
+                      </Button>
                       {doc.analysisResult && (
                         <Button
                           variant="outline"
@@ -936,6 +948,14 @@ PRIORITY LEVEL: ${viewingAnalysis.priority || 'Low'}
           )}
         </DialogContent>
       </Dialog>
+      {/* Document Sharing Modal */}
+      {sharingDocument && (
+        <DocumentShareModal
+          isOpen={!!sharingDocument}
+          onClose={() => setSharingDocument(null)}
+          document={sharingDocument}
+        />
+      )}
     </div>
   );
 }
