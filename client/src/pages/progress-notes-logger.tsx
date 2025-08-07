@@ -14,6 +14,7 @@ import { ArrowLeft, FileText, Plus, Filter, Upload, Calendar, CheckCircle, XCirc
 import { Link } from "wouter";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { useRoleAwareDashboard } from "@/utils/navigation";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -44,6 +45,7 @@ type ProgressNoteForm = z.infer<typeof progressNoteSchema>;
 
 export default function ProgressNotesLogger() {
   const { user } = useAuth();
+  const { getDashboardRoute } = useRoleAwareDashboard();
   const { toast } = useToast();
   const [showForm, setShowForm] = useState(false);
   const [statusFilter, setStatusFilter] = useState<string>("all");
