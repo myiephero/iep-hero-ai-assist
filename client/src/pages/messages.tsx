@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Send, MessageSquare, User, Clock, Loader2 } from "lucide-react";
 import { Link } from "wouter";
 import { useAuth } from "@/contexts/AuthContext";
+import { useRoleAwareDashboard } from "@/utils/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -20,6 +21,7 @@ interface ConversationUser extends UserType {
 
 export default function Messages() {
   const { user } = useAuth();
+  const { getDashboardRoute } = useRoleAwareDashboard();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [selectedRecipient, setSelectedRecipient] = useState<string | null>(null);
@@ -129,7 +131,7 @@ export default function Messages() {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
       <div className="max-w-6xl mx-auto">
         <div className="mb-6">
-          <Link href={user?.role === 'advocate' ? '/dashboard-premium' : '/dashboard-parent'}>
+          <Link href={getDashboardRoute()}>
             <Button variant="ghost" className="mb-4">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Dashboard

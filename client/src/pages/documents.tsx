@@ -19,6 +19,7 @@ import type { Document } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import { useRoleAwareDashboard } from "@/utils/navigation";
 
 export default function Documents() {
   const [showFileUpload, setShowFileUpload] = useState(false);
@@ -36,6 +37,7 @@ export default function Documents() {
   const [retaggingDocument, setRetaggingDocument] = useState<string | null>(null);
   const [sharingDocument, setSharingDocument] = useState<Document | null>(null);
   const { user } = useAuth();
+  const { getDashboardRoute } = useRoleAwareDashboard();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
@@ -413,7 +415,7 @@ PRIORITY LEVEL: ${analysisResult.priority || 'Low'}
               </Button>
             </Link>
           ) : (
-            <Link href={user?.role === 'parent' ? '/dashboard-parent' : user?.role === 'advocate' ? '/dashboard-advocate' : '/dashboard'}>
+            <Link href={getDashboardRoute()}>
               <Button variant="ghost" className="mb-4 text-slate-300 hover:text-white">
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to Dashboard
