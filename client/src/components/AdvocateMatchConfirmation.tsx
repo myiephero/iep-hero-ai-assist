@@ -1,9 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle, Mail, Calendar, Phone, MessageSquare, User, Clock, FileText, ArrowRight } from 'lucide-react';
+import { CheckCircle, Mail, Calendar, Phone, MessageSquare, User, Clock, FileText, ArrowRight, Download, Save, UserPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
+import { queryClient, apiRequest } from '@/lib/queryClient';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 
 interface AdvocateInfo {
   id: string;
@@ -71,6 +77,76 @@ export function AdvocateMatchConfirmation({ matchData, onComplete }: AdvocateMat
   const [currentStep, setCurrentStep] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
+  const [selectedStudentId, setSelectedStudentId] = useState<string>('');
+  const [showAssignDialog, setShowAssignDialog] = useState(false);
+  
+  const { user } = useAuth();
+  const { toast } = useToast();
+
+  // Fetch user's students for assignment
+  const { data: students } = useQuery({
+    queryKey: ['/api/students'],
+    enabled: !!user,
+  });
+
+  // Save to Vault mutation
+  const saveToVaultMutation = useMutation({
+    mutationFn: async () => {
+      const content = generateMatchSummary();
+      return apiRequest('/api/documents/generate', 'POST', {
+        content,
+        type: 'advocate_match',
+        generatedBy: 'Advocate Matcher',
+        displayName: `IEP Advocate Match - ${advocate.name}`,
+        studentId: selectedStudentId || undefined,
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Saved to Vault",
+        description: "Advocate match details saved to your document vault.",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/documents'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Save Failed", 
+        description: error.message || "Failed to save to vault.",
+        variant: "destructive"
+      });
+    },
+  });
+
+  // Assign to Student mutation
+  const assignToStudentMutation = useMutation({
+    mutationFn: async (studentId: string) => {
+      const content = generateMatchSummary();
+      return apiRequest('/api/documents/generate', 'POST', {
+        content,
+        type: 'advocate_match',
+        generatedBy: 'Advocate Matcher',
+        displayName: `IEP Advocate Match - ${advocate.name}`,
+        studentId: studentId,
+      });
+    },
+    onSuccess: (data, studentId) => {
+      const student = (students as any[])?.find((s: any) => s.id === studentId);
+      toast({
+        title: "Assigned Successfully",
+        description: `Advocate match assigned to ${student?.firstName} ${student?.lastName}'s records.`,
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/students'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/documents'] });
+      setShowAssignDialog(false);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Assignment Failed",
+        description: error.message || "Failed to assign to student.",
+        variant: "destructive"
+      });
+    },
+  });
 
   const advocate = advocateDatabase[matchData.advocateId] || {
     id: matchData.advocateId,
@@ -109,6 +185,57 @@ export function AdvocateMatchConfirmation({ matchData, onComplete }: AdvocateMat
       case 'zoom': return <MessageSquare className="w-4 h-4" />;
       default: return <MessageSquare className="w-4 h-4" />;
     }
+  };
+
+  const generateMatchSummary = () => {
+    return `IEP Advocate Match Summary
+
+Advocate Information:
+- Name: ${advocate.name}
+- Specialty: ${advocate.specialty}
+- Experience: ${advocate.experience}
+
+Match Details:
+- Meeting Date: ${formatDate(matchData.meetingDate)}
+- Contact Method: ${matchData.contactMethod}
+- Your Availability: ${matchData.parentAvailability}
+
+Areas of Support:
+${matchData.helpAreas.map(area => `- ${area}`).join('\n')}
+
+Your Concerns:
+${matchData.concerns}
+
+Child Information:
+- Grade Level: ${matchData.gradeLevel}
+- School District: ${matchData.schoolDistrict}
+
+Next Steps:
+1. Your advocate will receive your request within 15 minutes
+2. They'll contact you within 24 hours to schedule your meeting
+3. You'll receive a confirmation email with next steps
+
+Match ID: ${matchData.id}
+Created: ${formatDate(matchData.createdAt)}
+`;
+  };
+
+  const handleDownload = () => {
+    const content = generateMatchSummary();
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `IEP_Advocate_Match_${advocate.name.replace(/\s+/g, '_')}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    toast({
+      title: "Downloaded",
+      description: "Advocate match summary downloaded successfully.",
+    });
   };
 
   if (!isComplete) {
@@ -316,11 +443,81 @@ export function AdvocateMatchConfirmation({ matchData, onComplete }: AdvocateMat
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6 }}
-              className="flex justify-center space-x-4 pt-4"
+              className="space-y-4 pt-4"
             >
-              <Button onClick={onComplete} className="px-8">
-                Return to Dashboard
-              </Button>
+              {/* Enhanced Action Buttons */}
+              <div className="flex flex-wrap justify-center gap-3">
+                <Button 
+                  onClick={handleDownload}
+                  variant="outline"
+                  className="flex items-center gap-2"
+                >
+                  <Download className="w-4 h-4" />
+                  Download Plan
+                </Button>
+                
+                <Button 
+                  onClick={() => saveToVaultMutation.mutate()}
+                  variant="outline"
+                  disabled={saveToVaultMutation.isPending}
+                  className="flex items-center gap-2"
+                >
+                  <Save className="w-4 h-4" />
+                  {saveToVaultMutation.isPending ? "Saving..." : "Save to Vault"}
+                </Button>
+                
+                <Dialog open={showAssignDialog} onOpenChange={setShowAssignDialog}>
+                  <DialogTrigger asChild>
+                    <Button 
+                      variant="outline"
+                      className="flex items-center gap-2"
+                    >
+                      <UserPlus className="w-4 h-4" />
+                      Assign to Student
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Assign to Student</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        Select which student this advocate match should be assigned to:
+                      </p>
+                      <Select onValueChange={setSelectedStudentId} value={selectedStudentId}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a student" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {(students as any[])?.map((student: any) => (
+                            <SelectItem key={student.id} value={student.id}>
+                              {student.firstName} {student.lastName} - Grade {student.grade}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <div className="flex justify-end gap-2">
+                        <Button variant="outline" onClick={() => setShowAssignDialog(false)}>
+                          Cancel
+                        </Button>
+                        <Button 
+                          onClick={() => assignToStudentMutation.mutate(selectedStudentId)}
+                          disabled={!selectedStudentId || assignToStudentMutation.isPending}
+                        >
+                          {assignToStudentMutation.isPending ? "Assigning..." : "Assign"}
+                        </Button>
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
+              
+              {/* Return to Dashboard Button */}
+              <div className="flex justify-center">
+                <Button onClick={onComplete} className="px-8">
+                  Return to Dashboard
+                </Button>
+              </div>
             </motion.div>
           )}
         </div>
