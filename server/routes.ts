@@ -1779,6 +1779,33 @@ Be supportive and parent-friendly in your language while maintaining accuracy.`;
     }
   });
 
+  // Generate OT recommendations
+  app.post('/api/generate-ot-recommendations', requireAuth, async (req, res) => {
+    try {
+      const { studentId, assessment } = req.body;
+      
+      if (!studentId || !assessment) {
+        return res.status(400).json({
+          success: false,
+          error: 'Student ID and assessment data are required'
+        });
+      }
+
+      const recommendations = await generateOTRecommendations({
+        studentId,
+        assessment
+      });
+      
+      res.json({ success: true, recommendations });
+    } catch (error: any) {
+      console.error('Error generating OT recommendations:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: error.message || 'Failed to generate OT recommendations' 
+      });
+    }
+  });
+
   // Dashboard Metrics API - Real data from database
   app.get("/api/dashboard/metrics", requireAuth, async (req, res) => {
     try {
@@ -2616,4 +2643,130 @@ The next due date is ${context.goals.length > 0 ? new Date(context.goals[0].dueD
   return `Based on your current IEP data: You have ${context.goals.length} goals (${context.goals.filter((g: any) => g.status === "Completed").length} completed), ` +
          `${context.documentsCount} documents, and ${context.upcomingEvents} upcoming events. ` +
          "For specific questions about services, accommodations, or team members, please refer to your IEP document or contact your school team.";
+}
+
+// Generate OT recommendations using AI
+async function generateOTRecommendations(data: { studentId: string; assessment: any }) {
+  const { assessment } = data;
+  
+  // Check if OpenAI API key is available
+  if (!process.env.OPENAI_API_KEY) {
+    throw new Error("OPENAI_API_KEY not found in environment");
+  }
+
+  const prompt = `You are an expert Occupational Therapist creating personalized activity and adaptation recommendations for a student. Based on the assessment data provided, generate specific, actionable OT activities and environmental adaptations.
+
+Assessment Data:
+- Fine Motor Skills: ${assessment.fineMotorSkills}
+- Gross Motor Skills: ${assessment.grossMotorSkills}
+- Sensory Processing: ${assessment.sensoryProcessing}
+- Visual Perceptual Skills: ${assessment.visualPerceptual}
+- Self-Care Skills: ${assessment.selfCareSkills}
+- Handwriting Skills: ${assessment.handwritingSkills}
+- Attention & Focus: ${assessment.attentionFocus}
+- Organizational Skills: ${assessment.organizationalSkills}
+- Social Participation: ${assessment.socialParticipation}
+- Environmental Factors: ${assessment.environmentalFactors}
+- Current Challenges: ${assessment.currentChallenges}
+- Child's Strengths: ${assessment.strengths}
+- Previous OT Experience: ${assessment.previousOT ? 'Yes' : 'No'}
+- OT Goals: ${assessment.accommodationGoals}
+
+Please provide 6-8 specific recommendations in the following categories:
+1. Fine Motor Development
+2. Gross Motor Development  
+3. Sensory Processing
+4. Visual Perceptual Skills
+5. Self-Care & Daily Living
+6. Handwriting & Academic Tasks
+7. Environmental Adaptations
+8. Social Participation
+
+For each recommendation, provide:
+- Category
+- Activity name
+- Detailed description
+- Recommended frequency
+- Materials needed (as array)
+- Specific adaptations (as array)
+- Progress markers to track improvement (as array)
+
+Return ONLY a valid JSON array of recommendations. Each recommendation should have this exact structure:
+{
+  "category": "Category Name",
+  "activity": "Activity Name",
+  "description": "Detailed description of the activity and its purpose",
+  "frequency": "How often to perform this activity",
+  "materials": ["material1", "material2"],
+  "adaptations": ["adaptation1", "adaptation2"],
+  "progressMarkers": ["marker1", "marker2"]
+}
+
+Focus on evidence-based OT interventions that are practical for home and school implementation.`;
+
+  try {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are an expert Occupational Therapist with extensive experience in pediatric OT and IEP development. Provide evidence-based, practical recommendations that can be implemented in both home and school settings.'
+          },
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        max_tokens: 2000,
+        temperature: 0.7,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`OpenAI API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const content = data.choices[0].message.content;
+    
+    try {
+      // Parse the JSON response
+      const recommendations = JSON.parse(content);
+      return recommendations;
+    } catch (parseError) {
+      console.error('Failed to parse OT recommendations JSON:', parseError);
+      console.log('Raw response:', content);
+      
+      // Fallback recommendations if JSON parsing fails
+      return [
+        {
+          category: "Fine Motor Development",
+          activity: "Therapeutic Putty Activities",
+          description: "Use therapeutic putty to strengthen hand muscles and improve dexterity through hiding small objects, pinching, and rolling exercises",
+          frequency: "10-15 minutes, 3-4 times per week",
+          materials: ["Therapeutic putty", "Small objects (coins, beads)", "Timer"],
+          adaptations: ["Start with softer putty", "Use larger objects initially", "Provide hand-over-hand assistance"],
+          progressMarkers: ["Increased grip strength", "Improved finger isolation", "Longer endurance during activities"]
+        },
+        {
+          category: "Gross Motor Development", 
+          activity: "Obstacle Course Training",
+          description: "Create structured movement challenges to improve balance, coordination, and motor planning skills",
+          frequency: "2-3 times per week, 20-30 minutes",
+          materials: ["Cones", "Balance beam", "Tunnels", "Mats"],
+          adaptations: ["Simplify course layout", "Add visual cues", "Provide physical support"],
+          progressMarkers: ["Improved balance", "Better coordination", "Increased confidence in movement"]
+        }
+      ];
+    }
+  } catch (error) {
+    console.error('Error generating OT recommendations:', error);
+    throw new Error('Failed to generate OT recommendations');
+  }
 }

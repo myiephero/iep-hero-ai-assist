@@ -368,6 +368,17 @@ export default function ParentDashboard() {
                 <div className="text-xs text-blue-300">Generate autism-specific IEP accommodations</div>
               </CardContent>
             </Card>
+            
+            <Card
+              className="bg-gradient-to-br from-purple-600/20 to-pink-600/20 border-purple-500/30 cursor-pointer hover:from-purple-600/30 hover:to-pink-600/30 transition-all duration-200"
+              onClick={() => setLocation("/tools/occupational-therapy-recommender")}
+            >
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl mb-2">🏃</div>
+                <div className="font-semibold text-white">OT Activity Recommender</div>
+                <div className="text-xs text-purple-300">Personalized occupational therapy activities</div>
+              </CardContent>
+            </Card>
           </div>
         </div>
 
