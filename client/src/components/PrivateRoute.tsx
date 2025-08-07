@@ -34,7 +34,7 @@ export function PrivateRoute({
     if (userRole === 'parent') {
       return <Redirect to="/dashboard-parent" />;
     } else if (userRole === 'advocate' || userRole === 'professional') {
-      return <Redirect to="/dashboard-advocate" />;
+      return <Redirect to="/dashboard-premium" />;
     }
     return <Redirect to="/dashboard" />;
   }

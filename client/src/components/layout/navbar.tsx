@@ -7,16 +7,18 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
+import { useRoleAwareDashboard } from "@/utils/navigation";
 import { PlanStatusBadge } from "@/components/PlanStatusBadge";
 
 const NavLinks = ({ mobile = false }: { mobile?: boolean }) => {
   const [location] = useLocation();
   
   const { user } = useAuth();
+  const { getDashboardRoute } = useRoleAwareDashboard();
   
   // Dynamic nav items based on user plan - completely remove Subscribe for Hero users
   const navItems = [
-    { href: "/dashboard", label: "Dashboard", icon: Sparkles },
+    { href: getDashboardRoute(), label: "Dashboard", icon: Sparkles },
     { href: "/goals", label: "Goals", icon: Target },
     { href: "/documents", label: "Documents", icon: FileText }
   ];
@@ -121,6 +123,7 @@ const PWAInstallButton = () => {
 
 export default function Navbar() {
   const { user } = useAuth();
+  const { getDashboardRoute } = useRoleAwareDashboard();
   
   return (
     <nav className="bg-gradient-to-r from-purple-900/95 via-blue-900/95 to-purple-900/95 backdrop-blur-lg border-b border-white/10 sticky top-0 z-50 shadow-2xl">
@@ -131,7 +134,7 @@ export default function Navbar() {
               <div className="p-2 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-lg shadow-lg">
                 <GraduationCap className="h-6 w-6 text-white" />
               </div>
-              <Link href="/dashboard">
+              <Link href={getDashboardRoute()}>
                 <a className="ml-3 text-xl font-bold bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">
                   IEP Hero
                 </a>

@@ -106,7 +106,7 @@ function Router() {
       <Route path="/dashboard-advocate">
         <AuthGuard>
           <Navbar />
-          <DashboardAdvocate />
+          <Redirect to="/dashboard-premium" />
         </AuthGuard>
       </Route>
       <Route path="/dashboard-premium">
