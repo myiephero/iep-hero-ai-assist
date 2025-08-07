@@ -123,7 +123,7 @@ export default function SimpleAdvocateMatcherForm() {
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
         <div className="max-w-4xl mx-auto">
           <div className="mb-6">
-            <Link href="/dashboard-parent">
+            <Link href={getDashboardRoute()}>
               <Button variant="ghost" className="mb-4">
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to Dashboard
@@ -163,7 +163,7 @@ export default function SimpleAdvocateMatcherForm() {
               <p className="text-gray-600 mb-6">
                 Thank you for your advocate match request. Our team will review your information and connect you with a qualified special education advocate within 24-48 hours.
               </p>
-              <Link href="/dashboard-parent">
+              <Link href={getDashboardRoute()}>
                 <Button>Return to Dashboard</Button>
               </Link>
             </CardContent>
@@ -177,7 +177,7 @@ export default function SimpleAdvocateMatcherForm() {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
       <div className="max-w-2xl mx-auto">
         <div className="mb-6">
-          <Link href="/dashboard-parent">
+          <Link href={getDashboardRoute()}>
             <Button variant="ghost" className="mb-4">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Dashboard
