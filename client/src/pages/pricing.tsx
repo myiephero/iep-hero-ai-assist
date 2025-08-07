@@ -185,9 +185,12 @@ export default function Pricing() {
     <div className="min-h-screen bg-slate-900">
       <div className="max-w-6xl mx-auto py-12 px-4">
         {/* Back to Dashboard Button */}
-        <div className="mb-6">
+        <div className="mb-8">
           <Link href={getDashboardRoute()}>
-            <Button variant="ghost" className="text-slate-400 hover:text-white">
+            <Button 
+              variant="outline" 
+              className="bg-slate-800 border-slate-600 text-white hover:bg-slate-700 hover:text-white transition-colors"
+            >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Dashboard
             </Button>
