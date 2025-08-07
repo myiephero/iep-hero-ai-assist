@@ -231,12 +231,16 @@ export default function AdvocateMatcher() {
   };
 
   const nextStep = () => {
+    console.log(`🔄 Moving from step ${step} to ${step + 1}`);
     setStep(step + 1);
   };
 
   const prevStep = () => {
+    console.log(`🔄 Moving from step ${step} to ${step - 1}`);
     setStep(step - 1);
   };
+
+  console.log(`🔍 Advocate Matcher Render - Step: ${step}, showConfirmation: ${showConfirmation}, isSubmitted: ${isSubmitted}`);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
@@ -509,7 +513,56 @@ export default function AdvocateMatcher() {
                   )}
                   
                   {step < 3 ? (
-                    <Button type="button" onClick={nextStep} className="bg-blue-600 hover:bg-blue-700">
+                    <Button 
+                      type="button" 
+                      onClick={(e) => {
+                        console.log(`📝 Current step: ${step}, form errors:`, form.formState.errors);
+                        
+                        // Validate current step fields before moving to next step
+                        if (step === 1) {
+                          const step1Fields = ['gradeLevel', 'schoolDistrict'];
+                          const step1Valid = step1Fields.every(field => {
+                            const value = form.getValues(field as keyof AdvocateMatchForm);
+                            return value && value.toString().trim() !== '';
+                          });
+                          
+                          if (!step1Valid) {
+                            toast({
+                              title: "Please complete all fields",
+                              description: "Grade level and school district are required to continue.",
+                              variant: "destructive"
+                            });
+                            return;
+                          }
+                        }
+                        
+                        if (step === 2) {
+                          const helpAreas = form.getValues('helpAreas');
+                          const concerns = form.getValues('concerns');
+                          
+                          if (!helpAreas || helpAreas.length === 0) {
+                            toast({
+                              title: "Please select help areas",
+                              description: "Please select at least one area where you need help.",
+                              variant: "destructive"
+                            });
+                            return;
+                          }
+                          
+                          if (!concerns || concerns.length < 20) {
+                            toast({
+                              title: "Please describe your concerns",
+                              description: "Please provide at least 20 characters describing your biggest concern.",
+                              variant: "destructive"
+                            });
+                            return;
+                          }
+                        }
+                        
+                        nextStep();
+                      }} 
+                      className="bg-blue-600 hover:bg-blue-700"
+                    >
                       Next
                     </Button>
                   ) : (
