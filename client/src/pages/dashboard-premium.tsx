@@ -12,15 +12,15 @@ import { DashboardMetrics } from "@/components/DashboardMetrics";
 
 
 const advocateTools = [
-  { name: 'AI IEP Review', desc: 'Analyze existing IEPs for quality & improvement', icon: '🧠' },
-  { name: 'IEP Goal Generator', desc: 'Craft measurable objectives quickly', icon: '🎯' },
-  { name: 'One-Click Advocacy Report', desc: 'Generate comprehensive advocacy reports with legal framework', icon: '📋' },
-  { name: 'Template Builder', desc: 'Design reusable IEP templates and forms', icon: '📄' },
-  { name: 'Progress Analyzer', desc: 'Data-driven recommendations for IEP goals', icon: '📊' },
-  { name: 'Meeting Prep Assistant', desc: 'Generate talking points and meeting notes', icon: '🗣️' },
-  { name: 'Compliance Checker', desc: 'Ensure legal adherence to IEP policies', icon: '✅' },
-  { name: 'Accommodation Builder', desc: 'Auto-generate accommodations by diagnosis', icon: '⚙️' },
-  { name: 'Transition Planner', desc: 'Create plans for post-secondary success', icon: '📆' }
+  { name: 'Smart Letter Generator', desc: 'Generate legally sound advocacy letters', icon: '📝', route: '/tools/smart-letter-generator' },
+  { name: 'IEP Review Tool', desc: 'AI-powered IEP analysis and recommendations', icon: '🧠', route: '/tools/ai-iep-review' },
+  { name: 'Meeting Prep Assistant', desc: 'Generate talking points and meeting notes', icon: '📋', route: '/tools/meeting-prep-wizard' },
+  { name: 'Progress Analyzer', desc: 'Data-driven recommendations for IEP goals', icon: '📊', route: '/tools/progress-analyzer' },
+  { name: 'Document Vault', desc: 'Secure client document management', icon: '🗂️', route: '/documents' },
+  { name: 'Compliance Checker', desc: 'Ensure legal adherence to IEP policies', icon: '✅', route: '/tools/ai-iep-review' },
+  { name: 'Advocate Messaging', desc: 'Secure communication with clients', icon: '💬', route: '/messages' },
+  { name: 'Get Expert Help', desc: 'Connect with specialist advocates', icon: '🤝', route: '/tools/advocate-matcher' },
+  { name: 'Progress Logger', desc: 'Track service delivery and outcomes', icon: '📝', route: '/tools/progress-notes-logger' }
 ];
 
 export default function DashboardAdvocate() {
@@ -33,42 +33,7 @@ export default function DashboardAdvocate() {
   const displayUser = user || { email: "advocate@demo.com", planStatus: "heroOffer", username: "demo_advocate", role: "advocate" };
   const isHeroPlan = (displayUser as any).planStatus === 'heroOffer';
 
-  const openToolModal = (tool: string) => {
-    // Navigate directly to specific tool pages for all Hero Plan tools
-    switch (tool) {
-      case 'One-Click Advocacy Report':
-        setLocation('/tools/advocacy-report-generator');
-        break;
-      case 'IEP Goal Generator':
-        setLocation('/tools/iep-goal-generator');
-        break;
-      case 'AI IEP Review':
-        setLocation('/tools/ai-iep-review');
-        break;
-      case 'Template Builder':
-        setLocation('/tools/smart-letter-generator');
-        break;
-      case 'Progress Analyzer':
-        setLocation('/tools/progress-analyzer');
-        break;
-      case 'Meeting Prep Assistant':
-        setLocation('/tools/meeting-prep-wizard');
-        break;
-      case 'Compliance Checker':
-        setLocation('/tools/ai-iep-review'); // Use AI IEP Review for compliance checking
-        break;
-      case 'Accommodation Builder':
-        setLocation('/tools/iep-goal-generator'); // Use Goal Generator for accommodations
-        break;
-      case 'Transition Planner':
-        setLocation('/tools/progress-analyzer'); // Use Progress Analyzer for transition planning
-        break;
-      default:
-        // Fallback for unimplemented tools
-        setSelectedTool(tool);
-        setModalOpen(true);
-    }
-  };
+  // Tool navigation is now handled directly in the grid via tool.route
 
   const handleSubmit = () => {
     // Tools should redirect to their actual implementation pages
@@ -244,96 +209,66 @@ export default function DashboardAdvocate() {
           </Card>
         </div>
 
-        {/* AI Tools - Complete Professional Suite with Green Circle Design */}
+        {/* Advocate Professional Tools */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-semibold text-white">AI-Powered IEP Professional Tools</h3>
+            <h2 className="text-xl font-semibold text-white">Professional Advocate Tools</h2>
             {isHeroPlan && (
-              <Badge className="bg-green-600/20 text-green-300 border border-green-500">
-                ✅ Hero Plan Exclusive
+              <Badge className="bg-blue-600/20 text-blue-300 border border-blue-500">
+                ✅ Hero Plan Active
               </Badge>
             )}
           </div>
           
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
-            {/* Row 1: Core Tools */}
-            <Card className="bg-gradient-to-br from-green-900/20 to-green-800/10 border-green-600/30 hover:border-green-500 cursor-pointer transition-all duration-200 hover:shadow-lg hover:shadow-green-500/20"
-                  onClick={() => setLocation('/tools/smart-letter-generator')}>
-              <CardContent className="p-4 text-center">
-                <div className="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-3 border-2 border-green-500/30">
-                  <span className="text-2xl">📝</span>
-                </div>
-                <div className="text-white font-semibold">Smart Letter Generator</div>
-                <div className="text-green-300 text-sm">Generate Letters</div>
-              </CardContent>
-            </Card>
-            
-            <Card className="bg-gradient-to-br from-green-900/20 to-green-800/10 border-green-600/30 hover:border-green-500 cursor-pointer transition-all duration-200 hover:shadow-lg hover:shadow-green-500/20"
-                  onClick={() => setLocation('/tools/ai-iep-review')}>
-              <CardContent className="p-4 text-center">
-                <div className="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-3 border-2 border-green-500/30">
-                  <span className="text-2xl">🧠</span>
-                </div>
-                <div className="text-white font-semibold">IEP Review Tool</div>
-                <div className="text-green-300 text-sm">Analyze IEPs</div>
-              </CardContent>
-            </Card>
-            
-            <Card className="bg-gradient-to-br from-green-900/20 to-green-800/10 border-green-600/30 hover:border-green-500 cursor-pointer transition-all duration-200 hover:shadow-lg hover:shadow-green-500/20"
-                  onClick={() => setLocation('/tools/meeting-prep-wizard')}>
-              <CardContent className="p-4 text-center">
-                <div className="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-3 border-2 border-green-500/30">
-                  <span className="text-2xl">🗣️</span>
-                </div>
-                <div className="text-white font-semibold">Meeting Prep Assistant</div>
-                <div className="text-green-300 text-sm">Generate talking points</div>
-              </CardContent>
-            </Card>
-            
-            <Card className="bg-gradient-to-br from-green-900/20 to-green-800/10 border-green-600/30 hover:border-green-500 cursor-pointer transition-all duration-200 hover:shadow-lg hover:shadow-green-500/20"
-                  onClick={() => setLocation('/tools/progress-analyzer')}>
-              <CardContent className="p-4 text-center">
-                <div className="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-3 border-2 border-green-500/30">
-                  <span className="text-2xl">📊</span>
-                </div>
-                <div className="text-white font-semibold">Progress Analyzer</div>
-                <div className="text-green-300 text-sm">Data insights</div>
-              </CardContent>
-            </Card>
-            
-            {/* Row 2: Management Tools */}
-            <Card className="bg-gradient-to-br from-green-900/20 to-green-800/10 border-green-600/30 hover:border-green-500 cursor-pointer transition-all duration-200 hover:shadow-lg hover:shadow-green-500/20"
-                  onClick={() => setLocation('/documents')}>
-              <CardContent className="p-4 text-center">
-                <div className="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-3 border-2 border-green-500/30">
-                  <span className="text-2xl">📁</span>
-                </div>
-                <div className="text-white font-semibold">Document Vault</div>
-                <div className="text-green-300 text-sm">Manage files</div>
-              </CardContent>
-            </Card>
-            
-            <Card className="bg-gradient-to-br from-green-900/20 to-green-800/10 border-green-600/30 hover:border-green-500 cursor-pointer transition-all duration-200 hover:shadow-lg hover:shadow-green-500/20"
-                  onClick={() => setLocation('/tools/ai-iep-review')}>
-              <CardContent className="p-4 text-center">
-                <div className="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-3 border-2 border-green-500/30">
-                  <span className="text-2xl">✅</span>
-                </div>
-                <div className="text-white font-semibold">Compliance Checker</div>
-                <div className="text-green-300 text-sm">Legal compliance</div>
-              </CardContent>
-            </Card>
-            
-            <Card className="bg-gradient-to-br from-green-900/20 to-green-800/10 border-green-600/30 hover:border-green-500 cursor-pointer transition-all duration-200 hover:shadow-lg hover:shadow-green-500/20"
-                  onClick={() => setLocation('/messages')}>
-              <CardContent className="p-4 text-center">
-                <div className="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-3 border-2 border-green-500/30">
-                  <span className="text-2xl">💬</span>
-                </div>
-                <div className="text-white font-semibold">Advocate Messaging</div>
-                <div className="text-green-300 text-sm">Client communication</div>
-              </CardContent>
-            </Card>
+          {/* First Row - Core Tools */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            {advocateTools.slice(0, 3).map((tool, index) => (
+              <Card 
+                key={index}
+                className="bg-[#3E4161]/70 border-slate-600 cursor-pointer hover:bg-[#3E4161]/90 transition-all duration-200"
+                onClick={() => setLocation(tool.route)}
+              >
+                <CardContent className="p-4 text-center">
+                  <div className="text-2xl mb-2">{tool.icon}</div>
+                  <div className="font-semibold text-white">{tool.name}</div>
+                  <div className="text-xs text-slate-400">{tool.desc}</div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+          
+          {/* Second Row - Advanced Tools */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            {advocateTools.slice(3, 6).map((tool, index) => (
+              <Card 
+                key={index + 3}
+                className="bg-[#3E4161]/70 border-slate-600 cursor-pointer hover:bg-[#3E4161]/90 transition-all duration-200"
+                onClick={() => setLocation(tool.route)}
+              >
+                <CardContent className="p-4 text-center">
+                  <div className="text-2xl mb-2">{tool.icon}</div>
+                  <div className="font-semibold text-white">{tool.name}</div>
+                  <div className="text-xs text-slate-400">{tool.desc}</div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+          
+          {/* Third Row - Communication & Support Tools */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {advocateTools.slice(6, 9).map((tool, index) => (
+              <Card 
+                key={index + 6}
+                className="bg-[#3E4161]/70 border-slate-600 cursor-pointer hover:bg-[#3E4161]/90 transition-all duration-200"
+                onClick={() => setLocation(tool.route)}
+              >
+                <CardContent className="p-4 text-center">
+                  <div className="text-2xl mb-2">{tool.icon}</div>
+                  <div className="font-semibold text-white">{tool.name}</div>
+                  <div className="text-xs text-slate-400">{tool.desc}</div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
 
