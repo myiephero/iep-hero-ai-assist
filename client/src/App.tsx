@@ -34,6 +34,7 @@ import AdvocacyReportGenerator from "@/pages/advocacy-report-generator";
 import AutismAccommodations from "@/pages/autism-accommodations";
 import Subscribe from "@/pages/subscribe";
 import Pricing from "@/pages/pricing";
+import Profile from "@/pages/profile";
 import Chat from "@/pages/chat";
 import MyStudents from "@/pages/my-students";
 import MyParents from "@/pages/my-parents";
@@ -93,6 +94,12 @@ function Router() {
         </AuthGuard>
       </Route>
       <Route path="/pricing" component={Pricing} />
+      <Route path="/profile">
+        <AuthGuard>
+          <Navbar />
+          <Profile />
+        </AuthGuard>
+      </Route>
       <Route path="/dashboard">
         <AuthGuard>
           <DashboardRouter />
