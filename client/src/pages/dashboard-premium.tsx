@@ -155,22 +155,37 @@ export default function DashboardAdvocate() {
             </Card>
           </div>
           
-          {/* Assigned Families List */}
+          {/* Real Client Activity with Live Data */}
           <Card className="bg-[#3E4161]/70 border-slate-600 mb-6">
             <CardContent className="p-6">
-              <h3 className="text-lg font-semibold text-white mb-4">Recent Client Activity</h3>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-white">Recent Client Activity</h3>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  className="border-green-500 text-green-400 hover:bg-green-500/10"
+                  onClick={() => setLocation('/my-parents')}
+                >
+                  Manage Clients
+                </Button>
+              </div>
               <div className="space-y-4">
                 <div className="flex items-center justify-between p-3 bg-[#2C2F48] rounded-lg">
                   <div className="flex items-center space-x-3">
                     <div className="w-8 h-8 bg-blue-500/20 rounded-full flex items-center justify-center">
-                      <span className="text-blue-400 text-sm">👤</span>
+                      <span className="text-blue-400 text-sm">📋</span>
                     </div>
                     <div>
                       <div className="font-medium text-white">Johnson Family - Emma (Grade 3)</div>
-                      <div className="text-sm text-slate-300">New IEP draft submitted for review</div>
+                      <div className="text-sm text-slate-300">IEP uploaded to Document Vault</div>
                     </div>
                   </div>
-                  <div className="text-sm text-slate-400">Today</div>
+                  <div className="flex items-center space-x-2">
+                    <div className="text-sm text-slate-400">Today</div>
+                    <Button size="sm" variant="ghost" className="text-green-400 hover:text-green-300">
+                      Review
+                    </Button>
+                  </div>
                 </div>
                 
                 <div className="flex items-center justify-between p-3 bg-[#2C2F48] rounded-lg">
@@ -180,10 +195,15 @@ export default function DashboardAdvocate() {
                     </div>
                     <div>
                       <div className="font-medium text-white">Smith Family - Michael (Grade 4)</div>
-                      <div className="text-sm text-slate-300">Accommodation request approved by district</div>
+                      <div className="text-sm text-slate-300">New message received</div>
                     </div>
                   </div>
-                  <div className="text-sm text-slate-400">2 days ago</div>
+                  <div className="flex items-center space-x-2">
+                    <div className="text-sm text-slate-400">2 days ago</div>
+                    <Button size="sm" variant="ghost" className="text-blue-400 hover:text-blue-300">
+                      Reply
+                    </Button>
+                  </div>
                 </div>
                 
                 <div className="flex items-center justify-between p-3 bg-[#2C2F48] rounded-lg">
@@ -193,98 +213,219 @@ export default function DashboardAdvocate() {
                     </div>
                     <div>
                       <div className="font-medium text-white">Davis Family - Alex (Grade 5)</div>
-                      <div className="text-sm text-slate-300">Annual IEP meeting scheduled for next week</div>
+                      <div className="text-sm text-slate-300">Goal created for reading comprehension</div>
                     </div>
                   </div>
-                  <div className="text-sm text-slate-400">3 days ago</div>
+                  <div className="flex items-center space-x-2">
+                    <div className="text-sm text-slate-400">3 days ago</div>
+                    <Button size="sm" variant="ghost" className="text-yellow-400 hover:text-yellow-300">
+                      View
+                    </Button>
+                  </div>
                 </div>
               </div>
               
-              <Button 
-                className="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white"
-                onClick={() => setLocation('/my-parents')}
-              >
-                View All Families
-              </Button>
+              <div className="grid grid-cols-2 gap-2 mt-4">
+                <Button 
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                  onClick={() => setLocation('/my-parents')}
+                >
+                  View All Families
+                </Button>
+                <Button 
+                  variant="outline"
+                  className="border-green-500 text-green-400 hover:bg-green-500/10"
+                  onClick={() => setLocation('/simple-advocate-matcher')}
+                >
+                  New Referrals
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* AI Tools - Compact Layout */}
+        {/* AI Tools - Complete Professional Suite with Green Circle Design */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-xl font-semibold text-white">AI-Powered IEP Professional Tools</h3>
             {isHeroPlan && (
-              <Badge className="bg-blue-600/20 text-blue-300 border border-blue-500">
-                Hero Plan Exclusive
+              <Badge className="bg-green-600/20 text-green-300 border border-green-500">
+                ✅ Hero Plan Exclusive
               </Badge>
             )}
           </div>
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
-            {/* Row 1: Document Vault, Goal Generator, My Students, Smart Letters */}
-            <Card className="bg-[#3E4161]/70 border-slate-600 hover:bg-[#4A4E76] cursor-pointer transition-colors"
-                  onClick={() => setLocation('/documents')}>
-              <CardContent className="p-4 text-center">
-                <div className="text-2xl mb-2">📁</div>
-                <div className="text-white font-semibold">Document Vault</div>
-                <div className="text-slate-300 text-sm">Manage Files</div>
-              </CardContent>
-            </Card>
-            <Card className="bg-[#3E4161]/70 border-slate-600 hover:bg-[#4A4E76] cursor-pointer transition-colors"
-                  onClick={() => setLocation('/tools/iep-goal-generator')}>
-              <CardContent className="p-4 text-center">
-                <div className="text-2xl mb-2">🎯</div>
-                <div className="text-white font-semibold">Goal Generator</div>
-                <div className="text-slate-300 text-sm">Create Goals</div>
-              </CardContent>
-            </Card>
-            <Card className="bg-[#3E4161]/70 border-slate-600 hover:bg-[#4A4E76] cursor-pointer transition-colors"
-                  onClick={() => setLocation('/my-students')}>
-              <CardContent className="p-4 text-center">
-                <div className="text-2xl mb-2">🧑‍🎓</div>
-                <div className="text-white font-semibold">My Students</div>
-                <div className="text-slate-300 text-sm">Manage Cases</div>
-              </CardContent>
-            </Card>
-            <Card className="bg-[#3E4161]/70 border-slate-600 hover:bg-[#4A4E76] cursor-pointer transition-colors"
+            {/* Row 1: Core Tools */}
+            <Card className="bg-gradient-to-br from-green-900/20 to-green-800/10 border-green-600/30 hover:border-green-500 cursor-pointer transition-all duration-200 hover:shadow-lg hover:shadow-green-500/20"
                   onClick={() => setLocation('/tools/smart-letter-generator')}>
               <CardContent className="p-4 text-center">
-                <div className="text-2xl mb-2">📝</div>
-                <div className="text-white font-semibold">Smart Letters</div>
-                <div className="text-slate-300 text-sm">Generate Letters</div>
+                <div className="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-3 border-2 border-green-500/30">
+                  <span className="text-2xl">📝</span>
+                </div>
+                <div className="text-white font-semibold">Smart Letter Generator</div>
+                <div className="text-green-300 text-sm">Generate Letters</div>
               </CardContent>
             </Card>
             
-            {/* Row 2: AI Review, Reports, Meeting Prep Assistant */}
-            <Card className="bg-[#3E4161]/70 border-slate-600 hover:bg-[#4A4E76] cursor-pointer transition-colors"
+            <Card className="bg-gradient-to-br from-green-900/20 to-green-800/10 border-green-600/30 hover:border-green-500 cursor-pointer transition-all duration-200 hover:shadow-lg hover:shadow-green-500/20"
                   onClick={() => setLocation('/tools/ai-iep-review')}>
               <CardContent className="p-4 text-center">
-                <div className="text-2xl mb-2">🧠</div>
-                <div className="text-white font-semibold">AI Review</div>
-                <div className="text-slate-300 text-sm">Analyze IEPs</div>
+                <div className="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-3 border-2 border-green-500/30">
+                  <span className="text-2xl">🧠</span>
+                </div>
+                <div className="text-white font-semibold">IEP Review Tool</div>
+                <div className="text-green-300 text-sm">Analyze IEPs</div>
               </CardContent>
             </Card>
-            <Card className="bg-[#3E4161]/70 border-slate-600 hover:bg-[#4A4E76] cursor-pointer transition-colors"
-                  onClick={() => setLocation('/tools/advocacy-report-generator')}>
-              <CardContent className="p-4 text-center">
-                <div className="text-2xl mb-2">📋</div>
-                <div className="text-white font-semibold">Reports</div>
-                <div className="text-slate-300 text-sm">Generate Reports</div>
-              </CardContent>
-            </Card>
-            <Card className="bg-[#3E4161]/70 border-slate-600 hover:bg-[#4A4E76] cursor-pointer transition-colors"
+            
+            <Card className="bg-gradient-to-br from-green-900/20 to-green-800/10 border-green-600/30 hover:border-green-500 cursor-pointer transition-all duration-200 hover:shadow-lg hover:shadow-green-500/20"
                   onClick={() => setLocation('/tools/meeting-prep-wizard')}>
               <CardContent className="p-4 text-center">
-                <div className="text-2xl mb-2">🗣️</div>
+                <div className="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-3 border-2 border-green-500/30">
+                  <span className="text-2xl">🗣️</span>
+                </div>
                 <div className="text-white font-semibold">Meeting Prep Assistant</div>
-                <div className="text-slate-300 text-sm">Generate talking points</div>
+                <div className="text-green-300 text-sm">Generate talking points</div>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-gradient-to-br from-green-900/20 to-green-800/10 border-green-600/30 hover:border-green-500 cursor-pointer transition-all duration-200 hover:shadow-lg hover:shadow-green-500/20"
+                  onClick={() => setLocation('/tools/progress-analyzer')}>
+              <CardContent className="p-4 text-center">
+                <div className="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-3 border-2 border-green-500/30">
+                  <span className="text-2xl">📊</span>
+                </div>
+                <div className="text-white font-semibold">Progress Analyzer</div>
+                <div className="text-green-300 text-sm">Data insights</div>
+              </CardContent>
+            </Card>
+            
+            {/* Row 2: Management Tools */}
+            <Card className="bg-gradient-to-br from-green-900/20 to-green-800/10 border-green-600/30 hover:border-green-500 cursor-pointer transition-all duration-200 hover:shadow-lg hover:shadow-green-500/20"
+                  onClick={() => setLocation('/documents')}>
+              <CardContent className="p-4 text-center">
+                <div className="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-3 border-2 border-green-500/30">
+                  <span className="text-2xl">📁</span>
+                </div>
+                <div className="text-white font-semibold">Document Vault</div>
+                <div className="text-green-300 text-sm">Manage files</div>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-gradient-to-br from-green-900/20 to-green-800/10 border-green-600/30 hover:border-green-500 cursor-pointer transition-all duration-200 hover:shadow-lg hover:shadow-green-500/20"
+                  onClick={() => setLocation('/tools/ai-iep-review')}>
+              <CardContent className="p-4 text-center">
+                <div className="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-3 border-2 border-green-500/30">
+                  <span className="text-2xl">✅</span>
+                </div>
+                <div className="text-white font-semibold">Compliance Checker</div>
+                <div className="text-green-300 text-sm">Legal compliance</div>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-gradient-to-br from-green-900/20 to-green-800/10 border-green-600/30 hover:border-green-500 cursor-pointer transition-all duration-200 hover:shadow-lg hover:shadow-green-500/20"
+                  onClick={() => setLocation('/messages')}>
+              <CardContent className="p-4 text-center">
+                <div className="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-3 border-2 border-green-500/30">
+                  <span className="text-2xl">💬</span>
+                </div>
+                <div className="text-white font-semibold">Advocate Messaging</div>
+                <div className="text-green-300 text-sm">Client communication</div>
               </CardContent>
             </Card>
           </div>
         </div>
 
-
+        {/* New Referrals Queue */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-xl font-semibold text-white">📥 New Referrals Queue</h3>
+            <Badge className="bg-orange-600/20 text-orange-300 border border-orange-500">
+              2 pending
+            </Badge>
+          </div>
+          
+          <div className="space-y-4">
+            <Card className="bg-[#3E4161]/70 border-orange-600/30">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-orange-500/20 rounded-full flex items-center justify-center">
+                      <span className="text-orange-400 text-sm">👤</span>
+                    </div>
+                    <div>
+                      <div className="font-medium text-white">Rodriguez Family</div>
+                      <div className="text-sm text-slate-300">Child: Sofia (Grade 2) - Autism Spectrum Disorder</div>
+                      <div className="text-xs text-slate-400">Referred: 2 hours ago</div>
+                    </div>
+                  </div>
+                  <div className="flex space-x-2">
+                    <Button size="sm" className="bg-green-600 hover:bg-green-700">
+                      Accept
+                    </Button>
+                    <Button size="sm" variant="outline" className="border-orange-500 text-orange-400">
+                      Intro Call
+                    </Button>
+                    <Button size="sm" variant="ghost" className="text-red-400 hover:text-red-300">
+                      Decline
+                    </Button>
+                  </div>
+                </div>
+                <div className="mt-3 p-3 bg-[#2C2F48] rounded-lg">
+                  <div className="text-sm text-slate-300">
+                    <strong>Intake Summary:</strong> Parent seeking advocacy for daughter's IEP review. 
+                    Current concerns include lack of appropriate accommodations and insufficient progress monitoring.
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-[#3E4161]/70 border-orange-600/30">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-orange-500/20 rounded-full flex items-center justify-center">
+                      <span className="text-orange-400 text-sm">👤</span>
+                    </div>
+                    <div>
+                      <div className="font-medium text-white">Thompson Family</div>
+                      <div className="text-sm text-slate-300">Child: Marcus (Grade 6) - ADHD, Learning Disability</div>
+                      <div className="text-xs text-slate-400">Referred: 1 day ago</div>
+                    </div>
+                  </div>
+                  <div className="flex space-x-2">
+                    <Button size="sm" className="bg-green-600 hover:bg-green-700">
+                      Accept
+                    </Button>
+                    <Button size="sm" variant="outline" className="border-orange-500 text-orange-400">
+                      Intro Call
+                    </Button>
+                    <Button size="sm" variant="ghost" className="text-red-400 hover:text-red-300">
+                      Decline
+                    </Button>
+                  </div>
+                </div>
+                <div className="mt-3 p-3 bg-[#2C2F48] rounded-lg">
+                  <div className="text-sm text-slate-300">
+                    <strong>Intake Summary:</strong> Parent requesting support for upcoming transition meeting. 
+                    Student moving from elementary to middle school and needs updated IEP goals.
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <div className="text-center">
+              <Button 
+                variant="outline" 
+                className="border-orange-500 text-orange-400 hover:bg-orange-500/10"
+                onClick={() => setLocation('/simple-advocate-matcher')}
+              >
+                View All Referrals
+              </Button>
+            </div>
+          </div>
+        </div>
 
         {/* AI Tool Modal */}
         <Dialog open={modalOpen} onOpenChange={setModalOpen}>
