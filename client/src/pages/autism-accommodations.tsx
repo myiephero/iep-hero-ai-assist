@@ -84,9 +84,18 @@ export default function AutismAccommodations() {
   });
 
   // Fetch students for the logged-in user
-  const { data: students = [] } = useQuery<any[]>({
+  const { data: students = [], isLoading: studentsLoading, error: studentsError } = useQuery<any[]>({
     queryKey: ['/api/students'],
     enabled: !!user,
+  });
+
+  // Debug logging
+  console.log('🔍 Autism Accommodations Debug:', {
+    user: user ? { email: user.email, id: user.id } : null,
+    studentsCount: students?.length || 0,
+    studentsLoading,
+    studentsError: studentsError?.message,
+    enabled: !!user
   });
 
   // Fetch saved sessions for logged-in users
@@ -255,11 +264,19 @@ export default function AutismAccommodations() {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {students.map((student: any) => (
-                              <SelectItem key={student.id} value={student.id}>
-                                {student.firstName} {student.lastName} {student.gradeLevel && `(${student.gradeLevel})`}
+                            {studentsLoading ? (
+                              <SelectItem value="" disabled>Loading students...</SelectItem>
+                            ) : students.length === 0 ? (
+                              <SelectItem value="" disabled>
+                                {user ? "No students found. Create a student first." : "Please log in to see students."}
                               </SelectItem>
-                            ))}
+                            ) : (
+                              students.map((student: any) => (
+                                <SelectItem key={student.id} value={student.id}>
+                                  {student.firstName} {student.lastName} {student.gradeLevel && `(${student.gradeLevel})`}
+                                </SelectItem>
+                              ))
+                            )}
                           </SelectContent>
                         </Select>
                         <FormMessage />
