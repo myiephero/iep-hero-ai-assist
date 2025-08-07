@@ -19,7 +19,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
 const autismAccommodationSchema = z.object({
-  childName: z.string().min(1, "Child's name is required"),
+  studentId: z.string().min(1, "Please select a student"),
   gradeLevel: z.string().min(1, "Grade level is required"),
   diagnosisAreas: z.array(z.string()).min(1, "Please select at least one diagnosis area"),
   sensoryPreferences: z.string().min(1, "Please describe sensory preferences"),
@@ -73,7 +73,7 @@ export default function AutismAccommodations() {
   const form = useForm<AutismAccommodationForm>({
     resolver: zodResolver(autismAccommodationSchema),
     defaultValues: {
-      childName: "",
+      studentId: "",
       gradeLevel: "",
       diagnosisAreas: ["Autism Spectrum Disorder"],
       sensoryPreferences: "",
@@ -81,6 +81,12 @@ export default function AutismAccommodations() {
       communicationStyle: "",
       additionalNotes: "",
     },
+  });
+
+  // Fetch students for the logged-in user
+  const { data: students = [] } = useQuery<any[]>({
+    queryKey: ['/api/students'],
+    enabled: !!user,
   });
 
   // Fetch saved sessions for logged-in users
@@ -238,13 +244,24 @@ export default function AutismAccommodations() {
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                   <FormField
                     control={form.control}
-                    name="childName"
+                    name="studentId"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Child's Name</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter child's name" {...field} />
-                        </FormControl>
+                        <FormLabel>Select Student</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Choose a student" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {students.map((student: any) => (
+                              <SelectItem key={student.id} value={student.id}>
+                                {student.firstName} {student.lastName} {student.gradeLevel && `(${student.gradeLevel})`}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -421,7 +438,13 @@ export default function AutismAccommodations() {
                         Generated Accommodations
                       </CardTitle>
                       <CardDescription>
-                        {generatedAccommodations.length} autism-specific accommodations for {form.getValues('childName')}
+                        {generatedAccommodations.length} autism-specific accommodations for {
+                          (() => {
+                            const studentId = form.getValues('studentId');
+                            const selectedStudent = students.find((s: any) => s.id === studentId);
+                            return selectedStudent ? `${selectedStudent.firstName} ${selectedStudent.lastName}` : 'Selected Student';
+                          })()
+                        }
                       </CardDescription>
                     </div>
                     <div className="flex gap-2">
