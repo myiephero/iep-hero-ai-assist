@@ -28,7 +28,18 @@ export default function DashboardAdvocate() {
   const [selectedTool, setSelectedTool] = useState<string | null>(null);
   const [upload, setUpload] = useState<File | null>(null);
   const [, setLocation] = useLocation();
-  const { user } = useAuth();
+  const { user, getUserRole } = useAuth();
+
+  // Debug logging for role validation
+  console.log('🔍 Advocate Dashboard - User:', user?.email, 'Role:', getUserRole());
+
+  // Role validation - redirect if parent
+  const userRole = getUserRole();
+  if (userRole === 'parent') {
+    console.log('❌ Parent user accessing advocate dashboard, redirecting');
+    setLocation('/dashboard-parent');
+    return null;
+  }
 
   const displayUser = user || { email: "advocate@demo.com", planStatus: "heroOffer", username: "demo_advocate", role: "advocate" };
   const isHeroPlan = (displayUser as any).planStatus === 'heroOffer';
@@ -51,10 +62,10 @@ export default function DashboardAdvocate() {
         {/* Welcome Section */}
         <div className="pt-8 pb-6">
           <h1 className="text-2xl font-bold mb-2 text-white">
-            Welcome, {(displayUser as any).username || 'Professional'}!
+            Welcome back, {user?.username || 'Professional'}!
           </h1>
           <p className="text-slate-300 mb-6">
-            Access your complete suite of AI-powered IEP management tools
+            {userRole === 'advocate' ? 'Access your complete suite of AI-powered advocacy tools' : 'Access your complete suite of AI-powered IEP management tools'}
           </p>
           
           {/* Dashboard Metrics - Real Data */}
