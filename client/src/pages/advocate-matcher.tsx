@@ -18,6 +18,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useMutation } from "@tanstack/react-query";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { AdvocateMatchConfirmation } from "@/components/AdvocateMatchConfirmation";
+import { useRoleAwareDashboard } from "@/utils/navigation";
 
 const HELP_AREAS = [
   "IEP Evaluation Request",
@@ -59,6 +60,7 @@ type AdvocateMatchForm = z.infer<typeof advocateMatchSchema>;
 export default function AdvocateMatcher() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { getDashboardRoute } = useRoleAwareDashboard();
   const [step, setStep] = useState(1);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [matchData, setMatchData] = useState<any>(null);
@@ -83,25 +85,45 @@ export default function AdvocateMatcher() {
     },
   });
 
-  // Create advocate match mutation
+  // Create advocate match mutation with improved error handling
   const createMatchMutation = useMutation({
     mutationFn: async (data: AdvocateMatchForm) => {
-      const response = await apiRequest('POST', '/api/advocate-matches', data);
-      return response.json();
+      console.log('🚀 Submitting advocate match:', data);
+      
+      try {
+        const response = await apiRequest('POST', '/api/advocate-matches', data);
+        
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => null);
+          throw new Error(errorData?.error || `HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const result = await response.json();
+        console.log('✅ Match submission successful:', result);
+        return result;
+      } catch (error) {
+        console.error('❌ Match submission failed:', error);
+        throw error;
+      }
     },
     onSuccess: (result) => {
       const savedTo = result.savedTo === 'local' ? 'development database' : 'Supabase';
       console.log(`✅ Data saved to: ${savedTo}`);
       
       // Store match data and show animated confirmation
-      setMatchData(result.match);
+      setMatchData(result.match || result);
       setShowConfirmation(true);
+      
+      toast({
+        title: "Match Request Submitted!",
+        description: "Your advocate match request has been successfully submitted.",
+      });
     },
     onError: (error: any) => {
-      console.error('Error creating match:', error);
+      console.error('❌ Error creating match:', error);
       toast({
         title: "Submission Failed",
-        description: "Unable to submit your match request. Please try again.",
+        description: error.message || "Unable to submit your match request. Please try again.",
         variant: "destructive",
       });
     },
