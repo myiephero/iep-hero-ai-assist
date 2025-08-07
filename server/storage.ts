@@ -2,7 +2,7 @@ import { type User, type InsertUser, type Goal, type InsertGoal, type Document, 
 import { randomUUID } from "crypto";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
-import { eq, and, inArray } from "drizzle-orm";
+import { eq, and, inArray, desc } from "drizzle-orm";
 import fs from "fs";
 
 export interface IStorage {
@@ -368,7 +368,9 @@ export class MemStorage implements IStorage {
   }
 
   async getDocumentsByUserId(userId: string): Promise<Document[]> {
-    return Array.from(this.documents.values()).filter(doc => doc.userId === userId);
+    return Array.from(this.documents.values())
+      .filter(doc => doc.userId === userId)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   }
 
   async createDocument(documentData: InsertDocument): Promise<Document> {
@@ -815,7 +817,7 @@ export class DbStorage implements IStorage {
 
   // Documents
   async getDocumentsByUserId(userId: string): Promise<Document[]> {
-    return await this.db.select().from(documents).where(eq(documents.userId, userId));
+    return await this.db.select().from(documents).where(eq(documents.userId, userId)).orderBy(desc(documents.createdAt));
   }
 
   async createDocument(documentData: InsertDocument): Promise<Document> {
@@ -1279,7 +1281,7 @@ export const storage = new class LocalDbStorage implements IStorage {
 
   // Documents
   async getDocumentsByUserId(userId: string): Promise<Document[]> {
-    return await this.db.select().from(documents).where(eq(documents.userId, userId));
+    return await this.db.select().from(documents).where(eq(documents.userId, userId)).orderBy(desc(documents.createdAt));
   }
 
   async createDocument(documentData: any): Promise<Document> {

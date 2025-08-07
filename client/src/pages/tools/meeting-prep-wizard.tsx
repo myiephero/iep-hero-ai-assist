@@ -235,8 +235,9 @@ This preparation guide was generated using AI assistance and should be customize
         content,
         type: "meeting_prep",
         generatedBy: "Meeting Prep Wizard",
-        displayName: `Meeting Prep Guide - ${formData.studentName || 'Student'} - ${formData.meetingDate || new Date().toLocaleDateString()}`,
-        parentDocumentId: null
+        displayName: `Meeting Prep Guide - ${formData.studentId ? (students as any[]).find(s => s.id === formData.studentId)?.firstName + ' ' + (students as any[]).find(s => s.id === formData.studentId)?.lastName : 'Student'} - ${formData.meetingDate || new Date().toLocaleDateString()}`,
+        parentDocumentId: null,
+        studentId: formData.studentId || null
       });
       
       if (!response.ok) {
