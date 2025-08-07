@@ -93,7 +93,10 @@ function Router() {
           <Subscribe />
         </AuthGuard>
       </Route>
-      <Route path="/pricing" component={Pricing} />
+      <Route path="/pricing">
+        <Navbar />
+        <Pricing />
+      </Route>
       <Route path="/profile">
         <AuthGuard>
           <Navbar />
