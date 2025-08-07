@@ -109,12 +109,16 @@ export const sharedMemories = pgTable("shared_memories", {
 export const progressNotes = pgTable("progress_notes", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").notNull().references(() => users.id),
+  goalId: varchar("goal_id").references(() => iepGoals.id), // Link to specific goal
+  studentId: varchar("student_id").references(() => students.id), // Link to student
+  content: text("content").notNull(), // Main note content
   serviceType: text("service_type").notNull(),
   date: text("date").notNull(), // storing as text for simplicity with forms
   status: text("status").notNull(), // 'yes', 'no', 'not_sure'
   notes: text("notes").notNull(),
   attachmentUrl: text("attachment_url"),
   createdAt: timestamp("created_at").default(sql`now()`),
+  updatedAt: timestamp("updated_at").default(sql`now()`),
 });
 
 export const communicationLogs = pgTable("communication_logs", {

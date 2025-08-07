@@ -1,11 +1,11 @@
 // Demo goal seeding script for Goal Tracker testing
-const { drizzle } = require("drizzle-orm/postgres-js");
-const postgres = require("postgres");
-const { eq } = require("drizzle-orm");
-const { randomUUID } = require("crypto");
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
+import { eq } from "drizzle-orm";
+import { randomUUID } from "crypto";
 
-// Import schemas - you'll need to adjust these imports based on your structure
-const { iepGoals, users, students } = require("./shared/schema");
+// Import schemas
+import { iepGoals, users, students, progressNotes } from "./shared/schema.js";
 
 async function seedDemoGoals() {
   // Create database connection
@@ -166,7 +166,6 @@ async function seedDemoGoals() {
     console.log('✅ Successfully created 5 demo IEP goals for Goal Tracker');
 
     // Create some demo progress notes
-    const { progressNotes } = require("./shared/schema");
     
     const demoProgressNotes = [
       {
@@ -226,8 +225,4 @@ async function seedDemoGoals() {
 }
 
 // Run the seeding function
-if (require.main === module) {
-  seedDemoGoals();
-}
-
-module.exports = { seedDemoGoals };
+seedDemoGoals();
