@@ -7,7 +7,7 @@ import { registerShareMemoryRoutes } from "./routes/share-memory";
 import { registerTestMemoryRoutes } from "./routes/test-memory";
 import studentsRoutes from "./routes/students";
 import advocateClientsRoutes from "./routes/advocate-clients";
-import { insertUserSchema, insertGoalSchema, insertDocumentSchema, insertEventSchema, insertMessageSchema, insertStudentSchema } from "@shared/schema";
+import { insertUserSchema, insertGoalSchema, insertDocumentSchema, insertEventSchema, insertMessageSchema, insertStudentSchema, type User } from "@shared/schema";
 import bcrypt from "bcrypt";
 import session from "express-session";
 import pgSession from "connect-pg-simple";
@@ -856,27 +856,9 @@ Use professional, supportive language that empowers the parent while being legal
         return res.status(400).json({ message: 'Diagnosis is required' });
       }
 
-      const { analyzeDocumentContent } = await import('./ai-document-analyzer');
+      const { generateIEPGoals } = await import('./ai-document-analyzer');
       
-      const prompt = `You are an expert IEP (Individualized Education Program) goal writer. Generate 3-5 comprehensive, measurable IEP goals for a student diagnosed with: ${diagnosis}
-
-Please ensure each goal follows the SMART criteria:
-- Specific: Clearly defined skill or behavior
-- Measurable: Include specific criteria for success
-- Achievable: Realistic for the student
-- Relevant: Addresses the student's needs
-- Time-bound: Include timeframe (typically 1 year)
-
-Format each goal with:
-1. The specific skill area
-2. Current performance level
-3. Measurable objective
-4. Method of measurement
-5. Timeline
-
-Focus on functional skills that will help the student succeed in their educational environment.`;
-
-      const analysis = await analyzeDocumentContent('', prompt);
+      const analysis = await generateIEPGoals(diagnosis);
       
       res.json({ goals: analysis });
     } catch (error: any) {
