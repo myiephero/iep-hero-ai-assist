@@ -2,7 +2,7 @@ import { type User, type InsertUser, type Goal, type InsertGoal, type Document, 
 import { randomUUID } from "crypto";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
-import { eq, and, inArray, desc } from "drizzle-orm";
+import { eq, and, inArray, desc, sql } from "drizzle-orm";
 import fs from "fs";
 
 export interface IStorage {
@@ -184,6 +184,7 @@ export class MemStorage implements IStorage {
       {
         id: "student-001",
         parentId: "sample-user-1",
+        advocateId: null,
         firstName: "Emma",
         lastName: "Johnson",
         dateOfBirth: "2015-06-15",
@@ -202,6 +203,7 @@ export class MemStorage implements IStorage {
       {
         id: "student-002", 
         parentId: "sample-user-1",
+        advocateId: null,
         firstName: "Alex",
         lastName: "Johnson",
         dateOfBirth: "2013-03-22",
@@ -270,8 +272,8 @@ export class MemStorage implements IStorage {
       id, 
       stripeCustomerId: null,
       stripeSubscriptionId: null,
-      subscriptionTier: insertUser.subscriptionTier || "free",
-      planStatus: insertUser.planStatus || insertUser.subscriptionTier || "free",
+      subscriptionTier: "free",
+      planStatus: insertUser.planStatus || "free",
       advocateEmail: null,
       emailVerified: insertUser.emailVerified || false,
       verificationToken: insertUser.verificationToken || null,
@@ -331,7 +333,6 @@ export class MemStorage implements IStorage {
     
     const updatedUser = { 
       ...user, 
-      subscriptionTier: tier,
       planStatus: tier
     };
     this.users.set(userId, updatedUser);
@@ -359,6 +360,7 @@ export class MemStorage implements IStorage {
       ...insertGoal,
       id,
       userId,
+      studentId: insertGoal.studentId || null,
       createdAt: new Date(),
       updatedAt: new Date()
     };
@@ -390,8 +392,9 @@ export class MemStorage implements IStorage {
     const document: Document = {
       ...documentData,
       id,
-      uploadedAt: documentData.uploadedAt || new Date(),
-      createdAt: documentData.createdAt || new Date()
+      userId: documentData.userId,
+      uploadedAt: new Date(),
+      createdAt: new Date()
     };
     this.documents.set(id, document);
     return document;
@@ -472,6 +475,9 @@ export class MemStorage implements IStorage {
       id,
       messageType: insertMessage.messageType || 'text',
       priority: insertMessage.priority || 'normal',
+      threadId: insertMessage.threadId || null,
+      replyToId: insertMessage.replyToId || null,
+      attachmentUrl: insertMessage.attachmentUrl || null,
       read: false,
       archived: false,
       sentAt: new Date()
@@ -622,7 +628,7 @@ export class MemStorage implements IStorage {
     const newClient: AdvocateClient = {
       ...client,
       id,
-      assignedDate: new Date(),
+      startDate: null,
       createdAt: new Date()
     };
     this.advocateClients.set(id, newClient);
@@ -884,6 +890,8 @@ export class DbStorage implements IStorage {
       .returning();
     return result[0];
   }
+
+
 
   // Events
   async getEventsByUserId(userId: string): Promise<Event[]> {
@@ -1310,8 +1318,8 @@ export const storage = new class LocalDbStorage implements IStorage {
     const newDocument = {
       ...documentData,
       id,
-      uploadedAt: documentData.uploadedAt || new Date(),
-      createdAt: documentData.createdAt || new Date()
+      uploadedAt: new Date(),
+      createdAt: new Date()
     };
     
     console.log('💾 LocalDbStorage - Inserting document with filename:', newDocument.filename);
@@ -1571,7 +1579,7 @@ export const storage = new class LocalDbStorage implements IStorage {
   async updateDocument(documentId: string, updates: Partial<Document>): Promise<Document> {
     const result = await this.db
       .update(documents)
-      .set({ ...updates, updatedAt: new Date() })
+      .set(updates)
       .where(eq(documents.id, documentId))
       .returning();
     return result[0];
