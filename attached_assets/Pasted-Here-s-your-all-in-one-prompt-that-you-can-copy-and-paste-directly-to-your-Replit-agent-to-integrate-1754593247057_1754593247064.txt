@@ -1,0 +1,75 @@
+Here’s your all-in-one prompt that you can copy and paste directly to your Replit agent to integrate the Autism Accommodation Builder into the existing My IEP Hero platform:
+
+⸻
+
+🚀 Prompt for Replit Agent: Add Autism Accommodation Builder to Existing Platform
+
+Hi! I’d like to keep the current My IEP Hero platform as-is and simply add a new module called the Autism Accommodation Builder.
+
+🧠 Integration Instructions:
+
+🔗 New Route:
+	•	Add a new page at: /accommodations/autism
+
+🧩 Features to Build:
+	1.	Autism Accommodation Form (parent/advocate can fill out):
+	•	Child Name
+	•	Grade Level
+	•	Diagnosis Areas (checkbox list; default to “Autism Spectrum Disorder”)
+	•	Sensory Preferences
+	•	Behavioral Challenges
+	•	Preferred Communication Style
+	•	Optional: Free-text notes
+	2.	AI-Powered Generation:
+	•	Use the OpenAI key from .env
+	•	Model: gpt-4o
+	•	Prompt structure (I’ll provide this below)
+	•	Output: List of accommodations with:
+	•	Title
+	•	Description
+	•	Implementation Suggestions
+	•	Category (Sensory, Behavioral, Academic, etc.)
+	3.	Display the Results:
+	•	Show in a clean, sectioned UI
+	•	Include a “Copy” button
+	•	Include “Approve” or “Save” if logged-in
+	4.	Save Per User (if logged in):
+	•	Save accommodation sessions by userId
+	•	Allow them to view past sessions
+	•	Show “createdBy” role: parent or advocate
+	5.	Access Control:
+	•	Allow both Parent and Advocate roles
+	•	If advocate is logged in, show: “Working for [Parent Name]” at top
+	•	Pull current relationships from Supabase if needed
+	6.	Upsell Prompt:
+	•	If user is on Free plan, show message:
+“👋 Want an expert review of these accommodations? Upgrade to the HERO Plan for custom recommendations from a licensed advocate.”
+
+	•	Link to /pricing or Stripe checkout
+
+⸻
+
+🤖 OpenAI Prompt Example (use for generation):
+
+You are a special education expert. Based on the inputs below, generate a list of 8 specific IEP accommodations that support a student with autism. Each accommodation should include a title, description, category, and practical classroom implementation details. Use IDEA-compliant language.
+	•	Name: Emma Johnson
+	•	Grade: 3rd Grade
+	•	Diagnosis: Autism Spectrum Disorder
+	•	Sensory Preferences: Sound sensitivity
+	•	Behavioral Challenges: Difficulty with transitions
+	•	Communication: Verbal
+	•	Notes: Responds well to visuals
+
+⸻
+
+✅ Final Notes:
+	•	Use existing backend (Express + MongoDB)
+	•	Use current Supabase setup for user/auth/roles
+	•	Use same styling and layout as the platform
+	•	Let me know if you need a design mockup or exact data models
+
+Thanks! This will be a huge value-add for parents and advocates on our platform! Let me know once it’s live in the nav.
+
+⸻
+
+Let me know when you’re ready to generate a design mockup or database schema.

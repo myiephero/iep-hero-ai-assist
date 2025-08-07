@@ -295,6 +295,23 @@ export default function DashboardAdvocate() {
           </div>
         </div>
 
+        {/* Specialized Professional Tools */}
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold mb-4 text-white">Specialized Assessment Tools</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <Card
+              className="bg-gradient-to-br from-blue-600/20 to-purple-600/20 border-blue-500/30 cursor-pointer hover:from-blue-600/30 hover:to-purple-600/30 transition-all duration-200"
+              onClick={() => setLocation("/accommodations/autism")}
+            >
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl mb-2">🧠</div>
+                <div className="font-semibold text-white">Autism Accommodation Builder</div>
+                <div className="text-xs text-blue-300">Professional autism IEP accommodations</div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
         {/* New Referrals Queue */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
