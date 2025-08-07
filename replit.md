@@ -21,6 +21,8 @@ The application is a full-stack solution built with a modern, component-based ap
   * Applied role-aware navigation to all "Back to Dashboard" links and route redirects
   * Tools now correctly redirect advocates to /dashboard-premium and parents to /dashboard-parent based on user role
   * Eliminated cross-role routing issues permanently with systematic fix covering every hardcoded route
+- **Parent Student Creation Bug Fixed (Aug 7, 2025)**: Resolved GitHub Issue #18 completely. Fixed "No parent clients found" error preventing parents from creating students. Implemented role-aware student creation flow with conditional Parent/Guardian field display, auto-setting parentId for parent users, and enhanced form validation. Parents can now create students directly without requiring a separate parent profile creation step.
+- **Advocate Matcher Visibility Fixed (Aug 7, 2025)**: Added missing "Get Matched with an IEP Advocate" tool to parent dashboard. The tool was previously hidden from parent users despite being their primary method to connect with professional support. Added prominent "Get Expert Support" section with dedicated card linking to /advocate-matcher, ensuring parents can access this critical service.
 
 ## Frontend Architecture
 The frontend is developed with **React 18** and TypeScript, using **Vite** for fast builds and development.

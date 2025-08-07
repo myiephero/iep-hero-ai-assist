@@ -282,6 +282,26 @@ export default function ParentDashboard() {
           </div>
         </div>
 
+        {/* Get Expert Help Section - Advocate Matcher */}
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold mb-4 text-white">Get Expert Support</h2>
+          <Card
+            className="bg-[#3E4161]/70 border-slate-600 cursor-pointer hover:bg-[#3E4161]/90 transition-all duration-200 border-2 border-blue-500/30"
+            onClick={() => setLocation("/advocate-matcher")}
+          >
+            <CardContent className="p-6 text-center">
+              <div className="text-4xl mb-3">🤝</div>
+              <div className="font-bold text-white text-lg mb-2">Get Matched with an IEP Advocate</div>
+              <div className="text-sm text-slate-300 mb-3">
+                Connect with qualified professionals who can guide you through the IEP process
+              </div>
+              <div className="text-xs text-blue-300 bg-blue-900/20 px-3 py-1 rounded-full inline-block">
+                Free consultation available
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
         {/* IEP Overview Panel */}
         <div className="mb-8">
           <h2 className="text-xl font-semibold mb-4 text-white">Your Child's IEP Overview</h2>
