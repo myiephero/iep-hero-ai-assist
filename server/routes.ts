@@ -2234,6 +2234,206 @@ Generate accommodations that are specific to autism support and address the stud
     }
   });
 
+  // Goal Tracker API Routes
+  app.get('/api/goals/:studentId?', requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      const { studentId } = req.params;
+
+      let goals;
+      if (studentId) {
+        // Get goals for specific student
+        goals = await storage.getGoalsByUserId(user.id);
+        goals = goals.filter((goal: any) => goal.studentId === studentId);
+      } else {
+        // Get all goals for user
+        goals = await storage.getGoalsByUserId(user.id);
+      }
+
+      res.json(goals);
+
+    } catch (error: any) {
+      console.error('❌ Error fetching goals:', error);
+      res.status(500).json({ 
+        error: 'Failed to fetch goals',
+        details: error.message || 'Unknown error' 
+      });
+    }
+  });
+
+  app.get('/api/progress-notes/:studentId?', requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      const { studentId } = req.params;
+
+      const progressNotes = await storage.getProgressNotesByUserId(user.id);
+      
+      let filteredNotes = progressNotes;
+      if (studentId) {
+        filteredNotes = progressNotes.filter((note: any) => note.studentId === studentId);
+      }
+
+      res.json(filteredNotes);
+
+    } catch (error: any) {
+      console.error('❌ Error fetching progress notes:', error);
+      res.status(500).json({ 
+        error: 'Failed to fetch progress notes',
+        details: error.message || 'Unknown error' 
+      });
+    }
+  });
+
+  app.post('/api/progress-notes', requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      const { content, goalId, studentId } = req.body;
+
+      if (!content || !goalId || !studentId) {
+        return res.status(400).json({ error: 'Content, goalId, and studentId are required' });
+      }
+
+      const progressNote = await storage.createProgressNote(user.id, {
+        content,
+        goalId,
+        studentId,
+        date: new Date().toISOString().split('T')[0],
+        status: 'active',
+        serviceType: 'goal-tracking',
+        notes: content,
+        attachmentUrl: null
+      });
+
+      res.json(progressNote);
+
+    } catch (error: any) {
+      console.error('❌ Error creating progress note:', error);
+      res.status(500).json({ 
+        error: 'Failed to create progress note',
+        details: error.message || 'Unknown error' 
+      });
+    }
+  });
+
+  app.post('/api/goal-tracker/snapshot', requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      const { studentId, studentName, goals, progressNotes, generatedAt } = req.body;
+
+      if (!studentId || !studentName || !goals) {
+        return res.status(400).json({ error: 'Student ID, name, and goals are required' });
+      }
+
+      // Generate HTML content for the snapshot
+      const htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Goal Tracker Snapshot - ${studentName}</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 20px; color: #333; }
+            .header { border-bottom: 2px solid #3B82F6; padding-bottom: 10px; margin-bottom: 20px; }
+            .student-info { background: #F8FAFC; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+            .goal { border: 1px solid #E2E8F0; border-radius: 8px; padding: 15px; margin-bottom: 15px; }
+            .goal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+            .status { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+            .completed { background: #DCFCE7; color: #166534; }
+            .in-progress { background: #DBEAFE; color: #1E40AF; }
+            .not-started { background: #F1F5F9; color: #475569; }
+            .progress-bar { background: #E2E8F0; height: 8px; border-radius: 4px; margin: 10px 0; }
+            .progress-fill { background: #3B82F6; height: 100%; border-radius: 4px; }
+            .notes { background: #F8FAFC; padding: 10px; border-radius: 4px; margin-top: 10px; }
+            .note { margin-bottom: 8px; padding: 8px; background: white; border-radius: 4px; }
+            .meta { color: #64748B; font-size: 14px; margin-top: 20px; text-align: center; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1>IEP Goal Tracker Snapshot</h1>
+            <h2>${studentName}</h2>
+          </div>
+          
+          <div class="student-info">
+            <h3>Summary</h3>
+            <p><strong>Total Goals:</strong> ${goals.length}</p>
+            <p><strong>Completed:</strong> ${goals.filter((g: any) => g.status === 'Completed').length}</p>
+            <p><strong>In Progress:</strong> ${goals.filter((g: any) => g.status === 'In Progress').length}</p>
+            <p><strong>Not Started:</strong> ${goals.filter((g: any) => g.status === 'Not Started').length}</p>
+          </div>
+
+          ${goals.map((goal: any) => {
+            const goalNotes = progressNotes.filter((note: any) => note.goalId === goal.id);
+            return `
+              <div class="goal">
+                <div class="goal-header">
+                  <h3>${goal.title}</h3>
+                  <span class="status ${goal.status.toLowerCase().replace(' ', '-')}">${goal.status}</span>
+                </div>
+                <p>${goal.description}</p>
+                
+                <div>
+                  <strong>Progress: ${goal.progress}%</strong>
+                  <div class="progress-bar">
+                    <div class="progress-fill" style="width: ${goal.progress}%"></div>
+                  </div>
+                </div>
+                
+                <p><strong>Due Date:</strong> ${new Date(goal.dueDate).toLocaleDateString()}</p>
+                
+                ${goalNotes.length > 0 ? `
+                  <div class="notes">
+                    <h4>Progress Notes (${goalNotes.length})</h4>
+                    ${goalNotes.map((note: any) => `
+                      <div class="note">
+                        <p>${note.content}</p>
+                        <small>Added: ${new Date(note.createdAt).toLocaleDateString()}</small>
+                      </div>
+                    `).join('')}
+                  </div>
+                ` : ''}
+              </div>
+            `;
+          }).join('')}
+
+          <div class="meta">
+            <p>Generated on ${new Date(generatedAt).toLocaleDateString()} at ${new Date(generatedAt).toLocaleTimeString()}</p>
+            <p>My IEP Hero - Goal Tracker</p>
+          </div>
+        </body>
+        </html>
+      `;
+
+      // Save as document
+      const filename = `goal-tracker-${studentName.replace(/\s+/g, '-').toLowerCase()}-${new Date().toISOString().split('T')[0]}.html`;
+      
+      const document = await storage.createDocument({
+        type: 'goal-tracker-snapshot',
+        filename,
+        originalName: filename,
+        displayName: `Goal Tracker - ${studentName} (${new Date().toLocaleDateString()})`,
+        description: `Goal tracker snapshot for ${studentName} generated on ${new Date().toLocaleDateString()}`,
+        userId: user.id,
+        studentId,
+        tags: ['goal-tracker', 'snapshot', 'progress'],
+        category: 'progress-tracking',
+        fileContent: htmlContent
+      });
+
+      res.json({ 
+        success: true, 
+        filename: document.displayName,
+        documentId: document.id 
+      });
+
+    } catch (error: any) {
+      console.error('❌ Error generating goal tracker snapshot:', error);
+      res.status(500).json({ 
+        error: 'Failed to generate snapshot',
+        details: error.message || 'Unknown error' 
+      });
+    }
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;

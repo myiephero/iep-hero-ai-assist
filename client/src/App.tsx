@@ -40,6 +40,7 @@ import MyStudents from "@/pages/my-students";
 import MyParents from "@/pages/my-parents";
 import AdvocateStudents from "@/pages/advocate-students";
 import SharedDocumentPage from "@/pages/shared-document";
+import ParentGoalTracker from "@/pages/parent-goal-tracker";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 import { MobileNavigation } from "@/components/MobileNavigation";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
@@ -289,6 +290,12 @@ function Router() {
         <AuthGuard>
           <Navbar />
           <AdvocateStudents />
+        </AuthGuard>
+      </Route>
+      <Route path="/parent/goal-tracker">
+        <AuthGuard>
+          <Navbar />
+          <ParentGoalTracker />
         </AuthGuard>
       </Route>
       {/* Public route for shared documents */}
