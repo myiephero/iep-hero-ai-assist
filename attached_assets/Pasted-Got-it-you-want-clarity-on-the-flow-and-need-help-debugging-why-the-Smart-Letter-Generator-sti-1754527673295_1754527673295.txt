@@ -1,0 +1,119 @@
+Got it — you want clarity on the flow and need help debugging why the **Smart Letter Generator** still won't save to the vault. Let’s break down the key troubleshooting steps and share what to do next with your Replit agent:
+
+---
+
+## Step-by-Step Debug Guide to “Save to Vault” Issue
+
+### 1. Check for Button Click Trigger
+
+* **Goal:** Confirm the "Save to Vault" button click is reaching your code.
+* **Action:** In the handler, add `console.log("Save to Vault clicked")` before making any API calls.
+
+  * If you don't see the log, the issue is UI-related (button event binding issue).
+  * If you see it, proceed to the next step.
+
+### 2. Monitor the Insert Call
+
+* **Goal:** Verify if your app is calling Supabase’s `insert()` method.
+* **Action:** After the insert call:
+
+  ```js
+  const { data, error } = await supabase.from('documents').insert(/* your payload */);
+  console.log({ data, error });
+  ```
+
+  Check the browser console and Network tab—what status or error do you see?
+
+### 3. Inspect RLS Policy Settings
+
+Many apps stumble here: Supabase may silently block inserts due to restrictive RLS (`Row Level Security`).
+
+* Example insight from community:
+
+  > In Supabase, if `.insert()` is chained with `.select()` (default behavior), both INSERT and SELECT policies apply. Without a SELECT policy, the call may fail even if INSERT is allowed. A workaround is:
+
+  ```js
+  await supabase.from('documents').insert(data, { returning: 'minimal' });
+  ```
+
+  This avoids SELECT checks entirely.
+  ([Stack Overflow][1], [GitHub][2], [Stack Overflow][3])
+
+* Use Supabase SQL editor to double-check your RLS policies: make sure both INSERT and SELECT are allowed for authenticated users.
+  ([FrontendShape][4])
+
+### 4. Try a Manual Insert Test
+
+If the button code seems fine:
+
+* Add a temporary test button in your UI that runs:
+
+  ```js
+  supabase.from('documents').insert({
+    user_id: session.user.id,
+    title: "Debug Letter",
+    content: "Testing RLS policies",
+    created_at: new Date().toISOString()
+  }, { returning: "minimal" }).then(({ error }) => {
+    console.log("Manual insert test:", error);
+  });
+  ```
+* If this fails, it confirms the RLS policy is still blocking the insert.
+
+### 5. Consider Bypassing RLS Temporarily (For Debug Only!)
+
+You can use Supabase’s RLS bypass for debugging, which allows insert without RLS enforcement:
+
+```js
+await supabase
+  .from("documents")
+  .insert(data)
+  .rpc('supabase_admin') // bypass RLS – only for test/dev usage
+```
+
+([Stack Overflow][5], [GitHub][6], [FrontendShape][4])
+
+---
+
+## Prompt to Send to Replit Agent
+
+You can copy and send this unified prompt to your agent:
+
+> **🚨 Smart Letter Generator – “Save to Vault” Still Failing**
+>
+> Please assist with the following debug checklist:
+>
+> 1. **Verify Button Click Fired**
+>
+> * Add `console.log("Save to Vault clicked")` inside handler.
+>
+> 2. **Check Supabase Insert Call**
+>
+> * Add logging of insert `data` and `error`.
+>
+> * Confirm request shows in Network tab and note any status/error.
+>
+> 3. **Adjust Insert to Avoid `.select()`**
+>
+> * Use `insert(..., { returning: 'minimal' })` to avoid unintended SELECT RLS.
+>
+> 4. **Run Manual Insert Test**
+>
+> * Add a test button that runs a basic insert to `documents`.
+>
+> 5. **Temporarily Bypass RLS (for debugging only)**
+>
+> * Use an RPC like `supabase_admin` to confirm RLS is the blocker.
+>
+> Please report back any console logs or RLS errors you see—it will help pinpoint the root cause.
+
+---
+
+Let me know what results show up after they test these steps, and I’ll help analyze it further!
+
+[1]: https://stackoverflow.com/questions/78770969/how-can-i-fix-this-rls-policy-issue-with-supabase-on-insert?utm_source=chatgpt.com "How can I fix this RLS policy issue with Supabase on .insert()?"
+[2]: https://github.com/orgs/supabase/discussions/1548?utm_source=chatgpt.com "Unable to insert with row level security enabled · supabase ..."
+[3]: https://stackoverflow.com/questions/70236966/cant-insert-into-table-with-rls-despite-being-logged-in?utm_source=chatgpt.com "supabase - Can't insert into table with RLS despite being logged in ..."
+[4]: https://frontendshape.com/post/solving-row-level-security-violations-in-supabase?utm_source=chatgpt.com "Solving Row-Level Security Violations in Supabase A ... - FrontendShape"
+[5]: https://stackoverflow.com/questions/76005948/supabase-insert-will-not-add-row?utm_source=chatgpt.com "next.js - Supabase insert will not add row - Stack Overflow"
+[6]: https://github.com/orgs/supabase/discussions/12269?utm_source=chatgpt.com "Add Feature to Test + Debug Row Level Security Policies"
