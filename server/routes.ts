@@ -2106,13 +2106,28 @@ The report should be comprehensive yet concise, approximately 2-3 pages when pri
   // Autism accommodations endpoints
   app.post('/api/autism-accommodations/generate', requireAuth, async (req, res) => {
     try {
-      const { childName, gradeLevel, diagnosisAreas, sensoryPreferences, behavioralChallenges, communicationStyle, additionalNotes } = req.body;
+      const user = req.user as any;
+      const { studentId, gradeLevel, diagnosisAreas, sensoryPreferences, behavioralChallenges, communicationStyle, additionalNotes } = req.body;
 
-      if (!childName || !gradeLevel || !diagnosisAreas?.length || !sensoryPreferences || !behavioralChallenges || !communicationStyle) {
+      if (!studentId || !gradeLevel || !diagnosisAreas?.length || !sensoryPreferences || !behavioralChallenges || !communicationStyle) {
         return res.status(400).json({ error: 'All required fields must be provided' });
       }
 
-      console.log('🧠 Generating autism accommodations for:', childName);
+      // Get student name from studentId
+      let studentName = "Student";
+      if (studentId) {
+        try {
+          const students = await storage.getStudentsByParentId(user.id);
+          const selectedStudent = students.find((s: any) => s.id === studentId);
+          if (selectedStudent) {
+            studentName = `${selectedStudent.firstName} ${selectedStudent.lastName}`;
+          }
+        } catch (error) {
+          console.log('Could not fetch student name, using default');
+        }
+      }
+
+      console.log('🧠 Generating autism accommodations for:', studentName);
 
       const openaiResponse = await openai.chat.completions.create({
         model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
@@ -2126,7 +2141,7 @@ The report should be comprehensive yet concise, approximately 2-3 pages when pri
             content: `Based on the inputs below, generate 8 specific IEP accommodations that support a student with autism. Each accommodation should include a title, description, category (Sensory, Behavioral, Academic, Communication, Social, Environmental, Assessment, or Transition), and practical classroom implementation details.
 
 Student Information:
-• Name: ${childName}
+• Name: ${studentName}
 • Grade: ${gradeLevel}
 • Diagnosis Areas: ${diagnosisAreas.join(', ')}
 • Sensory Preferences: ${sensoryPreferences}
@@ -2151,7 +2166,7 @@ Generate accommodations that are specific to autism support and address the stud
 
       res.json({
         accommodations: aiResult.accommodations || [],
-        studentInfo: { childName, gradeLevel, diagnosisAreas, communicationStyle }
+        studentInfo: { studentName, studentId, gradeLevel, diagnosisAreas, communicationStyle }
       });
 
     } catch (error: any) {
