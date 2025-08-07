@@ -816,7 +816,7 @@ Use professional, supportive language that empowers the parent while being legal
         return res.status(400).json({ message: 'Diagnosis is required' });
       }
 
-      const { analyzeDocument } = await import('./ai-document-analyzer');
+      const { analyzeDocumentContent } = await import('./ai-document-analyzer');
       
       const prompt = `You are an expert IEP (Individualized Education Program) goal writer. Generate 3-5 comprehensive, measurable IEP goals for a student diagnosed with: ${diagnosis}
 
@@ -836,7 +836,7 @@ Format each goal with:
 
 Focus on functional skills that will help the student succeed in their educational environment.`;
 
-      const analysis = await analyzeDocument('', prompt);
+      const analysis = await analyzeDocumentContent('', prompt);
       
       res.json({ goals: analysis });
     } catch (error: any) {
