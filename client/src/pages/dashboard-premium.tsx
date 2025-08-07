@@ -1,6 +1,6 @@
 // dashboard-advocate.tsx - Professional advocate dashboard with full AI toolkit
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -31,15 +31,25 @@ export default function DashboardAdvocate() {
   const { user, getUserRole } = useAuth();
 
   // Debug logging for role validation
-  console.log('🔍 Advocate Dashboard - User:', user?.email, 'Role:', getUserRole());
+  console.log('🔍 Advocate Dashboard - User:', user?.email, 'Username:', user?.username, 'Role:', getUserRole());
 
   // Role validation - redirect if parent
   const userRole = getUserRole();
   if (userRole === 'parent') {
-    console.log('❌ Parent user accessing advocate dashboard, redirecting');
+    console.log('❌ Parent user accessing advocate dashboard, redirecting to parent');
     setLocation('/dashboard-parent');
     return null;
   }
+
+  // Additional debug for display issues
+  useEffect(() => {
+    console.log('🔍 Advocate Dashboard rendered with user:', {
+      email: user?.email,
+      username: user?.username,
+      role: user?.role,
+      getUserRole: getUserRole()
+    });
+  }, [user, getUserRole]);
 
   const displayUser = user || { email: "advocate@demo.com", planStatus: "heroOffer", username: "demo_advocate", role: "advocate" };
   const isHeroPlan = (displayUser as any).planStatus === 'heroOffer';

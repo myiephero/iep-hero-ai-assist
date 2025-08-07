@@ -1,5 +1,5 @@
 // dashboard-parent.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -65,15 +65,25 @@ export default function ParentDashboard() {
   const [modalOpen, setModalOpen] = useState(false);
 
   // Debug logging for role validation
-  console.log('🔍 Parent Dashboard - User:', user?.email, 'Role:', getUserRole());
+  console.log('🔍 Parent Dashboard - User:', user?.email, 'Username:', user?.username, 'Role:', getUserRole());
 
   // Role validation - redirect if not parent
   const userRole = getUserRole();
   if (userRole && userRole !== 'parent') {
-    console.log('❌ Non-parent user accessing parent dashboard, redirecting');
+    console.log('❌ Non-parent user accessing parent dashboard, redirecting to premium');
     setLocation('/dashboard-premium');
     return null;
   }
+
+  // Additional debug for display issues
+  useEffect(() => {
+    console.log('🔍 Parent Dashboard rendered with user:', {
+      email: user?.email,
+      username: user?.username,
+      role: user?.role,
+      getUserRole: getUserRole()
+    });
+  }, [user, getUserRole]);
 
   const [selectedTool, setSelectedTool] = useState<string | null>(null);
   const [upload, setUpload] = useState<File | null>(null);
