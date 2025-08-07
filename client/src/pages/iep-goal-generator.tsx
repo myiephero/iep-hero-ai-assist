@@ -10,6 +10,7 @@ import { Link } from 'wouter';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { useAuth } from '@/contexts/AuthContext';
+import { useRoleAwareDashboard } from '@/utils/navigation';
 import FileUploadModal from '@/components/modals/file-upload-modal';
 
 export default function IEPGoalGeneratorPage() {
@@ -22,6 +23,7 @@ export default function IEPGoalGeneratorPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { user } = useAuth();
+  const { getDashboardRoute } = useRoleAwareDashboard();
 
   // Fetch students based on user role
   const { data: students = [] } = useQuery<any[]>({
@@ -181,7 +183,7 @@ export default function IEPGoalGeneratorPage() {
       <div className="max-w-4xl mx-auto px-6">
         {/* Header with Back Button */}
         <div className="mb-8">
-          <Link href={user?.role === 'advocate' ? '/dashboard-advocate' : '/dashboard-parent'}>
+          <Link href={getDashboardRoute()}>
             <Button className="mb-4 bg-slate-600 hover:bg-slate-700 text-white">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Dashboard
