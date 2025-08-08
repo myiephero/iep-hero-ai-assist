@@ -30,7 +30,25 @@ const port = parseInt(process.env.PORT || '5000', 10);
 
 console.log(`🚀 Starting server on port ${port}...`);
 
-app.listen(port, '0.0.0.0', () => {
+// Add error handling for demo setup failures
+const server = app.listen(port, '0.0.0.0', () => {
   console.log(`✅ Minimal server successfully running on port ${port}`);
   console.log(`🌐 Visit: http://localhost:${port}`);
+});
+
+server.on('error', (error) => {
+  console.error('❌ Server startup error:', error);
+  if (error.code === 'EADDRINUSE') {
+    console.log(`⚠️ Port ${port} is in use - attempting alternate port...`);
+    const alternatePort = port + 1;
+    app.listen(alternatePort, '0.0.0.0', () => {
+      console.log(`✅ Server running on alternate port ${alternatePort}`);
+    });
+  } else if (process.env.NODE_ENV === 'production') {
+    console.log('⚠️ Production environment - preventing startup failure...');
+    setTimeout(() => {
+      console.log('🔄 Retrying server startup...');
+      process.exit(1);
+    }, 3000);
+  }
 });

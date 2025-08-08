@@ -1,7 +1,0 @@
-Price ID,Product ID,Product Name,Product Statement Descriptor,Product Tax Code,Description,Created (UTC),Amount,Currency,Interval,Interval Count,Usage Type,Aggregate Usage,Billing Scheme,Trial Period Days,Tax Behavior
-price_1Rr3ik8iKZXV0srZPRPByMQx,prod_SmcyWHzEYUieJO,Advocate Agency,My IEP Hero Agency,,,2025-07-31 21:09,99.00,usd,month,1,licensed,,per_unit,,unspecified
-price_1Rr3hR8iKZXV0srZ5lPscs0p,prod_SmcxRYlzNOsgmq,Advocate Pro,My IEP Hero Pro,,,2025-07-31 21:07,75.00,usd,month,1,licensed,,per_unit,,unspecified
-price_1Rr3gL8iKZXV0srZmfuD32yv,prod_SmcwDAutQFffU5,Advocate Starter,My IEP Hero Starter,,,2025-07-31 21:06,49.00,usd,month,1,licensed,,per_unit,,unspecified
-price_1Rr3e68iKZXV0srZnPPK5J3R,prod_SmctaBSSO9nsbc,Parent Premium,My IEP Hero Premium,,,2025-07-31 21:04,49.00,usd,month,1,licensed,,per_unit,,unspecified
-price_1Rr3co8iKZXV0srZA1kEdBW1,prod_SmcsKIZkLr1xUs,Parent Plus,My IEP Hero Plus,,,2025-07-31 21:02,29.00,usd,month,1,licensed,,per_unit,,unspecified
-price_1Rr3bk8iKZXV0srZ0URHZo4O,prod_SmcrtMVtM3cq3t,Parent Basic,My IEP Hero Basic,,,2025-07-31 21:01,19.00,usd,month,1,licensed,,per_unit,,unspecified
