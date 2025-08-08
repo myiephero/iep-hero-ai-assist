@@ -129,10 +129,25 @@ Applied critical fixes for Cloud Run deployment failures:
    - Created cloudbuild.yaml for Google Cloud Build integration
    - Added .dockerignore for optimized container builds
 
+5. **Single External Port Resolution (August 8, 2025)**:
+   - Enhanced production server logging to clearly identify port configuration
+   - Added startup health check endpoint (/startup-health) to prevent demo setup blocking
+   - Improved error handling with specific messaging for port conflicts
+   - Added Docker health checks for Cloud Run deployment verification
+   - Installed curl in Docker container for health check compatibility
+   - Explicitly configured single external port (5000→80) in Dockerfile and cloudbuild.yaml
+
 ### Changes Made:
 - **Removed**: Duplicate iep-hero-ai-assist directory causing port conflicts
 - **Updated**: All server files to respect PORT environment variable
 - **Added**: Production deployment configuration files
 - **Enhanced**: Error handling to prevent startup failures in Cloud Run
+- **Fixed**: Multiple external port configuration issue for Cloud Run compatibility
+- **Added**: Health check endpoints and Docker container verification
 
-**Status**: Ready for Cloud Run deployment with single external port (5000→80) configuration
+**Status**: Cloud Run deployment configured with single external port (5000→80), enhanced error handling for demo setup failures, and comprehensive health checking for reliable deployment startup
+
+### Known Development Environment Considerations:
+- Development environment (.replit, vite.config.ts) uses port 8080 but cannot be modified
+- Production deployment correctly overrides with PORT environment variable (5000)
+- Cloud Run deployment uses single external port mapping as required
