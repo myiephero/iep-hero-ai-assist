@@ -5,10 +5,12 @@ const path = require('path');
 
 const app = express();
 const port = process.env.PORT || 5000;
+const isDeployment = process.env.REPLIT_DEPLOYMENT === '1';
 
 console.log(`📦 Express loaded - Port: ${port}`);
 console.log(`🌐 NODE_ENV: ${process.env.NODE_ENV || 'development'}`);
-console.log(`🔧 Cloud Run Port: ${port} (mapped to external port 80)`);
+console.log(`🎯 Deployment Mode: ${isDeployment ? 'Replit Autoscale' : 'Development/Other'}`);
+console.log(`🔧 Port Configuration: ${port} ${isDeployment ? '(autoscale external port)' : '(mapped to external port 80)'}`);
 
 // Add startup health check to prevent demo setup failures from blocking deployment
 app.get('/startup-health', (req, res) => {
@@ -17,7 +19,13 @@ app.get('/startup-health', (req, res) => {
     message: 'Server startup successful',
     port: port,
     environment: process.env.NODE_ENV || 'development',
-    timestamp: new Date().toISOString()
+    deployment: isDeployment ? 'Replit Autoscale' : 'Development',
+    timestamp: new Date().toISOString(),
+    deploymentConfig: {
+      isAutoscale: isDeployment,
+      hasPortEnv: !!process.env.PORT,
+      listeningOn: `0.0.0.0:${port}`
+    }
   });
 });
 
@@ -59,6 +67,9 @@ console.log(`🔧 Starting server on port ${port}...`);
 const server = app.listen(port, '0.0.0.0', () => {
   console.log(`✅ Production server running on port ${port}`);
   console.log(`🌐 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`🎯 Deployment Type: ${isDeployment ? 'Replit Autoscale' : 'Other'}`);
+  console.log(`🔗 Health Check: http://0.0.0.0:${port}/startup-health`);
+  console.log(`🏥 API Health: http://0.0.0.0:${port}/api/health`);
 });
 
 // Graceful shutdown handling

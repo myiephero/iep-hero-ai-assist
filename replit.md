@@ -145,9 +145,41 @@ Applied critical fixes for Cloud Run deployment failures:
 - **Fixed**: Multiple external port configuration issue for Cloud Run compatibility
 - **Added**: Health check endpoints and Docker container verification
 
-**Status**: Cloud Run deployment configured with single external port (5000→80), enhanced error handling for demo setup failures, and comprehensive health checking for reliable deployment startup
+6. **Replit Autoscale Deployment Configuration (August 8, 2025)**:
+   - Created deploy.js as proper deployment entry point for autoscale service
+   - Enhanced server-js.js with deployment detection (REPLIT_DEPLOYMENT environment variable)
+   - Added comprehensive deployment health checks with autoscale configuration details
+   - Created DEPLOYMENT_AUTOSCALE.md with complete configuration instructions
+   - Fixed missing deployment configuration that was causing autoscale deployment failures
+
+**Status**: Multiple deployment targets supported:
+- **Cloud Run**: Single external port (5000→80), Docker containerized deployment
+- **Replit Autoscale**: Native Replit deployment with deploy.js entry point and autoscale configuration
+- Both deployments include enhanced error handling, health checks, and production-ready server configuration
+
+### Deployment Configuration Requirements:
+Since .replit and package.json files cannot be edited directly, the following must be configured through the Replit interface:
+
+#### Required .replit Updates (via Configuration pane):
+```toml
+[deployment]
+run = ["node", "deploy.js"]
+build = "npm run build" 
+deploymentTarget = "autoscale"
+
+[deployment.env]
+NODE_ENV = "production"
+PORT = "5000"
+REPLIT_DEPLOYMENT = "1"
+```
+
+#### Files Created for Deployment:
+- **deploy.js**: Autoscale deployment entry point
+- **server-js.js**: Enhanced production server with deployment detection
+- **DEPLOYMENT_AUTOSCALE.md**: Complete configuration guide
 
 ### Known Development Environment Considerations:
 - Development environment (.replit, vite.config.ts) uses port 8080 but cannot be modified
 - Production deployment correctly overrides with PORT environment variable (5000)
-- Cloud Run deployment uses single external port mapping as required
+- Multiple deployment targets supported: Cloud Run (containerized) and Replit Autoscale (native)
+- Both deployments use single external port configuration as required
