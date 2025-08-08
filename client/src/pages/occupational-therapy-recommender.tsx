@@ -99,8 +99,8 @@ const OccupationalTherapyRecommender: React.FC = () => {
   });
 
   // Fetch students for dropdown
-  const { data: students = [] } = useQuery({
-    queryKey: ['/api/students'],
+  const { data: students = [] } = useQuery<Student[]>({
+    queryKey: ['/api/parent/students'],
     enabled: !!user
   });
 
@@ -111,7 +111,7 @@ const OccupationalTherapyRecommender: React.FC = () => {
         body: JSON.stringify(data)
       });
     },
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       setRecommendations(data.recommendations);
       setStep(3);
       toast({
@@ -155,10 +155,11 @@ const OccupationalTherapyRecommender: React.FC = () => {
   };
 
   const downloadRecommendations = () => {
+    const selectedStudent = students.find((s: Student) => s.id === selectedStudentId);
     const content = `
 OCCUPATIONAL THERAPY ACTIVITY & ADAPTATION RECOMMENDATIONS
 
-Student: ${students.find(s => s.id === selectedStudentId)?.firstName} ${students.find(s => s.id === selectedStudentId)?.lastName}
+Student: ${selectedStudent?.firstName} ${selectedStudent?.lastName}
 Generated: ${new Date().toLocaleDateString()}
 
 ${recommendations.map((rec, index) => `
@@ -572,7 +573,7 @@ Progress Markers: ${rec.progressMarkers.join(', ')}
               <span>OT Activity & Adaptation Recommendations</span>
             </CardTitle>
             <p className="text-gray-600">
-              Personalized recommendations for {students.find(s => s.id === selectedStudentId)?.firstName} {students.find(s => s.id === selectedStudentId)?.lastName}
+              Personalized recommendations for {students.find((s: Student) => s.id === selectedStudentId)?.firstName} {students.find((s: Student) => s.id === selectedStudentId)?.lastName}
             </p>
           </CardHeader>
         </Card>
