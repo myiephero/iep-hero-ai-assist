@@ -1806,6 +1806,70 @@ Be supportive and parent-friendly in your language while maintaining accuracy.`;
     }
   });
 
+  // Emotion Tracking API endpoints
+  app.get('/api/emotion-entries/:studentId', requireAuth, async (req, res) => {
+    try {
+      const { studentId } = req.params;
+      const user = req.user as any;
+      
+      // Verify student belongs to this user
+      const student = await storage.getStudentById(studentId);
+      if (!student || student.parentId !== user.id) {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+      
+      const entries = await storage.getEmotionEntriesByStudentId(studentId);
+      res.json(entries);
+    } catch (error: any) {
+      console.error('Error fetching emotion entries:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post('/api/emotion-entries', requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      const entryData = req.body;
+      
+      // Verify student belongs to this user
+      const student = await storage.getStudentById(entryData.studentId);
+      if (!student || student.parentId !== user.id) {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+      
+      const entry = await storage.createEmotionEntry(user.id, entryData);
+      res.json(entry);
+    } catch (error: any) {
+      console.error('Error creating emotion entry:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.put('/api/emotion-entries/:entryId', requireAuth, async (req, res) => {
+    try {
+      const { entryId } = req.params;
+      const updates = req.body;
+      
+      const entry = await storage.updateEmotionEntry(entryId, updates);
+      res.json(entry);
+    } catch (error: any) {
+      console.error('Error updating emotion entry:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.delete('/api/emotion-entries/:entryId', requireAuth, async (req, res) => {
+    try {
+      const { entryId } = req.params;
+      
+      await storage.deleteEmotionEntry(entryId);
+      res.json({ message: 'Emotion entry deleted successfully' });
+    } catch (error: any) {
+      console.error('Error deleting emotion entry:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   // Dashboard Metrics API - Real data from database
   app.get("/api/dashboard/metrics", requireAuth, async (req, res) => {
     try {

@@ -33,6 +33,7 @@ import AdvocateMatcher from "@/pages/advocate-matcher";
 import AdvocacyReportGenerator from "@/pages/advocacy-report-generator";
 import AutismAccommodations from "@/pages/autism-accommodations";
 import OccupationalTherapyRecommender from "@/pages/occupational-therapy-recommender";
+import EmotionTrackingDashboard from "@/pages/emotion-tracking-dashboard";
 import Subscribe from "@/pages/subscribe";
 import Pricing from "@/pages/pricing";
 import Profile from "@/pages/profile";
@@ -263,6 +264,13 @@ function Router() {
         <AuthGuard>
           <Navbar />
           <OccupationalTherapyRecommender />
+        </AuthGuard>
+      </Route>
+      
+      <Route path="/emotion-tracking">
+        <AuthGuard>
+          <Navbar />
+          <EmotionTrackingDashboard />
         </AuthGuard>
       </Route>
       <Route path="/tools/advocacy-report-generator">
