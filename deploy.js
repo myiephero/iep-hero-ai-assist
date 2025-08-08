@@ -25,10 +25,10 @@ if (missingVars.length > 0) {
 
 console.log('✅ All required environment variables present');
 
-// Start the production server using server/index.ts
+// Start the production server using tsx
 const { spawn } = require('child_process');
 
-const server = spawn('node', ['server/index.ts'], {
+const server = spawn('tsx', ['server/index.ts'], {
   stdio: 'inherit',
   env: process.env
 });
