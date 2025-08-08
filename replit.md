@@ -162,9 +162,19 @@ Since .replit and package.json files cannot be edited directly, the following mu
 
 #### Required .replit Updates (via Configuration pane):
 ```toml
+[run]
+command = "npm run start"
+
+[nix]
+channel = "stable-24_11"
+
+[env]
+NODE_ENV = "development"
+PORT = "5000"
+
 [deployment]
-run = ["node", "deploy.js"]
-build = "npm run build" 
+run = ["node", "server/index.ts"]
+build = "npm run build"
 deploymentTarget = "autoscale"
 
 [deployment.env]
@@ -173,10 +183,27 @@ PORT = "5000"
 REPLIT_DEPLOYMENT = "1"
 ```
 
+#### Required package.json Updates (via manual editing):
+```json
+{
+  "scripts": {
+    "build:dev": "vite build --mode development",
+    "start": "node server/index.ts"
+  }
+}
+```
+
 #### Files Created for Deployment:
-- **deploy.js**: Autoscale deployment entry point
-- **server-js.js**: Enhanced production server with deployment detection
+- **deploy.js**: Enhanced autoscale deployment entry point with environment validation
+- **server/index.ts**: Unified development and production server with automatic mode detection
+- **server-js.js**: Legacy production server (backup)
 - **DEPLOYMENT_AUTOSCALE.md**: Complete configuration guide
+
+#### Environment Variables Configured:
+- **DATABASE_URL**: Configured via Replit Secrets
+- **SESSION_SECRET**: Configured via Replit Secrets  
+- **REPLIT_DOMAINS**: Automatically provided by Replit
+- **REPL_ID**: Automatically provided by Replit
 
 ### Known Development Environment Considerations:
 - Development environment (.replit, vite.config.ts) uses port 8080 but cannot be modified
