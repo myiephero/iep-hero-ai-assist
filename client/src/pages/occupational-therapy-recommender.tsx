@@ -106,10 +106,19 @@ const OccupationalTherapyRecommender: React.FC = () => {
 
   const generateOTRecommendations = useMutation({
     mutationFn: async (data: { studentId: string; assessment: Partial<OTAssessment> }) => {
-      return apiRequest('/api/generate-ot-recommendations', {
+      const response = await fetch('/api/generate-ot-recommendations', {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify(data)
       });
+      
+      if (!response.ok) {
+        throw new Error('Failed to generate recommendations');
+      }
+      
+      return response.json();
     },
     onSuccess: (data: any) => {
       setRecommendations(data.recommendations);
