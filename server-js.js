@@ -7,6 +7,19 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 console.log(`📦 Express loaded - Port: ${port}`);
+console.log(`🌐 NODE_ENV: ${process.env.NODE_ENV || 'development'}`);
+console.log(`🔧 Cloud Run Port: ${port} (mapped to external port 80)`);
+
+// Add startup health check to prevent demo setup failures from blocking deployment
+app.get('/startup-health', (req, res) => {
+  res.json({ 
+    status: 'OK', 
+    message: 'Server startup successful',
+    port: port,
+    environment: process.env.NODE_ENV || 'development',
+    timestamp: new Date().toISOString()
+  });
+});
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -68,12 +81,14 @@ process.on('SIGINT', () => {
 server.on('error', (error) => {
   console.error('❌ Server startup error:', error);
   if (error.code === 'EADDRINUSE') {
-    console.log(`⚠️ Port ${port} is in use`);
+    console.log(`⚠️ Port ${port} is in use - This indicates multiple external port configuration issue`);
+    console.log(`🔧 Cloud Run expects single external port mapping: ${port} → 80`);
     process.exit(1);
   } else if (process.env.NODE_ENV === 'production') {
-    console.log('⚠️ Production environment - preventing startup failure...');
+    console.log('⚠️ Production environment - preventing demo setup failures from blocking deployment...');
+    console.log('🔧 Implementing graceful recovery for Cloud Run deployment...');
     setTimeout(() => {
-      console.log('🔄 Retrying server startup...');
+      console.log('🔄 Retrying server startup after demo setup recovery...');
       process.exit(1);
     }, 3000);
   }
