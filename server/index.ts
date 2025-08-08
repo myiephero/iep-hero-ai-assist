@@ -40,17 +40,35 @@ app.use((req, res, next) => {
 (async () => {
   const server = await registerRoutes(app);
   
-  // Setup demo accounts - wrapped with comprehensive error handling
+  // Setup demo accounts - wrapped with comprehensive error handling for deployment
   try {
-    await setupDemoAccounts();
+    // Add timeout to prevent hanging during deployment
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Demo setup timeout')), 10000)
+    );
+    
+    await Promise.race([setupDemoAccounts(), timeoutPromise]);
     console.log("✅ Demo accounts setup completed successfully");
   } catch (error: any) {
     console.error("⚠️ Demo account setup failed, but continuing with server startup:", error.message);
-    // Log additional error details for debugging in production
-    if (error.stack) {
+    
+    // Enhanced error logging for deployment debugging
+    if (error.code) {
+      console.error("Error code:", error.code);
+    }
+    if (error.stack && process.env.NODE_ENV !== 'production') {
       console.error("Stack trace:", error.stack);
     }
+    
+    // Log environment for deployment troubleshooting
+    console.log("🔧 Environment info:", {
+      NODE_ENV: process.env.NODE_ENV,
+      DATABASE_URL: process.env.DATABASE_URL ? 'Set' : 'Not set',
+      PORT: process.env.PORT || 'Using default 5000'
+    });
+    
     // Continue with server startup - demo setup failure should not prevent deployment
+    console.log("🚀 Proceeding with server startup despite demo setup failure");
   }
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
