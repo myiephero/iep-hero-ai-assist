@@ -103,3 +103,36 @@ These colors are implemented as CSS custom properties in the design system and u
 - **PostCSS**: CSS processing with Tailwind and Autoprefixer
 - **TypeScript**: Static type checking across the entire application
 - **Replit Plugins**: Development environment integration and error overlays
+
+## Recent Deployment Fixes (August 2025)
+
+### Cloud Run Deployment Configuration
+Applied critical fixes for Cloud Run deployment failures:
+
+1. **Port Configuration Standardization**: 
+   - Unified all server configurations to use PORT environment variable (defaulting to 5000)
+   - Updated server/index.ts, server/minimal.ts, and server-js.js for consistent port handling
+   - Removed duplicate server configurations that caused port conflicts
+
+2. **Error Handling Enhancement**:
+   - Added graceful error handling for demo setup failures
+   - Implemented retry mechanisms for production environments
+   - Added proper SIGTERM/SIGINT handling for graceful shutdowns
+
+3. **Production Server Configuration**:
+   - Created production-ready server-js.js with static file serving
+   - Added health check endpoints with environment reporting
+   - Implemented proper error middleware and SPA routing
+
+4. **Container Deployment Support**:
+   - Added Dockerfile for Cloud Run compatibility
+   - Created cloudbuild.yaml for Google Cloud Build integration
+   - Added .dockerignore for optimized container builds
+
+### Changes Made:
+- **Removed**: Duplicate iep-hero-ai-assist directory causing port conflicts
+- **Updated**: All server files to respect PORT environment variable
+- **Added**: Production deployment configuration files
+- **Enhanced**: Error handling to prevent startup failures in Cloud Run
+
+**Status**: Ready for Cloud Run deployment with single external port (5000→80) configuration

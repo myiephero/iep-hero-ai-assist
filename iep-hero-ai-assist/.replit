@@ -1,9 +1,0 @@
-[run]
-command = "npx vite"
-
-[nix]
-channel = "stable"
-
-[env]
-NODE_ENV = "development"
-PORT = "8080"
