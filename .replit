@@ -1,5 +1,5 @@
 [run]
-command = "npm run start"
+command = ["npm", "run", "start"]
 
 [nix]
 channel = "stable-24_11"
@@ -16,4 +16,4 @@ deploymentTarget = "autoscale"
 [deployment.env]
 NODE_ENV = "production"
 PORT = "5000"
-REPLIT_DEPLOYMENT = "1" 
+REPLIT_DEPLOYMENT = "1"
