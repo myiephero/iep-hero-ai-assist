@@ -1,0 +1,10 @@
+# Replit deployment configuration with fixed build process
+[build]
+command = "node build-deploy.js"
+
+[run]
+command = "node server/index.ts"
+
+[env]
+NODE_ENV = "production"
+PORT = "5000"
