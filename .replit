@@ -1,15 +1,18 @@
-[run]
-command = "npm run start"
+run = "npm run start"
+modules = ["nodejs-20"]
+
 [nix]
 channel = "stable-24_11"
+
 [env]
 NODE_ENV = "development"
 PORT = "5000"
+
 [deployment]
 run = "npx tsx server/index.ts"
 build = "npm run build"
 deploymentTarget = "autoscale"
-[deployment.env]
-NODE_ENV = "production"
-PORT = "5000"
-REPLIT_DEPLOYMENT = "1"
+
+[[ports]]
+localPort = 5000
+externalPort = 80
