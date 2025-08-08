@@ -7,3 +7,7 @@ vite.config.ts.*
 .env
 .next
 backend/.env
+
+.env
+backend/.env
+.next
