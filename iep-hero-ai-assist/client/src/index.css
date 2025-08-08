@@ -1,0 +1,80 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Light neutrals with subtle blue undertones for a calming feel */
+  --background: 213 30% 98%;
+  --foreground: 213 20% 15%;
+  --muted: 213 25% 94%;
+  --muted-foreground: 213 15% 55%;
+  --popover: 213 30% 98%;
+  --popover-foreground: 213 20% 15%;
+  --card: 0 0% 100%;
+  --card-foreground: 213 20% 15%;
+  --border: 213 25% 88%;
+  --input: 213 25% 88%;
+  
+  /* My IEP Hero calming color palette - Professional Blue #4F9AFF */
+  --primary: 213 94% 68%;
+  --primary-foreground: 0 0% 100%;
+  /* Soft Sage Green #7DD3AC */
+  --secondary: 142 76% 73%;
+  --secondary-foreground: 213 20% 15%;
+  /* Warm Support Orange #FF7A1A */
+  --accent: 25 95% 53%;
+  --accent-foreground: 0 0% 100%;
+  
+  /* Status colors for supportive, non-overwhelming UX */
+  --success: 142 76% 36%;
+  --success-foreground: 0 0% 100%;
+  --warning: 43 96% 56%;
+  --warning-foreground: 213 20% 15%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  
+  --ring: 213 94% 68%;
+  --radius: 0.5rem;
+}
+
+.dark {
+  /* Dark mode with calming blue undertones */
+  --background: 213 50% 8%;
+  --foreground: 213 30% 92%;
+  --muted: 213 40% 15%;
+  --muted-foreground: 213 20% 65%;
+  --popover: 213 50% 8%;
+  --popover-foreground: 213 30% 92%;
+  --card: 213 45% 12%;
+  --card-foreground: 213 30% 92%;
+  --border: 213 40% 18%;
+  --input: 213 40% 18%;
+  
+  /* My IEP Hero colors adapted for dark mode */
+  --primary: 213 94% 68%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 142 60% 45%;
+  --secondary-foreground: 213 30% 92%;
+  --accent: 25 95% 53%;
+  --accent-foreground: 0 0% 100%;
+  
+  /* Status colors for dark mode */
+  --success: 142 70% 40%;
+  --success-foreground: 0 0% 100%;
+  --warning: 43 90% 60%;
+  --warning-foreground: 213 50% 8%;
+  --destructive: 0 80% 65%;
+  --destructive-foreground: 0 0% 100%;
+  
+  --ring: 213 94% 68%;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+}
