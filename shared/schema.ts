@@ -192,6 +192,28 @@ export const advocateMatches = pgTable("advocate_matches", {
   createdAt: timestamp("created_at").default(sql`now()`),
 });
 
+export const emotionEntries = pgTable("emotion_entries", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  studentId: varchar("student_id").notNull().references(() => students.id),
+  emotion: text("emotion").notNull(), // happy, sad, angry, anxious, excited, frustrated, calm, overwhelmed
+  intensity: integer("intensity").notNull(), // 1-5 scale
+  trigger: text("trigger"), // What caused this emotion
+  context: text("context").notNull(), // school, home, therapy, social, academic, transition
+  notes: text("notes"), // Additional observations
+  coping_strategies: jsonb("coping_strategies").default([]), // Array of strategies used
+  effectiveness: integer("effectiveness"), // How effective were coping strategies (1-5)
+  recorded_by: text("recorded_by").notNull(), // parent, teacher, therapist, student, advocate
+  mood_before: integer("mood_before"), // Baseline mood (1-5)
+  mood_after: integer("mood_after"), // Mood after intervention (1-5)
+  date: timestamp("date").notNull().default(sql`now()`),
+  time_of_day: text("time_of_day").notNull(), // morning, afternoon, evening, night
+  duration: integer("duration"), // How long did the emotion last (minutes)
+  support_needed: boolean("support_needed").default(false),
+  support_provided: text("support_provided"), // What support was given
+  createdAt: timestamp("created_at").default(sql`now()`),
+});
+
 // Schemas
 export const insertUserSchema = createInsertSchema(users).pick({
   email: true,
@@ -288,6 +310,21 @@ export const insertIEPDraftSchema = createInsertSchema(iepDrafts).omit({
   createdAt: true,
 });
 
+export const insertEmotionEntrySchema = createInsertSchema(emotionEntries).omit({
+  id: true,
+  userId: true,
+  createdAt: true,
+}).extend({
+  date: z.string().or(z.date()).transform((val) => new Date(val)).optional(),
+  intensity: z.number().min(1).max(5),
+  effectiveness: z.number().min(1).max(5).optional(),
+  mood_before: z.number().min(1).max(5).optional(),
+  mood_after: z.number().min(1).max(5).optional(),
+  duration: z.number().min(0).optional(),
+  support_needed: z.boolean().default(false),
+  coping_strategies: z.array(z.string()).default([]),
+});
+
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -315,3 +352,5 @@ export type InsertIEPDraft = z.infer<typeof insertIEPDraftSchema>;
 export type IEPDraft = typeof iepDrafts.$inferSelect;
 export type InsertDocumentShare = z.infer<typeof insertDocumentShareSchema>;
 export type DocumentShare = typeof documentShares.$inferSelect;
+export type InsertEmotionEntry = z.infer<typeof insertEmotionEntrySchema>;
+export type EmotionEntry = typeof emotionEntries.$inferSelect;

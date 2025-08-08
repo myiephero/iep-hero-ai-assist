@@ -379,6 +379,17 @@ export default function ParentDashboard() {
                 <div className="text-xs text-purple-300">Personalized occupational therapy activities</div>
               </CardContent>
             </Card>
+            
+            <Card
+              className="bg-gradient-to-br from-pink-600/20 to-red-600/20 border-pink-500/30 cursor-pointer hover:from-pink-600/30 hover:to-red-600/30 transition-all duration-200"
+              onClick={() => setLocation("/emotion-tracking")}
+            >
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl mb-2">💝</div>
+                <div className="font-semibold text-white">Emotion Tracking</div>
+                <div className="text-xs text-pink-300">Monitor student well-being and emotional patterns</div>
+              </CardContent>
+            </Card>
           </div>
         </div>
 

@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type Goal, type InsertGoal, type Document, type InsertDocument, type Event, type InsertEvent, type Message, type InsertMessage, type SharedMemory, type InsertSharedMemory, type ProgressNote, type InsertProgressNote, type CommunicationLog, type InsertCommunicationLog, type AdvocateMatch, type InsertAdvocateMatch, type Student, type InsertStudent, type AdvocateClient, type InsertAdvocateClient, type IEPDraft, type InsertIEPDraft, users, iepGoals, documents, events, messages, sharedMemories, progressNotes, communicationLogs, advocateMatches, students, advocateClients, iepDrafts } from "@shared/schema";
+import { type User, type InsertUser, type Goal, type InsertGoal, type Document, type InsertDocument, type Event, type InsertEvent, type Message, type InsertMessage, type SharedMemory, type InsertSharedMemory, type ProgressNote, type InsertProgressNote, type CommunicationLog, type InsertCommunicationLog, type AdvocateMatch, type InsertAdvocateMatch, type Student, type InsertStudent, type AdvocateClient, type InsertAdvocateClient, type IEPDraft, type InsertIEPDraft, type EmotionEntry, type InsertEmotionEntry, users, iepGoals, documents, events, messages, sharedMemories, progressNotes, communicationLogs, advocateMatches, students, advocateClients, iepDrafts, emotionEntries } from "@shared/schema";
 import { randomUUID } from "crypto";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
@@ -83,6 +83,14 @@ export interface IStorage {
   createAdvocateClient(client: InsertAdvocateClient): Promise<AdvocateClient>;
   updateAdvocateClient(clientId: string, updates: Partial<InsertAdvocateClient>): Promise<AdvocateClient>;
   deleteAdvocateClient(clientId: string): Promise<void>;
+  
+  // Emotion Tracking
+  getEmotionEntriesByUserId(userId: string): Promise<EmotionEntry[]>;
+  getEmotionEntriesByStudentId(studentId: string): Promise<EmotionEntry[]>;
+  createEmotionEntry(userId: string, entry: InsertEmotionEntry): Promise<EmotionEntry>;
+  updateEmotionEntry(entryId: string, updates: Partial<InsertEmotionEntry>): Promise<EmotionEntry>;
+  deleteEmotionEntry(entryId: string): Promise<void>;
+  getEmotionEntriesByDateRange(userId: string, startDate: Date, endDate: Date): Promise<EmotionEntry[]>;
 }
 
 export class MemStorage implements IStorage {
@@ -97,6 +105,7 @@ export class MemStorage implements IStorage {
   private advocateMatches: Map<string, AdvocateMatch>;
   private students: Map<string, Student>;
   private advocateClients: Map<string, AdvocateClient>;
+  private emotionEntries: Map<string, EmotionEntry>;
 
   constructor() {
     this.users = new Map();
@@ -110,6 +119,7 @@ export class MemStorage implements IStorage {
     this.advocateMatches = new Map();
     this.students = new Map();
     this.advocateClients = new Map();
+    this.emotionEntries = new Map();
     
     // Add sample data for development
     this.initializeSampleData();
@@ -652,6 +662,58 @@ export class MemStorage implements IStorage {
 
   async deleteAdvocateClient(clientId: string): Promise<void> {
     this.advocateClients.delete(clientId);
+  }
+  
+  // Emotion Tracking methods
+  async getEmotionEntriesByUserId(userId: string): Promise<EmotionEntry[]> {
+    return Array.from(this.emotionEntries.values())
+      .filter(entry => entry.userId === userId)
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  }
+
+  async getEmotionEntriesByStudentId(studentId: string): Promise<EmotionEntry[]> {
+    return Array.from(this.emotionEntries.values())
+      .filter(entry => entry.studentId === studentId)
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  }
+
+  async createEmotionEntry(userId: string, entry: InsertEmotionEntry): Promise<EmotionEntry> {
+    const id = randomUUID();
+    const newEntry: EmotionEntry = {
+      ...entry,
+      id,
+      userId,
+      date: entry.date || new Date(),
+      createdAt: new Date()
+    };
+    
+    this.emotionEntries.set(id, newEntry);
+    return newEntry;
+  }
+
+  async updateEmotionEntry(entryId: string, updates: Partial<InsertEmotionEntry>): Promise<EmotionEntry> {
+    const entry = this.emotionEntries.get(entryId);
+    if (!entry) {
+      throw new Error("Emotion entry not found");
+    }
+    
+    const updatedEntry = { ...entry, ...updates };
+    this.emotionEntries.set(entryId, updatedEntry);
+    return updatedEntry;
+  }
+
+  async deleteEmotionEntry(entryId: string): Promise<void> {
+    this.emotionEntries.delete(entryId);
+  }
+
+  async getEmotionEntriesByDateRange(userId: string, startDate: Date, endDate: Date): Promise<EmotionEntry[]> {
+    return Array.from(this.emotionEntries.values())
+      .filter(entry => 
+        entry.userId === userId &&
+        new Date(entry.date) >= startDate &&
+        new Date(entry.date) <= endDate
+      )
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   }
 
   // Missing methods for LocalDbStorage compatibility
@@ -1685,5 +1747,54 @@ export const storage = new class LocalDbStorage implements IStorage {
     return [...messages1, ...messages2].sort((a, b) => 
       (a.sentAt?.getTime() || 0) - (b.sentAt?.getTime() || 0)
     );
+  }
+  
+  // Emotion Tracking methods
+  async getEmotionEntriesByUserId(userId: string): Promise<EmotionEntry[]> {
+    return await this.db.select().from(emotionEntries).where(eq(emotionEntries.userId, userId)).orderBy(desc(emotionEntries.date));
+  }
+
+  async getEmotionEntriesByStudentId(studentId: string): Promise<EmotionEntry[]> {
+    return await this.db.select().from(emotionEntries).where(eq(emotionEntries.studentId, studentId)).orderBy(desc(emotionEntries.date));
+  }
+
+  async createEmotionEntry(userId: string, entry: InsertEmotionEntry): Promise<EmotionEntry> {
+    const id = randomUUID();
+    const newEntry = {
+      ...entry,
+      id,
+      userId,
+      createdAt: new Date()
+    };
+    
+    const result = await this.db.insert(emotionEntries).values(newEntry).returning();
+    return result[0];
+  }
+
+  async updateEmotionEntry(entryId: string, updates: Partial<InsertEmotionEntry>): Promise<EmotionEntry> {
+    const result = await this.db
+      .update(emotionEntries)
+      .set(updates)
+      .where(eq(emotionEntries.id, entryId))
+      .returning();
+    
+    if (result.length === 0) {
+      throw new Error("Emotion entry not found");
+    }
+    return result[0];
+  }
+
+  async deleteEmotionEntry(entryId: string): Promise<void> {
+    await this.db.delete(emotionEntries).where(eq(emotionEntries.id, entryId));
+  }
+
+  async getEmotionEntriesByDateRange(userId: string, startDate: Date, endDate: Date): Promise<EmotionEntry[]> {
+    return await this.db.select().from(emotionEntries)
+      .where(and(
+        eq(emotionEntries.userId, userId),
+        sql`${emotionEntries.date} >= ${startDate}`,
+        sql`${emotionEntries.date} <= ${endDate}`
+      ))
+      .orderBy(desc(emotionEntries.date));
   }
 }();
