@@ -1,0 +1,116 @@
+Got you. Here’s a single, copy‑paste prompt for the Replit agent that tells it exactly what to do (and explicitly that you’ll handle the .replit file yourself). This will get the Run button working and the app starting cleanly.
+
+⸻
+
+Prompt for Replit Agent
+
+I will update the .replit file myself via the Replit Configuration pane, so do not edit .replit. Assume it already contains:
+
+[run]
+command = "npm run start"
+
+[nix]
+channel = "stable-24_11"
+
+[env]
+NODE_ENV = "development"
+PORT = "5000"
+
+[deployment]
+run = ["node", "server/index.ts"]
+build = "npm run build"
+deploymentTarget = "autoscale"
+
+[deployment.env]
+NODE_ENV = "production"
+PORT = "5000"
+REPLIT_DEPLOYMENT = "1"
+
+Your job is to make sure the project actually starts when I click Run and is deployable. Please do the following steps end‑to‑end inside this Repl:
+	1.	Dependencies & tooling
+
+	•	Install missing tools:
+
+npm i -D tsx typescript @types/node
+
+
+	•	If there’s no tsconfig.json, create a minimal one:
+
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "outDir": "dist"
+  },
+  "include": ["server/**/*", "src/**/*", "index.ts", "server.ts"]
+}
+
+
+
+	2.	Server entry & health check
+
+	•	Ensure server/index.ts exists and does not import from url unless needed. If it’s missing, create this minimal Express server that respects PORT and has a health route:
+
+import express from "express";
+
+const app = express();
+const port = process.env.PORT ? Number(process.env.PORT) : 5000;
+
+app.get("/api/health", (_req, res) => {
+  res.json({ status: "OK", port, env: process.env.NODE_ENV || "development" });
+});
+
+app.get("/", (_req, res) => {
+  res.send("My IEP Hero server is running");
+});
+
+app.listen(port, "0.0.0.0", () => {
+  console.log(`Server listening on http://0.0.0.0:${port}`);
+});
+
+
+
+	3.	package.json scripts (so the Run button works)
+
+	•	Update package.json to include exactly these scripts:
+
+{
+  "scripts": {
+    "dev": "tsx server/index.ts",
+    "start": "tsx server/index.ts",
+    "build": "echo \"(optional) add your vite/tsc build here\" && exit 0"
+  }
+}
+
+Reason: Replit’s Run button calls npm run start from .replit. Using tsx lets us run TypeScript directly with no transpile step.
+
+	4.	Secrets check (no blocking)
+
+	•	Confirm the app can start without database envs. If code requires DATABASE_URL or SESSION_SECRET, gate those behind if (process.env.REPLIT_DEPLOYMENT) or provide safe fallbacks so local dev still runs.
+
+	5.	Prove it runs
+
+	•	Click Run (or start the process you need) and verify the console shows Server listening on http://0.0.0.0:5000.
+	•	Open the webview and confirm:
+	•	GET / returns “My IEP Hero server is running”.
+	•	GET /api/health returns { status: "OK", ... }.
+
+	6.	Deployment sanity
+
+	•	Ensure npm run build doesn’t fail (it’s a no‑op for now).
+	•	Confirm the same entry (server/index.ts) will be used by the deployment run command from .replit.
+
+	7.	Report back
+
+	•	Post the diff of any files you created/edited and paste the final package.json and (if created) tsconfig.json.
+	•	Confirm the exact URL of the health endpoint and that the Run button now starts the app cleanly.
+
+Do not modify .replit. I will keep that in sync. Focus on scripts, server entry, and ensuring Run succeeds.
+
+⸻
+
+If you want, I can also give you a tiny “fallback build” script once you know whether you’re using Vite or not.
