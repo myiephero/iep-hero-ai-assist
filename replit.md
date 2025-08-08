@@ -157,6 +157,14 @@ Applied critical fixes for Cloud Run deployment failures:
 - **Replit Autoscale**: Native Replit deployment with deploy.js entry point and autoscale configuration
 - Both deployments include enhanced error handling, health checks, and production-ready server configuration
 
+7. **Production Build Fixes (August 8, 2025)**:
+   - Resolved critical npm dependency resolution issues that caused "npm install removed 492 packages" error
+   - Fixed ESM/CommonJS module conflicts with Vite plugins (@replit/vite-plugin-runtime-error-modal, lovable-tagger)
+   - Corrected HTML import path issues (changed /src/main.tsx to ./src/main.tsx for proper rollup resolution)
+   - Created production-safe Vite configuration without problematic ESM-only plugins
+   - Implemented comprehensive deployment script (deploy-final.sh) with dependency fixes and build verification
+   - Successfully generated optimized production build: 646.82 kB JavaScript bundle with proper asset references
+
 ### Deployment Configuration Requirements:
 Since .replit and package.json files cannot be edited directly, the following must be configured through the Replit interface:
 
