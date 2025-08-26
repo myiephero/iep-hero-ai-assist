@@ -80,6 +80,19 @@ const server = app.listen(port, host, () => {
   console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`🚀 Deployment: ${process.env.REPLIT_DEPLOYMENT ? 'Replit Autoscale' : 'Development'}`);
   console.log(`💚 Health check available at /health and /startup-health`);
+  console.log(`🔌 Port configuration: ${process.env.PORT ? `Cloud Run ENV(${process.env.PORT})` : `Default(${port})`}`);
+  console.log(`🏠 Host binding: ${host} (Cloud Run compatible)`);
+});
+
+// Enhanced error handling for server startup
+server.on('error', (error: any) => {
+  if (error.code === 'EADDRINUSE') {
+    console.error(`❌ Port ${port} is already in use`);
+    console.error(`💡 Cloud Run requires binding to port from environment variable`);
+  } else {
+    console.error(`❌ Server startup error:`, error);
+  }
+  process.exit(1);
 });
 
 // Graceful shutdown for Cloud Run

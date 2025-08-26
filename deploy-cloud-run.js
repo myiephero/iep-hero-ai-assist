@@ -10,11 +10,12 @@ console.log("🚀 Starting Cloud Run compatible deployment...");
 // Set production environment
 process.env.NODE_ENV = 'production';
 
-// Cloud Run automatically sets PORT, but ensure compatibility
+// Cloud Run automatically sets PORT - must use environment variable
 const port = process.env.PORT || '5000';
 console.log(`📦 Environment: ${process.env.NODE_ENV}`);
-console.log(`🔌 Port: ${port}`);
+console.log(`🔌 Port: ${port} (from ${process.env.PORT ? 'Cloud Run ENV' : 'default'})`);
 console.log(`🎯 Deployment Target: Cloud Run`);
+console.log(`🏠 Host: 0.0.0.0 (required for Cloud Run)`);
 
 // Enhanced error handling for deployment debugging
 process.on('uncaughtException', (error) => {

@@ -30,6 +30,10 @@ steps:
       - '1'
       - '--max-instances'
       - '10'
+      - '--timeout'
+      - '300'
+      - '--concurrency'
+      - '80'
 
 images:
   - 'gcr.io/$PROJECT_ID/iep-advocacy-platform:$BUILD_ID'

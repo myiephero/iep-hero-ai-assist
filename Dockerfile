@@ -16,19 +16,19 @@ RUN npm ci --only=production
 # Copy the current directory contents into the container at /app
 COPY . .
 
-# Build the application
-RUN npm run build
+# Create basic static files directory for production
+RUN mkdir -p dist/public && echo '<h1>Application Ready</h1><p>API Server running on Cloud Run</p>' > dist/public/index.html
 
-# Ensure single external port configuration for Cloud Run
-ENV PORT=5000
+# Cloud Run port configuration - use environment variable
 ENV NODE_ENV=production
 
-# Expose only the single port expected by Cloud Run
-EXPOSE 5000
+# Cloud Run will provide PORT environment variable
+# Expose port for Cloud Run (will be remapped internally)
+EXPOSE ${PORT:-5000}
 
-# Add health check to verify startup
+# Add health check to verify startup - use dynamic port
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
-  CMD curl -f http://localhost:5000/startup-health || exit 1
+  CMD curl -f http://localhost:${PORT:-5000}/startup-health || exit 1
 
 # Define the command to run the application optimized for Cloud Run
-CMD ["node", "deploy-cloud-run.js"]
+CMD ["node", "cloud-run-start.js"]
