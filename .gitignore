@@ -11,3 +11,4 @@ backend/.env
 .env
 backend/.env
 .next
+.vercel

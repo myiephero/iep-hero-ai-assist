@@ -1,1 +1,12 @@
-import react from "@vitejs/plugin-react";\nimport runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";\n\n/** @type {import("vite").UserConfig} */\nexport default {\n  plugins: [react(), runtimeErrorOverlay()],\n};
+import react from "@vitejs/plugin-react";
+import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
+
+/** @type {import("vite").UserConfig} */
+export default {
+  resolve: {
+    alias: {
+      "@": "/client/src"
+    }
+  },
+  plugins: [react(), runtimeErrorOverlay()],
+};
