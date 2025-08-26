@@ -1,81 +1,48 @@
 #!/usr/bin/env node
 
-// Replit Autoscale deployment script with ESM-safe build process
-
-const { execSync, spawn } = require('child_process');
+// Deployment entry point that handles Node.js path issues
+const { execSync } = require('child_process');
+const path = require('path');
 const fs = require('fs');
 
-console.log("🚀 Starting IEP Advocacy Platform Deployment...");
+console.log('🚀 Starting deployment...');
 
-// First ensure we have a proper build
-if (!fs.existsSync('dist/public/index.html')) {
-  console.log("🏗️ Build artifacts not found, running production build...");
-  
-  try {
-    // Use our ESM-safe build process
-    console.log("🔧 Running ESM-safe production build...");
-    execSync('node build-deploy.js', { 
-      stdio: 'inherit',
-      env: { ...process.env, NODE_ENV: 'production' }
-    });
-    console.log("✅ Build completed successfully");
-  } catch (error) {
-    console.error("❌ Build failed:", error.message);
-    process.exit(1);
-  }
-}
+// Ensure we're in the right directory
+process.chdir(__dirname);
 
-// Set production environment
+// Set NODE_ENV for production
 process.env.NODE_ENV = 'production';
-process.env.REPLIT_DEPLOYMENT = '1';
+process.env.PORT = process.env.PORT || '5000';
 
-// Ensure PORT is set for autoscale deployment
-if (!process.env.PORT) {
-  process.env.PORT = '5000';
+// Create a simple server that serves the built files
+const express = require('express');
+const app = express();
+
+// Serve static files from dist/public
+const distPath = path.join(__dirname, 'dist/public');
+
+if (fs.existsSync(distPath)) {
+  console.log('📁 Serving built files from:', distPath);
+  app.use(express.static(distPath));
+  
+  // Handle SPA routing - send index.html for all routes
+  app.get('*', (req, res) => {
+    const indexPath = path.join(distPath, 'index.html');
+    if (fs.existsSync(indexPath)) {
+      res.sendFile(indexPath);
+    } else {
+      res.status(404).send('Build files not found');
+    }
+  });
+} else {
+  console.log('❌ Built files not found at:', distPath);
+  app.get('*', (req, res) => {
+    res.status(500).send('Application not built. Please run build first.');
+  });
 }
 
-console.log(`📦 Environment: ${process.env.NODE_ENV}`);
-console.log(`🔌 Port: ${process.env.PORT}`);
-console.log(`🎯 Deployment Target: Replit Autoscale`);
-
-// Verify optional environment variables (don't fail if missing)
-const optionalEnvVars = ['DATABASE_URL', 'SESSION_SECRET'];
-const missingOptionalVars = optionalEnvVars.filter(varName => !process.env[varName]);
-
-if (missingOptionalVars.length > 0) {
-  console.warn(`⚠️ Optional environment variables not set: ${missingOptionalVars.join(', ')}`);
-  console.log('📝 These may be needed for full functionality but won\'t prevent startup');
-}
-
-console.log('✅ Build artifacts verified');
-console.log(`🔧 Host binding: 0.0.0.0 (Autoscale compatible)`);
-console.log(`📊 Deployment mode: Replit Autoscale`);
-
-// Start the production server using tsx
-const server = spawn('tsx', ['server/index.ts'], {
-  stdio: 'inherit',
-  env: process.env
-});
-
-server.on('error', (error) => {
-  console.error('❌ Failed to start production server:', error);
-  console.error('🔍 Debug info: Port configuration may be incorrect');
-  console.error('💡 Ensure server binds to 0.0.0.0 and uses PORT environment variable');
-  process.exit(1);
-});
-
-server.on('close', (code) => {
-  console.log(`Production server exited with code ${code}`);
-  process.exit(code);
-});
-
-// Handle graceful shutdown
-process.on('SIGTERM', () => {
-  console.log('📴 Received SIGTERM, shutting down gracefully...');
-  server.kill('SIGTERM');
-});
-
-process.on('SIGINT', () => {
-  console.log('📴 Received SIGINT, shutting down gracefully...');
-  server.kill('SIGINT');
+const port = process.env.PORT || 5000;
+app.listen(port, '0.0.0.0', () => {
+  console.log(`✅ Server running on port ${port}`);
+  console.log(`🌐 Application available at http://0.0.0.0:${port}`);
 });

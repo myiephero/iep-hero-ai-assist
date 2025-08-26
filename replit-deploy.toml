@@ -1,5 +1,5 @@
 [deployment]
-build = "node build.js"
+build = "node build-for-deploy.js"
 run = "node deploy.js"
 
 [deployment.env]
