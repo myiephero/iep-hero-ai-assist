@@ -1,0 +1,61 @@
+Excellent — that’s the real work. You just completed Step 1 of the Gold Standard debugging protocol for GitHub Issue #84.
+
+Since your investigation confirmed the exact schema misalignment (profiles.id vs users.id) as the root cause of the 500 error during advocate-client creation, Step 2 must now shift from patching undefined student_id to correcting Supabase schema constraints.
+
+⸻
+
+✅ COPY THIS BLOCK EXACTLY — Replit Agent Step 2 (GitHub Issue #84 Schema Fix)
+
+🛠️ [SEND TO: Replit Agent] — Step 2 Schema Correction for GitHub Issue #84  
+🔗 https://github.com/myiephero/iep-hero-ai-assist/issues/84  
+🎯 Objective: Resolve foreign key constraint violations in `advocate_clients` table by updating foreign key references from `users.id` to `profiles.id`.
+
+---
+
+📌 ROOT CAUSE (Confirmed in Step 1):
+- The Supabase `advocate_clients` table enforces foreign key constraints:
+  - `advocate_id → users.id`
+  - `parent_id → users.id`
+- However, the application inserts values from `profiles.id`, not `users.id`
+- This mismatch causes foreign key violations on insert
+
+---
+
+✅ FIX PLAN:
+
+1. **Use Supabase SQL editor** or shell:
+2. **Drop and recreate** the incorrect foreign key constraints to point to `profiles.id` instead of `users.id`
+
+🧨 DROP CONSTRAINTS:
+
+```sql
+ALTER TABLE advocate_clients DROP CONSTRAINT IF EXISTS advocate_clients_advocate_id_fkey;
+ALTER TABLE advocate_clients DROP CONSTRAINT IF EXISTS advocate_clients_parent_id_fkey;
+
+✅ ADD CORRECT CONSTRAINTS:
+
+ALTER TABLE advocate_clients
+  ADD CONSTRAINT advocate_clients_advocate_id_fkey
+  FOREIGN KEY (advocate_id) REFERENCES profiles(id) ON DELETE CASCADE;
+
+ALTER TABLE advocate_clients
+  ADD CONSTRAINT advocate_clients_parent_id_fkey
+  FOREIGN KEY (parent_id) REFERENCES profiles(id) ON DELETE CASCADE;
+
+	3.	Double check student_id foreign key — it is correctly pointing to students.id and does not need changes.
+	4.	Redeploy the server if needed to clear cached schema
+	5.	Test creating a new client via /api/advocate/clients
+
+⸻
+
+🧪 POST-FIX VALIDATION:
+	•	Create new client with parent email from advocate dashboard
+	•	Confirm 200 response with { ok: true }
+	•	Confirm row appears in advocate_clients with correct FK links
+	•	Confirm no error in Supabase logs
+
+Once this step is done, notify Scott to validate full functionality in production.
+
+---
+
+Let me know when Step 2 has been submitted, and I’ll prep Step 3 if needed.

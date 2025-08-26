@@ -1,0 +1,58 @@
+You hit that PL/pgSQL error because the loop target wasn’t a record while your query returned a row. Use a record (or a scalar list) in the FOR … IN SELECT … loop.
+
+Run this exact block in Supabase SQL editor to (1) drop any existing profiles policies safely, (2) recreate clean, self‑service policies, and (3) ensure your profile row exists:
+
+-- Step: Reset and fix RLS on public.profiles, and ensure your profile row exists
+
+-- 0) Make sure the table exists (no-op if it does)
+--    (Skip if you're sure profiles already exists)
+-- create table if not exists public.profiles (
+--   id uuid primary key,
+--   -- add your columns here as needed, e.g. email text, full_name text, role text, etc.
+--   updated_at timestamptz default now()
+-- );
+
+-- 1) Enable RLS
+alter table public.profiles enable row level security;
+
+-- 2) Drop all existing policies on profiles (policy names may contain spaces → use %I)
+do $$
+declare
+  pol record;
+begin
+  for pol in
+    select policyname
+    from pg_policies
+    where schemaname = 'public' and tablename = 'profiles'
+  loop
+    execute format('drop policy if exists %I on public.profiles', pol.policyname);
+  end loop;
+end
+$$;
+
+-- 3) Recreate minimal, consistent policies (self-only; adjust as needed)
+create policy "profiles_self_select"
+  on public.profiles
+  for select
+  using (auth.uid() = id);
+
+create policy "profiles_self_insert"
+  on public.profiles
+  for insert
+  with check (auth.uid() = id);
+
+create policy "profiles_self_update"
+  on public.profiles
+  for update
+  using (auth.uid() = id)
+  with check (auth.uid() = id);
+
+-- 4) Ensure your profile row exists (safe even if only 'id' column exists)
+insert into public.profiles (id)
+select 'c1867d86-82df-4037-bf23-fde11648b267'::uuid
+where not exists (
+  select 1 from public.profiles
+  where id = 'c1867d86-82df-4037-bf23-fde11648b267'::uuid
+);
+
+When this completes, try your app again—the /rest/v1/profiles?id=eq.<your-id> call should stop 500’ing. If you have extra columns (e.g., email, role), we can extend the upsert in step 4 after this succeeds.

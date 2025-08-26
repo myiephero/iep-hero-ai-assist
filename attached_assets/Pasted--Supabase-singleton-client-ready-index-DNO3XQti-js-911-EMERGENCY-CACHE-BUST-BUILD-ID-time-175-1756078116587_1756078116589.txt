@@ -1,0 +1,70 @@
+✅ Supabase singleton client ready
+index-DNO3XQti.js:911 🚨 EMERGENCY CACHE BUST - BUILD_ID= time-1756078028629
+(anonymous) @ index-DNO3XQti.js:911Understand this error
+2index-DNO3XQti.js:450 🚀 PRODUCTION: Checking Supabase session...
+2index-DNO3XQti.js:450 ❌ No valid Supabase session found
+index-DNO3XQti.js:907 SW registered: ServiceWorkerRegistration
+index-DNO3XQti.js:907 SW registered: ServiceWorkerRegistration
+index-DNO3XQti.js:911 [Main] SW registered: ServiceWorkerRegistration
+/login:1 Banner not shown: beforeinstallpromptevent.preventDefault() called. The page must call beforeinstallpromptevent.prompt() to show the banner.
+2index-DNO3XQti.js:907 [PWA] Simulating installability for testing
+index-DNO3XQti.js:450 🔄 Starting login process for: rikka6879@yahoo.com
+index-DNO3XQti.js:450 🚀 PRODUCTION LOGIN: Supabase-only authentication for: rikka6879@yahoo.com
+index-DNO3XQti.js:450 ✅ Supabase login successful, user ID: c1867d86-82df-4037-bf23-fde11648b267
+index-DNO3XQti.js:450 🎯 LOGIN SUCCESS DEBUG: Object
+index-DNO3XQti.js:450 ✅ Login successful
+index-DNO3XQti.js:450 🔄 Redirecting to dashboard...
+index-DNO3XQti.js:450 🔄 Navigating to: /dashboard-premium
+index-DNO3XQti.js:494 ❌ Parent user accessing advocate dashboard, redirecting to parent dashboard
+index-DNO3XQti.js:494 💼 ADVOCATE DASHBOARD MOUNT DEBUG: Object
+index-DNO3XQti.js:494 🔍 Parent Dashboard - User: rikka6879@yahoo.com Username: rikka6879@yahoo.com Role: parent
+index-DNO3XQti.js:55 🔄 Default queryFn using apiRequest for: /api/dashboard/metrics
+index-DNO3XQti.js:494 🏠 PARENT DASHBOARD MOUNT DEBUG: Object
+index-DNO3XQti.js:494 🔍 Parent Dashboard rendered with user: Object
+sw.js:5 🚨 SW ACTIVE v-docs-auth-004
+(anonymous) @ sw.js:5Understand this error
+index-DNO3XQti.js:907 SW registered: ServiceWorkerRegistration
+sw.js:8 [SW] install Object
+(anonymous) @ sw.js:8Understand this warning
+index-DNO3XQti.js:494 🔍 Parent Dashboard - User: rikka6879@yahoo.com Username: rikka6879@yahoo.com Role: parent
+sw.js:18 [SW] activate Object
+(anonymous) @ sw.js:18Understand this warning
+sw.js:31 [SW] ACTIVATED v-docs-auth-004
+(anonymous) @ sw.js:31Understand this error
+sw.js:32 [SW] BYPASSING NON-GET & /api/*
+(anonymous) @ sw.js:32Understand this error
+index-DNO3XQti.js:907 [PWA] Simulating installability for testing
+index-DNO3XQti.js:55 🔄 Default queryFn using apiRequest for: /api/documents
+2index-DNO3XQti.js:55 🔄 Default queryFn using apiRequest for: /api/students
+index-DNO3XQti.js:55 🔄 Default queryFn using apiRequest for: /api/parent/students
+index-DNO3XQti.js:494 Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+(anonymous) @ index-DNO3XQti.js:494Understand this warning
+index-DNO3XQti.js:907 ✅ Student creation successful: Object
+2index-DNO3XQti.js:55 🔄 Default queryFn using apiRequest for: /api/parent/students
+2index-DNO3XQti.js:55 🔄 Default queryFn using apiRequest for: /api/students
+index-DNO3XQti.js:494 Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+(anonymous) @ index-DNO3XQti.js:494Understand this warning
+2index-DNO3XQti.js:55 🔄 Default queryFn using apiRequest for: /api/students
+index-DNO3XQti.js:494 [DOCS UPLOAD DEBUG] sending Object
+index-DNO3XQti.js:494 [DOCS UPLOAD DEBUG] Starting upload mutation
+index-DNO3XQti.js:494 [DOCS UPLOAD DEBUG] API Response: Object
+index-DNO3XQti.js:494 [DOCS UPLOAD DEBUG] Upload successful: Object
+index-DNO3XQti.js:55 🔄 Default queryFn using apiRequest for: /api/documents
+index-DNO3XQti.js:494 🔍 Parent Dashboard - User: rikka6879@yahoo.com Username: rikka6879@yahoo.com Role: parent
+index-DNO3XQti.js:494 🏠 PARENT DASHBOARD MOUNT DEBUG: Object
+index-DNO3XQti.js:494 🔍 Parent Dashboard rendered with user: Object
+index-DNO3XQti.js:526 🔍 StudentSelector Debug: Object
+index-DNO3XQti.js:526 🔍 StudentSelector Debug: Object
+index-DNO3XQti.js:526 🔍 StudentSelector Debug: Object
+index-DNO3XQti.js:526 🚨🚨🚨 EMERGENCY: AI IEP ANALYSIS STARTING - CACHE FIXED! 🚨🚨🚨
+p @ index-DNO3XQti.js:526Understand this error
+index-DNO3XQti.js:526 📁 FormData prepared with file: ***JPEC TEST Amendment- Izabella .pdf studentId: f0c58f15-692e-4bc1-925e-0eb66071be9e
+index-DNO3XQti.js:526 🔐 About to call apiRequest...
+index-DNO3XQti.js:526 🔍 StudentSelector Debug: Object
+index-DNO3XQti.js:526 Error analyzing IEP: SyntaxError: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+    at JSON.parse (<anonymous>)
+    at qe (index-DNO3XQti.js:55:35638)
+    at async p (index-DNO3XQti.js:526:155057)
+p @ index-DNO3XQti.js:526Understand this error
+index-DNO3XQti.js:526 🔍 StudentSelector Debug: Object
+index-DNO3XQti.js:526 🔍 StudentSelector Debug: Object

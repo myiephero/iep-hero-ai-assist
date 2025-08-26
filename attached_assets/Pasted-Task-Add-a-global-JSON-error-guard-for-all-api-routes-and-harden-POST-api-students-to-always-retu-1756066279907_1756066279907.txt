@@ -1,0 +1,69 @@
+Task: Add a global JSON error guard for all /api routes and harden POST /api/students to always return JSON.
+
+1) Open server/app (the file that creates the Express app) and confirm these are present near the top:
+   - import express from 'express'
+   - app.use(express.json({ limit: '5mb' }))
+   - app.use(express.urlencoded({ extended: true }))
+
+2) In server/routes.ts (or wherever routes are defined):
+   a) Ensure all /api routes are mounted *before* the error handler we’ll add.
+   b) Wrap POST /api/students with explicit try/catch and JSON responses.
+
+   Example (edit/replace the existing students POST; keep your auth middleware as-is):
+
+   // --- Students routes (hardened) ---
+   app.post('/api/students', requireAuth, async (req, res) => {
+     try {
+       console.log('[STUDENTS DEBUG]', { method: req.method, path: req.path, userId: (req as any).user?.id });
+
+       // extract expected fields; validate minimally
+       const {
+         firstName, lastName, dateOfBirth, grade,
+         school, district, disabilities, services, status
+       } = req.body || {};
+
+       // TODO: keep your existing insert logic here; just be sure to await and capture result
+       // Example shape (adapt to your code):
+       // const { data, error } = await supabase.from('students').insert({...}).select().single();
+
+       if (error) {
+         console.error('[STUDENTS ERROR]', { message: error.message });
+         return res.status(400).json({ ok: false, error: error.message });
+       }
+
+       return res.status(200).json({ ok: true, student: data });
+     } catch (err: any) {
+       console.error('[STUDENTS FATAL]', { message: err?.message, stack: err?.stack });
+       return res.status(500).json({ ok: false, error: 'Internal error (students)' });
+     }
+   });
+
+3) Add a JSON-only error guard *after* all /api routes, and before any static/SPA handlers:
+
+   // --- API JSON Guard (must be after all /api routes) ---
+   app.use('/api', (err: any, req: any, res: any, next: any) => {
+     // If a route called next(err), Express lands here.
+     const status = err?.status || err?.statusCode || 500;
+     console.error('[API JSON GUARD]', {
+       method: req.method,
+       path: req.path,
+       status,
+       msg: err?.message,
+     });
+     // Force JSON so the client never sees an HTML page
+     res.status(status).json({
+       ok: false,
+       error: err?.message || 'Unexpected API error',
+     });
+   });
+
+4) Optional but helpful: ensure your generic “catch-all” (the SPA index.html handler) is mounted
+   AFTER the /api routes + API JSON Guard. That prevents HTML from leaking into /api responses.
+
+5) Redeploy / restart the app.
+
+6) Test:
+   - Open DevTools → Console; confirm you still see “🚨 EMERGENCY CACHE BUST …”.
+   - Create a student again.
+   - You should now see a clean JSON response in the network tab and **no** “Unexpected token '<'” error.
+   - If the server rejects the request, it must now be a JSON body like: { ok:false, error:"..." }.

@@ -1,0 +1,130 @@
+Great catch sharing those logs—here’s the quick read:
+	•	“❌ No valid Supabase session found” right before login = expected (it flips to ✅ once you sign in).
+	•	PWA/service‑worker warnings = harmless.
+	•	The one real problem left is the 500 from rest/v1/profiles. That’s almost always a profiles RLS/policy/row issue, not caching.
+
+Below is your ready‑to‑paste Replit Agent prompt for Step 4. It creates an idempotent Supabase migration that (a) ensures sane RLS policies on public.profiles and (b) inserts your profile row so the 500 goes away.
+
+⸻
+
+📋 Step 4 — Replit Agent Prompt (copy–paste)
+
+Prompt to the Agent:
+
+Create a new migration file supabase/migrations/20250824_profiles_policies.sql with the exact content below. This migration must be idempotent. After creating the file, commit it with message fix(db): profiles RLS + seed current user. Do not change file paths or filenames.
+
+File content (exactly):
+
+-- 2025-08-24 Fix: profiles RLS & seed current user (idempotent)
+-- Target user (currently logged-in prod user)
+-- NOTE: update only if a different user is needed
+do $set_target_user$
+declare
+  v_user uuid := 'c1867d86-82df-4037-bf23-fde11648b267';
+begin
+  -- 0) Make sure table exists (no-op if it already does)
+  -- (We don’t create the table schema here to avoid guessing columns.)
+  if not exists (
+    select 1 from information_schema.tables
+    where table_schema='public' and table_name='profiles'
+  ) then
+    raise notice 'Table public.profiles does not exist. Please create it (at minimum: id uuid primary key referencing auth.users(id)).';
+  end if;
+end
+$set_target_user$;
+
+-- 1) Ensure RLS is enabled
+do $rls$
+begin
+  if exists (
+    select 1 from information_schema.tables
+    where table_schema='public' and table_name='profiles'
+  ) then
+    execute 'alter table public.profiles enable row level security';
+  end if;
+end
+$rls$;
+
+-- 2) Create "select/insert/update own" policies if missing
+do $policies$
+begin
+  if exists (select 1 from information_schema.tables where table_schema='public' and table_name='profiles') then
+    -- SELECT own
+    if not exists (
+      select 1 from pg_policies
+      where schemaname='public' and tablename='profiles' and policyname='Select own profile'
+    ) then
+      execute $sql$
+        create policy "Select own profile"
+        on public.profiles
+        for select
+        using (id = auth.uid());
+      $sql$;
+    end if;
+
+    -- INSERT own
+    if not exists (
+      select 1 from pg_policies
+      where schemaname='public' and tablename='profiles' and policyname='Insert own profile'
+    ) then
+      execute $sql$
+        create policy "Insert own profile"
+        on public.profiles
+        for insert
+        with check (id = auth.uid());
+      $sql$;
+    end if;
+
+    -- UPDATE own
+    if not exists (
+      select 1 from pg_policies
+      where schemaname='public' and tablename='profiles' and policyname='Update own profile'
+    ) then
+      execute $sql$
+        create policy "Update own profile"
+        on public.profiles
+        for update
+        using (id = auth.uid())
+        with check (id = auth.uid());
+      $sql$;
+    end if;
+  end if;
+end
+$policies$;
+
+-- 3) Seed/ensure a row exists for the current user (only sets id; other columns remain defaults/null)
+do $seed$
+declare
+  v_user uuid := 'c1867d86-82df-4037-bf23-fde11648b267';
+begin
+  if exists (select 1 from information_schema.tables where table_schema='public' and table_name='profiles') then
+    -- Try to insert id only; safe if other columns are nullable or have defaults
+    begin
+      execute format($fmt$
+        insert into public.profiles (id) values (%L)
+        on conflict (id) do nothing
+      $fmt$, v_user);
+    exception when others then
+      -- If profiles requires additional non-null columns, don’t fail the migration
+      raise notice 'profiles seed insert skipped: %', SQLERRM;
+    end;
+  end if;
+end
+$seed$;
+
+After committing, do not deploy anything else. I will run this migration in Supabase Studio SQL manually if needed.
+
+⸻
+
+What this fixes
+	•	The 500 on GET https://...supabase.co/rest/v1/profiles?... usually means:
+	•	RLS policies block access in a way that triggers an internal PostgREST error, or
+	•	there’s no row for your user, and a policy/trigger is throwing.
+	•	This migration gives you sane, minimal “own‑row” policies and ensures your user has a profile row (id only), which is enough for the client’s select=* to succeed instead of 500’ing.
+
+About the other console messages
+	•	“No valid session found” before login → normal.
+	•	PWA/service‑worker warnings → safe to ignore.
+	•	The JSON‑guard work already stopped the “Unexpected token ‘<’” failures. ✅
+
+Reply “done” after you have the migration file committed so we can proceed to the next step.

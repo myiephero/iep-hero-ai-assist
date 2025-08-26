@@ -1,0 +1,118 @@
+You are working in the repo currently open.
+
+Goal:
+- Eliminate “Unexpected token '<', '<!DOCTYPE' … is not valid JSON” by forcing JSON responses on all /api routes.
+- Make /api/dashboard/metrics and /api/students return consistent JSON on success and failure.
+- Add lightweight diagnostics so we can verify behavior from the browser console.
+
+Make the following exact edits:
+
+1) Create file: server/middleware/jsonGuard.ts
+------------------------------------------------
+import type { NextFunction, Request, Response } from "express";
+
+export function apiJsonPreamble(req: Request, res: Response, next: NextFunction) {
+  // All API responses are JSON
+  res.type("application/json; charset=utf-8");
+  next();
+}
+
+export function apiJsonErrorGuard(err: any, req: Request, res: Response, _next: NextFunction) {
+  const status = Number(err?.status || err?.statusCode || 500);
+  const code = err?.code || undefined;
+  const msg  = err?.message || "Unexpected API error";
+  // Prevent leaking HTML or stack traces to client
+  const payload = { ok: false, error: msg, code };
+  // Log once on server for debugging
+  // eslint-disable-next-line no-console
+  console.error("[API JSON GUARD]", { method: req.method, path: req.path, status, msg, code });
+  res.status(status).json(payload);
+}
+
+export function ok<T = unknown>(res: Response, data: T, status = 200) {
+  return res.status(status).json({ ok: true, ...(
+    typeof data === "object" && data !== null ? data as any : { data }
+  )});
+}
+
+2) Edit file: server/index.ts
+-----------------------------
+// Find where Express app is created (const app = express();)
+ // Ensure body parsers exist (keep your current limits if present)
+app.use(express.json({ limit: "5mb" }));
+app.use(express.urlencoded({ extended: true }));
+
+// Add this BEFORE mounting /api routes:
+import { apiJsonPreamble, apiJsonErrorGuard } from "./middleware/jsonGuard";
+app.use("/api", apiJsonPreamble);
+
+// ... your existing route mounting remains the same ...
+
+// Add this AFTER all route handlers are mounted (at the very end):
+app.use("/api", apiJsonErrorGuard);
+
+3) Edit file: server/routes.ts
+------------------------------
+// Ensure the following imports exist at top:
+import type { Request, Response, NextFunction } from "express";
+import { ok } from "./middleware/jsonGuard";
+
+// --- Harden /api/dashboard/metrics ---
+app.get("/api/dashboard/metrics", requireAuth, async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    // existing logic to compute metrics:
+    // const metrics = await getDashboardMetrics(req.user.id);
+    const metrics = await getDashboardMetrics((req as any).user.id);
+    return ok(res, { metrics });
+  } catch (err) {
+    (err as any).status = (err as any).status || 500;
+    return next(err);
+  }
+});
+
+// --- Harden /api/students (create) ---
+app.post("/api/students", requireAuth, async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { firstName, lastName, dateOfBirth, grade, school, schoolDistrict, currentServices } = req.body || {};
+    // Validate minimal fields
+    if (!firstName || !lastName) {
+      const e: any = new Error("firstName and lastName are required");
+      e.status = 400;
+      throw e;
+    }
+    // Your existing creation logic:
+    const student = await createStudent({
+      ownerId: (req as any).user.id,
+      firstName,
+      lastName,
+      dateOfBirth,
+      grade,
+      schoolName: school ?? null,
+      schoolDistrict: schoolDistrict ?? null,
+      currentServices: currentServices ?? [],
+    });
+
+    return ok(res, { student }, 201);
+  } catch (err) {
+    (err as any).status = (err as any).status || 500;
+    // eslint-disable-next-line no-console
+    console.error("[STUDENTS FATAL]", { path: "/api/students", err });
+    return next(err);
+  }
+});
+
+// --- Add a tiny JSON diag route (optional but helpful) ---
+app.get("/api/_diag/json", (_req: Request, res: Response) => {
+  return ok(res, { buildId: process.env.BUILD_ID ?? "dev" });
+});
+
+4) Save all files, restart the app.
+
+5) Quick verification checklist (no code changes):
+- Open https://my-iep-hero-myiephero.replit.app/api/_diag/json and confirm you see JSON: { ok: true, buildId: "..." } 
+- In the app, open DevTools → Console. You should still see the red “EMERGENCY CACHE BUST” line (BUILD_ID).
+- Navigate to the dashboard so /api/dashboard/metrics runs. If anything fails, the console should NOT show “<!DOCTYPE …” errors anymore; instead the response body will be JSON with { ok: false, error: "..."}.
+- Try creating a student. The response should be JSON; on error you’ll see { ok: false, error: "..." }.
+
+Commit message:
+chore(api): force JSON for all /api responses + harden metrics & students routes

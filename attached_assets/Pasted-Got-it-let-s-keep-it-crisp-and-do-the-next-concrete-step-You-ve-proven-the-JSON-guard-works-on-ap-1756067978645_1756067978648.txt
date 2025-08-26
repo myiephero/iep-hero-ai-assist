@@ -1,0 +1,87 @@
+Got it—let’s keep it crisp and do the next concrete step.
+
+You’ve proven the JSON guard works on /api/students. Now we’ll eliminate the “Unexpected token <” on the dashboard by adding two tiny routes that always return JSON:
+	•	GET /health (no auth)
+	•	GET /api/dashboard/metrics (auth) — safe JSON shape the UI can parse
+
+Below is a single cut‑and‑paste Agent prompt (one shot). After it completes, run the tiny smoke test and tell me the results (or just “done”).
+
+⸻
+
+📋 Replit Agent prompt (Step 3)
+
+Goal: Add JSON routes so the dashboard stops receiving HTML and the app parses responses correctly.
+
+Do exactly this:
+	1.	Edit server/routes.ts
+	•	At the top, ensure these imports exist (add if missing):
+
+import express from "express";
+import type { Request, Response } from "express";
+import { requireAuth, type AuthedRequest } from "./middleware/auth";
+
+	•	Just below other route registrations, add both endpoints:
+
+// --- Health endpoint (always JSON, no auth) ---
+// Minimal JSON so curl/monitors never see HTML
+app.get("/health", (_req: Request, res: Response) => {
+  res.status(200).json({
+    ok: true,
+    service: "api",
+    buildId: process.env.BUILD_ID || "dev",
+    time: new Date().toISOString(),
+  });
+});
+
+// --- Dashboard metrics (JSON, requires auth) ---
+// Returns a stable shape the UI can parse (even if counts are 0)
+app.get(
+  "/api/dashboard/metrics",
+  requireAuth,
+  async (req: AuthedRequest, res: Response) => {
+    try {
+      const userId = req.user.id;
+
+      // TODO: replace with real counts (stubbed for now to guarantee JSON)
+      // If you already have helpers to count rows, plug them in here.
+      const metrics = {
+        studentsCount: 0,
+        documentsCount: 0,
+        goalsCount: 0,
+      };
+
+      res.status(200).json({
+        ok: true,
+        userId,
+        metrics,
+      });
+    } catch (err: any) {
+      console.error("[METRICS ERROR]", err);
+      res.status(200).json({ ok: false, error: err?.message || "metrics failed" });
+    }
+  }
+);
+
+
+	2.	Ensure JSON guard remains in place (you already added it). Do not remove any app.use('/api', ...) error middleware that forces JSON.
+	3.	Restart the app (normal “Start”/“Redeploy”).
+	4.	Run this quick smoke test in the Replit Shell and show the results in the console output:
+
+echo "== /health ==" && curl -sS -i http://localhost:5000/health | head -20
+echo && echo "== /api/dashboard/metrics (no auth) ==" && curl -sS -i http://localhost:5000/api/dashboard/metrics | head -20
+echo && echo "== /api/dashboard/metrics (with bogus auth) ==" && curl -sS -i -H "Authorization: Bearer test" http://localhost:5000/api/dashboard/metrics | head -40
+
+Expected:
+	•	/health → 200 with Content-Type: application/json and { ok: true, ... }
+	•	/api/dashboard/metrics without auth → 401 JSON (from requireAuth)
+	•	/api/dashboard/metrics with bogus auth → 401 JSON
+
+	5.	Browser check (Incognito):
+
+	•	Hard reload with DevTools open (Application → Clear storage → Clear site data).
+	•	In the console you should no longer see Unexpected token '<' for dashboard metrics.
+	•	You should see the normal “API Response: GET /api/dashboard/metrics …”.
+
+⸻
+
+Reply with the three curl snippets’ headers/bodies (or just “done” if they match), and we’ll move to wiring real counts + tackling the remaining /profiles 500 you’re seeing.

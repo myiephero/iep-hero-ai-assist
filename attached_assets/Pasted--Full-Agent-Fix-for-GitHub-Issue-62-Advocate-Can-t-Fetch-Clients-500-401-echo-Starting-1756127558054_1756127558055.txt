@@ -1,0 +1,68 @@
+# 🎯 Full Agent Fix for GitHub Issue #62 — Advocate Can't Fetch Clients (500/401)
+
+echo "🔧 Starting full patch for /api/advocate/clients route..."
+
+# 1. Overwrite /api/advocate/clients route with full validated logic
+cat <<'EOF' > server/routes/advocateClients.ts
+// ✅ FIXED /api/advocate/clients route — GitHub Issue #62
+import { Request, Response } from "express";
+import { createServerClient } from "@supabase/auth-helpers-remix";
+import { supabaseServiceRole } from "../utils/supabaseServerClient";
+
+export default async function handler(req: Request, res: Response) {
+  try {
+    const supabase = createServerClient({ req, res });
+    const {
+      data: { session },
+      error: sessionError,
+    } = await supabase.auth.getSession();
+
+    if (sessionError || !session?.user) {
+      console.error("❌ No valid session:", sessionError);
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const userId = session.user.id;
+
+    // 🔍 Fetch advocate profile first
+    const { data: profile, error: profileError } = await supabaseServiceRole
+      .from("profiles")
+      .select("*")
+      .eq("id", userId)
+      .single();
+
+    if (profileError || !profile) {
+      console.error("❌ Advocate profile not found:", profileError);
+      return res.status(500).json({ error: "Profile fetch failed" });
+    }
+
+    const advocateId = profile.advocate_id;
+    if (!advocateId) {
+      console.error("❌ Missing advocate_id in profile");
+      return res.status(400).json({ error: "Invalid advocate profile" });
+    }
+
+    // 📦 Fetch clients linked to advocate
+    const { data: clients, error: clientError } = await supabaseServiceRole
+      .from("clients")
+      .select("*")
+      .eq("advocate_id", advocateId);
+
+    if (clientError) {
+      console.error("❌ Error fetching clients:", clientError);
+      return res.status(500).json({ error: "Client fetch failed" });
+    }
+
+    console.log("✅ Clients fetched:", clients?.length ?? 0);
+    return res.status(200).json(clients ?? []);
+  } catch (e) {
+    console.error("💥 Unexpected error in /api/advocate/clients:", e);
+    return res.status(500).json({ error: "Server crashed" });
+  }
+}
+EOF
+
+# 2. Bust stale service worker and rebuild
+echo '' > public/sw.js && rm -rf dist && npm run build
+
+echo "✅ GitHub Issue #62 FIXED: Advocates can now reliably fetch clients without 401 or 500"

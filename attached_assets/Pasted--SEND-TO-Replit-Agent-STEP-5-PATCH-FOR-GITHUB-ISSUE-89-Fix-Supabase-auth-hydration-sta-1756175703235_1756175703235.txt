@@ -1,0 +1,81 @@
+// [SEND TO: Replit Agent] STEP 5 - PATCH FOR GITHUB ISSUE #89
+// 🔧 Fix Supabase auth hydration stall on cold start (pre-login freeze)
+// 🐞 Issue: https://github.com/myiephero/iep-hero-ai-assist/issues/89
+
+// ✅ GOAL: Ensure login screen loads even if Supabase never returns session or auth event
+
+// ⏱ Add fallback session hydration timeout to `AuthProvider.tsx`
+// 📁 Path: `client/context/AuthProvider.tsx` (or similar)
+
+// ✅ EXECUTE IN SINGLE PASS:
+
+// === BEGIN PATCH ===
+import { useEffect, useState } from "react";
+import { supabase } from "@/utils/supabaseClient";
+
+const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  const [session, setSession] = useState(null);
+  const [isHydrated, setIsHydrated] = useState(false);
+  const [hasFallbackTriggered, setHasFallbackTriggered] = useState(false);
+
+  useEffect(() => {
+    const hydrateSession = async () => {
+      console.log("[ISSUE-89] Supabase client ready, starting session fetch...");
+      const { data, error } = await supabase.auth.getSession();
+      if (data?.session) {
+        console.log("[ISSUE-89] Initial session found:", data.session);
+        setSession(data.session);
+        setIsHydrated(true);
+      } else {
+        console.warn("[ISSUE-89] No session found, waiting for onAuthStateChange...");
+      }
+    };
+
+    // Attempt initial session fetch
+    hydrateSession();
+
+    // Subscribe to auth state changes
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("[ISSUE-89] Auth state changed:", event);
+      if (session) {
+        console.log("[ISSUE-89] Session hydrated via onAuthStateChange");
+        setSession(session);
+        setIsHydrated(true);
+      }
+    });
+
+    // Fallback: force hydration state after 2 seconds if nothing arrives
+    const fallback = setTimeout(() => {
+      if (!isHydrated && !hasFallbackTriggered) {
+        console.warn("[ISSUE-89] Fallback hydration triggered: forcing login screen");
+        setHasFallbackTriggered(true);
+        setIsHydrated(true); // Allow app to render login screen
+      }
+    }, 2000);
+
+    return () => {
+      authListener?.subscription?.unsubscribe();
+      clearTimeout(fallback);
+    };
+  }, []);
+
+  // Wrap app in loading check
+  if (!isHydrated) {
+    return (
+      <div className="h-screen w-screen flex items-center justify-center bg-gradient-to-br from-blue-900 to-blue-950 text-white">
+        <div className="text-lg animate-pulse">🔐 Checking session...</div>
+      </div>
+    );
+  }
+
+  return <AuthContext.Provider value={{ session }}>{children}</AuthContext.Provider>;
+};
+
+export default AuthProvider;
+// === END PATCH ===
+
+/* ✅ AFTER EXECUTION:
+   - Confirm login screen now appears within 2s in Incognito
+   - Check console logs for "[ISSUE-89] Fallback hydration triggered"
+   - Try both cold load and warm session flows
+*/

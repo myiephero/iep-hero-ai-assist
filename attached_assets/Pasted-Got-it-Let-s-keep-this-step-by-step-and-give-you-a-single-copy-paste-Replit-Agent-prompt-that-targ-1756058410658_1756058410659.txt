@@ -1,0 +1,132 @@
+Got it. Let’s keep this step‑by‑step and give you a single, copy‑paste Replit Agent prompt that targets the exact 401 on POST /api/documents and the SW POST caching warning.
+
+⸻
+
+Step 3 — Fix POST /api/documents 401 and stop SW from touching POST requests
+
+Copy‑paste to your Replit Agent:
+
+Task: Fix 401 on POST /api/documents and ensure the service worker never intercepts non‑GET requests.
+
+Context:
+- GET /api/documents works with Bearer tokens.
+- POST /api/documents returns 401.
+- Console has shown "Failed to execute 'put' on 'Cache': Request method 'POST' is unsupported" from sw.js previously.
+- We already standardized Bearer token auth for most endpoints and apiRequest() can send FormData.
+
+Do the following EXACT changes (create files if missing, keep diffs minimal):
+
+1) SERVER — Harden auth middleware + trace
+- File: server/middleware/auth.ts (if it does not exist, create it)
+- Content (idempotent; re-use if already present). Export `requireAuth` and a helper `getAuthToken`:
+
+----------------------------------8<----------------------------------
+import type { Request, Response, NextFunction } from "express";
+import { supabaseAdmin } from "../supabase"; // or wherever the admin client is exported
+
+export function getAuthToken(req: Request): string | null {
+  // Accept both "Authorization: Bearer <token>" and "authorization"
+  const raw = (req.headers["authorization"] || req.headers["Authorization"]) as string | undefined;
+  if (!raw) return null;
+  const m = raw.match(/^Bearer\s+(.+)$/i);
+  return m ? m[1] : raw; // tolerate tokens passed without "Bearer " just in case
+}
+
+export async function requireAuth(req: Request, res: Response, next: NextFunction) {
+  try {
+    const token = getAuthToken(req);
+    if (!token) {
+      console.log("[AUTH DEBUG] missing Authorization header", { path: req.path, method: req.method });
+      return res.status(401).json({ error: "Missing Authorization header" });
+    }
+    const { data, error } = await supabaseAdmin.auth.getUser(token);
+    if (error || !data?.user) {
+      console.log("[AUTH DEBUG] invalid token", { path: req.path, method: req.method, error });
+      return res.status(401).json({ error: "Invalid or expired token" });
+    }
+    // attach to request for downstream handlers
+    (req as any).authUser = data.user;
+    next();
+  } catch (err) {
+    console.log("[AUTH DEBUG] exception", { path: req.path, method: req.method, err });
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+}
+----------------------------------8<----------------------------------
+
+- File: server/routes.ts
+  - Ensure we import and use the above middleware for ALL /api/documents routes (GET, POST, PUT, DELETE, /:id/analyze, etc.)
+  - Add one line of trace inside each documents route handler:
+    console.log("[DOCS AUTH DEBUG]", { path: req.path, method: req.method, userId: (req as any)?.authUser?.id });
+
+2) SERVER — Verify upload route order (multer AFTER auth is fine)
+- In server/routes.ts, the POST /api/documents registration should look like:
+  app.post("/api/documents", requireAuth, upload.single("document"), async (req, res) => { ... });
+  (Do not move upload before requireAuth.)
+
+3) CLIENT — Force all document uploads to use apiRequest() (Bearer header included)
+- Search the client for any direct fetch calls that post to "/api/documents".
+  Typical places: client/src/components/**/DocumentVault*.tsx or similar helpers.
+- Replace raw fetch with apiRequest("/api/documents", { method: "POST", body: formData });
+  NOTE: Do NOT set Content-Type when using FormData; let the browser set the boundary.
+- Add a one‑time debug log before calling apiRequest to prove we reached the code:
+  console.error("[DOCS UPLOAD DEBUG] sending FormData via apiRequest");
+
+4) CLIENT — Make apiRequest() ALWAYS attach Bearer, even for FormData
+- File: client/src/lib/queryClient.ts (or where apiRequest is defined)
+  - Ensure the Authorization header is added for every request (GET/POST/PUT/DELETE), including when `body` is a FormData.
+  - Pseudocode must exist:
+      const token = await supabaseClient.auth.getSession().then(r => r.data.session?.access_token);
+      const headers = new Headers(init?.headers || {});
+      if (token) headers.set("Authorization", `Bearer ${token}`);
+      if (!(body instanceof FormData) && !headers.has("Content-Type")) headers.set("Content-Type", "application/json");
+      return fetch(path, { ...init, headers, body });
+
+5) SERVICE WORKER — Never touch non‑GET requests; bypass /api/**
+- File: client/public/sw.js (or wherever the SW is served)
+  - In the fetch event handler, short‑circuit for POST/PUT/PATCH/DELETE and for any request URL that includes "/api/":
+    ----------------------------------8<----------------------------------
+    self.addEventListener("fetch", (event) => {
+      const req = event.request;
+      const url = new URL(req.url);
+      if (req.method !== "GET" || url.pathname.startsWith("/api/")) {
+        // Bypass SW for non-GET and API calls
+        return; // allow default network handling; do NOT respondWith/cache
+      }
+      // existing GET caching code...
+    });
+    ----------------------------------8<----------------------------------
+  - Bump a version string at the top of sw.js, e.g. const SW_VERSION = "v-post-bypass-001";
+  - In self.activate, call caches.keys() and delete old caches whose name doesn’t match current version.
+
+6) BUILD ID + EMERGENCY CACHE LOGS (so the browser can’t hide old code)
+- File: client/src/main.tsx (or app bootstrap)
+  - At module top, add:
+    (window as any).__BUILD_ID__ = `${Date.now()}`;
+    console.error("🚨 EMERGENCY CACHE BUST - BUILD_ID=", (window as any).__BUILD_ID__);
+- After registering the service worker, log:
+    console.error("[Main] SW register called; BUILD_ID=", (window as any).__BUILD_ID__);
+
+7) REDEPLOY + MANUAL HARD RELOAD
+- Redeploy the app.
+- In the browser: DevTools → Application → Clear storage (all boxes) → Clear site data.
+- Then hold Shift and click Reload (or Ctrl/Cmd+Shift+R).
+- In console, confirm you see the red “EMERGENCY CACHE BUST - BUILD_ID=” line and that sw.js shows the new version.
+- Try uploading a document again and watch for:
+    [DOCS UPLOAD DEBUG] sending FormData via apiRequest
+    [DOCS AUTH DEBUG] { path: "/api/documents", method: "POST", userId: "<uuid>" }
+
+8) Report back the results:
+- Whether the POST now returns 200/201.
+- Any 401 plus the corresponding [AUTH DEBUG] server line.
+- Whether the SW version log updated and the red BUILD_ID log appears.
+
+
+⸻
+
+When you finish this step, paste back:
+	•	The first 5 lines around any [AUTH DEBUG] or [DOCS AUTH DEBUG] that print on the server when you upload.
+	•	Whether you saw the 🚨 EMERGENCY CACHE BUST - BUILD_ID= line in the browser console.
+	•	The HTTP status of the POST /api/documents call.
+
+I’ll use that to craft Step 4 (only if still needed).

@@ -1,0 +1,168 @@
+index-CWYFQYv2.js:55 ✅ Supabase singleton client ready
+index-CWYFQYv2.js:911 🚨 EMERGENCY CACHE BUST - BUILD_ID= time-1756134987391
+(anonymous) @ index-CWYFQYv2.js:911
+index-CWYFQYv2.js:48 Use of history.pushState in a trivial session history context, which maintains only one session history entry, is treated as history.replaceState.
+history.<computed> @ index-CWYFQYv2.js:48
+index-CWYFQYv2.js:450 🚀 PRODUCTION: Checking Supabase session...
+index-CWYFQYv2.js:450 🚀 PRODUCTION: Checking Supabase session...
+index-CWYFQYv2.js:450 ❌ No valid Supabase session found
+index-CWYFQYv2.js:450 ❌ No valid Supabase session found
+index-CWYFQYv2.js:907 SW registered: ServiceWorkerRegistration
+index-CWYFQYv2.js:907 SW registered: ServiceWorkerRegistration
+index-CWYFQYv2.js:911 [Main] SW registered: ServiceWorkerRegistration
+index-CWYFQYv2.js:907 [PWA] Simulating installability for testing
+index-CWYFQYv2.js:907 [PWA] Simulating installability for testing
+index-CWYFQYv2.js:450 🔄 Starting login process for: erika.levine2017@gmail.com
+index-CWYFQYv2.js:450 🚀 PRODUCTION LOGIN: Supabase-only authentication for: erika.levine2017@gmail.com
+index-CWYFQYv2.js:450 ✅ Supabase login successful, user ID: c89b7c1c-c60a-46fd-a45d-6f4b17f4cd13
+index-CWYFQYv2.js:450 🔍 Fetching profile for user: c89b7c1c-c60a-46fd-a45d-6f4b17f4cd13
+index-CWYFQYv2.js:450 📡 Profile fetch response: 200 
+index-CWYFQYv2.js:450 ✅ Profile fetched successfully: Object
+index-CWYFQYv2.js:450 🔍 LOGIN ROLE DETERMINATION DEBUG: Object
+index-CWYFQYv2.js:450 🎯 LOGIN SUCCESS DEBUG: Object
+index-CWYFQYv2.js:450 ✅ Login successful
+index-CWYFQYv2.js:450 🔄 Waiting for user role to be determined...
+index-CWYFQYv2.js:450 🔄 Navigating to role-appropriate dashboard: /dashboard-parent
+index-CWYFQYv2.js:494 🔍 Parent Dashboard - User: erika.levine2017@gmail.com Username: erika.levine2017@gmail.com Role: advocate
+index-CWYFQYv2.js:494 ❌ Non-parent user accessing parent dashboard, redirecting to appropriate dashboard
+index-CWYFQYv2.js:494 🏠 PARENT DASHBOARD MOUNT DEBUG: Object
+index-CWYFQYv2.js:55 🔄 Default queryFn using apiRequest for: /api/dashboard/metrics
+index-CWYFQYv2.js:494 💼 ADVOCATE DASHBOARD MOUNT DEBUG: Object
+index-CWYFQYv2.js:907 SW registered: ServiceWorkerRegistration
+api/advocate/clients:1  Failed to load resource: the server responded with a status of 500 ()
+index-CWYFQYv2.js:907 [PWA] Simulating installability for testing
+index-CWYFQYv2.js:907 🔍 MyParentsPage - User Debug: Object
+index-CWYFQYv2.js:907 🔍 MyParentsPage - Query Debug: Object
+index-CWYFQYv2.js:55 🔄 Default queryFn using apiRequest for: /api/advocate/clients
+api/advocate/clients:1  Failed to load resource: the server responded with a status of 500 ()
+index-CWYFQYv2.js:907 🔍 MyParentsPage - User Debug: Object
+index-CWYFQYv2.js:907 🔍 MyParentsPage - Query Debug: Object
+index-CWYFQYv2.js:907 🔍 MyParentsPage - User Debug: Object
+index-CWYFQYv2.js:907 🔍 MyParentsPage - Query Debug: Object
+index-CWYFQYv2.js:494 Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+(anonymous) @ index-CWYFQYv2.js:494
+index-CWYFQYv2.js:907 🔍 MyParentsPage - User Debug: Object
+index-CWYFQYv2.js:907 🔍 MyParentsPage - Query Debug: Object
+index-CWYFQYv2.js:907 🔍 MyParentsPage - User Debug: Object
+index-CWYFQYv2.js:907 🔍 MyParentsPage - Query Debug: Object
+index-CWYFQYv2.js:907 🔍 MyParentsPage - User Debug: Object
+index-CWYFQYv2.js:907 🔍 MyParentsPage - Query Debug: Object
+index-CWYFQYv2.js:907 🔍 MyParentsPage - User Debug: Object
+index-CWYFQYv2.js:907 🔍 MyParentsPage - Query Debug: Object
+index-CWYFQYv2.js:907 🔍 MyParentsPage - User Debug: Object
+index-CWYFQYv2.js:907 🔍 MyParentsPage - Query Debug: Object
+index-CWYFQYv2.js:907 🔍 MyParentsPage - User Debug: Object
+index-CWYFQYv2.js:907 🔍 MyParentsPage - Query Debug: Object
+index-CWYFQYv2.js:907 🔍 MyParentsPage - User Debug: Object
+index-CWYFQYv2.js:907 🔍 MyParentsPage - Query Debug: Object
+index-CWYFQYv2.js:907 🔍 MyParentsPage - User Debug: Object
+index-CWYFQYv2.js:907 🔍 MyParentsPage - Query Debug: Object
+sw.js:5 🚨 SW ACTIVE v-docs-auth-004
+(anonymous) @ sw.js:5
+index-CWYFQYv2.js:907 🔧 Submitting client data with authenticated user: {id: 'c89b7c1c-c60a-46fd-a45d-6f4b17f4cd13', email: 'erika.levine2017@gmail.com', username: 'erika.levine2017@gmail.com', role: 'advocate', planStatus: 'free'}
+index-CWYFQYv2.js:907 🔍 MyParentsPage - User Debug: {user: {…}, loading: false, userRole: 'advocate', userEmail: 'erika.levine2017@gmail.com'}
+index-CWYFQYv2.js:907 🔍 MyParentsPage - Query Debug: {clients: null, clientsLength: undefined, isLoading: false, error: null, queryEnabled: true}
+index-CWYFQYv2.js:907 🔍 MyParentsPage - User Debug: {user: {…}, loading: false, userRole: 'advocate', userEmail: 'erika.levine2017@gmail.com'}
+index-CWYFQYv2.js:907 🔍 MyParentsPage - Query Debug: {clients: null, clientsLength: undefined, isLoading: false, error: null, queryEnabled: true}
+index-CWYFQYv2.js:907 🔧 Making client creation request with data: {parentEmail: 'scooter4b@gmail.com', clientName: 'New Parent', phone: '3211234565', notes: 'testing notes field'}
+index-CWYFQYv2.js:55  POST https://my-iep-hero-myiephero.replit.app/api/advocate/clients 500 (Internal Server Error)
+Be @ index-CWYFQYv2.js:55
+await in Be
+mutationFn @ index-CWYFQYv2.js:907
+fn @ index-CWYFQYv2.js:48
+g @ index-CWYFQYv2.js:48
+start @ index-CWYFQYv2.js:48
+execute @ index-CWYFQYv2.js:48
+await in execute
+mutate @ index-CWYFQYv2.js:48
+(anonymous) @ index-CWYFQYv2.js:48
+P @ index-CWYFQYv2.js:907
+(anonymous) @ index-CWYFQYv2.js:526
+await in (anonymous)
+zG @ index-CWYFQYv2.js:37
+GG @ index-CWYFQYv2.js:37
+qG @ index-CWYFQYv2.js:37
+hk @ index-CWYFQYv2.js:37
+k$ @ index-CWYFQYv2.js:37
+(anonymous) @ index-CWYFQYv2.js:37
+g_ @ index-CWYFQYv2.js:40
+e$ @ index-CWYFQYv2.js:37
+uw @ index-CWYFQYv2.js:37
+WP @ index-CWYFQYv2.js:37
+lq @ index-CWYFQYv2.js:37
+index-CWYFQYv2.js:907 ✅ Client creation API result: {ok: false, status: 500, error: 'Failed to create parent profile', raw: {…}}
+index-CWYFQYv2.js:907 ✅ Mutation onSuccess called with data: {ok: false, status: 500, error: 'Failed to create parent profile', raw: {…}}
+index-CWYFQYv2.js:907 🔄 Invalidating queries to trigger refetch...
+index-CWYFQYv2.js:55 🔄 Default queryFn using apiRequest for: /api/advocate/clients
+index-CWYFQYv2.js:907 🔍 MyParentsPage - User Debug: {user: {…}, loading: false, userRole: 'advocate', userEmail: 'erika.levine2017@gmail.com'}
+index-CWYFQYv2.js:907 🔍 MyParentsPage - Query Debug: {clients: null, clientsLength: undefined, isLoading: false, error: null, queryEnabled: true}
+index-CWYFQYv2.js:907 🔄 Manual refetch triggered
+index-CWYFQYv2.js:55 🔄 Default queryFn using apiRequest for: /api/advocate/clients
+index-CWYFQYv2.js:55  GET https://my-iep-hero-myiephero.replit.app/api/advocate/clients 500 (Internal Server Error)
+Be @ index-CWYFQYv2.js:55
+await in Be
+queryFn @ index-CWYFQYv2.js:55
+i @ index-CWYFQYv2.js:48
+g @ index-CWYFQYv2.js:48
+start @ index-CWYFQYv2.js:48
+fetch @ index-CWYFQYv2.js:48
+(anonymous) @ index-CWYFQYv2.js:48
+(anonymous) @ index-CWYFQYv2.js:48
+batch @ index-CWYFQYv2.js:48
+refetchQueries @ index-CWYFQYv2.js:48
+(anonymous) @ index-CWYFQYv2.js:48
+batch @ index-CWYFQYv2.js:48
+invalidateQueries @ index-CWYFQYv2.js:48
+onSuccess @ index-CWYFQYv2.js:907
+execute @ index-CWYFQYv2.js:48
+await in execute
+mutate @ index-CWYFQYv2.js:48
+(anonymous) @ index-CWYFQYv2.js:48
+P @ index-CWYFQYv2.js:907
+(anonymous) @ index-CWYFQYv2.js:526
+await in (anonymous)
+zG @ index-CWYFQYv2.js:37
+GG @ index-CWYFQYv2.js:37
+qG @ index-CWYFQYv2.js:37
+hk @ index-CWYFQYv2.js:37
+k$ @ index-CWYFQYv2.js:37
+(anonymous) @ index-CWYFQYv2.js:37
+g_ @ index-CWYFQYv2.js:40
+e$ @ index-CWYFQYv2.js:37
+uw @ index-CWYFQYv2.js:37
+WP @ index-CWYFQYv2.js:37
+lq @ index-CWYFQYv2.js:37
+index-CWYFQYv2.js:55  GET https://my-iep-hero-myiephero.replit.app/api/advocate/clients 500 (Internal Server Error)
+Be @ index-CWYFQYv2.js:55
+await in Be
+queryFn @ index-CWYFQYv2.js:55
+i @ index-CWYFQYv2.js:48
+g @ index-CWYFQYv2.js:48
+start @ index-CWYFQYv2.js:48
+fetch @ index-CWYFQYv2.js:48
+fh @ index-CWYFQYv2.js:48
+fetch @ index-CWYFQYv2.js:48
+refetch @ index-CWYFQYv2.js:48
+(anonymous) @ index-CWYFQYv2.js:907
+setTimeout
+onSuccess @ index-CWYFQYv2.js:907
+execute @ index-CWYFQYv2.js:48
+await in execute
+mutate @ index-CWYFQYv2.js:48
+(anonymous) @ index-CWYFQYv2.js:48
+P @ index-CWYFQYv2.js:907
+(anonymous) @ index-CWYFQYv2.js:526
+await in (anonymous)
+zG @ index-CWYFQYv2.js:37
+GG @ index-CWYFQYv2.js:37
+qG @ index-CWYFQYv2.js:37
+hk @ index-CWYFQYv2.js:37
+k$ @ index-CWYFQYv2.js:37
+(anonymous) @ index-CWYFQYv2.js:37
+g_ @ index-CWYFQYv2.js:40
+e$ @ index-CWYFQYv2.js:37
+uw @ index-CWYFQYv2.js:37
+WP @ index-CWYFQYv2.js:37
+lq @ index-CWYFQYv2.js:37
+index-CWYFQYv2.js:907 🔍 MyParentsPage - User Debug: {user: {…}, loading: false, userRole: 'advocate', userEmail: 'erika.levine2017@gmail.com'}
+index-CWYFQYv2.js:907 🔍 MyParentsPage - Query Debug: {clients: null, clientsLength: undefined, isLoading: false, error: null, queryEnabled: true}

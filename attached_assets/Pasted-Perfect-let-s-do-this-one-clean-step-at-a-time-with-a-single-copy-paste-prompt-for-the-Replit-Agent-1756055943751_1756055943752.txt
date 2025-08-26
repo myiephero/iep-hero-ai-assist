@@ -1,0 +1,99 @@
+Perfect—let’s do this one clean step at a time, with a single copy‑paste prompt for the Replit Agent.
+
+Step 1 — Make the backend consistently accept Bearer tokens (fixes the 401s)
+
+What this does
+	•	Adds an Express requireAuth middleware that validates Authorization: Bearer <jwt> with Supabase.
+	•	Wires it onto the routes that are failing (/api/documents, /api/review-iep).
+	•	Ensures CORS allows the Authorization header.
+
+Copy‑paste the block below into the Replit Agent (exactly as is):
+
+Task: Standardize server auth to Bearer tokens and protect key routes.
+
+1) Create middleware at server/middleware/requireAuth.ts with EXACT content:
+
+---8<--- server/middleware/requireAuth.ts
+import type { Request, Response, NextFunction } from "express";
+import { createClient } from "@supabase/supabase-js";
+
+const SUPABASE_URL = process.env.SUPABASE_URL!;
+const SERVICE_ROLE = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+
+// Use admin client only to validate tokens. Do NOT use it for user queries.
+const supabaseAdmin = createClient(SUPABASE_URL, SERVICE_ROLE);
+
+export async function requireAuth(req: Request, res: Response, next: NextFunction) {
+  try {
+    const auth = req.headers.authorization || "";
+    const token = auth.startsWith("Bearer ") ? auth.slice(7) : undefined;
+    if (!token) return res.status(401).json({ error: "Missing Authorization header" });
+
+    const { data, error } = await supabaseAdmin.auth.getUser(token);
+    if (error || !data?.user) return res.status(401).json({ error: "Invalid token" });
+
+    (req as any).user = data.user;
+    (req as any).token = token; // handy for downstream calls
+    next();
+  } catch (e) {
+    console.error("requireAuth error:", e);
+    return res.status(401).json({ error: "Authentication failed" });
+  }
+}
+---8<---
+
+2) Ensure CORS allows Authorization header. In the server bootstrap (usually server/index.ts or server/app.ts):
+   - If CORS is already configured, add "Authorization" to allowed headers.
+   - If not present, add a basic CORS setup.
+
+Edit the file that creates the Express app and add (or update) this:
+
+---8<--- CORS snippet
+import cors from "cors";
+app.use(cors({
+  origin: true,
+  credentials: true,
+  methods: ["GET","POST","PUT","PATCH","DELETE","OPTIONS"],
+  allowedHeaders: ["Content-Type","Authorization"]
+}));
+---8<---
+
+3) Protect the failing routes with the middleware.
+   - Find the definitions for these endpoints and attach `requireAuth`:
+     • POST /api/documents
+     • POST /api/review-iep
+     • (optional now, but if present) POST /api/generate-ot-recommendations
+
+Examples (apply to your actual files):
+
+---8<--- examples
+// If routes are registered directly:
+import { requireAuth } from "./middleware/requireAuth";
+app.post("/api/documents", requireAuth, uploadDocumentHandler);
+app.post("/api/review-iep", requireAuth, reviewIepHandler);
+app.post("/api/generate-ot-recommendations", requireAuth, generateOtHandler);
+
+// If using Routers:
+import { requireAuth } from "../middleware/requireAuth";
+router.use("/documents", requireAuth);
+router.use("/review-iep", requireAuth);
+router.use("/generate-ot-recommendations", requireAuth);
+---8<---
+
+4) Ensure @supabase/supabase-js is available on the server. If not in package.json, install it:
+   - run: npm i @supabase/supabase-js
+
+5) Restart the dev server/process so changes take effect.
+
+6) Do NOT change any client code yet. We are only making the server accept the Bearer token consistently.
+
+7) Report back:
+   - Confirm the middleware file was created.
+   - Confirm the two routes above are now guarded by requireAuth.
+   - Confirm server compiles and starts with no TypeScript errors.
+
+Acceptance check (after Agent runs):
+	•	Server boots cleanly.
+	•	Visiting the app and retrying Upload to Document Vault or Analyze IEP should now hit the route without an immediate “Missing Authorization header” 401. (If the client still isn’t sending the bearer, we’ll fix that in the next step.)
+
+Reply “done” (or paste any errors) and I’ll give you Step 2 (service‑worker fix so POSTs aren’t intercepted, plus a tiny client helper to guarantee the Bearer token is sent everywhere).

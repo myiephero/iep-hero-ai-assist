@@ -1,0 +1,217 @@
+✅ Supabase singleton client ready
+index-00kYBI_B.js:932 🚨 BUILD LOADED upload-fix-1756060240301
+(anonymous) @ index-00kYBI_B.js:932Understand this error
+2index-00kYBI_B.js:450 🚀 PRODUCTION: Checking Supabase session...
+2index-00kYBI_B.js:450 ❌ No valid Supabase session found
+index-00kYBI_B.js:928 SW registered: ServiceWorkerRegistration
+index-00kYBI_B.js:928 SW registered: ServiceWorkerRegistration
+index-00kYBI_B.js:932 [Main] SW registered: ServiceWorkerRegistration
+login:1 <meta name="apple-mobile-web-app-capable" content="yes"> is deprecated. Please include <meta name="mobile-web-app-capable" content="yes">Understand this warning
+login:1 Banner not shown: beforeinstallpromptevent.preventDefault() called. The page must call beforeinstallpromptevent.prompt() to show the banner.
+2index-00kYBI_B.js:928 [PWA] Simulating installability for testing
+index-00kYBI_B.js:450 🔄 Starting login process for: rikka6879@yahoo.com
+index-00kYBI_B.js:450 🚀 PRODUCTION LOGIN: Supabase-only authentication for: rikka6879@yahoo.com
+index-00kYBI_B.js:450 ✅ Supabase login successful, user ID: c1867d86-82df-4037-bf23-fde11648b267
+wktcfhegoxjearpzdxpz.supabase.co/rest/v1/profiles?select=*&id=eq.c1867d86-82df-4037-bf23-fde11648b267:1  Failed to load resource: the server responded with a status of 500 ()Understand this error
+index-00kYBI_B.js:450 ⚠️ Profile fetch failed (non-critical): Object
+signIn @ index-00kYBI_B.js:450Understand this warning
+index-00kYBI_B.js:450 🎯 LOGIN SUCCESS DEBUG: Object
+index-00kYBI_B.js:450 ✅ Login successful
+index-00kYBI_B.js:450 🔄 Redirecting to dashboard...
+index-00kYBI_B.js:450 🔄 Navigating to: /dashboard-premium
+index-00kYBI_B.js:494 ❌ Parent user accessing advocate dashboard, redirecting to parent dashboard
+index-00kYBI_B.js:494 💼 ADVOCATE DASHBOARD MOUNT DEBUG: Object
+index-00kYBI_B.js:494 🔍 Parent Dashboard - User: rikka6879@yahoo.com Username: rikka6879@yahoo.com Role: parent
+index-00kYBI_B.js:55 🔄 Default queryFn using apiRequest for: /api/dashboard/metrics
+index-00kYBI_B.js:55 🌐 Making API request: GET /api/dashboard/metrics undefined
+index-00kYBI_B.js:55 🔄 Starting auth check for /api/dashboard/metrics...
+index-00kYBI_B.js:55 🔄 Supabase client obtained for /api/dashboard/metrics
+index-00kYBI_B.js:494 🏠 PARENT DASHBOARD MOUNT DEBUG: Object
+index-00kYBI_B.js:494 🔍 Parent Dashboard rendered with user: Object
+index-00kYBI_B.js:55 🔄 Session retrieval completed for /api/dashboard/metrics
+index-00kYBI_B.js:55 🔍 DEBUG: Session data for /api/dashboard/metrics: Object
+index-00kYBI_B.js:55 🔐 PRODUCTION: Including Supabase Bearer token for /api/dashboard/metrics
+sw.js:5 [SW] EMERGENCY CACHE BUST LOADING - VERSION: v-post-bypass-002
+(anonymous) @ sw.js:5Understand this error
+index-00kYBI_B.js:928 SW registered: ServiceWorkerRegistration
+sw.js:8 [SW] install Object
+(anonymous) @ sw.js:8Understand this warning
+index-00kYBI_B.js:55 🌐 API Response: GET /api/dashboard/metrics Object
+index-00kYBI_B.js:55 🔄 Default queryFn using apiRequest for: /api/dashboard/metrics
+index-00kYBI_B.js:55 🌐 Making API request: GET /api/dashboard/metrics undefined
+index-00kYBI_B.js:55 🔄 Starting auth check for /api/dashboard/metrics...
+index-00kYBI_B.js:55 🔄 Supabase client obtained for /api/dashboard/metrics
+index-00kYBI_B.js:55 🔄 Session retrieval completed for /api/dashboard/metrics
+index-00kYBI_B.js:55 🔍 DEBUG: Session data for /api/dashboard/metrics: Object
+index-00kYBI_B.js:55 🔐 PRODUCTION: Including Supabase Bearer token for /api/dashboard/metrics
+sw.js:18 [SW] activate Object
+(anonymous) @ sw.js:18Understand this warning
+sw.js:31 [SW] ACTIVATED v-post-bypass-002
+(anonymous) @ sw.js:31Understand this error
+sw.js:32 [SW] BYPASSING NON-GET & /api/*
+(anonymous) @ sw.js:32Understand this error
+index-00kYBI_B.js:55 🌐 API Response: GET /api/dashboard/metrics Object
+index-00kYBI_B.js:928 [PWA] Simulating installability for testing
+index-00kYBI_B.js:55 🔄 Default queryFn using apiRequest for: /api/parent/students
+index-00kYBI_B.js:55 🌐 Making API request: GET /api/parent/students undefined
+index-00kYBI_B.js:55 🔄 Starting auth check for /api/parent/students...
+index-00kYBI_B.js:55 🔄 Supabase client obtained for /api/parent/students
+index-00kYBI_B.js:55 🔄 Session retrieval completed for /api/parent/students
+index-00kYBI_B.js:55 🔍 DEBUG: Session data for /api/parent/students: Object
+index-00kYBI_B.js:55 🔐 PRODUCTION: Including Supabase Bearer token for /api/parent/students
+index-00kYBI_B.js:55 🌐 API Response: GET /api/parent/students Object
+index-00kYBI_B.js:55 🔄 Default queryFn using apiRequest for: /api/parent/students
+index-00kYBI_B.js:55 🌐 Making API request: GET /api/parent/students undefined
+index-00kYBI_B.js:55 🔄 Starting auth check for /api/parent/students...
+index-00kYBI_B.js:55 🔄 Supabase client obtained for /api/parent/students
+index-00kYBI_B.js:55 🔄 Session retrieval completed for /api/parent/students
+index-00kYBI_B.js:55 🔍 DEBUG: Session data for /api/parent/students: Object
+index-00kYBI_B.js:55 🔐 PRODUCTION: Including Supabase Bearer token for /api/parent/students
+index-00kYBI_B.js:55 🌐 API Response: GET /api/parent/students Object
+index-00kYBI_B.js:55 🔄 Default queryFn using apiRequest for: /api/parent/students
+index-00kYBI_B.js:55 🌐 Making API request: GET /api/parent/students undefined
+index-00kYBI_B.js:55 🔄 Starting auth check for /api/parent/students...
+index-00kYBI_B.js:55 🔄 Supabase client obtained for /api/parent/students
+index-00kYBI_B.js:55 🔄 Session retrieval completed for /api/parent/students
+index-00kYBI_B.js:55 🔍 DEBUG: Session data for /api/parent/students: Object
+index-00kYBI_B.js:55 🔐 PRODUCTION: Including Supabase Bearer token for /api/parent/students
+index-00kYBI_B.js:55 🌐 API Response: GET /api/parent/students Object
+index-00kYBI_B.js:55 🔄 Default queryFn using apiRequest for: /api/parent/students
+index-00kYBI_B.js:55 🌐 Making API request: GET /api/parent/students undefined
+index-00kYBI_B.js:55 🔄 Starting auth check for /api/parent/students...
+index-00kYBI_B.js:55 🔄 Supabase client obtained for /api/parent/students
+index-00kYBI_B.js:55 🔄 Session retrieval completed for /api/parent/students
+index-00kYBI_B.js:55 🔍 DEBUG: Session data for /api/parent/students: Object
+index-00kYBI_B.js:55 🔐 PRODUCTION: Including Supabase Bearer token for /api/parent/students
+index-00kYBI_B.js:494 🔍 Parent Dashboard - User: rikka6879@yahoo.com Username: rikka6879@yahoo.com Role: parent
+index-00kYBI_B.js:55 🔄 Default queryFn using apiRequest for: /api/dashboard/metrics
+index-00kYBI_B.js:55 🌐 Making API request: GET /api/dashboard/metrics undefined
+index-00kYBI_B.js:55 🔄 Starting auth check for /api/dashboard/metrics...
+index-00kYBI_B.js:55 🔄 Supabase client obtained for /api/dashboard/metrics
+index-00kYBI_B.js:494 🏠 PARENT DASHBOARD MOUNT DEBUG: Object
+index-00kYBI_B.js:494 🔍 Parent Dashboard rendered with user: Object
+index-00kYBI_B.js:55 🔄 Session retrieval completed for /api/dashboard/metrics
+index-00kYBI_B.js:55 🔍 DEBUG: Session data for /api/dashboard/metrics: Object
+index-00kYBI_B.js:55 🔐 PRODUCTION: Including Supabase Bearer token for /api/dashboard/metrics
+index-00kYBI_B.js:55 🌐 API Response: GET /api/parent/students Object
+index-00kYBI_B.js:55 🌐 API Response: GET /api/dashboard/metrics Object
+index-00kYBI_B.js:55 🔄 Default queryFn using apiRequest for: /api/dashboard/metrics
+index-00kYBI_B.js:55 🌐 Making API request: GET /api/dashboard/metrics undefined
+index-00kYBI_B.js:55 🔄 Starting auth check for /api/dashboard/metrics...
+index-00kYBI_B.js:55 🔄 Supabase client obtained for /api/dashboard/metrics
+index-00kYBI_B.js:55 🔄 Session retrieval completed for /api/dashboard/metrics
+index-00kYBI_B.js:55 🔍 DEBUG: Session data for /api/dashboard/metrics: Object
+index-00kYBI_B.js:55 🔐 PRODUCTION: Including Supabase Bearer token for /api/dashboard/metrics
+index-00kYBI_B.js:55 🌐 API Response: GET /api/dashboard/metrics Object
+index-00kYBI_B.js:55 🔄 Default queryFn using apiRequest for: /api/dashboard/metrics
+index-00kYBI_B.js:55 🌐 Making API request: GET /api/dashboard/metrics undefined
+index-00kYBI_B.js:55 🔄 Starting auth check for /api/dashboard/metrics...
+index-00kYBI_B.js:55 🔄 Supabase client obtained for /api/dashboard/metrics
+index-00kYBI_B.js:55 🔄 Session retrieval completed for /api/dashboard/metrics
+index-00kYBI_B.js:55 🔍 DEBUG: Session data for /api/dashboard/metrics: Object
+index-00kYBI_B.js:55 🔐 PRODUCTION: Including Supabase Bearer token for /api/dashboard/metrics
+index-00kYBI_B.js:55 🌐 API Response: GET /api/dashboard/metrics Object
+index-00kYBI_B.js:55 🔄 Default queryFn using apiRequest for: /api/dashboard/metrics
+index-00kYBI_B.js:55 🌐 Making API request: GET /api/dashboard/metrics undefined
+index-00kYBI_B.js:55 🔄 Starting auth check for /api/dashboard/metrics...
+index-00kYBI_B.js:55 🔄 Supabase client obtained for /api/dashboard/metrics
+index-00kYBI_B.js:55 🔄 Session retrieval completed for /api/dashboard/metrics
+index-00kYBI_B.js:55 🔍 DEBUG: Session data for /api/dashboard/metrics: Object
+index-00kYBI_B.js:55 🔐 PRODUCTION: Including Supabase Bearer token for /api/dashboard/metrics
+index-00kYBI_B.js:55 🌐 API Response: GET /api/dashboard/metrics Object
+index-00kYBI_B.js:494 Dashboard metrics error: SyntaxError: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+jF @ index-00kYBI_B.js:494Understand this error
+index-00kYBI_B.js:55 🔄 Default queryFn using apiRequest for: /api/documents
+index-00kYBI_B.js:55 🌐 Making API request: GET /api/documents undefined
+index-00kYBI_B.js:55 🔄 Starting auth check for /api/documents...
+index-00kYBI_B.js:55 🔄 Supabase client obtained for /api/documents
+index-00kYBI_B.js:55 🔄 Default queryFn using apiRequest for: /api/students
+index-00kYBI_B.js:55 🌐 Making API request: GET /api/students undefined
+index-00kYBI_B.js:55 🔄 Starting auth check for /api/students...
+index-00kYBI_B.js:55 🔄 Supabase client obtained for /api/students
+index-00kYBI_B.js:55 🔄 Session retrieval completed for /api/documents
+index-00kYBI_B.js:55 🔍 DEBUG: Session data for /api/documents: Object
+index-00kYBI_B.js:55 🔐 PRODUCTION: Including Supabase Bearer token for /api/documents
+index-00kYBI_B.js:55 🔄 Session retrieval completed for /api/students
+index-00kYBI_B.js:55 🔍 DEBUG: Session data for /api/students: Object
+index-00kYBI_B.js:55 🔐 PRODUCTION: Including Supabase Bearer token for /api/students
+index-00kYBI_B.js:55 🌐 API Response: GET /api/students Object
+index-00kYBI_B.js:55 🌐 API Response: GET /api/documents Object
+index-00kYBI_B.js:55 🔄 Default queryFn using apiRequest for: /api/parent/students
+index-00kYBI_B.js:55 🌐 Making API request: GET /api/parent/students undefined
+index-00kYBI_B.js:55 🔄 Starting auth check for /api/parent/students...
+index-00kYBI_B.js:55 🔄 Supabase client obtained for /api/parent/students
+index-00kYBI_B.js:55 🔄 Session retrieval completed for /api/parent/students
+index-00kYBI_B.js:55 🔍 DEBUG: Session data for /api/parent/students: Object
+index-00kYBI_B.js:55 🔐 PRODUCTION: Including Supabase Bearer token for /api/parent/students
+index-00kYBI_B.js:55 🌐 API Response: GET /api/parent/students Object
+index-00kYBI_B.js:55 🔄 Default queryFn using apiRequest for: /api/parent/students
+index-00kYBI_B.js:55 🌐 Making API request: GET /api/parent/students undefined
+index-00kYBI_B.js:55 🔄 Starting auth check for /api/parent/students...
+index-00kYBI_B.js:55 🔄 Supabase client obtained for /api/parent/students
+index-00kYBI_B.js:55 🔄 Session retrieval completed for /api/parent/students
+index-00kYBI_B.js:55 🔍 DEBUG: Session data for /api/parent/students: Object
+index-00kYBI_B.js:55 🔐 PRODUCTION: Including Supabase Bearer token for /api/parent/students
+index-00kYBI_B.js:55 🌐 API Response: GET /api/parent/students Object
+index-00kYBI_B.js:55 🔄 Default queryFn using apiRequest for: /api/parent/students
+index-00kYBI_B.js:55 🌐 Making API request: GET /api/parent/students undefined
+index-00kYBI_B.js:55 🔄 Starting auth check for /api/parent/students...
+index-00kYBI_B.js:55 🔄 Supabase client obtained for /api/parent/students
+index-00kYBI_B.js:55 🔄 Session retrieval completed for /api/parent/students
+index-00kYBI_B.js:55 🔍 DEBUG: Session data for /api/parent/students: Object
+index-00kYBI_B.js:55 🔐 PRODUCTION: Including Supabase Bearer token for /api/parent/students
+index-00kYBI_B.js:55 🌐 API Response: GET /api/parent/students Object
+index-00kYBI_B.js:55 🔄 Default queryFn using apiRequest for: /api/parent/students
+index-00kYBI_B.js:55 🌐 Making API request: GET /api/parent/students undefined
+index-00kYBI_B.js:55 🔄 Starting auth check for /api/parent/students...
+index-00kYBI_B.js:55 🔄 Supabase client obtained for /api/parent/students
+index-00kYBI_B.js:55 🔄 Session retrieval completed for /api/parent/students
+index-00kYBI_B.js:55 🔍 DEBUG: Session data for /api/parent/students: Object
+index-00kYBI_B.js:55 🔐 PRODUCTION: Including Supabase Bearer token for /api/parent/students
+index-00kYBI_B.js:55 🌐 API Response: GET /api/parent/students Object
+index-00kYBI_B.js:55 🔄 Default queryFn using apiRequest for: /api/students
+index-00kYBI_B.js:55 🌐 Making API request: GET /api/students undefined
+index-00kYBI_B.js:55 🔄 Starting auth check for /api/students...
+index-00kYBI_B.js:55 🔄 Supabase client obtained for /api/students
+index-00kYBI_B.js:55 🔄 Session retrieval completed for /api/students
+index-00kYBI_B.js:55 🔍 DEBUG: Session data for /api/students: Object
+index-00kYBI_B.js:55 🔐 PRODUCTION: Including Supabase Bearer token for /api/students
+index-00kYBI_B.js:55 🌐 API Response: GET /api/students Object
+index-00kYBI_B.js:55 🔄 Default queryFn using apiRequest for: /api/students
+index-00kYBI_B.js:55 🌐 Making API request: GET /api/students undefined
+index-00kYBI_B.js:55 🔄 Starting auth check for /api/students...
+index-00kYBI_B.js:55 🔄 Supabase client obtained for /api/students
+index-00kYBI_B.js:55 🔄 Session retrieval completed for /api/students
+index-00kYBI_B.js:55 🔍 DEBUG: Session data for /api/students: Object
+index-00kYBI_B.js:55 🔐 PRODUCTION: Including Supabase Bearer token for /api/students
+index-00kYBI_B.js:55 🌐 API Response: GET /api/students Object
+index-00kYBI_B.js:494 Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+(anonymous) @ index-00kYBI_B.js:494Understand this warning
+index-00kYBI_B.js:55 🔄 Default queryFn using apiRequest for: /api/students
+index-00kYBI_B.js:55 🌐 Making API request: GET /api/students undefined
+index-00kYBI_B.js:55 🔄 Starting auth check for /api/students...
+index-00kYBI_B.js:55 🔄 Supabase client obtained for /api/students
+index-00kYBI_B.js:55 🔄 Session retrieval completed for /api/students
+index-00kYBI_B.js:55 🔍 DEBUG: Session data for /api/students: Object
+index-00kYBI_B.js:55 🔐 PRODUCTION: Including Supabase Bearer token for /api/students
+index-00kYBI_B.js:55 🌐 API Response: GET /api/students Object
+index-00kYBI_B.js:494 [AI DEBUG] File upload modal request started
+mutationFn @ index-00kYBI_B.js:494Understand this error
+index-00kYBI_B.js:55 🌐 Making API request: POST /api/documents FormData
+index-00kYBI_B.js:55 🔄 Starting auth check for /api/documents...
+index-00kYBI_B.js:55 🔄 Supabase client obtained for /api/documents
+index-00kYBI_B.js:55 🔄 Session retrieval completed for /api/documents
+index-00kYBI_B.js:55 🔍 DEBUG: Session data for /api/documents: Object
+index-00kYBI_B.js:55 🔐 PRODUCTION: Including Supabase Bearer token for /api/documents
+api/documents:1  Failed to load resource: the server responded with a status of 500 ()Understand this error
+index-00kYBI_B.js:55 🌐 API Response: POST /api/documents Object
+index-00kYBI_B.js:55 ❌ API Request failed: POST /api/documents Object
+Ge @ index-00kYBI_B.js:55Understand this error
+index-00kYBI_B.js:55 🔄 Default queryFn using apiRequest for: /api/students
+index-00kYBI_B.js:55 🌐 Making API request: GET /api/students undefined
+index-00kYBI_B.js:55 🔄 Starting auth check for /api/students...
+index-00kYBI_B.js:55 🔄 Supabase client obtained for /api/students
+index-00kYBI_B.js:55 🔄 Session retrieval completed for /api/students
+index-00kYBI_B.js:55 🔍 DEBUG: Session data for /api/students: Object
+index-00kYBI_B.js:55 🔐 PRODUCTION: Including Supabase Bearer token for /api/students
+index-00kYBI_B.js:55 🌐 API Response: GET /api/students Object

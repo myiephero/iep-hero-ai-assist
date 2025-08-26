@@ -1,0 +1,226 @@
+Got it. Here’s a single, high‑level GitHub issue you can paste directly that the Replit Agent can execute against, covering: role/plan gating, AI tool access, monthly limits (temporarily increased), coupon to unlock “Hero” tools, and Stripe test flows—plus the “Advocate” label leaking into the parent experience.
+
+⸻
+
+Title
+
+[Prod Hardening] Unify role/plan entitlements, fix parent/advocate tool mapping, raise free-plan AI limit (temp), add coupon to unlock Hero tools, and validate Stripe flows
+
+Summary
+
+Parent accounts are intermittently seeing Advocate UI elements and some AI endpoints/tools don’t align with the logged-in user’s role/plan. We also need to (temporarily) raise the free plan’s monthly AI review quota for manual QA, add a coupon that unlocks all “Hero” tools, and run end‑to‑end Stripe purchase/refund tests. This issue standardizes entitlements across backend + frontend and removes remaining auth/JSON-response edge cases.
+
+Impact
+	•	Confusing UX: “Advocate” content visible to parent role.
+	•	Incorrect tool access: parent vs. advocate tools mixed.
+	•	AI tools: quota/entitlement mismatches cause failures or silent denials.
+	•	QA blocked by low free‑plan quota.
+	•	Stripe flows unverified in current build.
+
+Affected User (example)
+	•	Email: rikka6879@yahoo.com
+	•	Supabase user_id: c1867d86-82df-4037-bf23-fde11648b267
+	•	Role: parent (free plan)
+
+Environment
+	•	Replit autoscale instance (prod)
+	•	Supabase auth + RLS
+	•	React/Vite client, Express server
+	•	Service worker active (cache-busting already in place)
+
+Current vs Expected
+	•	Current: Parent session sometimes shows “Advocate” references and/or routes. Tools not consistently gated by role/plan. AI endpoints sometimes fail due to entitlement checks.
+	•	Expected: Single source of truth for role + plan → entitlements; frontend only shows allowed tools; backend enforces the same entitlements; free plan temporarily raised to ≥10 AI reviews/month for QA; coupon can elevate entitlements to “Hero” for testing; Stripe flows pass.
+
+Repro (high‑level)
+	1.	Log in with parent account (see user above).
+	2.	Navigate to dashboard → see occasional “Advocate” logs/labels.
+	3.	Use AI tools → intermittent entitlement or parsing errors (now JSON‑guarded).
+	4.	Observe tool menu shows items not intended for parent role.
+
+Definition of Done (acceptance criteria)
+	•	Single entitlement source: a function (server) getEntitlements(userId) returns canonical entitlements derived from role + plan + active coupon(s).
+	•	Backend enforcement: all protected/AI routes call requireAuth and requireEntitlement(featureKey) (new helper) before executing.
+	•	Frontend gating: menus, routes, and buttons visible only if hasEntitlement(featureKey) (new client helper) returns true for the current user.
+	•	Role/plan mapping is correct: parents see parent tools; advocates see advocate tools; no leakage.
+	•	Free plan AI limit temporarily raised to 10/month (config-driven) and logged clearly.
+	•	Coupon “HERO-ALL-ACCESS” grants all Hero tool entitlements for 14 days to a user (toggleable).
+	•	Stripe test: test card purchase → plan upgrade, entitlement changes live without reload; refund/cancellation → entitlements revert; customer portal works.
+	•	No Unexpected token '<' parse errors; all /api responses are JSON.
+	•	PWA console warnings minimized: no “Advocate” noise on parent side.
+
+⸻
+
+Work Plan (Agent-ready)
+
+Phase 1 — Entitlement foundation
+
+Server
+	•	Add server/entitlements/config.ts exporting canonical feature keys and plan matrices:
+	•	featureKeys (e.g., ai.reviewIEP, ai.autismAccommodations, docs.upload, students.manage, etc.)
+	•	plans: free_parent, premium_parent, advocate_basic, advocate_pro, hero (or whatever exists in codebase—map to reality).
+	•	Each plan lists: { enabledFeatures: string[], limits: { aiMonthlyReviews?: number, ... } }.
+	•	Add server/entitlements/runtime.ts:
+	•	getUserProfile(userId) → role/plan from profiles (or wherever truth lives).
+	•	getActiveCoupons(userId) → coupon rows (if table exists) or fallback in-memory/dev flag.
+	•	mergeEntitlements({role, plan}, coupons) → resolves a final entitlement object:
+	•	enabledFeatures: Set<string>
+	•	limits: { aiMonthlyReviews: number } (merged with overrides)
+	•	Add requireEntitlement(featureKey: string) middleware in server/middleware/entitlements.ts:
+	•	Uses res.locals.user.id from requireAuth
+	•	Calls getEntitlements(userId); 403 JSON if missing.
+
+Frontend
+	•	Create client/src/lib/entitlements.ts:
+	•	fetchEntitlements() → calls new endpoint /api/me/entitlements.
+	•	hasEntitlement(featureKey) memoized helper for UI checks.
+
+Server route
+	•	Add GET /api/me/entitlements:
+	•	requireAuth, returns merged entitlements JSON for current user.
+
+Phase 2 — Parent vs Advocate menu & routes
+
+Frontend
+	•	Centralize navigation: client/src/config/nav.ts with items tagged by featureKey and roles.
+	•	Update layout/pages to render only items where hasEntitlement(featureKey) is true.
+	•	Remove/rename any strings that say “Advocate” on parent screens (audit client/src/pages and shared components).
+
+Server
+	•	For all AI routes (/api/review-iep, /api/autism-accommodations/*, etc.), add requireEntitlement checks matching their feature keys.
+
+Phase 3 — Free-plan temporary limit increase
+
+Config-first approach
+	•	Add FREE_PLAN_AI_REVIEWS_PER_MONTH env (fallback 10).
+	•	In entitlement merge, if plan === free_parent and env var is set, override limits.aiMonthlyReviews to env value.
+	•	Log at startup: [ENTITLEMENTS] Free plan monthly reviews override: X.
+
+Usage tracking
+	•	If not present, create a small ai_usage table keyed by user_id, month, feature_key, count (idempotent SQL).
+	•	In AI endpoints, increment usage only on success; check against limits.aiMonthlyReviews first → return 402-ish JSON { ok: false, error: 'limit_exceeded' } if exceeded.
+
+Phase 4 — Coupon to unlock Hero tools
+
+Server
+	•	Add a simplified coupon flow (dev-first):
+	•	Table coupons (code, featuresOverride?, planOverride?, starts_at, ends_at, is_active).
+	•	Table user_coupons (user_id, coupon_code, applied_at, expires_at).
+	•	New route:
+	•	POST /api/billing/apply-coupon (body: { code })
+	•	requireAuth, validates code, upserts into user_coupons.
+	•	Entitlements merge should honor active/recent coupon → unlock hero features or set limits high.
+	•	Seed a code: HERO-ALL-ACCESS (14-day expiry from apply-time).
+
+Frontend
+	•	Add a minimal “Apply Coupon” dialog under Account/Billing for testing (parent + advocate).
+
+Phase 5 — Stripe flows (test mode)
+
+Server
+	•	Ensure we have:
+	•	POST /api/billing/checkout (body: { planId }) → returns Stripe Checkout URL.
+	•	GET /api/billing/portal → returns Stripe Customer Portal URL.
+	•	Webhooks handling checkout.session.completed, customer.subscription.updated, invoice.payment_failed, charge.refunded:
+	•	Map Stripe product/price → plan key.
+	•	Update profiles.plan and/or add a subscriptions table row.
+	•	On downgrade/cancel/refund, recompute entitlements on next fetch.
+
+Frontend
+	•	Add billing page links/buttons for:
+	•	“Upgrade plan” (pick price id)
+	•	“Manage subscription (Portal)”
+	•	Display current plan and limits from /api/me/entitlements.
+
+Phase 6 — Clean console & QA
+	•	Remove residual “Advocate” console logs on parent flows.
+	•	Ensure only the already-known benign PWA warnings remain (or suppress if needed).
+	•	Verify:
+	•	Parent free plan: can create student, upload doc, run up to 10 AI reviews this month.
+	•	Applying HERO-ALL-ACCESS → all Hero tools visible/usable.
+	•	Stripe: test card purchase upgrades plan; cancel/refund reverts; entitlements update without refresh.
+
+⸻
+
+Implementation Notes
+
+Suggested file touches
+	•	Server:
+	•	server/entitlements/config.ts
+	•	server/entitlements/runtime.ts
+	•	server/middleware/entitlements.ts
+	•	server/routes.ts (wire GET /api/me/entitlements, guard AI routes)
+	•	server/middleware/auth.ts (already hardened)
+	•	server/utils/respondJSON.ts (already added—reuse ok()/fail())
+	•	server/billing/* (checkout, portal, webhooks)
+	•	Client:
+	•	client/src/lib/entitlements.ts
+	•	client/src/config/nav.ts
+	•	client/src/pages/** (menu/route gating)
+	•	client/src/pages/Account/Billing.tsx (coupon apply, plan display)
+
+Minimal SQL (idempotent scaffolding)
+
+Only run if these tables don’t already exist.
+
+-- Coupons
+create table if not exists public.coupons (
+  code text primary key,
+  plan_override text,
+  features_override jsonb,
+  starts_at timestamptz default now(),
+  ends_at timestamptz,
+  is_active boolean default true
+);
+
+-- User ↔ coupons
+create table if not exists public.user_coupons (
+  user_id uuid references auth.users(id) on delete cascade,
+  coupon_code text references public.coupons(code) on delete cascade,
+  applied_at timestamptz default now(),
+  expires_at timestamptz,
+  primary key (user_id, coupon_code)
+);
+
+-- AI usage per month
+create table if not exists public.ai_usage (
+  user_id uuid references auth.users(id) on delete cascade,
+  month text, -- e.g. '2025-08'
+  feature_key text,
+  usage_count integer default 0,
+  primary key (user_id, month, feature_key)
+);
+
+-- Seed the test coupon once:
+insert into public.coupons (code, plan_override, features_override, ends_at, is_active)
+values (
+  'HERO-ALL-ACCESS',
+  'hero',
+  null,
+  now() + interval '180 days',
+  true
+)
+on conflict (code) do nothing;
+
+Temporary free-plan increase (no schema change)
+	•	Add env: FREE_PLAN_AI_REVIEWS_PER_MONTH=10
+	•	In entitlement merge: if plan === 'free_parent' and env present → override limit.
+
+⸻
+
+QA Checklist (tick before closing)
+	•	Parent (free): menu shows only parent tools; no “Advocate” strings anywhere in the UI/console.
+	•	Parent (free): can create student, upload doc, run AI review ≤ limit; 11th attempt returns { ok:false, error:'limit_exceeded' }.
+	•	Apply coupon HERO-ALL-ACCESS: parent now sees all Hero tools for 14 days; limit lifted per plan.
+	•	Stripe test purchase: upgrades plan and entitlements update immediately; refund/cancel reverts.
+	•	All API calls return JSON; no HTML parse errors.
+	•	Logs: [ENTITLEMENTS] lines show correct plan/limits for target user.
+
+⸻
+
+Assignees: Replit Agent
+Labels: prod-hardening, entitlements, stripe, ai, p0
+
+⸻
+
+If you want, I can also generate the follow‑up “Agent Prompt” after you file this issue so the agent executes Phase 1 first (entitlement foundation).

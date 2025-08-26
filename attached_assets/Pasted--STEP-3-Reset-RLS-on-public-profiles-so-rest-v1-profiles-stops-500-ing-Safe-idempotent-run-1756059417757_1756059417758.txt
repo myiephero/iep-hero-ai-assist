@@ -1,0 +1,102 @@
+-- STEP 3: Reset RLS on public.profiles so /rest/v1/profiles stops 500'ing
+-- Safe & idempotent: run as-is.
+
+begin;
+
+-- 3.1 Make sure the table has the expected columns (no-op if already present)
+alter table if exists public.profiles
+  add column if not exists id uuid primary key,
+  add column if not exists email text,
+  add column if not exists role text,
+  add column if not exists created_at timestamptz not null default now(),
+  add column if not exists updated_at timestamptz not null default now();
+
+-- Optional role constraint (already added earlier; re-adding is safe)
+do $$
+begin
+  if not exists (
+    select 1 from pg_constraint
+    where conname = 'profiles_role_check'
+  ) then
+    alter table public.profiles
+      add constraint profiles_role_check
+      check (role in ('parent','student','educator','advocate','admin'));
+  end if;
+end $$;
+
+-- 3.2 Ensure updated_at auto-touches on update (function & trigger, both idempotent)
+create or replace function public.set_updated_at()
+returns trigger language plpgsql as $$
+begin
+  new.updated_at := now();
+  return new;
+end $$;
+
+do $$
+begin
+  if not exists (
+    select 1 from pg_trigger
+    where tgname = 'profiles_set_updated_at'
+  ) then
+    create trigger profiles_set_updated_at
+    before update on public.profiles
+    for each row execute procedure public.set_updated_at();
+  end if;
+end $$;
+
+-- 3.3 Make sure RLS is enabled
+alter table public.profiles enable row level security;
+
+-- 3.4 Drop any old/bad policies that reference "user_id" (common cause of 500s)
+do $$
+declare
+  pol record;
+begin
+  for pol in
+    select policyname
+    from pg_policies
+    where schemaname = 'public'
+      and tablename  = 'profiles'
+      and policyname ilike '%user_id%'
+  loop
+    execute format('drop policy if exists %I on public.profiles;', pol.policyname);
+  end loop;
+end $$;
+
+-- 3.5 Drop and recreate a clean, minimal policy set (by stable names)
+drop policy if exists profiles_select_own_or_admin on public.profiles;
+drop policy if exists profiles_insert_self       on public.profiles;
+drop policy if exists profiles_update_self       on public.profiles;
+
+-- Allow authenticated users to read their own row; allow admins to read all
+create policy profiles_select_own_or_admin
+on public.profiles
+as permissive
+for select
+to authenticated
+using (
+  id = auth.uid()
+  or exists (
+    select 1 from public.profiles p
+    where p.id = auth.uid() and p.role = 'admin'
+  )
+);
+
+-- Allow creating a profile whose id = auth.uid()
+create policy profiles_insert_self
+on public.profiles
+as permissive
+for insert
+to authenticated
+with check ( id = auth.uid() );
+
+-- Allow updating only your own profile (admins can update via the admin row)
+create policy profiles_update_self
+on public.profiles
+as permissive
+for update
+to authenticated
+using ( id = auth.uid() )
+with check ( id = auth.uid() );
+
+commit;

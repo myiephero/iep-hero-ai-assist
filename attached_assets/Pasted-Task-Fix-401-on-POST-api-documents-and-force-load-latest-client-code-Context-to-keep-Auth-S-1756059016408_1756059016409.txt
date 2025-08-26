@@ -1,0 +1,70 @@
+Task: Fix 401 on POST /api/documents and force-load latest client code.
+
+Context to keep:
+- Auth = Supabase JWT via Bearer token.
+- Use existing requireAuth middleware (server/middleware/auth.ts).
+- uploads use multer single('document').
+- We already updated most fetches to apiRequest() which injects Bearer tokens.
+
+Do the following EXACTLY:
+
+1) CORS & Preflight hardening (server/app bootstrap, e.g., server/index.ts or server/app.ts):
+   - Ensure we use `cors` with explicit allowed headers and methods:
+     app.use(cors({
+       origin: true,
+       credentials: true,
+       methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
+       allowedHeaders: ['Content-Type','Authorization','X-Requested-With']
+     }));
+   - Add a global OPTIONS preflight handler BEFORE routes:
+     app.options('*', cors());
+
+2) requireAuth improvements (server/middleware/auth.ts):
+   - Keep current behavior but add robust header parsing + logs:
+     - Accept `Authorization: Bearer <token>` (case-insensitive).
+     - If header missing, log `[AUTH DEBUG] Missing Authorization header` and return 401 JSON.
+     - If present but invalid, log `[AUTH DEBUG] Invalid/expired token` and return 401 JSON.
+   - On success, log `[AUTH DEBUG] OK userId=<uuid> method=<req.method> path=<req.path>`.
+
+3) Documents routes (server/routes.ts):
+   - Ensure order is EXACTLY: `requireAuth`, then `upload.single('document')`.
+   - At the top of each documents route (GET/POST/PUT/DELETE), add:
+     console.log('[DOCS AUTH DEBUG]', { method: req.method, path: req.path, userId: (req as any).user?.id });
+   - For the POST handler, before doing any DB work, also log:
+     console.log('[DOCS UPLOAD DEBUG] file?', !!req.file, 'headers_auth?', !!req.headers.authorization);
+
+4) Frontend upload path (client/src/components/**/documents*.tsx or wherever the upload lives):
+   - Replace ANY remaining raw `fetch('/api/documents', ...)` with the shared `apiRequest()` helper.
+   - For FormData uploads, DO NOT set Content-Type manually (let the browser set boundary).
+   - Confirm apiRequest attaches `Authorization: Bearer <token>` for FormData (it should already). If not, add it.
+
+5) Service Worker (client/public/sw.js OR wherever it lives):
+   - Bypass ALL non-GET and ALL `/api/` requests from the SW:
+     if (request.method !== 'GET' || new URL(request.url).pathname.startsWith('/api/')) {
+       return fetch(request);
+     }
+   - Bump a visible version string: `const SW_VERSION = 'v-post-bypass-002';`
+   - On activate: `self.skipWaiting();` and `clients.claim();`
+   - Add console logs:
+     console.error('[SW] ACTIVATED', SW_VERSION);
+     console.error('[SW] BYPASSING NON-GET & /api/*');
+
+6) Build-time cache-bust (client/src/main.tsx or entry):
+   - Emit a loud marker so we can confirm new code is loaded:
+     const BUILD_ID = `upload-fix-${Date.now()}`;
+     console.error('🚨 BUILD LOADED', BUILD_ID);
+
+7) Redeploy and then tell me:
+   - Open DevTools → Application → Clear storage → check all → Clear site data.
+   - Hard-reload.
+   - In console you MUST see BOTH:
+     a) `🚨 BUILD LOADED upload-fix-...`
+     b) `[SW] ACTIVATED v-post-bypass-002`
+   - Then try uploading in Document Vault and copy the log lines that begin with:
+     `[DOCS AUTH DEBUG]` and `[DOCS UPLOAD DEBUG]`.
+
+Acceptance criteria:
+- POST /api/documents returns 200/201 (no 401).
+- Server logs include `[DOCS AUTH DEBUG] { userId: <uuid>, method: 'POST', path: '/api/documents' }`.
+- Client console shows the new BUILD + SW version logs.
+- No service-worker cache interference with /api/*.

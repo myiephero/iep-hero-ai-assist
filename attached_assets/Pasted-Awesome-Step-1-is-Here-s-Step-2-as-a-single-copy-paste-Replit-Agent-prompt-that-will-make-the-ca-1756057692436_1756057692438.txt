@@ -1,0 +1,119 @@
+Awesome—Step 1 is ✅.
+Here’s Step 2 as a single, copy‑paste Replit Agent prompt that will make the cache‑busting bullet‑proof and add unmistakable console logs so we can verify it.
+
+⸻
+
+🚀 Replit Agent Prompt — Step 2: “Harden cache busting + add verification logs”
+
+Goal: Ensure the latest JS loads by tagging the SW and bundle with a unique build ID, purging old caches, and logging loudly so we can confirm in DevTools.
+
+Task: Harden cache-busting across app and service worker, add verifiable logs, and redeploy.
+
+1) Create a tiny build-id helper the client can import:
+- File: client/src/lib/build.ts
+- Content (replace entirely):
+------------------------------------------------
+export const BUILD_ID = String(Date.now());
+export const BUILD_TAG = `EMERGENCY-${BUILD_ID}`;
+console.error(`🚨 EMERGENCY CACHE BUST - BUILD_ID=${BUILD_ID}`);
+------------------------------------------------
+
+2) Register the SW with a cache-busting query and add visible logs:
+- File: client/src/main.ts (or wherever the service worker is registered)
+- Edits:
+  - Import the build tag: `import { BUILD_ID, BUILD_TAG } from "./lib/build";`
+  - When registering the service worker, use: `/sw.js?build=${BUILD_ID}`
+  - Add logs before/after register:
+    console.error("🚨 IF YOU SEE THIS, CACHE BUSTING WORKED!", { BUILD_ID, BUILD_TAG });
+    navigator.serviceWorker.register(`/sw.js?build=${BUILD_ID}`).then(reg => {
+      console.log("[Main] SW registered:", reg);
+    });
+
+3) Make the service worker versioned and aggressively purge old caches:
+- File: sw.js (at repo root; if your SW lives elsewhere, adjust path accordingly)
+- Replace the whole file with this:
+------------------------------------------------
+/* eslint-disable no-undef */
+const SW_BUILD_QS = new URL(self.location).searchParams.get("build") || "NA";
+const SW_VERSION = `EMERGENCY-${SW_BUILD_QS}`;
+const CACHE_NAME = `iep-hero-cache-${SW_VERSION}`;
+
+console.error(`[SW] EMERGENCY CACHE BUST LOADING - VERSION: ${SW_VERSION}`);
+
+self.addEventListener("install", (event) => {
+  console.warn("[SW] install", { SW_VERSION, CACHE_NAME });
+  self.skipWaiting();
+  event.waitUntil((async () => {
+    const cache = await caches.open(CACHE_NAME);
+    // Optionally pre-cache minimal shell if needed.
+    await cache.addAll(["/"]);
+  })());
+});
+
+self.addEventListener("activate", (event) => {
+  console.warn("[SW] activate", { SW_VERSION, CACHE_NAME });
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(
+      keys
+        .filter((k) => k.startsWith("iep-hero-cache-") && k !== CACHE_NAME)
+        .map((k) => {
+          console.warn("[SW] deleting old cache:", k);
+          return caches.delete(k);
+        })
+    );
+    await self.clients.claim();
+    console.error(`[SW] activated ${SW_VERSION}`);
+  })());
+});
+
+self.addEventListener("fetch", (event) => {
+  const req = event.request;
+  // Network-first for JS/CSS/HTML to avoid stale code
+  if (req.method === "GET" && /(\.js$|\.css$|\.html$|\/$)/.test(new URL(req.url).pathname)) {
+    event.respondWith((async () => {
+      try {
+        const netRes = await fetch(req, { cache: "no-store" });
+        const cache = await caches.open(CACHE_NAME);
+        cache.put(req, netRes.clone());
+        return netRes;
+      } catch (e) {
+        const cache = await caches.open(CACHE_NAME);
+        const cached = await cache.match(req);
+        return cached || Response.error();
+      }
+    })());
+    return;
+  }
+  // Default: pass-through
+});
+------------------------------------------------
+
+4) Ensure the client bundles recompile with cache-busting:
+- If present, bump any Vite/Next service-worker registration path to include `?build=${BUILD_ID}` (already handled above).
+- No other files need changing.
+
+5) Build & redeploy (same as your normal preview deploy flow):
+- Run the project or click Redeploy in Replit.
+
+6) Verification steps for you (manual, in browser):
+- Open the preview, then open DevTools → Console.
+- **Hard refresh** with “Empty Cache and Hard Reload”.
+- You MUST see these red logs:
+  - `🚨 EMERGENCY CACHE BUST - BUILD_ID=...`
+  - `🚨 IF YOU SEE THIS, CACHE BUSTING WORKED!`
+  - `[SW] EMERGENCY CACHE BUST LOADING - VERSION: EMERGENCY-...`
+  - `[SW] activated EMERGENCY-...`
+  - `[Main] SW registered: ServiceWorkerRegistration{...}`
+
+7) Commit the changes:
+- Stage changed files under `client/src/lib/build.ts`, `client/src/main.ts`, and `sw.js`.
+- Commit: `chore(sw): harden cache-busting & add verification logs (EMERGENCY)`
+- Push to origin.
+
+Report back with a short snippet of the console showing the above logs.
+
+
+⸻
+
+When you’re done, reply with the RED console lines you see (copy/paste is fine). Then I’ll give you Step 3 (locking down the AI endpoints & verifying /api/review-iep and /api/generate‑ot‑recommendations end‑to‑end).

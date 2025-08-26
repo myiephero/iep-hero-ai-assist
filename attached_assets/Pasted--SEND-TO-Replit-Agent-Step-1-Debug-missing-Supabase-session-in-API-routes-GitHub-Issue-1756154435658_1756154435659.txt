@@ -1,0 +1,63 @@
+[SEND TO: Replit Agent]  
+🔧 **Step 1: Debug missing Supabase session in API routes**  
+GitHub Issue: https://github.com/myiephero/iep-hero-ai-assist/issues/79  
+
+---
+
+## 🎯 Goal  
+Fix platform-wide Supabase session loss that causes 401/403 errors for parent and advocate POST requests.
+
+---
+
+## 🔍 Context  
+
+After successful login, users are routed to the correct dashboard, but **Supabase sessions are not persisting across API routes**.  
+
+Console logs show:
+- `❌ No valid Supabase session found`  
+- `❌ Student creation error details: Authentication required`  
+- `❌ Error in mutation function: Failed to create advocate-client relationship`  
+
+This suggests `supabase.auth.getSession()` inside API route is returning null or missing headers.
+
+---
+
+## ✅ Fix Plan  
+
+Please do all of the following in one shell command block:
+
+1. **Audit the API route at `/api/parent/students` and `/api/advocate/clients`**:  
+   - Log incoming headers (`req.headers`)  
+   - Check whether the `Authorization` header with Bearer token is being sent  
+   - Confirm `supabase.auth.getUser(req)` or `getServerSession()` is properly used
+
+2. **Verify session persistence**:
+   - Ensure `supabase.auth.getSession()` returns a valid session inside API routes
+   - Confirm the `Authorization` header is passed correctly from the frontend
+
+3. **Patch Supabase client if needed**:
+   - If session is missing, wrap your API handlers with a session hydration utility  
+   - Review Supabase middleware or cookie settings if needed (Supabase Edge client, if applicable)
+
+4. **Test fix with advocate and parent accounts**:
+   - Test POST `/api/parent/students` using rikka6879@yahoo.com  
+   - Test POST `/api/advocate/clients` using erika.levine2017@gmail.com  
+   - Verify the record is successfully created in DB  
+   - Check that the `owner_id` or `advocate_id` fields are correct (matches `auth.uid()`)
+
+5. ✅ Once confirmed, log:  
+   - `[ISSUE-79] Supabase session correctly hydrated in API route`  
+   - `[ISSUE-79] POST /api/parent/students passed`  
+   - `[ISSUE-79] POST /api/advocate/clients passed`
+
+---
+
+## 🧠 Reminder  
+This bug is now blocking all student/client creation. Session hydration must work identically across:
+- Frontend PWA → Supabase client
+- API route → Supabase server API client
+
+---
+
+Deploy only after full local test passes.  
+Awaiting confirmation before Step 2.  

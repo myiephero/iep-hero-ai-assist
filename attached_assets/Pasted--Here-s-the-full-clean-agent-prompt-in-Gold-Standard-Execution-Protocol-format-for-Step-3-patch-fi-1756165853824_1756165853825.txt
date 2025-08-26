@@ -1,0 +1,55 @@
+✅ Here’s the full, clean agent prompt in Gold Standard Execution Protocol format for Step 3 patch fix. You will paste this directly into the Replit agent chat.
+
+⸻
+
+
+🔧 PATCH INSTRUCTIONS: ISSUE-82-STEP-3 — Fix login failure caused by invalid Supabase column
+
+🎯 OBJECTIVE:
+Fix production login failure caused by a `400 Bad Request` Supabase error when querying a non-existent column `subscription_tier` in the `profiles` table. This is breaking the post-login `.select('role, email, subscription_tier')` fetch and preventing role hydration.
+
+👨‍💻 FILE LOCATION:
+Locate the code handling login and Supabase profile fetch in:
+`/lib/auth/signIn.ts` or the file where:
+```ts
+const { data: profile, error: profileError } = await supabase
+  .from('profiles')
+  .select('role, email, subscription_tier') // 🔥 This line causes the 400 error
+  .eq('id', session.user.id)
+  .single();
+
+🛠️ REQUIRED FIX:
+	1.	✅ Remove the invalid column subscription_tier from the .select() call.
+	2.	✅ Final version should be:
+
+const { data: profile, error: profileError } = await supabase
+  .from('profiles')
+  .select('role, email') // ✅ FIXED: Removed invalid column
+  .eq('id', session.user.id)
+  .single();
+
+	3.	🧪 Confirm that login now fetches the profile.role and injects it properly into userContext.
+	4.	🧠 You should see this log on successful login:
+
+[ISSUE-82-STEP-3] Login profile fetch successful: { role: 'advocate', email: 'erika.levine2017@gmail.com' }
+
+📦 DEPLOYMENT:
+Push fix live to Replit production build. No schema changes needed.
+
+🧪 TEST CASES (on production):
+	•	✅ Login: erika.levine2017@gmail.com → should route to /dashboard-advocate
+	•	✅ Role: Must come from Supabase profiles.role
+	•	✅ No fallback logic used
+
+🚫 DO NOT:
+	•	Reintroduce any default fallback roles
+	•	Add back subscription_tier unless it’s re-added to the schema later
+
+🔒 This patch is a blocker fix to enable all post-login routing now that fallback logic has been permanently removed per [ISSUE-82-STEP-3].
+
+---
+
+✅ **Where to use this**:
+Paste directly into the **Replit agent chat** window. This is a single, surgical task.
+
+Once it’s confirmed deployed, we’ll proceed to `GitHub Issue #83: Role Assignment on Signup`.

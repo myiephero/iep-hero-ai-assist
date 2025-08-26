@@ -1,0 +1,228 @@
+✅ Supabase singleton client ready
+index-ntGC6uQo.js:932 🚨 EMERGENCY CACHE BUST - BUILD_ID= time-1756066014850
+(anonymous) @ index-ntGC6uQo.js:932Understand this error
+index-ntGC6uQo.js:48 Use of history.pushState in a trivial session history context, which maintains only one session history entry, is treated as history.replaceState.
+history.<computed> @ index-ntGC6uQo.js:48Understand this warning
+2index-ntGC6uQo.js:450 🚀 PRODUCTION: Checking Supabase session...
+2index-ntGC6uQo.js:450 ❌ No valid Supabase session found
+index-ntGC6uQo.js:928 SW registered: ServiceWorkerRegistration
+index-ntGC6uQo.js:928 SW registered: ServiceWorkerRegistration
+index-ntGC6uQo.js:932 [Main] SW registered: ServiceWorkerRegistration
+2index-ntGC6uQo.js:928 [PWA] Simulating installability for testing
+index-ntGC6uQo.js:450 🔄 Starting login process for: rikka6879@yahoo.com
+index-ntGC6uQo.js:450 🚀 PRODUCTION LOGIN: Supabase-only authentication for: rikka6879@yahoo.com
+index-ntGC6uQo.js:450 ✅ Supabase login successful, user ID: c1867d86-82df-4037-bf23-fde11648b267
+wktcfhegoxjearpzdxpz.supabase.co/rest/v1/profiles?select=*&id=eq.c1867d86-82df-4037-bf23-fde11648b267:1  Failed to load resource: the server responded with a status of 500 ()Understand this error
+index-ntGC6uQo.js:450 ⚠️ Profile fetch failed (non-critical): Object
+signIn @ index-ntGC6uQo.js:450Understand this warning
+index-ntGC6uQo.js:450 🎯 LOGIN SUCCESS DEBUG: Object
+index-ntGC6uQo.js:450 ✅ Login successful
+index-ntGC6uQo.js:450 🔄 Redirecting to dashboard...
+index-ntGC6uQo.js:450 🔄 Navigating to: /dashboard-premium
+index-ntGC6uQo.js:494 ❌ Parent user accessing advocate dashboard, redirecting to parent dashboard
+index-ntGC6uQo.js:494 💼 ADVOCATE DASHBOARD MOUNT DEBUG: Object
+index-ntGC6uQo.js:494 🔍 Parent Dashboard - User: rikka6879@yahoo.com Username: rikka6879@yahoo.com Role: parent
+index-ntGC6uQo.js:55 🔄 Default queryFn using apiRequest for: /api/dashboard/metrics
+index-ntGC6uQo.js:55 🌐 Making API request: GET /api/dashboard/metrics undefined
+index-ntGC6uQo.js:55 🔄 Starting auth check for /api/dashboard/metrics...
+index-ntGC6uQo.js:55 🔄 Supabase client obtained for /api/dashboard/metrics
+index-ntGC6uQo.js:494 🏠 PARENT DASHBOARD MOUNT DEBUG: Object
+index-ntGC6uQo.js:494 🔍 Parent Dashboard rendered with user: Object
+index-ntGC6uQo.js:55 🔄 Session retrieval completed for /api/dashboard/metrics
+index-ntGC6uQo.js:55 🔍 DEBUG: Session data for /api/dashboard/metrics: Object
+index-ntGC6uQo.js:55 🔐 PRODUCTION: Including Supabase Bearer token for /api/dashboard/metrics
+sw.js:5 🚨 SW ACTIVE v-docs-auth-004
+(anonymous) @ sw.js:5Understand this error
+index-ntGC6uQo.js:928 SW registered: ServiceWorkerRegistration
+sw.js:8 [SW] install Object
+(anonymous) @ sw.js:8Understand this warning
+index-ntGC6uQo.js:55 🌐 API Response: GET /api/dashboard/metrics Object
+index-ntGC6uQo.js:55 🔄 Default queryFn using apiRequest for: /api/dashboard/metrics
+index-ntGC6uQo.js:55 🌐 Making API request: GET /api/dashboard/metrics undefined
+index-ntGC6uQo.js:55 🔄 Starting auth check for /api/dashboard/metrics...
+index-ntGC6uQo.js:55 🔄 Supabase client obtained for /api/dashboard/metrics
+index-ntGC6uQo.js:55 🔄 Session retrieval completed for /api/dashboard/metrics
+index-ntGC6uQo.js:55 🔍 DEBUG: Session data for /api/dashboard/metrics: Object
+index-ntGC6uQo.js:55 🔐 PRODUCTION: Including Supabase Bearer token for /api/dashboard/metrics
+index-ntGC6uQo.js:55 🌐 API Response: GET /api/dashboard/metrics Object
+sw.js:18 [SW] activate Object
+(anonymous) @ sw.js:18Understand this warning
+sw.js:31 [SW] ACTIVATED v-docs-auth-004
+(anonymous) @ sw.js:31Understand this error
+sw.js:32 [SW] BYPASSING NON-GET & /api/*
+(anonymous) @ sw.js:32Understand this error
+index-ntGC6uQo.js:928 [PWA] Simulating installability for testing
+index-ntGC6uQo.js:55 🔄 Default queryFn using apiRequest for: /api/dashboard/metrics
+index-ntGC6uQo.js:55 🌐 Making API request: GET /api/dashboard/metrics undefined
+index-ntGC6uQo.js:55 🔄 Starting auth check for /api/dashboard/metrics...
+index-ntGC6uQo.js:55 🔄 Supabase client obtained for /api/dashboard/metrics
+index-ntGC6uQo.js:55 🔄 Session retrieval completed for /api/dashboard/metrics
+index-ntGC6uQo.js:55 🔍 DEBUG: Session data for /api/dashboard/metrics: Object
+index-ntGC6uQo.js:55 🔐 PRODUCTION: Including Supabase Bearer token for /api/dashboard/metrics
+index-ntGC6uQo.js:55 🌐 API Response: GET /api/dashboard/metrics Object
+index-ntGC6uQo.js:55 🔄 Default queryFn using apiRequest for: /api/dashboard/metrics
+index-ntGC6uQo.js:55 🌐 Making API request: GET /api/dashboard/metrics undefined
+index-ntGC6uQo.js:55 🔄 Starting auth check for /api/dashboard/metrics...
+index-ntGC6uQo.js:55 🔄 Supabase client obtained for /api/dashboard/metrics
+index-ntGC6uQo.js:55 🔄 Session retrieval completed for /api/dashboard/metrics
+index-ntGC6uQo.js:55 🔍 DEBUG: Session data for /api/dashboard/metrics: Object
+index-ntGC6uQo.js:55 🔐 PRODUCTION: Including Supabase Bearer token for /api/dashboard/metrics
+index-ntGC6uQo.js:55 🌐 API Response: GET /api/dashboard/metrics Object
+index-ntGC6uQo.js:494 Dashboard metrics error: SyntaxError: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+SF @ index-ntGC6uQo.js:494Understand this error
+index-ntGC6uQo.js:55 🔄 Default queryFn using apiRequest for: /api/parent/students
+index-ntGC6uQo.js:55 🌐 Making API request: GET /api/parent/students undefined
+index-ntGC6uQo.js:55 🔄 Starting auth check for /api/parent/students...
+index-ntGC6uQo.js:55 🔄 Supabase client obtained for /api/parent/students
+index-ntGC6uQo.js:55 🔄 Session retrieval completed for /api/parent/students
+index-ntGC6uQo.js:55 🔍 DEBUG: Session data for /api/parent/students: Object
+index-ntGC6uQo.js:55 🔐 PRODUCTION: Including Supabase Bearer token for /api/parent/students
+index-ntGC6uQo.js:55 🌐 API Response: GET /api/parent/students Object
+index-ntGC6uQo.js:55 🔄 Default queryFn using apiRequest for: /api/parent/students
+index-ntGC6uQo.js:55 🌐 Making API request: GET /api/parent/students undefined
+index-ntGC6uQo.js:55 🔄 Starting auth check for /api/parent/students...
+index-ntGC6uQo.js:55 🔄 Supabase client obtained for /api/parent/students
+index-ntGC6uQo.js:55 🔄 Session retrieval completed for /api/parent/students
+index-ntGC6uQo.js:55 🔍 DEBUG: Session data for /api/parent/students: Object
+index-ntGC6uQo.js:55 🔐 PRODUCTION: Including Supabase Bearer token for /api/parent/students
+index-ntGC6uQo.js:55 🌐 API Response: GET /api/parent/students Object
+index-ntGC6uQo.js:55 🔄 Default queryFn using apiRequest for: /api/parent/students
+index-ntGC6uQo.js:55 🌐 Making API request: GET /api/parent/students undefined
+index-ntGC6uQo.js:55 🔄 Starting auth check for /api/parent/students...
+index-ntGC6uQo.js:55 🔄 Supabase client obtained for /api/parent/students
+index-ntGC6uQo.js:55 🔄 Session retrieval completed for /api/parent/students
+index-ntGC6uQo.js:55 🔍 DEBUG: Session data for /api/parent/students: Object
+index-ntGC6uQo.js:55 🔐 PRODUCTION: Including Supabase Bearer token for /api/parent/students
+index-ntGC6uQo.js:55 🌐 API Response: GET /api/parent/students Object
+index-ntGC6uQo.js:494 🔍 Parent Dashboard - User: rikka6879@yahoo.com Username: rikka6879@yahoo.com Role: parent
+index-ntGC6uQo.js:55 🔄 Default queryFn using apiRequest for: /api/dashboard/metrics
+index-ntGC6uQo.js:55 🌐 Making API request: GET /api/dashboard/metrics undefined
+index-ntGC6uQo.js:55 🔄 Starting auth check for /api/dashboard/metrics...
+index-ntGC6uQo.js:55 🔄 Supabase client obtained for /api/dashboard/metrics
+index-ntGC6uQo.js:494 🏠 PARENT DASHBOARD MOUNT DEBUG: Object
+index-ntGC6uQo.js:494 🔍 Parent Dashboard rendered with user: Object
+index-ntGC6uQo.js:55 🔄 Session retrieval completed for /api/dashboard/metrics
+index-ntGC6uQo.js:55 🔍 DEBUG: Session data for /api/dashboard/metrics: Object
+index-ntGC6uQo.js:55 🔐 PRODUCTION: Including Supabase Bearer token for /api/dashboard/metrics
+index-ntGC6uQo.js:55 🌐 API Response: GET /api/dashboard/metrics Object
+index-ntGC6uQo.js:55 🔄 Default queryFn using apiRequest for: /api/dashboard/metrics
+index-ntGC6uQo.js:55 🌐 Making API request: GET /api/dashboard/metrics undefined
+index-ntGC6uQo.js:55 🔄 Starting auth check for /api/dashboard/metrics...
+index-ntGC6uQo.js:55 🔄 Supabase client obtained for /api/dashboard/metrics
+index-ntGC6uQo.js:55 🔄 Session retrieval completed for /api/dashboard/metrics
+index-ntGC6uQo.js:55 🔍 DEBUG: Session data for /api/dashboard/metrics: Object
+index-ntGC6uQo.js:55 🔐 PRODUCTION: Including Supabase Bearer token for /api/dashboard/metrics
+index-ntGC6uQo.js:55 🌐 API Response: GET /api/dashboard/metrics Object
+index-ntGC6uQo.js:55 🔄 Default queryFn using apiRequest for: /api/dashboard/metrics
+index-ntGC6uQo.js:55 🌐 Making API request: GET /api/dashboard/metrics undefined
+index-ntGC6uQo.js:55 🔄 Starting auth check for /api/dashboard/metrics...
+index-ntGC6uQo.js:55 🔄 Supabase client obtained for /api/dashboard/metrics
+index-ntGC6uQo.js:55 🔄 Session retrieval completed for /api/dashboard/metrics
+index-ntGC6uQo.js:55 🔍 DEBUG: Session data for /api/dashboard/metrics: Object
+index-ntGC6uQo.js:55 🔐 PRODUCTION: Including Supabase Bearer token for /api/dashboard/metrics
+index-ntGC6uQo.js:55 🌐 API Response: GET /api/dashboard/metrics Object
+index-ntGC6uQo.js:55 🔄 Default queryFn using apiRequest for: /api/dashboard/metrics
+index-ntGC6uQo.js:55 🌐 Making API request: GET /api/dashboard/metrics undefined
+index-ntGC6uQo.js:55 🔄 Starting auth check for /api/dashboard/metrics...
+index-ntGC6uQo.js:55 🔄 Supabase client obtained for /api/dashboard/metrics
+index-ntGC6uQo.js:55 🔄 Session retrieval completed for /api/dashboard/metrics
+index-ntGC6uQo.js:55 🔍 DEBUG: Session data for /api/dashboard/metrics: Object
+index-ntGC6uQo.js:55 🔐 PRODUCTION: Including Supabase Bearer token for /api/dashboard/metrics
+index-ntGC6uQo.js:55 🌐 API Response: GET /api/dashboard/metrics Object
+index-ntGC6uQo.js:494 Dashboard metrics error: SyntaxError: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+SF @ index-ntGC6uQo.js:494Understand this error
+index-ntGC6uQo.js:55 🔄 Default queryFn using apiRequest for: /api/parent/students
+index-ntGC6uQo.js:55 🌐 Making API request: GET /api/parent/students undefined
+index-ntGC6uQo.js:55 🔄 Starting auth check for /api/parent/students...
+index-ntGC6uQo.js:55 🔄 Supabase client obtained for /api/parent/students
+index-ntGC6uQo.js:55 🔄 Session retrieval completed for /api/parent/students
+index-ntGC6uQo.js:55 🔍 DEBUG: Session data for /api/parent/students: Object
+index-ntGC6uQo.js:55 🔐 PRODUCTION: Including Supabase Bearer token for /api/parent/students
+index-ntGC6uQo.js:55 🌐 API Response: GET /api/parent/students Object
+index-ntGC6uQo.js:55 🔄 Default queryFn using apiRequest for: /api/parent/students
+index-ntGC6uQo.js:55 🌐 Making API request: GET /api/parent/students undefined
+index-ntGC6uQo.js:55 🔄 Starting auth check for /api/parent/students...
+index-ntGC6uQo.js:55 🔄 Supabase client obtained for /api/parent/students
+index-ntGC6uQo.js:55 🔄 Session retrieval completed for /api/parent/students
+index-ntGC6uQo.js:55 🔍 DEBUG: Session data for /api/parent/students: Object
+index-ntGC6uQo.js:55 🔐 PRODUCTION: Including Supabase Bearer token for /api/parent/students
+index-ntGC6uQo.js:55 🌐 API Response: GET /api/parent/students Object
+index-ntGC6uQo.js:55 🔄 Default queryFn using apiRequest for: /api/parent/students
+index-ntGC6uQo.js:55 🌐 Making API request: GET /api/parent/students undefined
+index-ntGC6uQo.js:55 🔄 Starting auth check for /api/parent/students...
+index-ntGC6uQo.js:55 🔄 Supabase client obtained for /api/parent/students
+index-ntGC6uQo.js:55 🔄 Session retrieval completed for /api/parent/students
+index-ntGC6uQo.js:55 🔍 DEBUG: Session data for /api/parent/students: Object
+index-ntGC6uQo.js:55 🔐 PRODUCTION: Including Supabase Bearer token for /api/parent/students
+index-ntGC6uQo.js:55 🌐 API Response: GET /api/parent/students Object
+index-ntGC6uQo.js:55 🔄 Default queryFn using apiRequest for: /api/parent/students
+index-ntGC6uQo.js:55 🌐 Making API request: GET /api/parent/students undefined
+index-ntGC6uQo.js:55 🔄 Starting auth check for /api/parent/students...
+index-ntGC6uQo.js:55 🔄 Supabase client obtained for /api/parent/students
+index-ntGC6uQo.js:55 🔄 Session retrieval completed for /api/parent/students
+index-ntGC6uQo.js:55 🔍 DEBUG: Session data for /api/parent/students: Object
+index-ntGC6uQo.js:55 🔐 PRODUCTION: Including Supabase Bearer token for /api/parent/students
+index-ntGC6uQo.js:55 🌐 API Response: GET /api/parent/students Object
+index-ntGC6uQo.js:494 Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+(anonymous) @ index-ntGC6uQo.js:494
+Jx @ index-ntGC6uQo.js:40
+Fu @ index-ntGC6uQo.js:40
+jH @ index-ntGC6uQo.js:40
+_l @ index-ntGC6uQo.js:40
+Wk @ index-ntGC6uQo.js:40
+il @ index-ntGC6uQo.js:38
+(anonymous) @ index-ntGC6uQo.js:40Understand this warning
+index-ntGC6uQo.js:55 🌐 Making API request: POST /api/students {firstName: 'Test', lastName: 'Hero', dateOfBirth: '2001-01-01', grade: 'K', school: 'Stepping Stones', …}
+index-ntGC6uQo.js:55 🔄 Starting auth check for /api/students...
+index-ntGC6uQo.js:55 🔄 Supabase client obtained for /api/students
+index-ntGC6uQo.js:55 🔄 Session retrieval completed for /api/students
+index-ntGC6uQo.js:55 🔍 DEBUG: Session data for /api/students: {hasSession: true, hasAccessToken: true, sessionError: undefined, tokenLength: 845, tokenPreview: 'eyJhbGciOiJIUzI1NiIs...', …}
+index-ntGC6uQo.js:55 🔐 PRODUCTION: Including Supabase Bearer token for /api/students
+index-ntGC6uQo.js:55 🌐 API Response: POST /api/students {status: 200, ok: true, headers: {…}}
+index-ntGC6uQo.js:928 ❌ Student creation error details: {error: SyntaxError: Unexpected token '<', "<!DOCTYPE "... is not valid JSON, message: `Unexpected token '<', "<!DOCTYPE "... is not valid JSON`, status: undefined}
+onError @ index-ntGC6uQo.js:928
+execute @ index-ntGC6uQo.js:48
+await in execute
+mutate @ index-ntGC6uQo.js:48
+(anonymous) @ index-ntGC6uQo.js:48
+v @ index-ntGC6uQo.js:928
+(anonymous) @ index-ntGC6uQo.js:547
+await in (anonymous)
+VG @ index-ntGC6uQo.js:37
+zG @ index-ntGC6uQo.js:37
+WG @ index-ntGC6uQo.js:37
+mk @ index-ntGC6uQo.js:37
+E$ @ index-ntGC6uQo.js:37
+(anonymous) @ index-ntGC6uQo.js:37
+v_ @ index-ntGC6uQo.js:40
+J4 @ index-ntGC6uQo.js:37
+uw @ index-ntGC6uQo.js:37
+GP @ index-ntGC6uQo.js:37
+iq @ index-ntGC6uQo.js:37Understand this error
+index-ntGC6uQo.js:55 🌐 Making API request: POST /api/students {firstName: 'Test', lastName: 'Hero', dateOfBirth: '2001-01-01', grade: 'K', school: 'Stepping Stones', …}
+index-ntGC6uQo.js:55 🔄 Starting auth check for /api/students...
+index-ntGC6uQo.js:55 🔄 Supabase client obtained for /api/students
+index-ntGC6uQo.js:55 🔄 Session retrieval completed for /api/students
+index-ntGC6uQo.js:55 🔍 DEBUG: Session data for /api/students: {hasSession: true, hasAccessToken: true, sessionError: undefined, tokenLength: 845, tokenPreview: 'eyJhbGciOiJIUzI1NiIs...', …}
+index-ntGC6uQo.js:55 🔐 PRODUCTION: Including Supabase Bearer token for /api/students
+index-ntGC6uQo.js:55 🌐 API Response: POST /api/students {status: 200, ok: true, headers: {…}}
+index-ntGC6uQo.js:928 ❌ Student creation error details: {error: SyntaxError: Unexpected token '<', "<!DOCTYPE "... is not valid JSON, message: `Unexpected token '<', "<!DOCTYPE "... is not valid JSON`, status: undefined}
+onError @ index-ntGC6uQo.js:928
+execute @ index-ntGC6uQo.js:48
+await in execute
+mutate @ index-ntGC6uQo.js:48
+(anonymous) @ index-ntGC6uQo.js:48
+v @ index-ntGC6uQo.js:928
+(anonymous) @ index-ntGC6uQo.js:547
+await in (anonymous)
+VG @ index-ntGC6uQo.js:37
+zG @ index-ntGC6uQo.js:37
+WG @ index-ntGC6uQo.js:37
+mk @ index-ntGC6uQo.js:37
+E$ @ index-ntGC6uQo.js:37
+(anonymous) @ index-ntGC6uQo.js:37
+v_ @ index-ntGC6uQo.js:40
+J4 @ index-ntGC6uQo.js:37
+uw @ index-ntGC6uQo.js:37
+GP @ index-ntGC6uQo.js:37
+iq @ index-ntGC6uQo.js:37Understand this error

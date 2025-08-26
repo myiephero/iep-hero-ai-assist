@@ -1,0 +1,219 @@
+✅ Supabase singleton client ready
+index-EGjdGV42.js:911 🚨 EMERGENCY CACHE BUST - BUILD_ID= time-1756178847245
+(anonymous) @ index-EGjdGV42.js:911Understand this error
+index-EGjdGV42.js:450 [ISSUE-89] Supabase client ready, starting session fetch...
+index-EGjdGV42.js:450 🩺 [ISSUE-88] Supabase client ready, setting up auth listener
+index-EGjdGV42.js:450 🚀 [ISSUE-88] Fetching initial session...
+index-EGjdGV42.js:450 🔔 [ISSUE-88] onAuthStateChange triggered: Object
+index-EGjdGV42.js:450 ❌ [ISSUE-88] Session cleared via auth state change
+2index-EGjdGV42.js:450 [ISSUE-89] Supabase client ready, starting session fetch...
+index-EGjdGV42.js:450 🩺 [ISSUE-88] Supabase client ready, setting up auth listener
+index-EGjdGV42.js:450 🚀 [ISSUE-88] Fetching initial session...
+index-EGjdGV42.js:450 🩺 [ISSUE-88] Supabase client ready, setting up auth listener
+index-EGjdGV42.js:450 🚀 [ISSUE-88] Fetching initial session...
+index-EGjdGV42.js:450 🩺 [ISSUE-88] Initial session response: Object
+index-EGjdGV42.js:450 ⚠️ [ISSUE-88] getSession returned null. Waiting for onAuthStateChange...
+g @ index-EGjdGV42.js:450Understand this warning
+index-EGjdGV42.js:450 [ISSUE-89] Supabase client ready, starting session fetch...
+index-EGjdGV42.js:450 🩺 [ISSUE-88] Supabase client ready, setting up auth listener
+index-EGjdGV42.js:450 🔔 [ISSUE-88] onAuthStateChange triggered: Object
+index-EGjdGV42.js:450 ❌ [ISSUE-88] Session cleared via auth state change
+index-EGjdGV42.js:450 [ISSUE-89] Supabase client ready, starting session fetch...
+index-EGjdGV42.js:450 🩺 [ISSUE-88] Supabase client ready, setting up auth listener
+index-EGjdGV42.js:450 🚀 [ISSUE-88] Fetching initial session...
+index-EGjdGV42.js:450 🔔 [ISSUE-88] onAuthStateChange triggered: Object
+index-EGjdGV42.js:450 ❌ [ISSUE-88] Session cleared via auth state change
+index-EGjdGV42.js:450 🩺 [ISSUE-88] Initial session response: Object
+index-EGjdGV42.js:450 ⚠️ [ISSUE-88] getSession returned null. Waiting for onAuthStateChange...
+g @ index-EGjdGV42.js:450Understand this warning
+index-EGjdGV42.js:450 [ISSUE-89] Supabase client ready, starting session fetch...
+index-EGjdGV42.js:450 🩺 [ISSUE-88] Supabase client ready, setting up auth listener
+index-EGjdGV42.js:450 🩺 [ISSUE-88] Initial session response: Object
+index-EGjdGV42.js:450 ⚠️ [ISSUE-88] getSession returned null. Waiting for onAuthStateChange...
+g @ index-EGjdGV42.js:450Understand this warning
+index-EGjdGV42.js:450 🔔 [ISSUE-88] onAuthStateChange triggered: Object
+index-EGjdGV42.js:450 ❌ [ISSUE-88] Session cleared via auth state change
+index-EGjdGV42.js:450 🔔 [ISSUE-88] onAuthStateChange triggered: Object
+index-EGjdGV42.js:450 ❌ [ISSUE-88] Session cleared via auth state change
+index-EGjdGV42.js:450 🩺 [ISSUE-88] Initial session response: Object
+index-EGjdGV42.js:450 ⚠️ [ISSUE-88] getSession returned null. Waiting for onAuthStateChange...
+g @ index-EGjdGV42.js:450Understand this warning
+index-EGjdGV42.js:450 🔔 [ISSUE-88] onAuthStateChange triggered: Object
+index-EGjdGV42.js:450 ❌ [ISSUE-88] Session cleared via auth state change
+index-EGjdGV42.js:907 SW registered: ServiceWorkerRegistration
+index-EGjdGV42.js:907 SW registered: ServiceWorkerRegistration
+index-EGjdGV42.js:911 [Main] SW registered: ServiceWorkerRegistration
+index-EGjdGV42.js:450 [ISSUE-89] Fallback hydration triggered: forcing login screen
+(anonymous) @ index-EGjdGV42.js:450Understand this warning
+index-EGjdGV42.js:450 [ISSUE-89] Supabase client ready, starting session fetch...
+index-EGjdGV42.js:450 🩺 [ISSUE-88] Supabase client ready, setting up auth listener
+index-EGjdGV42.js:450 🔔 [ISSUE-88] onAuthStateChange triggered: Object
+index-EGjdGV42.js:450 ❌ [ISSUE-88] Session cleared via auth state change
+index-EGjdGV42.js:450 [ISSUE-89] Fallback hydration triggered: forcing login screen
+(anonymous) @ index-EGjdGV42.js:450Understand this warning
+index-EGjdGV42.js:450 [ISSUE-89] Supabase client ready, starting session fetch...
+index-EGjdGV42.js:450 🩺 [ISSUE-88] Supabase client ready, setting up auth listener
+index-EGjdGV42.js:450 🔔 [ISSUE-88] onAuthStateChange triggered: Object
+index-EGjdGV42.js:450 ❌ [ISSUE-88] Session cleared via auth state change
+2index-EGjdGV42.js:450 [FALLBACK] Session not found after timeout. Redirecting to login.
+(anonymous) @ index-EGjdGV42.js:450Understand this warning
+2index-EGjdGV42.js:907 [PWA] Simulating installability for testing
+index-EGjdGV42.js:450 🔄 Starting login process for: erika.levine2017@gmail.com
+index-EGjdGV42.js:450 🚀 PRODUCTION LOGIN: Supabase-only authentication for: erika.levine2017@gmail.com
+index-EGjdGV42.js:450 🔔 [ISSUE-88] onAuthStateChange triggered: Object
+index-EGjdGV42.js:450 ✅ [ISSUE-88] Valid session from auth state change: c89b7c1c-c60a-46fd-a45d-6f4b17f4cd13
+index-EGjdGV42.js:450 [ISSUE-89] Session hydrated via onAuthStateChange
+index-EGjdGV42.js:450 🔄 [ISSUE-88] Processing session data: Object
+index-EGjdGV42.js:450 🔔 [ISSUE-88] onAuthStateChange triggered: Object
+index-EGjdGV42.js:450 ✅ [ISSUE-88] Valid session from auth state change: c89b7c1c-c60a-46fd-a45d-6f4b17f4cd13
+index-EGjdGV42.js:450 [ISSUE-89] Session hydrated via onAuthStateChange
+index-EGjdGV42.js:450 🔄 [ISSUE-88] Processing session data: Object
+index-EGjdGV42.js:450 🔔 [ISSUE-88] onAuthStateChange triggered: Object
+index-EGjdGV42.js:450 ✅ [ISSUE-88] Valid session from auth state change: c89b7c1c-c60a-46fd-a45d-6f4b17f4cd13
+index-EGjdGV42.js:450 [ISSUE-89] Session hydrated via onAuthStateChange
+index-EGjdGV42.js:450 🔄 [ISSUE-88] Processing session data: Object
+index-EGjdGV42.js:450 🔔 [ISSUE-88] onAuthStateChange triggered: Object
+index-EGjdGV42.js:450 ✅ [ISSUE-88] Valid session from auth state change: c89b7c1c-c60a-46fd-a45d-6f4b17f4cd13
+index-EGjdGV42.js:450 [ISSUE-89] Session hydrated via onAuthStateChange
+index-EGjdGV42.js:450 🔄 [ISSUE-88] Processing session data: Object
+index-EGjdGV42.js:450 🔔 [ISSUE-88] onAuthStateChange triggered: Object
+index-EGjdGV42.js:450 ✅ [ISSUE-88] Valid session from auth state change: c89b7c1c-c60a-46fd-a45d-6f4b17f4cd13
+index-EGjdGV42.js:450 [ISSUE-89] Session hydrated via onAuthStateChange
+index-EGjdGV42.js:450 🔄 [ISSUE-88] Processing session data: Object
+index-EGjdGV42.js:450 🔔 [ISSUE-88] onAuthStateChange triggered: Object
+index-EGjdGV42.js:450 ✅ [ISSUE-88] Valid session from auth state change: c89b7c1c-c60a-46fd-a45d-6f4b17f4cd13
+index-EGjdGV42.js:450 [ISSUE-89] Session hydrated via onAuthStateChange
+index-EGjdGV42.js:450 🔄 [ISSUE-88] Processing session data: Object
+index-EGjdGV42.js:450 🔔 [ISSUE-88] onAuthStateChange triggered: Object
+index-EGjdGV42.js:450 ✅ [ISSUE-88] Valid session from auth state change: c89b7c1c-c60a-46fd-a45d-6f4b17f4cd13
+index-EGjdGV42.js:450 [ISSUE-89] Session hydrated via onAuthStateChange
+index-EGjdGV42.js:450 🔄 [ISSUE-88] Processing session data: Object
+index-EGjdGV42.js:450 🔔 [ISSUE-88] onAuthStateChange triggered: Object
+index-EGjdGV42.js:450 ✅ [ISSUE-88] Valid session from auth state change: c89b7c1c-c60a-46fd-a45d-6f4b17f4cd13
+index-EGjdGV42.js:450 [ISSUE-89] Session hydrated via onAuthStateChange
+index-EGjdGV42.js:450 🔄 [ISSUE-88] Processing session data: Object
+index-EGjdGV42.js:450 [ISSUE-88] Profile fetch successful: Object
+index-EGjdGV42.js:450 🩺 [ISSUE-88] Setting user data: Object
+index-EGjdGV42.js:450 [ISSUE-88] Profile fetch successful: Object
+index-EGjdGV42.js:450 🩺 [ISSUE-88] Setting user data: Object
+index-EGjdGV42.js:450 [ISSUE-88] Profile fetch successful: Object
+index-EGjdGV42.js:450 🩺 [ISSUE-88] Setting user data: Object
+index-EGjdGV42.js:450 [ISSUE-88] Profile fetch successful: Object
+index-EGjdGV42.js:450 🩺 [ISSUE-88] Setting user data: Object
+index-EGjdGV42.js:450 [ISSUE-88] Profile fetch successful: Object
+index-EGjdGV42.js:450 🩺 [ISSUE-88] Setting user data: Object
+index-EGjdGV42.js:450 [ISSUE-88] Profile fetch successful: Object
+index-EGjdGV42.js:450 🩺 [ISSUE-88] Setting user data: Object
+index-EGjdGV42.js:450 [ISSUE-88] Profile fetch successful: Object
+index-EGjdGV42.js:450 🩺 [ISSUE-88] Setting user data: Object
+index-EGjdGV42.js:450 [ISSUE-88] Profile fetch successful: Object
+index-EGjdGV42.js:450 🩺 [ISSUE-88] Setting user data: Object
+index-EGjdGV42.js:450 ✅ Supabase login successful, user ID: c89b7c1c-c60a-46fd-a45d-6f4b17f4cd13
+index-EGjdGV42.js:450 🔄 [ISSUE-88] Processing session data: Object
+index-EGjdGV42.js:450 [ISSUE-88] Profile fetch successful: Object
+index-EGjdGV42.js:450 🩺 [ISSUE-88] Setting user data: Object
+index-EGjdGV42.js:450 ✅ Login successful
+index-EGjdGV42.js:450 🔄 Waiting for user role to be determined...
+index-EGjdGV42.js:450 🎯 GITHUB-ISSUE-75: getDashboardRoute called with role: null
+index-EGjdGV42.js:450 🔄 Navigating to role-appropriate dashboard: /login
+index-EGjdGV42.js:450 🔄 Starting login process for: erika.levine2017@gmail.com
+index-EGjdGV42.js:450 🚀 PRODUCTION LOGIN: Supabase-only authentication for: erika.levine2017@gmail.com
+index-EGjdGV42.js:450 🔔 [ISSUE-88] onAuthStateChange triggered: Object
+index-EGjdGV42.js:450 ✅ [ISSUE-88] Valid session from auth state change: c89b7c1c-c60a-46fd-a45d-6f4b17f4cd13
+index-EGjdGV42.js:450 [ISSUE-89] Session hydrated via onAuthStateChange
+index-EGjdGV42.js:450 🔄 [ISSUE-88] Processing session data: Object
+index-EGjdGV42.js:450 🔔 [ISSUE-88] onAuthStateChange triggered: Object
+index-EGjdGV42.js:450 ✅ [ISSUE-88] Valid session from auth state change: c89b7c1c-c60a-46fd-a45d-6f4b17f4cd13
+index-EGjdGV42.js:450 [ISSUE-89] Session hydrated via onAuthStateChange
+index-EGjdGV42.js:450 🔄 [ISSUE-88] Processing session data: Object
+index-EGjdGV42.js:450 🔔 [ISSUE-88] onAuthStateChange triggered: Object
+index-EGjdGV42.js:450 ✅ [ISSUE-88] Valid session from auth state change: c89b7c1c-c60a-46fd-a45d-6f4b17f4cd13
+index-EGjdGV42.js:450 [ISSUE-89] Session hydrated via onAuthStateChange
+index-EGjdGV42.js:450 🔄 [ISSUE-88] Processing session data: Object
+index-EGjdGV42.js:450 🔔 [ISSUE-88] onAuthStateChange triggered: Object
+index-EGjdGV42.js:450 ✅ [ISSUE-88] Valid session from auth state change: c89b7c1c-c60a-46fd-a45d-6f4b17f4cd13
+index-EGjdGV42.js:450 [ISSUE-89] Session hydrated via onAuthStateChange
+index-EGjdGV42.js:450 🔄 [ISSUE-88] Processing session data: Object
+index-EGjdGV42.js:450 🔔 [ISSUE-88] onAuthStateChange triggered: Object
+index-EGjdGV42.js:450 ✅ [ISSUE-88] Valid session from auth state change: c89b7c1c-c60a-46fd-a45d-6f4b17f4cd13
+index-EGjdGV42.js:450 [ISSUE-89] Session hydrated via onAuthStateChange
+index-EGjdGV42.js:450 🔄 [ISSUE-88] Processing session data: Object
+index-EGjdGV42.js:450 🔔 [ISSUE-88] onAuthStateChange triggered: Object
+index-EGjdGV42.js:450 ✅ [ISSUE-88] Valid session from auth state change: c89b7c1c-c60a-46fd-a45d-6f4b17f4cd13
+index-EGjdGV42.js:450 [ISSUE-89] Session hydrated via onAuthStateChange
+index-EGjdGV42.js:450 🔄 [ISSUE-88] Processing session data: Object
+index-EGjdGV42.js:450 🔔 [ISSUE-88] onAuthStateChange triggered: Object
+index-EGjdGV42.js:450 ✅ [ISSUE-88] Valid session from auth state change: c89b7c1c-c60a-46fd-a45d-6f4b17f4cd13
+index-EGjdGV42.js:450 [ISSUE-89] Session hydrated via onAuthStateChange
+index-EGjdGV42.js:450 🔄 [ISSUE-88] Processing session data: Object
+index-EGjdGV42.js:450 🔔 [ISSUE-88] onAuthStateChange triggered: Object
+index-EGjdGV42.js:450 ✅ [ISSUE-88] Valid session from auth state change: c89b7c1c-c60a-46fd-a45d-6f4b17f4cd13
+index-EGjdGV42.js:450 [ISSUE-89] Session hydrated via onAuthStateChange
+index-EGjdGV42.js:450 🔄 [ISSUE-88] Processing session data: Object
+index-EGjdGV42.js:450 [ISSUE-88] Profile fetch successful: Object
+index-EGjdGV42.js:450 🩺 [ISSUE-88] Setting user data: Object
+index-EGjdGV42.js:450 [ISSUE-88] Profile fetch successful: Object
+index-EGjdGV42.js:450 🩺 [ISSUE-88] Setting user data: Object
+index-EGjdGV42.js:450 [ISSUE-88] Profile fetch successful: Object
+index-EGjdGV42.js:450 🩺 [ISSUE-88] Setting user data: Object
+index-EGjdGV42.js:450 [ISSUE-88] Profile fetch successful: Object
+index-EGjdGV42.js:450 🩺 [ISSUE-88] Setting user data: Object
+index-EGjdGV42.js:450 [ISSUE-88] Profile fetch successful: Object
+index-EGjdGV42.js:450 🩺 [ISSUE-88] Setting user data: Object
+index-EGjdGV42.js:450 [ISSUE-88] Profile fetch successful: Object
+index-EGjdGV42.js:450 🩺 [ISSUE-88] Setting user data: Object
+index-EGjdGV42.js:450 [ISSUE-88] Profile fetch successful: Object
+index-EGjdGV42.js:450 🩺 [ISSUE-88] Setting user data: Object
+index-EGjdGV42.js:450 [ISSUE-88] Profile fetch successful: Object
+index-EGjdGV42.js:450 🩺 [ISSUE-88] Setting user data: Object
+index-EGjdGV42.js:450 ✅ Supabase login successful, user ID: c89b7c1c-c60a-46fd-a45d-6f4b17f4cd13
+index-EGjdGV42.js:450 🔄 [ISSUE-88] Processing session data: Object
+index-EGjdGV42.js:450 [ISSUE-88] Profile fetch successful: Object
+index-EGjdGV42.js:450 🩺 [ISSUE-88] Setting user data: Object
+index-EGjdGV42.js:450 ✅ Login successful
+index-EGjdGV42.js:450 🔄 Waiting for user role to be determined...
+index-EGjdGV42.js:450 🎯 [ISSUE-88] getUserRole called: Object
+index-EGjdGV42.js:450 🎯 GITHUB-ISSUE-75: getDashboardRoute called with role: advocate
+index-EGjdGV42.js:450 🔄 Navigating to role-appropriate dashboard: /dashboard-advocate
+index-EGjdGV42.js:450 🎯 [ISSUE-88] getUserRole called: Object
+index-EGjdGV42.js:450 🎯 GITHUB-ISSUE-75: getDashboardRoute called with role: advocate
+index-EGjdGV42.js:450 🎯 [ISSUE-88] getUserRole called: Object
+index-EGjdGV42.js:450 🎯 GITHUB-ISSUE-75: getDashboardRoute called with role: advocate
+index-EGjdGV42.js:494 [ISSUE-88] Session result: Object
+index-EGjdGV42.js:494 [ISSUE-88] Valid session detected: erika.levine2017@gmail.com
+index-EGjdGV42.js:450 🎯 [ISSUE-88] getUserRole called: Object
+index-EGjdGV42.js:450 🎯 [ISSUE-88] getUserRole called: Object
+index-EGjdGV42.js:40 Error: Minified React error #310; visit https://reactjs.org/docs/error-decoder.html?invariant=310 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.
+    at Fs (index-EGjdGV42.js:38:17615)
+    at Zx (index-EGjdGV42.js:38:20561)
+    at Object.u_ [as useEffect] (index-EGjdGV42.js:38:20819)
+    at gt.useEffect (index-EGjdGV42.js:9:5880)
+    at oO (index-EGjdGV42.js:494:34806)
+    at l_ (index-EGjdGV42.js:38:17018)
+    at S1 (index-EGjdGV42.js:40:3139)
+    at AL (index-EGjdGV42.js:40:44833)
+    at _L (index-EGjdGV42.js:40:39790)
+    at wH (index-EGjdGV42.js:40:39718)
+j1 @ index-EGjdGV42.js:40Understand this error
+index-EGjdGV42.js:40 Uncaught Error: Minified React error #310; visit https://reactjs.org/docs/error-decoder.html?invariant=310 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.
+    at Fs (index-EGjdGV42.js:38:17615)
+    at Zx (index-EGjdGV42.js:38:20561)
+    at Object.u_ [as useEffect] (index-EGjdGV42.js:38:20819)
+    at gt.useEffect (index-EGjdGV42.js:9:5880)
+    at oO (index-EGjdGV42.js:494:34806)
+    at l_ (index-EGjdGV42.js:38:17018)
+    at S1 (index-EGjdGV42.js:40:3139)
+    at AL (index-EGjdGV42.js:40:44833)
+    at _L (index-EGjdGV42.js:40:39790)
+    at wH (index-EGjdGV42.js:40:39718)Understand this error
+sw.js:5 🚨 SW ACTIVE v-docs-auth-004
+(anonymous) @ sw.js:5Understand this error
+index-EGjdGV42.js:907 SW registered: ServiceWorkerRegistration
+sw.js:8 [SW] install Object
+(anonymous) @ sw.js:8Understand this warning
+sw.js:18 [SW] activate Object
+(anonymous) @ sw.js:18Understand this warning
+sw.js:31 [SW] ACTIVATED v-docs-auth-004
+(anonymous) @ sw.js:31Understand this error
+sw.js:32 [SW] BYPASSING NON-GET & /api/*
+(anonymous) @ sw.js:32Understand this error

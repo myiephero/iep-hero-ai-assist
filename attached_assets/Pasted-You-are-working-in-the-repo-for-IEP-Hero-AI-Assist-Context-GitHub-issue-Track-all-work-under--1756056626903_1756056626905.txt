@@ -1,0 +1,70 @@
+You are working in the repo for IEP Hero AI Assist.
+
+Context / GitHub issue:
+- Track all work under: https://github.com/myiephero/iep-hero-ai-assist/issues/45
+- Branch name: fix/auth-cache-bust-45
+- Commit messages must reference the issue, e.g., "fix(auth): bust service worker + asset cache [#45]"
+
+GOAL (Step 1 of N): Eliminate stale JavaScript from PWA caching so that new authentication fixes load reliably. Implement aggressive cache-busting and a network-first strategy for app JS.
+
+Do the following exactly:
+
+1) Create branch
+   - Create and switch to branch: fix/auth-cache-bust-45
+
+2) Service Worker hard refresh
+   - Locate the service worker file (likely one of):
+     - client/src/service-worker.ts OR client/src/service-worker.js
+     - client/public/service-worker.js
+     - client/src/sw.ts or client/src/sw.js
+   - If none exists but PWA is enabled, search the codebase for `self.addEventListener('install'` or `workbox`.
+   - Make these changes (create a service worker file if needed, registered from the app):
+     a) Bump a CACHE_VERSION string to a new value that includes today’s date-time, e.g., CACHE_VERSION = 'v-45-' + Date.now();
+     b) On install: `self.skipWaiting()`
+     c) On activate: `self.clients.claim()` and delete all old caches not starting with the current CACHE_VERSION prefix.
+     d) Use **network-first** for `*.js`, `*.css`, `*.html`, and `/**` app-shell requests. Only fall back to cache if network fails. (If using Workbox, apply a NetworkFirst strategy for JS/CSS/HTML.)
+     e) Ensure the service worker responds to a `message` event with `{ type: 'SKIP_WAITING' }` to activate immediately.
+
+3) Register SW (if not already) with update ping
+   - In the client app entry (likely client/src/main.tsx or client/src/main.ts), ensure the service worker registration is enabled in production.
+   - After registration, postMessage `{ type: 'SKIP_WAITING' }` when `updatefound` fires so new SW takes control quickly.
+
+4) Build-ID cache busting
+   - Add a BUILD_ID constant that changes every build:
+     - In Vite: add `define: { __BUILD_ID__: JSON.stringify(Date.now()) }` in `client/vite.config.ts` (or `.js`).
+   - In `index.html` (or HTML template used by Vite), append `?v=__BUILD_ID__` to the main script tag if present, OR in code where the main bundle is injected, ensure assets are versioned by Vite’s content hashing (default) AND add a small runtime check to log the BUILD_ID at startup.
+   - In the app bootstrap (e.g., client/src/main.tsx), `console.info('BUILD_ID', __BUILD_ID__)`.
+
+5) Caching headers (dev server / preview)
+   - Ensure that in dev/preview, no extra service-worker-like caching layer is interfering. If there is a static server config (Express or similar) for preview, set `Cache-Control: no-store` for `index.html`.
+
+6) Minimal acceptance test hooks
+   - Add a visible console log at startup: `console.info('[IEP Hero] Cache-bust step applied, BUILD_ID=', __BUILD_ID__)`.
+   - Add another log in the service worker `activate` handler: `console.info('[SW] activated', CACHE_VERSION)`.
+
+7) Build, run, verify
+   - Restart the app in Replit “Run” / Preview.
+   - In the Preview window DevTools:
+     a) In Application > Service Workers, confirm a **new active** SW with the updated CACHE_VERSION.
+     b) In Console, confirm both logs appear:
+        - `[SW] activated ...`
+        - `[IEP Hero] Cache-bust step applied, BUILD_ID= ...`
+     c) Do a hard refresh. Confirm the BUILD_ID value changes after each rebuild.
+
+8) Commit & push
+   - Commit all changes with: 
+     "fix(pwa/cache): network-first SW, skipWaiting/claim, build-id busting [#45]"
+   - Push branch.
+
+9) Report back (in your final message)
+   - Paths of files changed/created.
+   - The detected service worker file path.
+   - The exact CACHE_VERSION and BUILD_ID seen in console.
+   - Confirmation that old caches were deleted and the new SW is **activated**.
+   - Screenshot note not needed; just paste the console lines.
+
+IMPORTANT:
+- Do not modify any auth code in this step; we are only fixing caching to ensure subsequent auth fixes load.
+- If the project already uses Workbox, apply the equivalent changes using Workbox’s NetworkFirst strategy and cache versioning.
+
+When finished, stop and report results. Do not proceed to any other steps.

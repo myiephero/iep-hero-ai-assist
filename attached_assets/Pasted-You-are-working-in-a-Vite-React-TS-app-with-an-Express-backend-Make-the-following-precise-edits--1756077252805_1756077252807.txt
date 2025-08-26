@@ -1,0 +1,107 @@
+You are working in a Vite React + TS app with an Express backend. Make the following precise edits.
+
+1) Edit client/src/lib/queryClient.ts
+- Replace the entire apiRequest function with this version that NEVER uses res.clone() and reads the body ONCE:
+
+export async function apiRequest(
+  path: string,
+  opts: RequestInit & { expect?: "json" | "text" | "auto" } = {}
+) {
+  const expect = opts.expect ?? "auto";
+
+  // Inject Supabase bearer token if available (existing helper is assumed present)
+  const headers = new Headers(opts.headers || {});
+  if (!(opts.body instanceof FormData)) {
+    headers.set("Accept", "application/json");
+    if (!headers.has("Content-Type")) {
+      headers.set("Content-Type", "application/json");
+    }
+  } else {
+    // Let the browser set multipart/form-data headers
+    headers.set("Accept", "application/json");
+  }
+
+  const resp = await fetch(path, {
+    ...opts,
+    headers,
+    credentials: "omit",
+  });
+
+  // Read body ONCE safely
+  const ct = resp.headers.get("content-type") || "";
+  const isJSON = ct.includes("application/json");
+  let body: any = null;
+
+  if (resp.status === 204) {
+    body = null;
+  } else if (expect === "text") {
+    body = await resp.text().catch(() => "");
+  } else if (expect === "json" || (expect === "auto" && isJSON)) {
+    const text = await resp.text().catch(() => "");
+    body = text ? JSON.parse(text) : null;
+  } else {
+    // Fallback for non-JSON: capture text once for diagnostics
+    body = await resp.text().catch(() => "");
+  }
+
+  // Normalize shape to { ok, data?, error? }
+  if (!resp.ok) {
+    const errMsg =
+      (body && (body.error || body.message)) ||
+      `HTTP ${resp.status}`;
+    return { ok: false, status: resp.status, error: errMsg, raw: body };
+  }
+
+  // If server already uses { ok, data, error } keep it; otherwise wrap
+  if (body && typeof body === "object" && "ok" in body) {
+    return body;
+  }
+
+  return { ok: true, data: body, status: resp.status };
+}
+
+2) Update all callers to rely on apiRequest’s normalized return.
+Make these surgical edits:
+
+2a) client/src/pages/ai-iep-review.tsx (or wherever the AI IEP analysis submit lives):
+- Ensure the submit/analyze handler does:
+  const res = await apiRequest("/api/review-iep", { method: "POST", body: formData });
+  if (!res.ok) { console.error("[AI REVIEW] error:", res.error, res.raw); /* show toast */ return; }
+  // use res.data
+
+- Remove ANY direct calls to response.json(), response.text(), or response.clone().
+
+2b) client/src/features/autism-accommodations/generate.tsx (or the component that calls POST /api/autism-accommodations/generate):
+- Change mutationFn to:
+  const res = await apiRequest("/api/autism-accommodations/generate", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) throw new Error(res.error || "Failed to generate");
+  return res.data;
+
+- Remove any manual res.json() or res.clone().
+
+2c) client/src/components/modals/file-upload-modal.tsx (document upload):
+- Ensure it already uses:
+  const res = await apiRequest("/api/documents", { method: "POST", body: formData });
+  if (!res.ok) { console.error("[DOCS] upload failed:", res.error, res.raw); return; }
+  // use res.data
+- Confirm there is NO extra parsing of the Response.
+
+3) Optional: tighten React Query helpers to expect the normalized object.
+- Wherever we do:
+    const data = await apiRequest(...);
+    return data;
+  consumers should use data.ok/data.data, not data.json().
+
+4) Quick smoke tests (dev console):
+- Upload a document → expect:
+  [DOCS UPLOAD DEBUG] Upload successful: { ok: true, data: { ... } }
+  No "Response body is already used".
+- Run AI IEP Review and Autism Accommodations → both return { ok: true, data: ... } and render results.
+- If server returns HTML by mistake, apiRequest will capture it as text and return { ok: false, error: "HTTP 500", raw: "<!DOCTYPE ..." } without throwing a parse error.
+
+Commit all changes with message:
+chore(client): single-read apiRequest + remove Response.clone() usage; normalize JSON handling

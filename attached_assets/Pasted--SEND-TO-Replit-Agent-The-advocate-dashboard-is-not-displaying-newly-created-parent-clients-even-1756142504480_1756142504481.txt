@@ -1,0 +1,42 @@
+[SEND TO: Replit Agent]
+
+The advocate dashboard is not displaying newly created parent clients, even though Supabase confirms they exist in `auth.users`. A success toast appears after creation, but the `/api/advocate/clients` endpoint continues to return 500 errors and the UI shows "No clients yet". Please execute a full diagnosis and resolution for this.
+
+🔗 GitHub Issue: https://github.com/myiephero/iep-hero-ai-assist/issues/67
+
+✅ Step-by-step actions to take:
+
+1. **Confirm backend changes are deploying**:
+   - Add a console log marker to `routes/advocate-clients.ts` and confirm it's present in the production build logs via `dist/index.js`.
+
+2. **Log actual error response in production**:
+   - Wrap the logic inside `GET /api/advocate/clients` route with `try/catch`.
+   - In the `catch`, `console.error('AdvocateClientsAPI Error:', error)` and `return res.status(500).json({ error: error.message })`.
+
+3. **Trace database query behavior**:
+   - Temporarily log the Supabase query result just before sending the response.
+   - If the result is null or empty, confirm:
+     - `advocate_id` in the clients table is correctly populated on insert.
+     - There are no missing joins or filters (e.g., missing `profile_id`, `display_name`, or `parent_id`).
+
+4. **Manually check Supabase DB row**:
+   - Using known UID (e.g. `scooter4b@gmail.com`), check the related row in:
+     - `clients` table (does it exist?)
+     - `profiles` table (is it linked properly?)
+   - Confirm `advocate_id` matches current session user ID.
+
+5. **Check and log RLS behavior**:
+   - Verify RLS policies allow advocates to select clients where `advocate_id = auth.uid()`.
+   - Add a log showing the `auth.uid()` received in the handler.
+
+6. **Return a fallback error message to the frontend**:
+   - If nothing is returned from the DB but no actual error occurs, return:
+     ```ts
+     return res.status(200).json({ clients: [], message: "No clients found or failed to query." })
+     ```
+
+7. **Deploy and retest in production**:
+   - Add a test parent (e.g., `testparent@myiephero.com`) from the advocate view.
+   - Confirm it appears in Supabase and that the advocate UI shows the client after refetch.
+
+Once all steps are complete and the issue is confirmed resolved, mark the GitHub issue closed with a brief technical postmortem.

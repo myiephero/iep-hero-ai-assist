@@ -1,0 +1,63 @@
+Create two API endpoints that always return JSON and are protected (where needed):
+
+Files to edit:
+1) server/routes.ts
+   - Import: 
+       import { requireAuth } from "./middleware/auth";
+   - Add at top (near other constants):
+       const BUILD_ID = process.env.BUILD_ID || "dev";
+   - Add these routes **above** the SPA fallback:
+
+   // --- Health (no auth) ---
+   app.get("/health", (req, res) => {
+     res.status(200).json({
+       ok: true,
+       service: "api",
+       buildId: BUILD_ID,
+       time: new Date().toISOString(),
+     });
+   });
+
+   // --- Dashboard metrics (auth) ---
+   // Keep it simple & resilient; don't hit DB yet. Just return a shape the UI can consume.
+   app.get("/api/dashboard/metrics", requireAuth, async (req, res) => {
+     try {
+       console.log("[METRICS DEBUG]", { userId: req.user?.id, path: req.path });
+       // Minimal placeholder so the client gets valid JSON.
+       // You can enrich later with real counts.
+       res.json({
+         ok: true,
+         summary: {
+           studentsCount: 1,   // placeholder
+           documentsCount: 0,  // placeholder
+         },
+         buildId: BUILD_ID,
+       });
+     } catch (err:any) {
+       console.error("[METRICS ERROR]", err);
+       res.status(500).json({ ok: false, error: err?.message || "metrics failed" });
+     }
+   });
+
+2) server/index.ts
+   - Ensure your global JSON error guard remains AFTER routes:
+     // (keep existing error guard you added)
+     app.use("/api", (err:any, req:any, res:any, next:any) => {
+       const status = err?.status || err?.statusCode || 500;
+       res.status(status).json({ ok: false, error: err?.message || "Unexpected API error" });
+     });
+
+After edits:
+- Restart the app.
+- Run quick smoke test in the Shell:
+
+  echo "== /health ==" && curl -sS -i http://localhost:5000/health | head -20
+  echo "== /api/dashboard/metrics (no token) ==" && curl -sS -i http://localhost:5000/api/dashboard/metrics | head -20
+
+Expected:
+- /health → HTTP/1.1 200 OK with JSON body { ok:true, ... }
+- /api/dashboard/metrics → HTTP/1.1 401 with JSON { error: "Missing Authorization header" } (that’s good w/o token)
+
+Finally, open the app and watch the browser console:
+- You should **no longer** see “Unexpected token '<' ...” for dashboard metrics.
+- You should see your usual “Including Supabase Bearer token” followed by a **200 JSON** response for /api/dashboard/metrics once logged in.

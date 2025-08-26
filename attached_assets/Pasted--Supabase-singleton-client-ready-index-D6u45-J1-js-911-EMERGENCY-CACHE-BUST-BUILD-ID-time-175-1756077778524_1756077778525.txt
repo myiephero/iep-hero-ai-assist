@@ -1,0 +1,55 @@
+✅ Supabase singleton client ready
+index-D6u45-J1.js:911 🚨 EMERGENCY CACHE BUST - BUILD_ID= time-1756077665140
+(anonymous) @ index-D6u45-J1.js:911Understand this error
+2index-D6u45-J1.js:450 🚀 PRODUCTION: Checking Supabase session...
+2index-D6u45-J1.js:450 ❌ No valid Supabase session found
+index-D6u45-J1.js:907 SW registered: ServiceWorkerRegistration
+index-D6u45-J1.js:907 SW registered: ServiceWorkerRegistration
+index-D6u45-J1.js:911 [Main] SW registered: ServiceWorkerRegistration
+login:1 Banner not shown: beforeinstallpromptevent.preventDefault() called. The page must call beforeinstallpromptevent.prompt() to show the banner.
+2index-D6u45-J1.js:907 [PWA] Simulating installability for testing
+index-D6u45-J1.js:450 🔄 Starting login process for: rikka6879@yahoo.com
+index-D6u45-J1.js:450 🚀 PRODUCTION LOGIN: Supabase-only authentication for: rikka6879@yahoo.com
+index-D6u45-J1.js:450 ✅ Supabase login successful, user ID: c1867d86-82df-4037-bf23-fde11648b267
+index-D6u45-J1.js:450 🎯 LOGIN SUCCESS DEBUG: Object
+index-D6u45-J1.js:450 ✅ Login successful
+index-D6u45-J1.js:450 🔄 Redirecting to dashboard...
+index-D6u45-J1.js:450 🔄 Navigating to: /dashboard-premium
+index-D6u45-J1.js:494 ❌ Parent user accessing advocate dashboard, redirecting to parent dashboard
+index-D6u45-J1.js:494 💼 ADVOCATE DASHBOARD MOUNT DEBUG: Object
+index-D6u45-J1.js:494 🔍 Parent Dashboard - User: rikka6879@yahoo.com Username: rikka6879@yahoo.com Role: parent
+index-D6u45-J1.js:55 🔄 Default queryFn using apiRequest for: /api/dashboard/metrics
+index-D6u45-J1.js:494 🏠 PARENT DASHBOARD MOUNT DEBUG: Object
+index-D6u45-J1.js:494 🔍 Parent Dashboard rendered with user: Object
+sw.js:5 🚨 SW ACTIVE v-docs-auth-004
+(anonymous) @ sw.js:5Understand this error
+index-D6u45-J1.js:907 SW registered: ServiceWorkerRegistration
+sw.js:8 [SW] install Object
+(anonymous) @ sw.js:8Understand this warning
+index-D6u45-J1.js:494 🔍 Parent Dashboard - User: rikka6879@yahoo.com Username: rikka6879@yahoo.com Role: parent
+sw.js:18 [SW] activate Object
+(anonymous) @ sw.js:18Understand this warning
+sw.js:31 [SW] ACTIVATED v-docs-auth-004
+(anonymous) @ sw.js:31Understand this error
+sw.js:32 [SW] BYPASSING NON-GET & /api/*
+(anonymous) @ sw.js:32Understand this error
+index-D6u45-J1.js:55 🔄 Default queryFn using apiRequest for: /api/parent/students
+index-D6u45-J1.js:907 [PWA] Simulating installability for testing
+index-D6u45-J1.js:494 Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+(anonymous) @ index-D6u45-J1.js:494Understand this warning
+index-D6u45-J1.js:907 ✅ Student creation successful: Object
+2index-D6u45-J1.js:55 🔄 Default queryFn using apiRequest for: /api/parent/students
+index-D6u45-J1.js:55 🔄 Default queryFn using apiRequest for: /api/documents
+3index-D6u45-J1.js:55 🔄 Default queryFn using apiRequest for: /api/students
+index-D6u45-J1.js:494 Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+(anonymous) @ index-D6u45-J1.js:494Understand this warning
+2index-D6u45-J1.js:55 🔄 Default queryFn using apiRequest for: /api/students
+index-D6u45-J1.js:494 [DOCS UPLOAD DEBUG] sending Object
+index-D6u45-J1.js:494 [DOCS UPLOAD DEBUG] Starting upload mutation
+index-D6u45-J1.js:494 [DOCS UPLOAD DEBUG] API Response: Object
+index-D6u45-J1.js:494 [DOCS UPLOAD DEBUG] Upload successful: Object
+index-D6u45-J1.js:55 🔄 Default queryFn using apiRequest for: /api/documents
+index-D6u45-J1.js:494 🔍 Parent Dashboard - User: rikka6879@yahoo.com Username: rikka6879@yahoo.com Role: parent
+index-D6u45-J1.js:494 🏠 PARENT DASHBOARD MOUNT DEBUG: Object
+index-D6u45-J1.js:494 🔍 Parent Dashboard rendered with user: Object
+2index-D6u45-J1.js:55 🔄 Default queryFn using apiRequest for: /api/students

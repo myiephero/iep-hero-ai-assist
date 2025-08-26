@@ -1,0 +1,41 @@
+# [SEND TO: Replit Agent] 🛠️ Step 2 – Fix Supabase Session Delay and Advocate-Client Insert Error (GitHub Issue #87)
+# GitHub Issue: https://github.com/myiephero/iep-hero-ai-assist/issues/87
+
+echo "⚙️ Step 2: Begin bug fix implementation for GitHub Issue #87..."
+
+### 🧠 A. FIX LOGIN DOUBLE-CLICK (Supabase Session Hydration Bug)
+# 🔧 Patch logic in `AuthContext.tsx` or `useAuth.ts`:
+# 1. Ensure session retrieval is delayed until Supabase client is ready:
+#    ✅ Wrap session fetch inside: `useEffect(() => { if (!sessionChecked) fetchSession(); }, [supabase])`
+# 2. Update `getUserRole` or routing logic to:
+#    ```ts
+#    if (!isHydrated || !session || !user?.email || !user?.id) return null;
+#    ```
+# 3. Gate all role-based routing inside: 
+#    ```ts
+#    useEffect(() => {
+#      if (isHydrated && user?.role) router.push(getDashboardRoute(user.role));
+#    }, [isHydrated, user]);
+#    ```
+# 4. Add a hydration fallback timeout (e.g., 1s) to ensure session is checked at least once.
+
+### 🔧 B. FIX 500 ERROR IN /api/advocate/clients
+# File: `pages/api/advocate/clients.ts`
+# 1. Confirm `req.user.id` or Supabase session returns a valid `advocate_id`.
+#    ✅ If not, immediately return `401 Unauthorized`
+# 2. Verify `profiles` table has a matching `id` row for authenticated advocate
+#    ```ts
+#    const { data: profile, error } = await supabase.from('profiles').select('*').eq('id', advocateId).single();
+#    if (!profile) return res.status(400).json({ error: 'Advocate profile not found' });
+#    ```
+# 3. Fix the insertion logic:
+#    ✅ Use `supabaseAdmin` to insert to `advocate_clients` (not user client)
+#    ✅ Ensure payload includes: `advocate_id`, `parent_email`, `phone`, `notes`, etc.
+#    ✅ Log insert error with `.error.message` and `.status_code`
+
+### 🧪 TESTS AFTER FIX:
+# ✅ Log in as `erika.levine2017@gmail.com` → should route on first attempt
+# ✅ Submit Add New Client form → should succeed with HTTP 200
+# ✅ No console 500 errors; Supabase logs show insert success
+
+echo "✅ Step 2 patch logic delivered. Awaiting fix commit + confirmation before proceeding to Step 3 (validation and QA)."

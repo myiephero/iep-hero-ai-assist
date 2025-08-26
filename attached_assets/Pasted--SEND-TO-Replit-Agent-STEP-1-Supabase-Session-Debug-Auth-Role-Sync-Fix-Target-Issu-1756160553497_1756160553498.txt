@@ -1,0 +1,44 @@
+### 🛠️ [SEND TO: Replit Agent] STEP 1 — Supabase Session Debug + Auth Role Sync Fix  
+**Target Issue:** [#82 – Supabase Session False Negative During Auth Hydration](https://github.com/myiephero/iep-hero-ai-assist/issues/82)
+
+---
+
+#### 🧠 Objective:
+Diagnose and correct **false negatives during Supabase session hydration**, which result in advocate users being incorrectly routed to the **parent dashboard** due to missing or delayed session detection.
+
+---
+
+#### ✅ Task Scope:
+
+1. Open `_app.tsx` (or wherever `SupabaseProvider` + `AuthProvider` are initialized).
+2. Insert precise diagnostic logs **with `[ISSUE-82-STEP-1]` prefix**:
+   - `console.debug('[ISSUE-82-STEP-1] Supabase session check START')`
+   - `console.debug('[ISSUE-82-STEP-1] Supabase session response:', session)`
+   - `console.debug('[ISSUE-82-STEP-1] Supabase client state:', supabase)`
+3. Trace the full hydration sequence:
+   - Confirm `supabase.auth.getSession()` resolves **before** `getUserRole()` or `getDashboardRoute()` is invoked.
+   - Ensure the `AuthContext` is populated **prior to** any role-based dashboard routing logic.
+4. Temporarily insert blocking guard (if needed) before routing:
+   ```ts
+   if (!session || loading) {
+     console.debug('[ISSUE-82-STEP-1] Session loading - blocking routing...');
+     return <Loading />;
+   }
+   ```
+5. Ensure all race condition logs are visible from `index.js`, `dashboard.tsx`, and `MyParentsPage` where role routing and mount logic occurs.
+6. **DO NOT WRAP** `.getSession()` in a generic try/catch — we need raw visibility into the session object.
+7. Push to Replit **production** and notify Scott that live testing can begin.
+
+---
+
+#### 🧪 Validation Plan:
+- ✅ `[ISSUE-82-STEP-1]` logs appear for all key checkpoints (session load, auth context, routing)
+- ✅ Session is no longer `null` or undefined at time of role resolution
+- ✅ Advocate user is routed to `/dashboard-advocate` on login
+
+---
+
+#### 🔁 If session is still falsy during routing:
+Proceed to Step 2 — patch hydration race by delaying dashboard resolution until Supabase session is fully resolved.
+
+---

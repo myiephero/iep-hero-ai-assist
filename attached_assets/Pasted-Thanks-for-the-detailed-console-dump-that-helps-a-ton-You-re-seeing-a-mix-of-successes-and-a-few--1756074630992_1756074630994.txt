@@ -1,0 +1,161 @@
+Thanks for the detailed console dump—that helps a ton. You’re seeing a mix of ✅ successes and a few flaky errors because some endpoints still sometimes fall through to the SPA (HTML) or return a non‑standard JSON shape. Let’s fix that in one precise step.
+
+Here’s a single ready‑to‑paste Replit Agent prompt that will:
+	•	Add a tiny respondJSON() helper and force JSON responses (never HTML)
+	•	Standardize POST /api/students and POST /api/documents to always return { ok: boolean, data?, error? }
+	•	Add missing GET /api/dashboard/metrics (so it can’t fall through to HTML)
+	•	Harden the client apiRequest() to log raw response text if JSON parsing ever fails (to catch future regressions)
+
+Paste this to the Replit Agent as-is:
+
+You are acting on repo "iep-hero-ai-assist". Perform ALL of the following changes and then restart the app.
+
+GOAL
+- Eliminate any “Unexpected token '<'” by guaranteeing JSON on ALL /api/* routes.
+- Standardize success shape to `{ ok: true, data: ... }` and errors to `{ ok: false, error: string }`.
+- Ensure /api/dashboard/metrics exists and returns JSON (no SPA fallthrough).
+- Improve client parse diagnostics.
+
+1) Create server/utils/respondJSON.ts with a strict helper:
+
+--- a/server/utils/respondJSON.ts (new)
++++ b/server/utils/respondJSON.ts
++import type { Response } from "express";
++
++export function ok(res: Response, data: any, status = 200) {
++  return res.status(status).type("application/json").json({ ok: true, data });
++}
++
++export function fail(res: Response, error: any, status = 400) {
++  const message =
++    typeof error === "string"
++      ? error
++      : error?.message || "Unexpected API error";
++  return res.status(status).type("application/json").json({ ok: false, error: message });
++}
+
+2) Update server/routes.ts
+- Import the helper at top.
+- Add missing GET /api/dashboard/metrics
+- Wrap POST /api/students and POST /api/documents in try/catch and use respondJSON
+- Keep requireAuth and upload middleware as-is.
+
+Find (near other imports):
+  import { requireAuth } from "./middleware/auth";
+  import { upload } from "./middleware/upload";
+Add:
+  import { ok, fail } from "./utils/respondJSON";
+
+Add (ANYWHERE after app declarations, alongside other routes):
+  // Minimal metrics endpoint to guarantee JSON and avoid SPA fallback
+  app.get("/api/dashboard/metrics", requireAuth, async (req, res) => {
+    try {
+      // TODO: replace with real metrics later
+      return ok(res, {
+        studentsCount: 0,
+        documentsCount: 0,
+        lastUpdated: new Date().toISOString(),
+      });
+    } catch (err) {
+      console.error("[METRICS ERROR]", err);
+      return fail(res, err, 500);
+    }
+  });
+
+Harden POST /api/students (replace handler body with):
+  app.post("/api/students", requireAuth, async (req, res) => {
+    try {
+      // existing validation + DB logic...
+      // Assume you create `student` object
+      // return ok(res, { student }, 201);
+      const student = await createStudent(req.user.id, req.body); // or your existing function
+      return ok(res, { student }, 201);
+    } catch (err: any) {
+      console.error("[STUDENTS FATAL]", err);
+      return fail(res, err, err?.statusCode === 401 ? 401 : 500);
+    }
+  });
+
+Harden POST /api/documents (replace handler body with):
+  app.post("/api/documents", requireAuth, upload.single("document"), async (req, res) => {
+    try {
+      // Accept "document" or legacy "file"
+      const file = req.file ?? (req as any).files?.document ?? (req as any).files?.file;
+      if (!file) return fail(res, "Missing file field 'document'", 400);
+      // existing storage + DB insert...
+      const doc = await saveDocument(req.user.id, file, req.body); // or your existing function
+      return ok(res, { document: doc }, 201);
+    } catch (err: any) {
+      console.error("[DOCS UPLOAD ERROR]", err);
+      return fail(res, err, err?.statusCode === 401 ? 401 : 500);
+    }
+  });
+
+NOTE: Leave other routes intact; just ensure every /api/* route returns via ok()/fail().
+
+3) Strengthen global JSON guard (server/index.ts)
+Right after your app.use("/api", ...) JSON/error guards, ensure ANY error going through /api uses JSON:
+- If you already have an error middleware for /api, update it to:
+  app.use("/api", (err, req, res, next) => {
+    console.error("[API JSON GUARD]", err);
+    res
+      .status(err?.status || 500)
+      .type("application/json")
+      .json({ ok: false, error: err?.message || "Unexpected API error" });
+  });
+
+4) Harden client parser (client/src/lib/queryClient.ts or apiRequest helper file)
+- After `fetch`, attempt JSON parse; if it throws, read text and log it, then throw a structured error.
+
+Find your apiRequest (the fetch wrapper) and replace its response parsing with:
+
+  const contentType = resp.headers.get("content-type") || "";
+  let body: any = null;
+  try {
+    if (contentType.includes("application/json")) {
+      body = await resp.json();
+    } else {
+      const raw = await resp.text();
+      console.error("[API RAW NON-JSON]", { url, status: resp.status, raw });
+      // attempt JSON fallback
+      try { body = JSON.parse(raw); } catch {
+        throw new Error(`Non-JSON response from ${url}: status=${resp.status}`);
+      }
+    }
+  } catch (e) {
+    const raw = await resp.clone().text().catch(() => "");
+    console.error("[API PARSE FAIL]", { url, status: resp.status, raw, error: String(e) });
+    throw e;
+  }
+
+  if (!resp.ok || (body && body.ok === false)) {
+    const msg = body?.error || `HTTP ${resp.status}`;
+    throw new Error(msg);
+  }
+  return body;
+
+5) Confirm SW is not touching /api and POST (you already have this, just keep it):
+  // in client/public/sw.js
+  // if (request.method !== 'GET' || url.pathname.startsWith('/api/')) return;
+
+6) Restart app
+
+7) Quick smoke tests (agent can run):
+- curl -i http://localhost:5000/api/dashboard/metrics   -> expect 401 JSON { ok:false, error:"Missing Authorization header" }
+- curl -i -X POST http://localhost:5000/api/students     -> expect 401 JSON
+- (Optional) with a valid token, both should return ok:true JSON.
+
+When finished, report:
+- the exact diff hunks touched,
+- server console lines for METRICS/ STUDENTS/ DOCS handlers,
+- and a one-line confirmation that all /api responses are JSON (no HTML).
+
+Once the agent applies that, do a hard reload and try:
+	•	Create a student
+	•	Upload a document
+
+Then tell me:
+	•	For student creation: do you see ✅ Student creation successful (and no parse error)?
+	•	For documents: do you see [DOCS UPLOAD DEBUG] Upload successful and a 201 with { ok: true, data: { document: ... } }?
+
+If anything still errors, the improved client parser will dump the raw response text, which will give us an immediate, exact cause to squash next.

@@ -1,0 +1,77 @@
+Got it ✅ Thanks for clarifying. Since you want a ready-to-paste Replit Agent prompt that ensures Step 3 (Document Upload Fix) aligns with the issue you logged (#45), here’s the exact block you can drop into the Replit agent chat:
+
+⸻
+
+📌 Replit Agent Prompt (Step 3 – Document Upload Fix, tied to Issue #45)
+
+Repo: https://github.com/myiephero/iep-hero-ai-assist
+Tracking: https://github.com/myiephero/iep-hero-ai-assist/issues/45
+
+⸻
+
+🚨 MISSION – Fix Document Upload (POST /api/documents) Authentication + Persistence
+
+We’re still seeing 401 errors and 500s when uploading to the Document Vault. The browser console shows Supabase session + Bearer tokens, but uploads fail. This is part of the widespread authentication failures logged in Issue #45.
+
+⸻
+
+🔨 Required Fixes
+	1.	Server-Side Middleware
+	•	Ensure all /api/documents routes (GET, POST, analyze, etc.) use requireAuth with Supabase Bearer validation.
+	•	Add [DOCS AUTH DEBUG] logs showing { userId, method, path } when a request is processed.
+	2.	POST /api/documents
+	•	Ensure middleware order is correct:
+
+app.post("/api/documents", requireAuth, upload.single("document"), async (req, res) => { ... })
+
+
+	•	Return { success: true, documentId } on success.
+	•	Log storage errors clearly with [DOCS UPLOAD ERROR].
+
+	3.	Database Integrity
+	•	Ensure documents.owner_id exists and is correctly FK’d → auth.users(id) (see migration file 20250824_fix_documents.sql).
+	•	Verify that INSERTs use owner_id from Supabase user.id, not a session/local value.
+	4.	Frontend Client
+	•	Replace any direct fetch() in Document Vault with the shared apiRequest() helper, which already injects Bearer tokens.
+	•	Add [DOCS UPLOAD DEBUG] log in client to show formData keys + API response.
+	5.	Service Worker (Cache Busting)
+	•	Confirm SW bypasses all POST and /api/ calls:
+
+if (event.request.method !== "GET" || event.request.url.includes("/api/")) {
+  return fetch(event.request);
+}
+
+
+	•	Bump SW version to v-docs-auth-002.
+	•	Add RED emergency logs:
+🚨 DOCS CACHE BUST [BUILD_ID: ${timestamp}]
+
+⸻
+
+✅ Acceptance Criteria
+	•	Upload a document via Parent Dashboard → 200/201 response, file appears in Document Vault.
+	•	Browser console shows:
+	•	[DOCS UPLOAD DEBUG]
+	•	🚨 DOCS CACHE BUST [BUILD_ID=...]
+	•	Server logs show [DOCS AUTH DEBUG] userId=... path=/api/documents method=POST.
+	•	Supabase documents table row contains:
+	•	id
+	•	owner_id = correct Supabase UUID
+	•	filename, created_at
+
+⸻
+
+🚫 Do Not
+	•	Do NOT fallback to demo sessions.
+	•	Do NOT bypass requireAuth for testing.
+	•	Do NOT close Issue #45 until:
+	•	Document upload confirmed working
+	•	Screenshots of Supabase row + browser console logs attached
+
+⸻
+
+👉 Please implement this one-shot fix for document uploads, commit to repo, and redeploy.
+
+⸻
+
+Would you like me to also generate the SQL verification query block (ready-to-paste in Supabase SQL editor) so you can quickly confirm that documents.owner_id is set correctly after the agent’s fix?

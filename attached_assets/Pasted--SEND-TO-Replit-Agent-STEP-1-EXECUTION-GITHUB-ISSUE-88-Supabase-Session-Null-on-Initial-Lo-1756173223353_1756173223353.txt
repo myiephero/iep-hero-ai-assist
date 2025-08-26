@@ -1,0 +1,60 @@
+[SEND TO: Replit Agent]
+
+🛠 STEP 1 EXECUTION — GITHUB ISSUE #88: Supabase Session Null on Initial Load (Login Requires Double Attempt)
+
+🔗 GitHub Issue: https://github.com/myiephero/iep-hero-ai-assist/issues/88  
+🧩 Root Symptom: Supabase `getSession()` returns `null` on initial load, preventing dashboard routing. Requires a second login attempt.  
+
+🎯 OBJECTIVE: Ensure that Supabase session and user state are reliably hydrated on the first login attempt. Gate routing logic until session is available.
+
+✅ STEP 1: DIAGNOSTIC ENHANCEMENTS TO AUTHCONTEXT (Login Flow Stabilization)
+
+1. In `AuthProvider.tsx`, add Supabase `onAuthStateChange` listener:
+useEffect(() => {
+  const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+    console.log('[ISSUE-88] onAuthStateChange - session:', session);
+    if (session) {
+      setSession(session);
+      setUser(session.user);
+      setIsHydrated(true);
+    }
+  });
+  return () => listener?.subscription?.unsubscribe();
+}, []);
+
+2. Ensure `getSession()` fallback logic handles null sessions and waits for auth event:
+useEffect(() => {
+  const fetchSession = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      console.log('[ISSUE-88] getSession success:', session);
+      setSession(session);
+      setUser(session.user);
+      setIsHydrated(true);
+    } else {
+      console.warn('[ISSUE-88] getSession returned null. Waiting for onAuthStateChange...');
+    }
+  };
+  fetchSession();
+}, []);
+
+3. Gate routing logic in dashboard redirect using all hydration checks:
+if (isHydrated && session && user?.email && user?.id) {
+  const userRole = getUserRole();
+  if (userRole) {
+    router.push(getDashboardRoute(userRole));
+  } else {
+    console.warn('[ISSUE-88] Role not ready for routing.');
+  }
+} else {
+  console.warn('[ISSUE-88] Routing blocked - waiting for full hydration.');
+}
+
+🧪 TEST PLAN:
+- Open in Incognito
+- Sign in once
+- Verify session is non-null, user is routed on first attempt
+- Confirm `[ISSUE-88] onAuthStateChange - session:` appears in console
+- Ensure no double-login is required
+
+✅ Awaiting validation before proceeding to Step 2 (final login route guard optimization)

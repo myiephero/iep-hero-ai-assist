@@ -1,0 +1,58 @@
+	13	/tools/ai-document-review	basic	text/html	1,895	8/24/2025, 12:43:48 PM		
+﻿
+index-DRDIG7g4.js:55 ✅ Supabase singleton client ready
+2
+index-DRDIG7g4.js:450 🚀 PRODUCTION: Checking Supabase session...
+index-DRDIG7g4.js:928 SW registered: 
+ServiceWorkerRegistration
+index-DRDIG7g4.js:928 SW registered: 
+ServiceWorkerRegistration
+2
+index-DRDIG7g4.js:450 ✅ Valid Supabase session found: c1867d86-82df-4037-bf23-fde11648b267
+wktcfhegoxjearpzdxpz…bf23-fde11648b267:1 
+ Failed to load resource: the server responded with a status of 500 ()
+index-DRDIG7g4.js:450 🎯 SESSION CHECK DEBUG: 
+Object
+wktcfhegoxjearpzdxpz…bf23-fde11648b267:1 
+ Failed to load resource: the server responded with a status of 500 ()
+index-DRDIG7g4.js:450 🎯 SESSION CHECK DEBUG: 
+Object
+index-DRDIG7g4.js:494 🔍 Parent Dashboard - User: rikka6879@yahoo.com Username: rikka6879@yahoo.com Role: parent
+index-DRDIG7g4.js:55 🔄 Default queryFn using apiRequest for: /api/dashboard/metrics
+index-DRDIG7g4.js:55 🌐 Making API request: GET /api/dashboard/metrics undefined
+index-DRDIG7g4.js:494 🏠 PARENT DASHBOARD MOUNT DEBUG: 
+Object
+index-DRDIG7g4.js:494 🔍 Parent Dashboard rendered with user: 
+Object
+index-DRDIG7g4.js:928 SW registered: 
+ServiceWorkerRegistration
+index-DRDIG7g4.js:55 🔐 PRODUCTION: Including Supabase Bearer token for /api/dashboard/metrics
+index-DRDIG7g4.js:55 🌐 API Response: GET /api/dashboard/metrics 
+Object
+index-DRDIG7g4.js:494 🔍 Parent Dashboard - User: rikka6879@yahoo.com Username: rikka6879@yahoo.com Role: parent
+2
+index-DRDIG7g4.js:928 [PWA] Simulating installability for testing
+index-DRDIG7g4.js:547 🔍 StudentSelector Debug: 
+Object
+index-DRDIG7g4.js:55 🔄 Default queryFn using apiRequest for: /api/parent/students
+index-DRDIG7g4.js:55 🌐 Making API request: GET /api/parent/students undefined
+index-DRDIG7g4.js:55 🔐 PRODUCTION: Including Supabase Bearer token for /api/parent/students
+index-DRDIG7g4.js:928 [PWA] Simulating installability for testing
+index-DRDIG7g4.js:55 🌐 API Response: GET /api/parent/students 
+Object
+index-DRDIG7g4.js:547 🔍 StudentSelector Debug: 
+Object
+index-DRDIG7g4.js:547 🔍 StudentSelector Debug: 
+Object
+index-DRDIG7g4.js:547 🔍 StudentSelector Debug: 
+Object
+index-DRDIG7g4.js:547 🔍 StudentSelector Debug: 
+Object
+/api/review-iep:1 
+ Failed to load resource: the server responded with a status of 401 ()
+index-DRDIG7g4.js:547 Error analyzing IEP: Error: Authentication required. Missing Authorization header.
+    at p (index-DRDIG7g4.js:547:154948)
+index-DRDIG7g4.js:547 🔍 StudentSelector Debug: 
+Object
+index-DRDIG7g4.js:547 🔍 StudentSelector Debug: 
+Object

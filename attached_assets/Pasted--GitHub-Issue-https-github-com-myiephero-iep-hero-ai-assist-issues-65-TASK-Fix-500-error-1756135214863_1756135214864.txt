@@ -1,0 +1,41 @@
+📎 GitHub Issue: https://github.com/myiephero/iep-hero-ai-assist/issues/65  
+🛠️ TASK: Fix 500 error on GET /api/advocate/clients for advocate users
+
+Overview:
+The POST endpoint for creating parent-client relationships now works and returns { success: true }, but immediately after, the frontend dashboard fails to fetch the updated client list. The GET request to /api/advocate/clients returns a 500 Internal Server Error, and clients: null remains in the React state.
+
+🔬 Debug Details:
+- Error occurs on GET /api/advocate/clients
+- No detailed error is returned from the backend — likely swallowed or unhandled
+- React logs show:
+  queryFn using apiRequest for: /api/advocate/clients
+  Failed to load resource: 500 (Internal Server Error)
+- Advocate user: erika.levine2017@gmail.com (UUID: c89b7c1c-c60a-46fd-a45d-6f4b17f4cd13)
+
+✅ Fix Instructions:
+1. Add enhanced debugging to the GET handler in /api/advocate/clients:
+   console.log("🔍 Advocate client fetch - session user:", user);
+   console.log("🔍 Advocate client fetch - Supabase query initiated");
+
+2. Wrap Supabase call in a try/catch block:
+   try {
+     const { data, error } = await supabase
+       .from('advocate_clients')
+       .select('client_name, phone, notes, parent_id')
+       .eq('advocate_id', user.id);
+     if (error) throw error;
+     return res.status(200).json({ clients: data });
+   } catch (error) {
+     console.error("❌ Failed to fetch advocate clients:", error.message);
+     return res.status(500).json({ error: error.message });
+   }
+
+3. Check Supabase schema:
+   - Ensure all selected columns (client_name, phone, notes, parent_id, advocate_id) exist in the advocate_clients table
+   - Confirm data exists for advocate_id = c89b7c1c-c60a-46fd-a45d-6f4b17f4cd13
+
+4. Rebuild and test:
+   - Verify no 500 error occurs
+   - Dashboard renders client correctly for advocate erika.levine2017@gmail.com
+
+🎯 Goal: Eliminate the 500 error and confirm that the advocate dashboard shows all linked parent-clients after POST creation.

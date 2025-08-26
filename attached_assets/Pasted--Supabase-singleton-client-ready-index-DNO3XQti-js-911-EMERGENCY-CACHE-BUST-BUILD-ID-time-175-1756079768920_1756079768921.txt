@@ -1,0 +1,79 @@
+✅ Supabase singleton client ready
+index-DNO3XQti.js:911 🚨 EMERGENCY CACHE BUST - BUILD_ID= time-1756078725842
+(anonymous) @ index-DNO3XQti.js:911Understand this error
+index-DNO3XQti.js:48 Use of history.pushState in a trivial session history context, which maintains only one session history entry, is treated as history.replaceState.
+history.<computed> @ index-DNO3XQti.js:48Understand this warning
+2index-DNO3XQti.js:450 🚀 PRODUCTION: Checking Supabase session...
+2index-DNO3XQti.js:450 ❌ No valid Supabase session found
+index-DNO3XQti.js:907 SW registered: ServiceWorkerRegistration
+index-DNO3XQti.js:907 SW registered: ServiceWorkerRegistration
+index-DNO3XQti.js:911 [Main] SW registered: ServiceWorkerRegistration
+2index-DNO3XQti.js:907 [PWA] Simulating installability for testing
+index-DNO3XQti.js:450 🔄 Starting login process for: rikka6879@yahoo.com
+index-DNO3XQti.js:450 🚀 PRODUCTION LOGIN: Supabase-only authentication for: rikka6879@yahoo.com
+index-DNO3XQti.js:450 ✅ Supabase login successful, user ID: c1867d86-82df-4037-bf23-fde11648b267
+index-DNO3XQti.js:450 🎯 LOGIN SUCCESS DEBUG: Object
+index-DNO3XQti.js:450 ✅ Login successful
+index-DNO3XQti.js:450 🔄 Redirecting to dashboard...
+index-DNO3XQti.js:450 🔄 Navigating to: /dashboard-premium
+index-DNO3XQti.js:494 ❌ Parent user accessing advocate dashboard, redirecting to parent dashboard
+index-DNO3XQti.js:494 💼 ADVOCATE DASHBOARD MOUNT DEBUG: Object
+index-DNO3XQti.js:494 🔍 Parent Dashboard - User: rikka6879@yahoo.com Username: rikka6879@yahoo.com Role: parent
+index-DNO3XQti.js:55 🔄 Default queryFn using apiRequest for: /api/dashboard/metrics
+index-DNO3XQti.js:494 🏠 PARENT DASHBOARD MOUNT DEBUG: Object
+index-DNO3XQti.js:494 🔍 Parent Dashboard rendered with user: Object
+index-DNO3XQti.js:907 SW registered: ServiceWorkerRegistration
+index-DNO3XQti.js:494 🔍 Parent Dashboard - User: rikka6879@yahoo.com Username: rikka6879@yahoo.com Role: parent
+index-DNO3XQti.js:55 🔄 Default queryFn using apiRequest for: /api/parent/students
+index-DNO3XQti.js:907 [PWA] Simulating installability for testing
+index-DNO3XQti.js:55 🔄 Default queryFn using apiRequest for: /api/documents
+4index-DNO3XQti.js:55 🔄 Default queryFn using apiRequest for: /api/students
+index-DNO3XQti.js:494 🔍 Parent Dashboard - User: rikka6879@yahoo.com Username: rikka6879@yahoo.com Role: parent
+index-DNO3XQti.js:494 🏠 PARENT DASHBOARD MOUNT DEBUG: Object
+index-DNO3XQti.js:494 🔍 Parent Dashboard rendered with user: Object
+index-DNO3XQti.js:630 MeetingPrepWizard component rendering
+index-DNO3XQti.js:630 User: Object
+index-DNO3XQti.js:494 🔍 Parent Dashboard - User: rikka6879@yahoo.com Username: rikka6879@yahoo.com Role: parent
+index-DNO3XQti.js:494 🏠 PARENT DASHBOARD MOUNT DEBUG: Object
+index-DNO3XQti.js:494 🔍 Parent Dashboard rendered with user: Object
+index-DNO3XQti.js:526 🔍 StudentSelector Debug: Object
+index-DNO3XQti.js:907 SW registered: ServiceWorkerRegistration
+index-DNO3XQti.js:526 🔍 StudentSelector Debug: Object
+index-DNO3XQti.js:526 🔍 StudentSelector Debug: Object
+index-DNO3XQti.js:907 [PWA] Simulating installability for testing
+index-DNO3XQti.js:526 🔍 StudentSelector Debug: Object
+index-DNO3XQti.js:526 🔍 StudentSelector Debug: Object
+index-DNO3XQti.js:526 🔍 StudentSelector Debug: Object
+index-DNO3XQti.js:526 🔍 StudentSelector Debug: Object
+index-DNO3XQti.js:526 🔍 StudentSelector Debug: Object
+index-DNO3XQti.js:526 🔍 StudentSelector Debug: Object
+index-DNO3XQti.js:526 🔍 StudentSelector Debug: Object
+index-DNO3XQti.js:526 🔍 StudentSelector Debug: Object
+index-DNO3XQti.js:526 🔍 StudentSelector Debug: Object
+index-DNO3XQti.js:526 🔍 StudentSelector Debug: Object
+index-DNO3XQti.js:526 🔍 StudentSelector Debug: Object
+index-DNO3XQti.js:526 🔍 StudentSelector Debug: Object
+index-DNO3XQti.js:526 🔍 StudentSelector Debug: Object
+index-DNO3XQti.js:526 🔍 StudentSelector Debug: Object
+index-DNO3XQti.js:526 🔍 StudentSelector Debug: Object
+index-DNO3XQti.js:526 🔍 StudentSelector Debug: Object
+index-DNO3XQti.js:526 🔍 StudentSelector Debug: Object
+index-DNO3XQti.js:526 🔍 StudentSelector Debug: Object
+index-DNO3XQti.js:526 🔍 StudentSelector Debug: Object
+index-DNO3XQti.js:526 🔍 StudentSelector Debug: Object
+index-DNO3XQti.js:526 🔍 StudentSelector Debug: Object
+index-DNO3XQti.js:526 🔍 StudentSelector Debug: Object
+index-DNO3XQti.js:526 🔍 StudentSelector Debug: Object
+index-DNO3XQti.js:526 🔍 StudentSelector Debug: Object
+index-DNO3XQti.js:526 🔍 StudentSelector Debug: Object
+index-DNO3XQti.js:526 🔍 StudentSelector Debug: Object
+index-DNO3XQti.js:494 🔍 Parent Dashboard - User: rikka6879@yahoo.com Username: rikka6879@yahoo.com Role: parent
+index-DNO3XQti.js:494 🏠 PARENT DASHBOARD MOUNT DEBUG: Object
+index-DNO3XQti.js:494 🔍 Parent Dashboard rendered with user: Object
+3index-DNO3XQti.js:55 🔄 Default queryFn using apiRequest for: /api/students
+index-DNO3XQti.js:494 🔍 Parent Dashboard - User: rikka6879@yahoo.com Username: rikka6879@yahoo.com Role: parent
+index-DNO3XQti.js:494 🏠 PARENT DASHBOARD MOUNT DEBUG: Object
+index-DNO3XQti.js:494 🔍 Parent Dashboard rendered with user: Object
+index-DNO3XQti.js:526 🔍 StudentSelector Debug: Object
+sw.js:5 🚨 SW ACTIVE v-docs-auth-004
+(anonymous) @ sw.js:5Understand this error

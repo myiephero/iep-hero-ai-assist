@@ -1,0 +1,49 @@
+[SEND TO: Replit Agent]
+
+Step 3 – Fix Advocate-Client Relationship Creation  
+🔗 GitHub Issue: https://github.com/myiephero/iep-hero-ai-assist/issues/64
+
+🎯 OBJECTIVE: Fix POST /api/advocate/clients to successfully create an advocate-client relationship in Supabase without returning a 500 error.
+
+🧭 EXECUTION INSTRUCTIONS:
+
+1. Open `server/routes/advocate-clients.ts` (or wherever the `/api/advocate/clients` POST handler resides).
+
+2. Temporarily wrap the handler logic in a try/catch block and log the following to debug payload and session context:  
+console.log("📥 POST body:", req.body);  
+console.log("🧑‍💼 Session user:", session.user);
+
+3. Confirm the Supabase table being inserted into (likely `advocate_clients`) and validate the schema expects:  
+- advocate_id (from session.user.id)  
+- parent_email (req.body.parentEmail)  
+- client_name (req.body.clientName)  
+- phone (req.body.phone)  
+- notes (req.body.notes, optional)
+
+4. Update the insert logic to explicitly define the payload with correct keys:  
+const { error } = await supabaseAdmin  
+.from("advocate_clients")  
+.insert({  
+ advocate_id: session.user.id,  
+ parent_email: req.body.parentEmail,  
+ client_name: req.body.clientName,  
+ phone: req.body.phone,  
+ notes: req.body.notes || null,  
+});  
+
+if (error) {  
+ console.error("❌ Supabase insert failed:", error);  
+ return res.status(500).json({ error: "Failed to create advocate-client relationship", details: error });  
+}  
+
+return res.status(200).json({ success: true });
+
+5. Verify the following:  
+✅ Creating a parent via the Advocate dashboard returns a 200 success  
+✅ The new row appears in the `advocate_clients` table  
+✅ /api/advocate/clients now returns the newly linked parent
+
+6. After confirming success, bust any service worker or frontend cache by running:  
+echo '' > public/sw.js && rm -rf dist && npm run build
+
+📌 Mark this step complete only if parent creation + fetching now both work cleanly for advocate user `erika.levine2017@gmail.com` (UUID: c89b7c1c-c60a-46fd-a45d-6f4b17f4cd13), and no 500 errors remain in dev console.

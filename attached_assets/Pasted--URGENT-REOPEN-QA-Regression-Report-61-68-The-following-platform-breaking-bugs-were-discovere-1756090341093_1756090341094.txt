@@ -1,0 +1,43 @@
+🚨 URGENT REOPEN - QA Regression Report (#61–68)
+The following platform-breaking bugs were discovered after redeployment and must be resolved immediately. These are confirmed in production using the QA account rikka6879@yahoo.com with full Hero Plan override.
+
+🔴 CRITICAL ERRORS TO FIX
+
+#61 - Document Vault `.json is not a function` error
+Still occurring when sharing or saving documents. Must confirm all Vault actions use `await response.data` not `response.json()`.
+
+#62 - AI Tools: OpenAI Quota Error Not Handled (429)
+AI IEP Review and Smart Letter Generator return OpenAI quota errors with no graceful fallback. Must catch 429 errors and show user-friendly UI message.
+→ Ref: https://platform.openai.com/docs/guides/error-codes/api-errors
+
+#63 - JSON Parse Error (`DOCTYPE "<"` ... not valid JSON)
+Smart Letter Generator and Advocate Matcher fail on invalid server responses. These are HTML error pages parsed as JSON.
+→ Fix: Add `Content-Type` check before parsing, return structured JSON on server errors, improve frontend error boundary.
+
+#64 - Hero Plan Wall Appears on QA Account (Meeting Prep)
+QA override failed on `/tools/meeting-prep`. Ensure PlanAware logic includes override check and is wired across all restricted tools.
+
+#65 - Goals Page: `Cannot read property 'filter' of null`
+When opening Goals page, platform crashes on null response from `/api/goals`.
+→ Fix: add null guard `goals?.filter(...) || []`.
+
+#66 - Advocate Matcher: JSON Parse + Submission Crash
+Fails to submit form, backend returns non-JSON, leading to `Unexpected token '<'` crash. Ensure all backend responses are valid JSON, even on error.
+
+#67 - OT Recommender: Student Dropdown Disabled
+Student list not loaded in dropdown, despite student existing in dashboard. Re-enable dropdown and confirm `/api/students` populates.
+
+#68 - 404 Error on `/settings`
+Settings page link is active, but route not defined. Either remove nav reference or define route properly in router config.
+
+✅ ACTION PLAN
+
+- Refactor apiRequest usage platform-wide
+- Add OpenAI error handling (429) to all AI tools
+- Patch backend error responses to always return JSON
+- Confirm PlanAware override applies to all tools
+- Add null guards across `.filter`, `.map`, `.forEach`
+- Validate student dropdown hydration logic
+- Fix dead route for `/settings`
+
+🛠️ Platform is not stable for QA or production usage until these are resolved. Please confirm receipt and begin triage.

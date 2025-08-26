@@ -1,0 +1,79 @@
+✅ Supabase singleton client ready
+index-grKiSrKZ.js:911 🚨 EMERGENCY CACHE BUST - BUILD_ID= time-1756125154846
+(anonymous) @ index-grKiSrKZ.js:911Understand this error
+2index-grKiSrKZ.js:450 🚀 PRODUCTION: Checking Supabase session...
+index-grKiSrKZ.js:907 SW registered: ServiceWorkerRegistration
+index-grKiSrKZ.js:907 SW registered: ServiceWorkerRegistration
+index-grKiSrKZ.js:450 ✅ Valid Supabase session found: c89b7c1c-c60a-46fd-a45d-6f4b17f4cd13
+index-grKiSrKZ.js:450 🔍 Fetching profile for user: c89b7c1c-c60a-46fd-a45d-6f4b17f4cd13
+index-grKiSrKZ.js:450 ✅ Valid Supabase session found: c89b7c1c-c60a-46fd-a45d-6f4b17f4cd13
+index-grKiSrKZ.js:450 🔍 Fetching profile for user: c89b7c1c-c60a-46fd-a45d-6f4b17f4cd13
+index-grKiSrKZ.js:450 📡 Profile fetch response: 200 
+index-grKiSrKZ.js:450 ✅ Profile fetched successfully: Object
+index-grKiSrKZ.js:450 🔍 ROLE DETERMINATION DEBUG: Object
+index-grKiSrKZ.js:450 🎯 SESSION CHECK DEBUG: Object
+index-grKiSrKZ.js:450 📡 Profile fetch response: 200 
+index-grKiSrKZ.js:450 ✅ Profile fetched successfully: Object
+index-grKiSrKZ.js:450 🔍 ROLE DETERMINATION DEBUG: Object
+index-grKiSrKZ.js:450 🎯 SESSION CHECK DEBUG: Object
+index-grKiSrKZ.js:907 🔍 MyParentsPage - User Debug: Object
+index-grKiSrKZ.js:907 🔍 MyParentsPage - Query Debug: Object
+index-grKiSrKZ.js:55 🔄 Default queryFn using apiRequest for: /api/advocate/clients
+index-grKiSrKZ.js:907 SW registered: ServiceWorkerRegistration
+sw.js?build=time-1756125154846:5 🚨 SW ACTIVE v-docs-auth-004
+(anonymous) @ sw.js?build=time-1756125154846:5Understand this error
+index-grKiSrKZ.js:911 [Main] SW registered: ServiceWorkerRegistration
+sw.js?build=time-1756125154846:8 [SW] install Object
+(anonymous) @ sw.js?build=time-1756125154846:8Understand this warning
+my-parents:1 Banner not shown: beforeinstallpromptevent.preventDefault() called. The page must call beforeinstallpromptevent.prompt() to show the banner.
+index-grKiSrKZ.js:55 🔄 Default queryFn using apiRequest for: /api/advocate/clients
+3index-grKiSrKZ.js:907 [PWA] Simulating installability for testing
+index-grKiSrKZ.js:55 🔄 Default queryFn using apiRequest for: /api/advocate/clients
+index-grKiSrKZ.js:907 🔍 MyParentsPage - User Debug: {user: {…}, loading: false, userRole: 'advocate', userEmail: 'erika.levine2017@gmail.com'}
+index-grKiSrKZ.js:907 🔍 MyParentsPage - Query Debug: {clients: Array(0), clientsLength: 0, isLoading: true, error: null, queryEnabled: true}
+index-grKiSrKZ.js:494 Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+(anonymous) @ index-grKiSrKZ.js:494
+Jx @ index-grKiSrKZ.js:40
+Fu @ index-grKiSrKZ.js:40
+SH @ index-grKiSrKZ.js:40
+_l @ index-grKiSrKZ.js:40
+zk @ index-grKiSrKZ.js:40
+ol @ index-grKiSrKZ.js:38
+(anonymous) @ index-grKiSrKZ.js:40Understand this warning
+index-grKiSrKZ.js:907 🔍 MyParentsPage - User Debug: {user: {…}, loading: false, userRole: 'advocate', userEmail: 'erika.levine2017@gmail.com'}
+index-grKiSrKZ.js:907 🔍 MyParentsPage - Query Debug: {clients: Array(0), clientsLength: 0, isLoading: true, error: null, queryEnabled: true}
+index-grKiSrKZ.js:55 🔄 Default queryFn using apiRequest for: /api/advocate/clients
+index-grKiSrKZ.js:907 🔍 MyParentsPage - User Debug: {user: {…}, loading: false, userRole: 'advocate', userEmail: 'erika.levine2017@gmail.com'}
+index-grKiSrKZ.js:907 🔍 MyParentsPage - Query Debug: {clients: Array(0), clientsLength: 0, isLoading: false, error: SyntaxError: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+    at JSON.parse (<anonymous>…, queryEnabled: true}
+index-grKiSrKZ.js:907 🔍 MyParentsPage - User Debug: {user: {…}, loading: false, userRole: 'advocate', userEmail: 'erika.levine2017@gmail.com'}
+index-grKiSrKZ.js:907 🔍 MyParentsPage - Query Debug: {clients: Array(0), clientsLength: 0, isLoading: false, error: SyntaxError: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+    at JSON.parse (<anonymous>…, queryEnabled: true}
+index-grKiSrKZ.js:907 🔍 MyParentsPage - User Debug: {user: {…}, loading: false, userRole: 'advocate', userEmail: 'erika.levine2017@gmail.com'}
+index-grKiSrKZ.js:907 🔍 MyParentsPage - Query Debug: {clients: Array(0), clientsLength: 0, isLoading: false, error: SyntaxError: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+    at JSON.parse (<anonymous>…, queryEnabled: true}
+index-grKiSrKZ.js:907 🔍 MyParentsPage - User Debug: {user: {…}, loading: false, userRole: 'advocate', userEmail: 'erika.levine2017@gmail.com'}
+index-grKiSrKZ.js:907 🔍 MyParentsPage - Query Debug: {clients: Array(0), clientsLength: 0, isLoading: false, error: SyntaxError: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+    at JSON.parse (<anonymous>…, queryEnabled: true}
+index-grKiSrKZ.js:907 🔧 Submitting client data with authenticated user: {id: 'c89b7c1c-c60a-46fd-a45d-6f4b17f4cd13', email: 'erika.levine2017@gmail.com', username: 'erika.levine2017@gmail.com', role: 'advocate', planStatus: 'free'}
+index-grKiSrKZ.js:907 🔍 MyParentsPage - User Debug: {user: {…}, loading: false, userRole: 'advocate', userEmail: 'erika.levine2017@gmail.com'}
+index-grKiSrKZ.js:907 🔍 MyParentsPage - Query Debug: {clients: Array(0), clientsLength: 0, isLoading: false, error: SyntaxError: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+    at JSON.parse (<anonymous>…, queryEnabled: true}
+index-grKiSrKZ.js:907 🔍 MyParentsPage - User Debug: {user: {…}, loading: false, userRole: 'advocate', userEmail: 'erika.levine2017@gmail.com'}
+index-grKiSrKZ.js:907 🔍 MyParentsPage - Query Debug: {clients: Array(0), clientsLength: 0, isLoading: false, error: SyntaxError: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+    at JSON.parse (<anonymous>…, queryEnabled: true}
+index-grKiSrKZ.js:907 🔧 Making client creation request with data: {parentEmail: 'king@demo.com', clientName: 'test parent', phone: '', notes: ''}
+index-grKiSrKZ.js:907 ✅ Client creation API result: {ok: true, data: '<!DOCTYPE html>\n<html lang="en">\n  <head>\n    <met…replit-dev-banner.js">\x3C/script>\n  </body>\n</html>', status: 200}
+index-grKiSrKZ.js:907 ✅ Mutation onSuccess called with data: {ok: true, data: '<!DOCTYPE html>\n<html lang="en">\n  <head>\n    <met…replit-dev-banner.js">\x3C/script>\n  </body>\n</html>', status: 200}
+index-grKiSrKZ.js:907 🔄 Invalidating queries to trigger refetch...
+index-grKiSrKZ.js:55 🔄 Default queryFn using apiRequest for: /api/advocate/clients
+index-grKiSrKZ.js:907 🔍 MyParentsPage - User Debug: {user: {…}, loading: false, userRole: 'advocate', userEmail: 'erika.levine2017@gmail.com'}
+index-grKiSrKZ.js:907 🔍 MyParentsPage - Query Debug: {clients: Array(0), clientsLength: 0, isLoading: true, error: null, queryEnabled: true}
+index-grKiSrKZ.js:907 🔄 Manual refetch triggered
+2index-grKiSrKZ.js:55 🔄 Default queryFn using apiRequest for: /api/advocate/clients
+index-grKiSrKZ.js:907 🔍 MyParentsPage - User Debug: {user: {…}, loading: false, userRole: 'advocate', userEmail: 'erika.levine2017@gmail.com'}
+index-grKiSrKZ.js:907 🔍 MyParentsPage - Query Debug: {clients: Array(0), clientsLength: 0, isLoading: true, error: null, queryEnabled: true}
+index-grKiSrKZ.js:55 🔄 Default queryFn using apiRequest for: /api/advocate/clients
+index-grKiSrKZ.js:907 🔍 MyParentsPage - User Debug: {user: {…}, loading: false, userRole: 'advocate', userEmail: 'erika.levine2017@gmail.com'}
+index-grKiSrKZ.js:907 🔍 MyParentsPage - Query Debug: {clients: Array(0), clientsLength: 0, isLoading: false, error: SyntaxError: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+    at JSON.parse (<anonymous>…, queryEnabled: true}

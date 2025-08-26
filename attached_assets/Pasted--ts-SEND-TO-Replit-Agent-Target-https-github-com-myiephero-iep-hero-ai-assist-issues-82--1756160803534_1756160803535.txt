@@ -1,0 +1,49 @@
+```ts
+[SEND TO: Replit Agent]  
+Target: https://github.com/myiephero/iep-hero-ai-assist/issues/82  
+Step: 2 of 3  
+Title: 🧭 Supabase Session False Negative During Auth Hydration (Advocate Routed to Parent Dashboard)
+
+🎯 OBJECTIVE: Eliminate edge-case race condition causing false role detection (`parent`) during Supabase session hydration for authenticated `advocate` user.
+
+🔍 CONTEXT:
+Even after hydration debug logging (Step 1), user is sometimes routed to `/dashboard-parent` during initial login. Logs show `userRole: parent` followed shortly by `userRole: advocate`. Race condition likely due to parallel invocations of `getUserRole()` and delayed `AuthContext` propagation.
+
+🧪 STEP 2 FIX STRATEGY:
+1. ✅ Introduce `useEffect` debounce pattern in `DashboardRouter` to wait for `isHydrated === true` and `userRole !== null` before routing:
+
+useEffect(() => {
+  if (isHydrated && userRole && !loading) {
+    console.debug('[ISSUE-82-STEP-2] Routing after full hydration:', { userRole });
+    const route = getDashboardRoute(userRole);
+    router.push(route);
+  } else {
+    console.debug('[ISSUE-82-STEP-2] Waiting on hydration...', { isHydrated, userRole, loading });
+  }
+}, [isHydrated, userRole, loading]);
+
+2. ✅ In `getUserRole()`, ensure fallback to "parent" only occurs when all role detection fails:
+
+if (!role && profile?.role) {
+  role = profile.role;
+}
+if (!role) {
+  console.warn('[ISSUE-82-STEP-2] Role not found, defaulting to parent (TEMP)');
+  role = 'parent'; // TODO: Remove once root cause fixed
+}
+
+3. ✅ Do not export userRole until hydration is complete in `useAuth()`:
+
+return isHydrated
+  ? { user, userRole, userEmail, isHydrated, loading }
+  : { user: null, userRole: null, userEmail: null, isHydrated: false, loading: true };
+
+4. ✅ Add `[ISSUE-82-STEP-2]` debug logs to all routing, fallback, and hydration decision points
+
+5. ✅ Push to Replit production
+
+Expected Result:
+✅ Advocates consistently routed to /dashboard-advocate after full hydration  
+✅ No misfires to /dashboard-parent  
+✅ Logs verify hydration and role before any router.push  
+```

@@ -1,0 +1,44 @@
+Task: Make /api/documents use the same Bearer token auth as the working routes, add minimal debug, redeploy.
+
+1) Identify the Bearer-auth middleware already used by working endpoints:
+   - Search for the route handler that protects either "/api/parent/students" or "/api/students".
+   - Note the middleware name and file (e.g., requireAuthBearer, requireBearer, ensureAuth, etc.). 
+   - DO NOT create a new auth middleware if one already exists—reuse the exact one used by the working routes.
+
+2) Apply that same middleware to ALL /api/documents endpoints:
+   - Find where /api/documents routes are registered (could be in server/routes.ts, server/index.ts, or server/routes/documents.ts).
+   - Ensure EVERY verb on /api/documents (GET, POST, PUT/PATCH, DELETE) is wrapped with the Bearer-auth middleware you identified in step 1.
+   - If the router is defined like `router.use("/api/documents", ...)`, attach the middleware at the router.use level so it covers all verbs.
+   - Example (adjust to actual names/locations):
+       // BEFORE
+       router.get("/api/documents", listDocumentsHandler);
+       router.post("/api/documents", uploadDocumentHandler);
+
+       // AFTER (using the exact existing middleware you found)
+       router.use("/api/documents", requireAuthBearer);
+       router.get("/api/documents", listDocumentsHandler);
+       router.post("/api/documents", uploadDocumentHandler);
+       
+   - Do NOT change handler logic yet. Only add the middleware consistently.
+
+3) Ensure the handlers read the authenticated user id consistently:
+   - In handlers for /api/documents, wherever the code filters by user, confirm it uses the same user property the working routes use (e.g., req.user.id or res.locals.user.id).
+   - If the working routes expose the user on req.user, mirror that. If they use res.locals.user, mirror that.
+   - Add a temporary log at the top of each /api/documents handler:
+       console.log("[DOCS AUTH DEBUG]", { userId: <the same property used by working routes>, method: req.method, path: req.path });
+
+4) Confirm CORS allows Authorization header (only if not already set):
+   - Locate CORS setup (likely server/app.ts or server/index.ts).
+   - Ensure "Authorization" appears in the allowed headers.
+   - Do not change anything if it is already present.
+
+5) Build & redeploy:
+   - Run the app and redeploy so the changes are live.
+
+6) Output verification to me:
+   - Paste the exact code diff (or file paths + snippets) showing:
+       a) Where the Bearer middleware is defined and what it’s called.
+       b) Where you attached it to /api/documents (file + lines).
+       c) One console log line you added in a /api/documents handler.
+   - Then tail the server logs for one request to GET /api/documents and show the new line like:
+       [DOCS AUTH DEBUG] { userId: "...", method: "GET", path: "/api/documents" }

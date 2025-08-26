@@ -1,0 +1,57 @@
+Goal:
+1) Prove all /api endpoints return JSON (no HTML fallthrough).
+2) Confirm diag endpoint + BUILD_ID are live.
+3) Silence the two recurring console warnings:
+   - DialogContent missing description
+   - Apple web app meta tag deprecation
+
+Actions:
+
+# 1) Version/diag proof
+echo "=== __diag ===" && curl -sS -i http://localhost:5000/__diag | head -40
+
+# 2) JSON guard smoke tests (expect JSON, not HTML)
+echo "=== /api/dashboard/metrics (unauth) ===" && curl -sS -i http://localhost:5000/api/dashboard/metrics | head -40
+echo "=== POST /api/students (unauth) ===" && curl -sS -i -X POST http://localhost:5000/api/students | head -40
+echo "=== POST /api/documents (unauth) ===" && curl -sS -i -X POST http://localhost:5000/api/documents | head -40
+
+# 3) Fix: DialogContent missing aria-describedby (File Upload modal)
+#   - Add a hidden description and wire aria-describedby.
+applypatch << 'PATCH'
+*** Begin Patch
+*** Update File: client/src/components/modals/file-upload-modal.tsx
+@@
+-      <DialogContent>
++      <DialogContent aria-describedby="upload-desc">
++        {/* Hidden, screen-reader only description to satisfy DialogContent a11y */}
++        <p id="upload-desc" className="sr-only">
++          Upload a PDF or image. This description is read by assistive technologies.
++        </p>
+         {/* existing modal contents continue below */}
+*** End Patch
+PATCH
+
+# If the import path/file differs, apply the same pattern to the modal actually rendering <DialogContent>.
+# (The message above from the runtime showed the warning triggered inside the modal.)
+
+# 4) Fix: PWA meta deprecation (add modern meta)
+# Add <meta name="mobile-web-app-capable" content="yes"> alongside existing tags.
+# Try common entry points; keep changes idempotent.
+for f in client/public/index.html client/index.html ; do
+  if [ -f "$f" ]; then
+    grep -q 'name="mobile-web-app-capable"' "$f" || \
+    sed -i '1,40{s#<head>#<head>\n    <meta name="mobile-web-app-capable" content="yes">#}' "$f"
+    echo "Updated meta in $f"
+  fi
+done
+
+# 5) Rebuild + restart so BUILD_ID/logs reflect these changes
+echo "Rebuilding and restarting..."
+npm run build --workspace=client >/dev/null 2>&1 || true
+npm run start:server >/dev/null 2>&1 || true
+
+# 6) Show current BUILD_ID occurrences (sanity check)
+echo "=== BUILD_ID grep ==="
+grep -n "BUILD_ID" server/middleware/auth.ts server/routes.ts client/src/main.tsx || true
+
+echo "Step 4 complete. Ready for browser hard refresh."

@@ -1,0 +1,74 @@
+# ✅ [SEND TO: Replit Agent]
+## 🛠️ STEP 1 — EXECUTE GITHUB ISSUE #73
+**Issue Title:** Fix: Advocate Client Creation Does Not Update /api/advocate/clients Response (GitHub Issue #73)  
+**GitHub Issue:** https://github.com/myiephero/iep-hero-ai-assist/issues/73
+
+---
+
+### 🧠 CONTEXT
+- Advocate successfully creates a parent client via POST /api/advocate/clients ✅
+- API returns `{ ok: true, client_id: "..." }` and no 500 error ✅
+- However, frontend call to GET /api/advocate/clients returns `clients: []` (empty) ❌
+- Advocate ID: `c89b7c1c-c60a-46fd-a45d-6f4b17f4cd13`
+
+---
+
+### 🎯 OBJECTIVE
+Fix the Supabase query or relationship logic so the newly created client appears in `/api/advocate/clients` response.
+
+---
+
+### 🔍 DIAGNOSTICS REQUIRED
+
+✅ Step 1: Query database manually
+
+```sql
+-- Check if client profile exists
+SELECT * FROM profiles WHERE email = 'hometeambuyersclub@gmail.com';
+
+-- Check if relationship exists
+SELECT * FROM advocate_clients WHERE advocate_id = 'c89b7c1c-c60a-46fd-a45d-6f4b17f4cd13';
+```
+
+✅ Step 2: Check RLS policies on `advocate_clients` and `profiles`
+- Ensure advocate can read their own linked clients
+
+✅ Step 3: Examine API handler `GET /api/advocate/clients`
+- Ensure Supabase query does `JOIN` correctly between `advocate_clients` and `profiles`
+- Make sure it's returning `clients: [...]`, not `undefined` or `{}`
+
+---
+
+### ✅ FIX INSTRUCTIONS
+
+If the data **exists** in Supabase:
+- 🔧 Patch API query handler to:
+  - Join advocate_clients and profiles correctly
+  - Return result in format `{ clients: [...] }`
+  - Ensure query uses `select(...)` with all required profile fields
+  - Fallback to empty array if no matches
+
+If data **is missing**:
+- 🔧 Patch POST handler to:
+  - Insert into `advocate_clients` table
+  - Ensure parent profile exists in `profiles`
+
+---
+
+### 🧪 TESTING TARGETS
+
+Test using:
+- Advocate: `erika.levine2017@gmail.com`
+- Parent: `hometeambuyersclub@gmail.com`
+
+✅ Expect: Client visible in `/my-parents` list  
+✅ Refetch returns `clients.length > 0`
+
+---
+
+### 📦 FINAL OUTPUT REQUIRED
+
+- ✅ Commit message: `fix(api): ensure created clients appear in advocate client list (#73)`
+- ✅ API GET returns `{ clients: [...] }`
+- ✅ Frontend renders created client
+- ✅ Status: Production-ready

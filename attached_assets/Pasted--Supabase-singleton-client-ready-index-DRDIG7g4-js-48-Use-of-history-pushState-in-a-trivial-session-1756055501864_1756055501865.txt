@@ -1,0 +1,47 @@
+✅ Supabase singleton client ready
+index-DRDIG7g4.js:48 Use of history.pushState in a trivial session history context, which maintains only one session history entry, is treated as history.replaceState.
+history.<computed> @ index-DRDIG7g4.js:48Understand this warning
+2index-DRDIG7g4.js:450 🚀 PRODUCTION: Checking Supabase session...
+2index-DRDIG7g4.js:450 ❌ No valid Supabase session found
+index-DRDIG7g4.js:928 SW registered: ServiceWorkerRegistration
+index-DRDIG7g4.js:928 SW registered: ServiceWorkerRegistration
+2index-DRDIG7g4.js:928 [PWA] Simulating installability for testing
+index-DRDIG7g4.js:450 🔄 Starting login process for: rikka6879@yahoo.com
+index-DRDIG7g4.js:450 🚀 PRODUCTION LOGIN: Supabase-only authentication for: rikka6879@yahoo.com
+index-DRDIG7g4.js:450 ✅ Supabase login successful, user ID: c1867d86-82df-4037-bf23-fde11648b267
+wktcfhegoxjearpzdxpz.supabase.co/rest/v1/profiles?select=*&id=eq.c1867d86-82df-4037-bf23-fde11648b267:1  Failed to load resource: the server responded with a status of 500 ()Understand this error
+index-DRDIG7g4.js:450 ⚠️ Profile fetch failed (non-critical): Object
+signIn @ index-DRDIG7g4.js:450Understand this warning
+index-DRDIG7g4.js:450 🎯 LOGIN SUCCESS DEBUG: Object
+index-DRDIG7g4.js:450 ✅ Login successful
+index-DRDIG7g4.js:450 🔄 Redirecting to dashboard...
+index-DRDIG7g4.js:450 🔄 Navigating to: /dashboard-premium
+index-DRDIG7g4.js:494 ❌ Parent user accessing advocate dashboard, redirecting to parent dashboard
+index-DRDIG7g4.js:494 💼 ADVOCATE DASHBOARD MOUNT DEBUG: Object
+index-DRDIG7g4.js:494 🔍 Parent Dashboard - User: rikka6879@yahoo.com Username: rikka6879@yahoo.com Role: parent
+index-DRDIG7g4.js:55 🔄 Default queryFn using apiRequest for: /api/dashboard/metrics
+index-DRDIG7g4.js:55 🌐 Making API request: GET /api/dashboard/metrics undefined
+index-DRDIG7g4.js:494 🏠 PARENT DASHBOARD MOUNT DEBUG: Object
+index-DRDIG7g4.js:494 🔍 Parent Dashboard rendered with user: Object
+index-DRDIG7g4.js:928 SW registered: ServiceWorkerRegistration
+index-DRDIG7g4.js:55 🔐 PRODUCTION: Including Supabase Bearer token for /api/dashboard/metrics
+index-DRDIG7g4.js:55 🌐 API Response: GET /api/dashboard/metrics Object
+index-DRDIG7g4.js:494 🔍 Parent Dashboard - User: rikka6879@yahoo.com Username: rikka6879@yahoo.com Role: parent
+index-DRDIG7g4.js:55 🔄 Default queryFn using apiRequest for: /api/parent/students
+index-DRDIG7g4.js:55 🌐 Making API request: GET /api/parent/students undefined
+index-DRDIG7g4.js:55 🔐 PRODUCTION: Including Supabase Bearer token for /api/parent/students
+index-DRDIG7g4.js:928 [PWA] Simulating installability for testing
+index-DRDIG7g4.js:55 🌐 API Response: GET /api/parent/students Object
+index-DRDIG7g4.js:494 🔍 Parent Dashboard - User: rikka6879@yahoo.com Username: rikka6879@yahoo.com Role: parent
+index-DRDIG7g4.js:494 🏠 PARENT DASHBOARD MOUNT DEBUG: Object
+index-DRDIG7g4.js:494 🔍 Parent Dashboard rendered with user: Object
+index-DRDIG7g4.js:547 🔍 StudentSelector Debug: Object
+index-DRDIG7g4.js:547 🔍 StudentSelector Debug: Object
+index-DRDIG7g4.js:547 🔍 StudentSelector Debug: Object
+index-DRDIG7g4.js:547 🔍 StudentSelector Debug: Object
+/api/review-iep:1  Failed to load resource: the server responded with a status of 401 ()Understand this error
+index-DRDIG7g4.js:547 Error analyzing IEP: Error: Authentication required. Missing Authorization header.
+    at p (index-DRDIG7g4.js:547:154948)
+p @ index-DRDIG7g4.js:547Understand this error
+index-DRDIG7g4.js:547 🔍 StudentSelector Debug: Object
+index-DRDIG7g4.js:547 🔍 StudentSelector Debug: Object
