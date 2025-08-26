@@ -1,4 +1,5 @@
 run = "npm run dev"
+modules = ["nodejs-20"]
 
 [env]
 PORT="5000"

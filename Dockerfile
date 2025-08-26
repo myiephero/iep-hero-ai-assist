@@ -30,5 +30,5 @@ EXPOSE 5000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
   CMD curl -f http://localhost:5000/startup-health || exit 1
 
-# Define the command to run the application
-CMD ["node", "server-js.js"]
+# Define the command to run the application optimized for Cloud Run
+CMD ["node", "deploy-cloud-run.js"]

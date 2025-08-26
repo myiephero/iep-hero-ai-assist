@@ -23,7 +23,13 @@ steps:
       - '5000'
       - '--allow-unauthenticated'
       - '--set-env-vars'
-      - 'NODE_ENV=production'
+      - 'NODE_ENV=production,REPLIT_DEPLOYMENT=1'
+      - '--memory'
+      - '512Mi'
+      - '--cpu'
+      - '1'
+      - '--max-instances'
+      - '10'
 
 images:
   - 'gcr.io/$PROJECT_ID/iep-advocacy-platform:$BUILD_ID'
