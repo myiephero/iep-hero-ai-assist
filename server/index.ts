@@ -16,13 +16,17 @@ app.use((req, res, next) => {
 // Health check endpoint for Cloud Run
 app.get('/health', (_, res) => {
   const health = {
+    status: "healthy",
     ok: true,
     service: "api",
     buildId: process.env.REPLIT_DEPLOYMENT ? "production" : "dev",
     time: new Date().toISOString(),
     port: process.env.PORT || "5000",
+    host: "0.0.0.0",
     environment: process.env.NODE_ENV || "development",
-    deployment: process.env.REPLIT_DEPLOYMENT ? "Replit Autoscale" : "Development"
+    deployment: process.env.REPLIT_DEPLOYMENT ? "Replit Autoscale" : "Development",
+    uptime: process.uptime(),
+    cloudRunReady: true
   };
   console.log(`Health check requested: ${JSON.stringify(health)}`);
   res.status(200).json(health);
