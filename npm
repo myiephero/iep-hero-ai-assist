@@ -1,27 +1,20 @@
 #!/bin/bash
 
-# npm wrapper script for deployment
-echo "🔧 npm wrapper called with: $*"
+# Final npm wrapper for deployment
+echo "🔧 npm deployment wrapper: $*"
 
-# Handle "npm run build" command from .replit deployment  
 if [[ "$*" == *"run build"* ]]; then
-  echo "📦 Redirecting to working build system..."
+  echo "📦 Using bulletproof build system..."
   
-  # Set proper PATH
+  # Set environment and PATH
+  export NODE_ENV=production
   export PATH="/nix/store/hdq16s6vq9smhmcyl4ipmwfp9f2558rc-nodejs-20.10.0/bin:$PATH"
   
-  # Run our working build script
-  /nix/store/hdq16s6vq9smhmcyl4ipmwfp9f2558rc-nodejs-20.10.0/bin/node build
+  # Run the comprehensive build wrapper
+  /home/runner/workspace/build-wrapper.sh
   
-  if [ $? -eq 0 ]; then
-    echo "✅ Build completed via wrapper"
-    exit 0
-  else
-    echo "❌ Build failed"
-    exit 1
-  fi
+  exit $?
 fi
 
-# Handle other commands
-echo "ℹ️ npm wrapper: ignoring command"
+# Ignore other commands
 exit 0
