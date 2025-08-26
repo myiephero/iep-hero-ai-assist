@@ -1,5 +1,5 @@
 run = "npm run start"
-modules = ["nodejs-20"]
+modules = ["nodejs-20", "bun"]
 
 [env]
 PORT = "5000"
