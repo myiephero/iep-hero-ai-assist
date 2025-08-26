@@ -1,9 +1,9 @@
 # Replit deployment configuration with fixed build process
 [build]
-command = "node build-deploy.js"
+command = "export PATH='/nix/store/hdq16s6vq9smhmcyl4ipmwfp9f2558rc-nodejs-20.10.0/bin:$PATH' && node build-deploy.js"
 
 [run]
-command = "node server/index.ts"
+command = "./start-deployment.sh"
 
 [env]
 NODE_ENV = "production"

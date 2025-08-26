@@ -1,11 +1,23 @@
 #!/usr/bin/env node
 
-// Deployment build that bypasses npm issues completely
+// Deployment build that ensures Node.js is available and uses reliable build system
 const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
-console.log('🔧 Deployment Build System - Bypassing npm issues...');
+console.log('🔧 Deployment Build System - Ensuring Node.js runtime is available...');
+
+// Ensure Node.js is available in PATH
+process.env.PATH = '/nix/store/hdq16s6vq9smhmcyl4ipmwfp9f2558rc-nodejs-20.10.0/bin:' + process.env.PATH;
+
+// Verify Node.js is available
+try {
+  const nodeVersion = execSync('node --version', { encoding: 'utf8' });
+  console.log(`✅ Node.js version: ${nodeVersion.trim()}`);
+} catch (error) {
+  console.error('❌ Node.js not found in PATH');
+  process.exit(1);
+}
 
 try {
   // Use our working build wrapper that bypasses all npm/Vite problems

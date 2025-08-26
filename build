@@ -1,14 +1,24 @@
 #!/usr/bin/env node
 
-// Alternative build that bypasses hanging Vite entirely
+// Alternative build that bypasses npm command and ensures Node.js runtime is available
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
-console.log('🚀 Alternative build system (Vite-free)...');
+console.log('🚀 Alternative build system - Ensuring Node.js runtime...');
 
-// Set production environment
+// Ensure Node.js is available in PATH (Fix #3 - Add Node.js module)
+process.env.PATH = '/nix/store/hdq16s6vq9smhmcyl4ipmwfp9f2558rc-nodejs-20.10.0/bin:' + process.env.PATH;
 process.env.NODE_ENV = 'production';
+
+// Verify Node.js is available in deployment environment
+try {
+  const nodeVersion = execSync('node --version', { encoding: 'utf8' });
+  console.log(`✅ Node.js runtime available: ${nodeVersion.trim()}`);
+} catch (error) {
+  console.error('❌ Node.js runtime not found in deployment environment');
+  console.error('This is likely the root cause of npm command not found error');
+}
 
 // Clear existing build
 const distDir = path.join(__dirname, 'dist/public');
