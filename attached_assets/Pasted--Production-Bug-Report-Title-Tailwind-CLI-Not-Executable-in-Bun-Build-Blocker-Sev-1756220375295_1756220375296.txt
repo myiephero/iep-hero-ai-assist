@@ -1,0 +1,77 @@
+### 🐞 Production Bug Report
+
+**Title:** ❌ Tailwind CLI Not Executable in Bun (Build Blocker)
+
+**Severity:** High – Blocks Vercel deployment due to missing CSS output  
+**Source Environment:** Replit (Bun runtime)  
+**Role Affected:** DevOps / Build System  
+**Date:** 2025-08-26  
+
+---
+
+### 🧵 Issue Summary:
+Attempting to run the Tailwind CSS build command fails with:
+
+```
+error: could not determine executable to run for package tailwindcss  
+bash: tailwindcss: command not found
+```
+
+This prevents `output.css` from being generated, which halts Vercel deploy. Attempts with `bun add`, `npx`, `bunx`, and direct binary usage have all failed.
+
+---
+
+### 🔁 Current Behavior:
+- `bunx tailwindcss` → CLI not found
+- `npx tailwindcss` → still fails to resolve binary
+- No `dist/output.css` is produced
+- Deployment queue blocks due to missing output
+
+---
+
+### ✅ Expected Behavior:
+- `bunx tailwindcss` or `npx tailwindcss` should successfully build and minify CSS from `client/index.css` into `dist/output.css`
+- Build output should be valid for Vercel deploy
+- Tailwind CLI should be available for scripting in Replit shell
+
+---
+
+### 🧪 Steps to Reproduce:
+1. Replit Shell:
+```bash
+bunx tailwindcss -i ./client/index.css -o ./dist/output.css --minify
+```
+2. Observe:
+```
+error: could not determine executable to run for package tailwindcss
+```
+
+---
+
+### 🗂️ Related Files:
+- `client/index.css`
+- `vite.config.ts`
+- `package.json`
+- Replit Shell + Bun runtime
+- No functional `tailwindcss` binary in path
+
+---
+
+### 🧠 Recommended Debug Focus:
+- Ensure `tailwindcss` binary is correctly resolved via `bunx`
+- Validate that install path is correct and not ESM-only blocked
+- If `bunx` fails, switch to `npm` install path with `npx`
+
+---
+
+### ✅ Fix Checklist:
+- [ ] Fully remove `tailwindcss` from bun: `bun remove tailwindcss`
+- [ ] Reinstall with: `bun add -d tailwindcss`
+- [ ] Test CLI: `bunx tailwindcss -i ./client/index.css -o ./dist/output.css --minify`
+- [ ] If still fails: switch to `npm install -D tailwindcss` then run via `npx tailwindcss`
+- [ ] Confirm `dist/output.css` is created
+- [ ] Resume deploy process (Vercel CLI)
+
+---
+
+🔗 [GitHub Issue #93](https://github.com/myiephero/iep-hero-ai-assist/issues/93)

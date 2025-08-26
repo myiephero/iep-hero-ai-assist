@@ -1,9 +1,4 @@
 {
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "start": "tsx server/index.ts"
-  },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",
     "@radix-ui/react-accordion": "^1.2.11",
@@ -60,6 +55,7 @@
     "react-icons": "^5.5.0",
     "stripe": "^18.4.0",
     "tailwind-merge": "^3.3.1",
+    "tailwindcss": "^4.1.12",
     "tailwindcss-animate": "^1.0.7",
     "tsx": "^4.20.3",
     "typescript": "^5.9.2",
@@ -68,7 +64,9 @@
     "wouter": "^3.7.1",
     "zod": "^4.0.15"
   },
-  "devDependencies": {
-    "tailwindcss": "^4.1.12"
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "start": "tsx server/index.ts"
   }
 }

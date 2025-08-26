@@ -9,3 +9,6 @@ NODE_ENV = "development"
 run = "node deploy.js"
 build = "npm run build"
 deploymentTarget = "autoscale"
+
+[nix]
+channel = "stable-25_05"
