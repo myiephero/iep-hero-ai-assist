@@ -1,12 +1,9 @@
-[run]
-command = "npm run start"
-
-[nix]
-channel = "stable-24_11"
+run = "npm run start"
+modules = ["nodejs-20"]
 
 [env]
-NODE_ENV = "development"
 PORT = "5000"
+NODE_ENV = "development"
 
 [deployment]
 run = "node deploy.js"
