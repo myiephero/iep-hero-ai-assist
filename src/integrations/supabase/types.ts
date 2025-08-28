@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.12 (cd3cf9e)"
@@ -113,6 +113,55 @@ export type Database = {
           },
         ]
       }
+      advocate_clients: {
+        Row: {
+          advocate_id: string | null
+          created_at: string | null
+          id: string
+          notes: string | null
+          parent_id: string | null
+          student_id: string | null
+        }
+        Insert: {
+          advocate_id?: string | null
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          parent_id?: string | null
+          student_id?: string | null
+        }
+        Update: {
+          advocate_id?: string | null
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          parent_id?: string | null
+          student_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "advocate_clients_advocate_id_fkey"
+            columns: ["advocate_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "advocate_clients_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "advocate_clients_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       advocate_matches: {
         Row: {
           default_value: string | null
@@ -181,6 +230,59 @@ export type Database = {
             columns: ["parent_id"]
             isOneToOne: false
             referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      advocate_profiles: {
+        Row: {
+          availability: Json | null
+          bio: string | null
+          created_at: string
+          display_name: string | null
+          hourly_rate: number | null
+          id: string
+          languages: string[] | null
+          max_caseload: number | null
+          service_areas: string[] | null
+          tags: string[] | null
+          timezone: string | null
+          updated_at: string
+        }
+        Insert: {
+          availability?: Json | null
+          bio?: string | null
+          created_at?: string
+          display_name?: string | null
+          hourly_rate?: number | null
+          id: string
+          languages?: string[] | null
+          max_caseload?: number | null
+          service_areas?: string[] | null
+          tags?: string[] | null
+          timezone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          availability?: Json | null
+          bio?: string | null
+          created_at?: string
+          display_name?: string | null
+          hourly_rate?: number | null
+          id?: string
+          languages?: string[] | null
+          max_caseload?: number | null
+          service_areas?: string[] | null
+          tags?: string[] | null
+          timezone?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "advocate_profiles_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -257,10 +359,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "assignments_advocate_id_fkey"
+            columns: ["advocate_id"]
+            isOneToOne: false
+            referencedRelation: "v_users"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "assignments_parent_id_fkey"
             columns: ["parent_id"]
             isOneToOne: false
             referencedRelation: "user_roles_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "assignments_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "v_users"
             referencedColumns: ["id"]
           },
         ]
@@ -356,6 +472,7 @@ export type Database = {
           file_url: string
           id: string
           name: string | null
+          owner_id: string | null
           type: string | null
           uploaded_at: string | null
           user_id: string | null
@@ -364,6 +481,7 @@ export type Database = {
           file_url: string
           id?: string
           name?: string | null
+          owner_id?: string | null
           type?: string | null
           uploaded_at?: string | null
           user_id?: string | null
@@ -372,16 +490,38 @@ export type Database = {
           file_url?: string
           id?: string
           name?: string | null
+          owner_id?: string | null
           type?: string | null
           uploaded_at?: string | null
           user_id?: string | null
         }
         Relationships: [
           {
+            foreignKeyName: "documents_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "user_roles_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documents_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "v_users"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "documents_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "user_roles_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documents_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "v_users"
             referencedColumns: ["id"]
           },
         ]
@@ -416,6 +556,7 @@ export type Database = {
           id: string
           notes: string | null
           status: string
+          student_id: string | null
           targetDate: string | null
           title: string
           updatedAt: string | null
@@ -426,6 +567,7 @@ export type Database = {
           id?: string
           notes?: string | null
           status?: string
+          student_id?: string | null
           targetDate?: string | null
           title: string
           updatedAt?: string | null
@@ -436,12 +578,55 @@ export type Database = {
           id?: string
           notes?: string | null
           status?: string
+          student_id?: string | null
           targetDate?: string | null
           title?: string
           updatedAt?: string | null
           userId?: string
         }
         Relationships: []
+      }
+      iep_action_drafts: {
+        Row: {
+          analysis_id: string
+          body: string
+          created_at: string | null
+          id: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          analysis_id: string
+          body: string
+          created_at?: string | null
+          id?: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          analysis_id?: string
+          body?: string
+          created_at?: string | null
+          id?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "iep_action_drafts_analysis_id_fkey"
+            columns: ["analysis_id"]
+            isOneToOne: false
+            referencedRelation: "iep_analysis"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "iep_action_drafts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       iep_analyses: {
         Row: {
@@ -499,6 +684,294 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      iep_analysis: {
+        Row: {
+          created_at: string | null
+          doc_id: string
+          flags: Json
+          id: string
+          kind: string
+          model: string
+          recommendations: Json
+          scores: Json
+          summary: Json
+          user_id: string
+          version: number
+        }
+        Insert: {
+          created_at?: string | null
+          doc_id: string
+          flags: Json
+          id?: string
+          kind: string
+          model: string
+          recommendations: Json
+          scores: Json
+          summary: Json
+          user_id: string
+          version?: number
+        }
+        Update: {
+          created_at?: string | null
+          doc_id?: string
+          flags?: Json
+          id?: string
+          kind?: string
+          model?: string
+          recommendations?: Json
+          scores?: Json
+          summary?: Json
+          user_id?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "iep_analysis_doc_id_fkey"
+            columns: ["doc_id"]
+            isOneToOne: false
+            referencedRelation: "iep_documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "iep_analysis_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      iep_documents: {
+        Row: {
+          id: string
+          pages: number | null
+          storage_path: string
+          student_id: string | null
+          title: string | null
+          uploaded_at: string | null
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          pages?: number | null
+          storage_path: string
+          student_id?: string | null
+          title?: string | null
+          uploaded_at?: string | null
+          user_id: string
+        }
+        Update: {
+          id?: string
+          pages?: number | null
+          storage_path?: string
+          student_id?: string | null
+          title?: string | null
+          uploaded_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "iep_documents_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "iep_documents_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      iep_text_chunks: {
+        Row: {
+          content: string
+          created_at: string | null
+          doc_id: string
+          id: string
+          idx: number
+          tokens: number | null
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          doc_id: string
+          id?: string
+          idx: number
+          tokens?: number | null
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          doc_id?: string
+          id?: string
+          idx?: number
+          tokens?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "iep_text_chunks_doc_id_fkey"
+            columns: ["doc_id"]
+            isOneToOne: false
+            referencedRelation: "iep_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      intro_calls: {
+        Row: {
+          channel: string | null
+          created_at: string
+          created_by: string
+          id: string
+          link: string | null
+          proposal_id: string
+          status: string
+          when_ts: string | null
+        }
+        Insert: {
+          channel?: string | null
+          created_at?: string
+          created_by: string
+          id?: string
+          link?: string | null
+          proposal_id: string
+          status?: string
+          when_ts?: string | null
+        }
+        Update: {
+          channel?: string | null
+          created_at?: string
+          created_by?: string
+          id?: string
+          link?: string | null
+          proposal_id?: string
+          status?: string
+          when_ts?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "intro_calls_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "intro_calls_proposal_id_fkey"
+            columns: ["proposal_id"]
+            isOneToOne: false
+            referencedRelation: "match_proposals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      match_events: {
+        Row: {
+          actor_id: string
+          created_at: string
+          event_type: string
+          id: string
+          note: string | null
+          proposal_id: string
+        }
+        Insert: {
+          actor_id: string
+          created_at?: string
+          event_type: string
+          id?: string
+          note?: string | null
+          proposal_id: string
+        }
+        Update: {
+          actor_id?: string
+          created_at?: string
+          event_type?: string
+          id?: string
+          note?: string | null
+          proposal_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "match_events_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_events_proposal_id_fkey"
+            columns: ["proposal_id"]
+            isOneToOne: false
+            referencedRelation: "match_proposals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      match_proposals: {
+        Row: {
+          acted_at: string | null
+          advocate_id: string
+          created_at: string
+          id: string
+          meeting_link: string | null
+          parent_id: string
+          reason: Json | null
+          score: number | null
+          status: string
+          student_id: string
+        }
+        Insert: {
+          acted_at?: string | null
+          advocate_id: string
+          created_at?: string
+          id?: string
+          meeting_link?: string | null
+          parent_id: string
+          reason?: Json | null
+          score?: number | null
+          status?: string
+          student_id: string
+        }
+        Update: {
+          acted_at?: string | null
+          advocate_id?: string
+          created_at?: string
+          id?: string
+          meeting_link?: string | null
+          parent_id?: string
+          reason?: Json | null
+          score?: number | null
+          status?: string
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "match_proposals_advocate_id_fkey"
+            columns: ["advocate_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_proposals_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_proposals_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       meetings: {
         Row: {
@@ -631,10 +1104,34 @@ export type Database = {
         }
         Relationships: []
       }
+      messages: {
+        Row: {
+          created_at: string | null
+          id: string
+          message: string
+          receiver_id: string
+          sender_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          message: string
+          receiver_id: string
+          sender_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          message?: string
+          receiver_id?: string
+          sender_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string | null
-          email: string
+          email: string | null
           first_name: string | null
           id: string
           last_name: string | null
@@ -643,7 +1140,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
-          email: string
+          email?: string | null
           first_name?: string | null
           id?: string
           last_name?: string | null
@@ -652,14 +1149,29 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
-          email?: string
+          email?: string | null
           first_name?: string | null
           id?: string
           last_name?: string | null
           role?: string | null
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "user_roles_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "v_users"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       reminder_emails: {
         Row: {
@@ -731,24 +1243,45 @@ export type Database = {
       }
       shared_answers: {
         Row: {
+          created_at: string | null
           default_value: string | null
           is_required: boolean | null
           name: string | null
+          shared_by: string | null
           type: string | null
         }
         Insert: {
+          created_at?: string | null
           default_value?: string | null
           is_required?: boolean | null
           name?: string | null
+          shared_by?: string | null
           type?: string | null
         }
         Update: {
+          created_at?: string | null
           default_value?: string | null
           is_required?: boolean | null
           name?: string | null
+          shared_by?: string | null
           type?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "shared_answers_shared_by_fkey"
+            columns: ["shared_by"]
+            isOneToOne: false
+            referencedRelation: "user_roles_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shared_answers_shared_by_fkey"
+            columns: ["shared_by"]
+            isOneToOne: false
+            referencedRelation: "v_users"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       smart_uploads: {
         Row: {
@@ -776,6 +1309,64 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      students: {
+        Row: {
+          created_at: string | null
+          first_name: string
+          grade_level: string | null
+          id: string
+          last_name: string
+          owner_id: string
+          parent_id: string
+          school_district: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          first_name: string
+          grade_level?: string | null
+          id?: string
+          last_name: string
+          owner_id: string
+          parent_id: string
+          school_district?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          first_name?: string
+          grade_level?: string | null
+          id?: string
+          last_name?: string
+          owner_id?: string
+          parent_id?: string
+          school_district?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "students_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "students_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "user_roles_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "students_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "v_users"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       subscriptions: {
         Row: {
@@ -849,6 +1440,13 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "user_roles_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tool_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "v_users"
             referencedColumns: ["id"]
           },
         ]
@@ -974,6 +1572,13 @@ export type Database = {
             referencedRelation: "user_roles_view"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "user_profiles_auth_id_fkey"
+            columns: ["auth_id"]
+            isOneToOne: true
+            referencedRelation: "v_users"
+            referencedColumns: ["id"]
+          },
         ]
       }
     }
@@ -1008,6 +1613,19 @@ export type Database = {
         }
         Relationships: []
       }
+      v_users: {
+        Row: {
+          auth_created_at: string | null
+          email: string | null
+          first_name: string | null
+          id: string | null
+          last_name: string | null
+          profile_created_at: string | null
+          profile_updated_at: string | null
+          role: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       auto_assign_advocate_to_review: {
@@ -1021,46 +1639,46 @@ export type Database = {
       get_ai_review_with_advocate: {
         Args: { review_id: string }
         Returns: {
-          review_data: Json
           advocate_info: Json
           assignment_info: Json
+          review_data: Json
         }[]
       }
       get_assigned_parents: {
         Args: { advocate_uuid: string }
         Returns: {
-          parent_id: string
-          full_name: string
-          email: string
           assigned_at: string
           assignment_status: string
-          total_documents: number
-          total_preps: number
-          total_letters: number
-          upcoming_meetings: number
+          email: string
+          full_name: string
           last_activity: string
+          parent_id: string
+          total_documents: number
+          total_letters: number
+          total_preps: number
+          upcoming_meetings: number
         }[]
       }
       get_parent_case_data: {
         Args: { advocate_uuid: string; parent_uuid: string }
         Returns: {
-          parent_info: Json
-          documents: Json
-          meeting_preps: Json
-          letters: Json
-          meetings: Json
           advocate_notes: Json
+          documents: Json
+          letters: Json
+          meeting_preps: Json
+          meetings: Json
+          parent_info: Json
         }[]
       }
       get_pending_reminders: {
         Args: Record<PropertyKey, never>
         Returns: {
-          reminder_id: string
-          user_id: string
-          title: string
-          meeting_date: string
           days_until: number
+          meeting_date: string
+          reminder_id: string
           reminder_type: string
+          title: string
+          user_id: string
         }[]
       }
       halfvec_avg: {
@@ -1096,7 +1714,15 @@ export type Database = {
         Returns: unknown
       }
       is_admin: {
-        Args: { user_email: string }
+        Args: { uid: string } | { user_email: string }
+        Returns: boolean
+      }
+      is_advocate: {
+        Args: { uid: string }
+        Returns: boolean
+      }
+      is_parent_of: {
+        Args: { student: string; uid: string }
         Returns: boolean
       }
       ivfflat_bit_support: {
@@ -1130,6 +1756,10 @@ export type Database = {
       sparsevec_typmod_in: {
         Args: { "": unknown[] }
         Returns: number
+      }
+      uid_txt: {
+        Args: Record<PropertyKey, never>
+        Returns: string
       }
       vector_avg: {
         Args: { "": number[] }
